@@ -29,51 +29,55 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
     try {
       setError("");
       setIsScanning(true);
+      console.log("Starting camera...");
       
-      // Try environment camera first, fallback to user camera
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: "environment", // Use back camera
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-      } catch (envError) {
-        console.log("Environment camera not available, trying user camera");
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: "user", // Use front camera
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-      }
+      // Try simpler constraints first
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      });
       
+      console.log("Got media stream:", stream);
       streamRef.current = stream;
       setHasPermission(true);
       
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        console.log("Setting video source...");
+        const video = videoRef.current;
+        video.srcObject = stream;
         
-        // Wait for video to be ready before starting scanning
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().then(() => {
-              console.log("Video started playing");
-              // Start QR code scanning after video is playing
-              setTimeout(() => startQRScanning(), 500);
-            }).catch((err) => {
+        // Try immediate play
+        try {
+          await video.play();
+          console.log("Video playing immediately");
+          setTimeout(() => startQRScanning(), 1000);
+        } catch (playError) {
+          console.log("Immediate play failed, waiting for metadata");
+          // Fallback to metadata loading
+          video.onloadedmetadata = async () => {
+            console.log("Video metadata loaded");
+            try {
+              await video.play();
+              console.log("Video started playing after metadata");
+              setTimeout(() => startQRScanning(), 1000);
+            } catch (err) {
               console.error("Video play error:", err);
-            });
-          }
+              setError("비디오 재생에 실패했습니다: " + err.message);
+            }
+          };
+        }
+        
+        video.onerror = (e) => {
+          console.error("Video error:", e);
+          setError("비디오 로드 오류가 발생했습니다.");
         };
       }
     } catch (err) {
       console.error("Camera access error:", err);
       setHasPermission(false);
-      setError("카메라에 접근할 수 없습니다. 권한을 확인해주세요.");
+      setError(`카메라에 접근할 수 없습니다: ${err.message}`);
       setIsScanning(false);
     }
   };
@@ -166,14 +170,24 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
 
         {hasPermission === true && (
           <div className="space-y-4">
-            <div className="relative bg-black rounded-lg overflow-hidden aspect-square">
+            <div className="relative bg-gray-800 rounded-lg overflow-hidden" style={{ minHeight: '300px' }}>
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                width="100%"
+                height="300"
                 playsInline
                 muted
                 autoPlay
-                style={{ transform: 'scaleX(-1)' }}
+                style={{ 
+                  objectFit: 'cover',
+                  width: '100%',
+                  height: '100%',
+                  display: 'block'
+                }}
+                onCanPlay={() => console.log("Video can play")}
+                onPlaying={() => console.log("Video is playing")}
+                onLoadStart={() => console.log("Video load start")}
+                onError={(e) => console.error("Video element error:", e)}
               />
               
               {/* Scanning overlay */}
