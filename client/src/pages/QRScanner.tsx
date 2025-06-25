@@ -5,12 +5,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useEquipment } from "@/hooks/useEquipment";
 import CameraScanner from "@/components/CameraScanner";
+import TestCamera from "@/components/TestCamera";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { Search, Camera, ChevronRight } from "lucide-react";
 
 export default function QRScanner() {
   const [, setLocation] = useLocation();
   const [showScanner, setShowScanner] = useState(false);
+  const [showTestCamera, setShowTestCamera] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { data: equipment, isLoading } = useEquipment();
 
@@ -59,17 +61,30 @@ export default function QRScanner() {
           onScan={handleQRScan}
           onClose={() => setShowScanner(false)}
         />
+      ) : showTestCamera ? (
+        <TestCamera 
+          onClose={() => setShowTestCamera(false)}
+        />
       ) : (
         <div className="bg-gray-100 rounded-lg p-8 mb-6 text-center">
           <Camera size={64} className="text-primary mx-auto mb-4" />
           <p className="text-gray-600 mb-4">카메라로 QR 코드를 스캔하세요</p>
-          <Button 
-            onClick={() => setShowScanner(true)}
-            className="bg-primary hover:bg-primary/90 text-white font-medium material-shadow"
-          >
-            <Camera className="mr-2 h-4 w-4" />
-            QR 스캔 시작
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={() => setShowScanner(true)}
+              className="bg-primary hover:bg-primary/90 text-white font-medium material-shadow w-full"
+            >
+              <Camera className="mr-2 h-4 w-4" />
+              QR 스캔 시작
+            </Button>
+            <Button 
+              onClick={() => setShowTestCamera(true)}
+              variant="outline"
+              className="w-full"
+            >
+              카메라 테스트
+            </Button>
+          </div>
         </div>
       )}
       

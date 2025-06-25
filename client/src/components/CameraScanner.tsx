@@ -42,9 +42,24 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
       setHasPermission(true);
       
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
-        console.log("Video element started");
+        const video = videoRef.current;
+        video.srcObject = mediaStream;
+        
+        // Force video to be visible and playing
+        video.style.display = 'block';
+        video.style.visibility = 'visible';
+        video.style.opacity = '1';
+        
+        video.addEventListener('loadedmetadata', () => {
+          console.log("Video dimensions:", video.videoWidth, video.videoHeight);
+          video.play().then(() => {
+            console.log("Video playing successfully");
+          }).catch(err => {
+            console.error("Play error:", err);
+          });
+        });
+        
+        console.log("Video element configured");
       }
       
     } catch (err) {
@@ -103,12 +118,17 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
                     autoPlay
                     playsInline
                     muted
+                    controls={false}
                     style={{
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
                       borderRadius: '4px',
-                      backgroundColor: '#000'
+                      backgroundColor: '#000',
+                      display: 'block',
+                      visibility: 'visible',
+                      opacity: 1,
+                      border: '2px solid red' // Debug border
                     }}
                   />
                   <canvas
