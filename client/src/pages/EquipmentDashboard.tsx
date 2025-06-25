@@ -147,6 +147,13 @@ export default function EquipmentDashboard() {
                   src={equipment.imageUrl} 
                   alt={equipment.name}
                   className="w-24 h-24 object-cover rounded-lg border-2 border-white/20"
+                  onError={(e) => {
+                    console.error('Image failed to load:', equipment.imageUrl);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('Image loaded successfully:', equipment.imageUrl);
+                  }}
                 />
               </div>
             )}
@@ -213,6 +220,13 @@ export default function EquipmentDashboard() {
                   src={equipment.imageUrl} 
                   alt={equipment.name}
                   className="w-full h-48 object-cover rounded-lg border"
+                  onError={(e) => {
+                    console.error('Details image failed to load:', equipment.imageUrl);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('Details image loaded successfully:', equipment.imageUrl);
+                  }}
                 />
               </div>
             )}
