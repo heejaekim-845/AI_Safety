@@ -42,23 +42,7 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
       setHasPermission(true);
       
       if (videoRef.current) {
-        const video = videoRef.current;
-        video.srcObject = mediaStream;
-        
-        // Force video to be visible and playing
-        video.style.display = 'block';
-        video.style.visibility = 'visible';
-        video.style.opacity = '1';
-        
-        video.addEventListener('loadedmetadata', () => {
-          console.log("Video dimensions:", video.videoWidth, video.videoHeight);
-          video.play().then(() => {
-            console.log("Video playing successfully");
-          }).catch(err => {
-            console.error("Play error:", err);
-          });
-        });
-        
+        videoRef.current.srcObject = mediaStream;
         console.log("Video element configured");
       }
       
@@ -111,41 +95,27 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
 
           {hasPermission === true && (
             <div className="space-y-4">
-              <div className="bg-black rounded-lg p-4">
-                <div className="relative" style={{ width: '100%', height: '240px' }}>
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    controls={false}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                      backgroundColor: '#000',
-                      display: 'block',
-                      visibility: 'visible',
-                      opacity: 1,
-                      border: '2px solid red' // Debug border
-                    }}
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    style={{ display: 'none' }}
-                    width="640"
-                    height="480"
-                  />
-                  
-                  {/* Scanner overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 border-2 border-white border-dashed rounded animate-pulse">
-                      <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-blue-400"></div>
-                      <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-blue-400"></div>
-                      <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-blue-400"></div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-blue-400"></div>
-                    </div>
+              <div className="relative" style={{ width: '100%', height: '300px', backgroundColor: 'black' }}>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  width="100%"
+                  height="100%"
+                  style={{ 
+                    objectFit: 'cover',
+                    backgroundColor: 'black'
+                  }}
+                />
+                
+                {/* Scanner overlay */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-32 h-32 border-2 border-white border-dashed rounded animate-pulse">
+                    <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-blue-400"></div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-blue-400"></div>
+                    <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-blue-400"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-blue-400"></div>
                   </div>
                 </div>
               </div>
@@ -159,10 +129,17 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
                 </Button>
               </div>
               
-              <div className="text-center text-sm text-gray-600">
+              <div className="text-center text-sm text-gray-600 mt-4">
                 <p>QR 코드를 화면에 맞춰주세요</p>
                 <p className="mt-1 font-mono">테스트: COMP-A-101</p>
               </div>
+              
+              <canvas
+                ref={canvasRef}
+                style={{ display: 'none' }}
+                width="640"
+                height="480"
+              />
             </div>
           )}
         </div>
