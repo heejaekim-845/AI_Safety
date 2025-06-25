@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useEquipment } from "@/hooks/useEquipment";
-import SimpleQRScanner from "@/components/SimpleQRScanner";
+import CameraScanner from "@/components/CameraScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { Search, Camera, ChevronRight } from "lucide-react";
 
@@ -55,7 +55,7 @@ export default function QRScanner() {
       
       {/* QR Scanner Interface */}
       {showScanner ? (
-        <SimpleQRScanner 
+        <CameraScanner 
           onScan={handleQRScan}
           onClose={() => setShowScanner(false)}
         />

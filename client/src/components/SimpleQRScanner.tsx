@@ -33,20 +33,37 @@ export default function SimpleQRScanner({ onScan, onClose }: SimpleQRScannerProp
       setError("");
       setIsScanning(true);
       
+      console.log("Requesting camera access...");
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
+        video: {
+          width: 640,
+          height: 480,
+          facingMode: 'environment'
+        }
       });
       
+      console.log("Camera stream obtained:", stream);
       setHasPermission(true);
       
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        const video = videoRef.current;
+        console.log("Setting video source...");
+        
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          console.log("Video metadata loaded");
+          video.play().then(() => {
+            console.log("Video playing successfully");
+          }).catch(err => {
+            console.error("Play failed:", err);
+            setError("비디오 재생 실패: " + err.message);
+          });
+        };
       }
     } catch (err) {
       console.error("Camera error:", err);
       setHasPermission(false);
-      setError("카메라 접근이 거부되었습니다.");
+      setError("카메라 접근이 거부되었습니다: " + err.message);
       setIsScanning(false);
     }
   };
@@ -93,17 +110,22 @@ export default function SimpleQRScanner({ onScan, onClose }: SimpleQRScannerProp
 
           {hasPermission === true && (
             <div className="space-y-4">
-              <div className="relative bg-black rounded-lg" style={{ height: '300px' }}>
+              <div className="relative bg-gray-900 border-2 border-gray-300 rounded-lg p-2" style={{ height: '320px' }}>
                 <video
                   ref={videoRef}
+                  width="100%"
+                  height="100%"
                   autoPlay
                   playsInline
                   muted
+                  controls={false}
                   style={{
+                    display: 'block',
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    borderRadius: '8px'
+                    backgroundColor: '#111827',
+                    borderRadius: '4px'
                   }}
                 />
                 
