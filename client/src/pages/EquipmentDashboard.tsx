@@ -176,6 +176,49 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
+        {/* Hazardous Chemicals Information */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <AlertTriangle className="mr-2 h-5 w-5" />
+              유해화학물질 정보
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {equipment.hazardousChemicalType || equipment.hazardousChemicalName ? (
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">화학물질 유형:</span>
+                  <span className="font-medium">{equipment.hazardousChemicalType || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">화학물질명:</span>
+                  <span className="font-medium">{equipment.hazardousChemicalName || 'N/A'}</span>
+                </div>
+                {equipment.riskManagementZone && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">위험관리구역:</span>
+                    <span className="font-medium">{equipment.riskManagementZone}</span>
+                  </div>
+                )}
+                <div className="p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+                  <p className="text-sm text-orange-800">
+                    ⚠️ 유해화학물질 취급 시 반드시 안전수칙을 준수하세요
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                  <p className="text-sm text-green-800">
+                    ✓ 해당 없음 - 유해화학물질이 사용되지 않는 설비입니다
+                  </p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Equipment Risk Information */}
         <div className="grid grid-cols-2 gap-4">
           {equipment.highTemperatureRisk && (
