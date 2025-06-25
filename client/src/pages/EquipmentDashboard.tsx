@@ -3,10 +3,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useEquipment } from "@/hooks/useEquipment";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
+import nitrogenMsdsImage from "@assets/nitrogen_1_1750834174079.png";
 import { 
   ArrowLeft, 
   Shield, 
@@ -17,7 +19,8 @@ import {
   Pause,
   Square,
   Equal,
-  Settings
+  Settings,
+  FileText
 } from "lucide-react";
 import type { Incident } from "@shared/schema";
 
@@ -268,9 +271,41 @@ export default function EquipmentDashboard() {
                   <span className="text-gray-600">화학물질 유형:</span>
                   <span className="font-medium">{equipment.hazardousChemicalType || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">화학물질명:</span>
-                  <span className="font-medium">{equipment.hazardousChemicalName || 'N/A'}</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">화학물질명:</span>
+                    <span className="font-medium">{equipment.hazardousChemicalName || 'N/A'}</span>
+                  </div>
+                  {equipment.hazardousChemicalName === "질소가스" && (
+                    <div className="flex justify-center">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            MSDS 정보보기
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="text-lg font-bold">
+                              질소가스 MSDS (Material Safety Data Sheet)
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="mt-4">
+                            <img 
+                              src={nitrogenMsdsImage} 
+                              alt="질소가스 MSDS 정보" 
+                              className="w-full h-auto border rounded-lg shadow-sm"
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  )}
                 </div>
                 {equipment.riskManagementZone && (
                   <div className="flex justify-between">
