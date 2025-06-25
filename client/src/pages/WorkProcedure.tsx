@@ -30,6 +30,9 @@ export default function WorkProcedureComponent() {
   
   const [specialNotes, setSpecialNotes] = useState("");
   const [showRiskDialog, setShowRiskDialog] = useState(false);
+  const [showAiAnalysis, setShowAiAnalysis] = useState(false);
+  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
+  const [currentStepForAnalysis, setCurrentStepForAnalysis] = useState<any>(null);
   const [riskReport, setRiskReport] = useState({
     description: "",
     severity: "MEDIUM" as "HIGH" | "MEDIUM" | "LOW",
@@ -73,6 +76,25 @@ export default function WorkProcedureComponent() {
     }
   });
 
+  const analyzeStepNoteMutation = useMutation({
+    mutationFn: async (data: { stepNote: string; stepInfo: any; equipmentId: number }) => {
+      const response = await apiRequest("POST", "/api/ai/analyze-step-note", data);
+      return response.json();
+    },
+    onSuccess: (result) => {
+      setAiAnalysisResult(result);
+      setShowAiAnalysis(true);
+    },
+    onError: (error) => {
+      console.error("특이사항 분석 오류:", error);
+      toast({
+        title: "분석 오류",
+        description: "특이사항 분석 중 오류가 발생했습니다.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleStepComplete = (stepNumber: number) => {
     if (!session) return;
     
@@ -92,6 +114,20 @@ export default function WorkProcedureComponent() {
 
     updateSessionMutation.mutate(updateData);
     setSpecialNotes("");
+  };
+
+  const handleAnalyzeStepNote = (step: WorkProcedure) => {
+    if (!specialNotes.trim() || !session) return;
+    
+    setCurrentStepForAnalysis(step);
+    analyzeStepNoteMutation.mutate({
+      stepNote: specialNotes,
+      stepInfo: {
+        title: step.title,
+        description: step.description
+      },
+      equipmentId: session.equipmentId
+    });
   };
 
   const handleRiskReport = () => {
@@ -215,18 +251,29 @@ export default function WorkProcedureComponent() {
                     onChange={(e) => setSpecialNotes(e.target.value)}
                     placeholder="이상 상황이나 주의사항을 입력하세요..."
                     rows={3}
-                    className="w-full"
+                    className="w-full mb-3"
                   />
+                  
+                  <div className="flex gap-2">
+                    {specialNotes.trim() && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => handleAnalyzeStepNote(currentProcedure)}
+                        disabled={analyzeStepNoteMutation.isPending}
+                        className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                      >
+                        {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => handleStepComplete(currentProcedure.stepNumber)}
+                      disabled={updateSessionMutation.isPending}
+                      className="flex-1 bg-primary hover:bg-primary/90"
+                    >
+                      {currentProcedure.stepNumber === totalSteps ? "작업 완료" : "다음 단계"}
+                    </Button>
+                  </div>
                 </div>
-
-                {/* Complete Step Button */}
-                <Button
-                  onClick={() => handleStepComplete(currentProcedure.stepNumber)}
-                  disabled={updateSessionMutation.isPending}
-                  className="w-full mt-4 bg-primary hover:bg-primary/90"
-                >
-                  {currentProcedure.stepNumber === totalSteps ? "작업 완료" : "다음 단계"}
-                </Button>
               </div>
             </div>
           </CardContent>
@@ -356,6 +403,127 @@ export default function WorkProcedureComponent() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Analysis Results Dialog */}
+      <Dialog open={showAiAnalysis} onOpenChange={setShowAiAnalysis}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              AI 안전 분석 결과
+              {aiAnalysisResult && (
+                <Badge 
+                  variant={aiAnalysisResult.riskLevel === "HIGH" ? "destructive" : 
+                           aiAnalysisResult.riskLevel === "MEDIUM" ? "default" : "secondary"}
+                  className={
+                    aiAnalysisResult.riskLevel === "HIGH" ? "bg-red-100 text-red-800" :
+                    aiAnalysisResult.riskLevel === "MEDIUM" ? "bg-yellow-100 text-yellow-800" : 
+                    "bg-green-100 text-green-800"
+                  }
+                >
+                  {aiAnalysisResult.riskLevel === "HIGH" ? "고위험" : 
+                   aiAnalysisResult.riskLevel === "MEDIUM" ? "중위험" : "저위험"}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {aiAnalysisResult && (
+            <div className="space-y-6">
+              {/* Analysis Context */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">분석 대상</h4>
+                <p className="text-sm text-blue-800 mb-1">
+                  <strong>작업 단계:</strong> {currentStepForAnalysis?.title}
+                </p>
+                <p className="text-sm text-blue-800">
+                  <strong>특이사항:</strong> "{specialNotes}"
+                </p>
+              </div>
+
+              {/* Safety Recommendations */}
+              {aiAnalysisResult.recommendations?.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                    안전 권고사항
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiAnalysisResult.recommendations.map((rec: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2 text-sm">
+                        <ChevronRight className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Immediate Actions */}
+              {aiAnalysisResult.immediateActions?.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    즉시 조치사항
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiAnalysisResult.immediateActions.map((action: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2 text-sm bg-red-50 border border-red-200 rounded p-2">
+                        <ChevronRight className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-red-800">{action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Preventive Measures */}
+              {aiAnalysisResult.preventiveMeasures?.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    예방 조치사항
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiAnalysisResult.preventiveMeasures.map((measure: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2 text-sm">
+                        <ChevronRight className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span>{measure}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  className="flex-1" 
+                  onClick={() => setShowAiAnalysis(false)}
+                >
+                  확인
+                </Button>
+                {aiAnalysisResult.riskLevel === "HIGH" && (
+                  <Button 
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white" 
+                    onClick={() => {
+                      setShowAiAnalysis(false);
+                      setShowRiskDialog(true);
+                      setRiskReport(prev => ({
+                        ...prev,
+                        description: `AI 분석 결과 고위험 상황 감지: ${specialNotes}`,
+                        severity: "HIGH"
+                      }));
+                    }}
+                  >
+                    위험 보고 등록
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

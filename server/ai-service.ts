@@ -179,6 +179,83 @@ export class AIService {
     }
   }
 
+  async analyzeStepNote(stepNote: string, stepInfo: any, equipmentInfo: any): Promise<{
+    recommendations: string[];
+    riskLevel: "HIGH" | "MEDIUM" | "LOW";
+    immediateActions: string[];
+    preventiveMeasures: string[];
+  }> {
+    try {
+      const prompt = `작업자가 입력한 특이사항을 분석하여 안전 조치사항을 제공해주세요.
+
+작업 단계: ${stepInfo.title}
+작업 설명: ${stepInfo.description}
+설비 정보: ${equipmentInfo.name} (위험도: ${equipmentInfo.riskLevel})
+작업자 특이사항: "${stepNote}"
+
+위 특이사항을 분석하여 다음 형식으로 안전 조치사항을 제공해주세요:
+{
+  "riskLevel": "HIGH|MEDIUM|LOW",
+  "recommendations": ["조치사항1", "조치사항2"],
+  "immediateActions": ["즉시 수행할 작업1", "즉시 수행할 작업2"],
+  "preventiveMeasures": ["예방 조치1", "예방 조치2"]
+}`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "당신은 산업 안전 전문가입니다. 작업자의 특이사항을 분석하여 적절한 안전 조치사항을 JSON 형식으로 제공합니다."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || "{}");
+      
+      return {
+        riskLevel: result.riskLevel || "MEDIUM",
+        recommendations: result.recommendations || [],
+        immediateActions: result.immediateActions || [],
+        preventiveMeasures: result.preventiveMeasures || []
+      };
+    } catch (error) {
+      console.error("작업 특이사항 분석 오류:", error);
+      
+      // Provide fallback analysis based on keywords
+      const isHighRisk = stepNote.toLowerCase().includes('문제') || 
+                        stepNote.toLowerCase().includes('고장') || 
+                        stepNote.toLowerCase().includes('위험') ||
+                        stepNote.toLowerCase().includes('이상') ||
+                        stepNote.toLowerCase().includes('누수') ||
+                        stepNote.toLowerCase().includes('소음');
+      
+      return {
+        riskLevel: isHighRisk ? "HIGH" : "MEDIUM",
+        recommendations: [
+          "작업을 일시 중단하고 상급자에게 보고하세요",
+          "안전 장비 착용 상태를 재확인하세요",
+          "주변 작업자에게 상황을 알리세요"
+        ],
+        immediateActions: [
+          "현재 작업 중단",
+          "안전 구역으로 이동",
+          "상급자 연락"
+        ],
+        preventiveMeasures: [
+          "정기 점검 주기 단축 검토",
+          "작업 절차 재검토",
+          "추가 안전 교육 실시"
+        ]
+      };
+    }
+  }
+
   private formatRisks(equipmentInfo: any): string {
     const risks = [];
     if (equipmentInfo.highVoltageRisk) risks.push("고전압");

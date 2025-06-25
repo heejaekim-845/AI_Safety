@@ -267,6 +267,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/ai/analyze-step-note", async (req, res) => {
+    try {
+      const { stepNote, stepInfo, equipmentId } = req.body;
+      
+      if (!stepNote || !stepNote.trim()) {
+        return res.status(400).json({ message: "특이사항 내용이 필요합니다." });
+      }
+
+      const equipment = await storage.getEquipmentById(equipmentId);
+      if (!equipment) {
+        return res.status(404).json({ message: "설비를 찾을 수 없습니다." });
+      }
+
+      const analysis = await aiService.analyzeStepNote(stepNote, stepInfo, equipment);
+      res.json(analysis);
+    } catch (error) {
+      console.error("특이사항 분석 오류:", error);
+      res.status(500).json({ message: "특이사항 분석을 수행할 수 없습니다." });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
