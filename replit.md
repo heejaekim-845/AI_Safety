@@ -116,6 +116,7 @@ Changelog:
 - June 25, 2025. Added comprehensive equipment information fields: manufacturer, model name, installation year, specifications
 - June 25, 2025. Added Hazardous Chemicals section to equipment dashboard with not applicable status
 - June 25, 2025. Enhanced AI voice guidance to provide comprehensive coverage of all dashboard content including equipment details, hazardous chemicals, risk assessments, safety procedures, and emergency contacts
+- June 25, 2025. Added "Major Risk Factors" section title to organize high temperature, high pressure, electrical, and other equipment risk information
 ```
 
 ## User Preferences
