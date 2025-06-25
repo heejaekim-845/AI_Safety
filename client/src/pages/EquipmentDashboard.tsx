@@ -14,6 +14,8 @@ import {
   History, 
   Phone, 
   Play,
+  Pause,
+  Square,
   Equal,
   Settings
 } from "lucide-react";
@@ -23,6 +25,8 @@ export default function EquipmentDashboard() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const [isPlayingGuide, setIsPlayingGuide] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
   
   const equipmentId = parseInt(id || "0");
   
@@ -44,11 +48,47 @@ export default function EquipmentDashboard() {
 
   const handlePlayVoiceGuide = () => {
     if (voiceGuide?.guide && 'speechSynthesis' in window) {
+      if (isPaused && currentUtterance) {
+        // Resume paused audio
+        speechSynthesis.resume();
+        setIsPaused(false);
+        return;
+      }
+      
+      // Start new playback
       setIsPlayingGuide(true);
+      setIsPaused(false);
       const utterance = new SpeechSynthesisUtterance(voiceGuide.guide);
       utterance.lang = 'ko-KR';
-      utterance.onend = () => setIsPlayingGuide(false);
+      utterance.rate = 0.9; // Slightly slower for better comprehension
+      utterance.onend = () => {
+        setIsPlayingGuide(false);
+        setIsPaused(false);
+        setCurrentUtterance(null);
+      };
+      utterance.onerror = () => {
+        setIsPlayingGuide(false);
+        setIsPaused(false);
+        setCurrentUtterance(null);
+      };
+      setCurrentUtterance(utterance);
       speechSynthesis.speak(utterance);
+    }
+  };
+
+  const handlePauseVoiceGuide = () => {
+    if ('speechSynthesis' in window && isPlayingGuide) {
+      speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const handleStopVoiceGuide = () => {
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      setIsPlayingGuide(false);
+      setIsPaused(false);
+      setCurrentUtterance(null);
     }
   };
 
@@ -356,15 +396,68 @@ export default function EquipmentDashboard() {
                 <p className="text-sm text-primary/80 mb-3">
                   현재 설비의 주요 위험 요소와 안전 수칙을 음성으로 안내받을 수 있습니다.
                 </p>
-                <Button 
-                  onClick={handlePlayVoiceGuide}
-                  disabled={isPlayingGuide}
-                  className="bg-primary hover:bg-primary/90 text-white"
-                  size="sm"
-                >
-                  <Play className="mr-1 h-4 w-4" />
-                  {isPlayingGuide ? "재생 중..." : "음성 안내 시작"}
-                </Button>
+                <div className="flex gap-2">
+                  {!isPlayingGuide && !isPaused ? (
+                    <Button 
+                      onClick={handlePlayVoiceGuide}
+                      className="bg-primary hover:bg-primary/90 text-white"
+                      size="sm"
+                    >
+                      <Play className="mr-1 h-4 w-4" />
+                      음성 안내 시작
+                    </Button>
+                  ) : isPaused ? (
+                    <>
+                      <Button 
+                        onClick={handlePlayVoiceGuide}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        size="sm"
+                      >
+                        <Play className="mr-1 h-4 w-4" />
+                        재생
+                      </Button>
+                      <Button 
+                        onClick={handleStopVoiceGuide}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <Square className="mr-1 h-4 w-4" />
+                        정지
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        onClick={handlePauseVoiceGuide}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                        size="sm"
+                      >
+                        <Pause className="mr-1 h-4 w-4" />
+                        일시정지
+                      </Button>
+                      <Button 
+                        onClick={handleStopVoiceGuide}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <Square className="mr-1 h-4 w-4" />
+                        정지
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {isPlayingGuide && !isPaused && (
+                  <div className="mt-2 flex items-center text-xs text-primary/70">
+                    <div className="animate-pulse w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    음성 안내 재생 중...
+                  </div>
+                )}
+                {isPaused && (
+                  <div className="mt-2 flex items-center text-xs text-yellow-600">
+                    <Pause className="w-3 h-3 mr-1" />
+                    일시정지됨
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
