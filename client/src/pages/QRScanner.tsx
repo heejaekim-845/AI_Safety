@@ -55,7 +55,7 @@ export default function QRScanner() {
       
       {/* QR Scanner Interface */}
       {showScanner ? (
-        <QRScannerComponent 
+        <SimpleQRScanner 
           onScan={handleQRScan}
           onClose={() => setShowScanner(false)}
         />
