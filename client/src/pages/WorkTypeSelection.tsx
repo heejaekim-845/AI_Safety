@@ -397,13 +397,11 @@ export default function WorkTypeSelection() {
               </Button>
             </div>
             <div className="p-6 space-y-6">
-              {/* Overall Risk Level */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">전체 위험도</h4>
-                  <p className="text-sm text-gray-600">총점: {riskAssessmentData.totalScore}/20점</p>
-                </div>
-                <RiskLevelBadge level={riskAssessmentData.overallRiskLevel} className="text-lg px-4 py-2" />
+              {/* Risk Assessment Results Count */}
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-center text-gray-700 font-medium">
+                  {riskAssessmentData.riskFactors.length}개의 위험성평가 결과가 도출되었습니다
+                </p>
               </div>
 
               {/* Risk Factors */}
