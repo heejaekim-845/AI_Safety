@@ -80,6 +80,7 @@ export class MemStorage implements IStorage {
       manufacturer: "삼성중공업",
       installYear: 2020,
       specification: "용량: 500L/min, 압력: 15bar",
+      imageUrl: "/attached_assets/air-compressor-solution_1750831656695.jpg",
       modelName: "SC-500-15",
       blueprintInfo: "도면번호: DWG-COMP-A101-2020",
       riskLevel: "YELLOW",

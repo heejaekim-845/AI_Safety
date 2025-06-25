@@ -11,6 +11,7 @@ export const equipment = pgTable("equipment", {
   manufacturer: text("manufacturer"),
   installYear: integer("install_year"),
   specification: text("specification"),
+  imageUrl: text("image_url"),
   modelName: text("model_name"),
   blueprintInfo: text("blueprint_info"),
   riskLevel: text("risk_level").notNull(), // RED, YELLOW, GREEN

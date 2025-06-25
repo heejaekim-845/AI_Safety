@@ -47,6 +47,7 @@ export default function AdminPanel() {
       manufacturer: "",
       installYear: new Date().getFullYear(),
       specification: "",
+      imageUrl: "",
       modelName: "",
       riskLevel: "GREEN",
       highVoltageRisk: false,
@@ -222,6 +223,20 @@ export default function AdminPanel() {
                         <FormLabel>모델명</FormLabel>
                         <FormControl>
                           <Input placeholder="예: SC-500-15" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>설비 사진 URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="설비 사진 URL을 입력하세요" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
