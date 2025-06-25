@@ -14,7 +14,8 @@ import {
   History, 
   Phone, 
   Play,
-  Equal
+  Equal,
+  Settings
 } from "lucide-react";
 import type { Incident } from "@shared/schema";
 
