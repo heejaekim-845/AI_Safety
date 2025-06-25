@@ -181,8 +181,7 @@ export default function WorkTypeSelection() {
         {workTypes?.map((workType) => (
           <Card 
             key={workType.id}
-            className="cursor-pointer hover:bg-gray-50 transition-colors material-shadow"
-            onClick={() => handleWorkTypeSelect(workType)}
+            className="hover:bg-gray-50 transition-colors material-shadow"
           >
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-3">
@@ -196,7 +195,7 @@ export default function WorkTypeSelection() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs mb-4">
                 <div className="flex items-center">
                   {getRequiredLevelIcon(workType)}
                   <span>자격: {workType.requiredQualifications?.[0] || '기본'}</span>
@@ -205,6 +204,27 @@ export default function WorkTypeSelection() {
                   <Clock className="text-sm mr-1 text-warning h-4 w-4" />
                   <span>소요시간: {workType.estimatedDuration || 30}분</span>
                 </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => handleWorkTypeSelect(workType)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <ChevronRight className="w-4 h-4 mr-2" />
+                  작업 시작
+                </Button>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    riskAssessmentMutation.mutate(workType.id);
+                  }}
+                  disabled={riskAssessmentMutation.isPending}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-3"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  {riskAssessmentMutation.isPending ? '분석중...' : 'AI 위험성평가'}
+                </Button>
               </div>
             </CardContent>
           </Card>
