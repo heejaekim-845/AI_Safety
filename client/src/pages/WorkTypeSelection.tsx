@@ -58,10 +58,8 @@ export default function WorkTypeSelection() {
 
   const riskAssessmentMutation = useMutation({
     mutationFn: async (workTypeId: number) => {
-      const response = await apiRequest(`/api/ai/risk-assessment/${workTypeId}`, {
-        method: 'POST'
-      });
-      return response;
+      const response = await apiRequest("POST", `/api/ai/risk-assessment/${workTypeId}`, {});
+      return response.json();
     },
     onSuccess: (data) => {
       setRiskAssessmentData(data);
@@ -387,6 +385,76 @@ export default function WorkTypeSelection() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* AI Risk Assessment Popup */}
+      {showRiskAssessment && riskAssessmentData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">AI 위험성평가 결과 - {riskAssessmentData.workTypeName}</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowRiskAssessment(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Overall Risk Level */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-gray-900">전체 위험도</h4>
+                  <p className="text-sm text-gray-600">총점: {riskAssessmentData.totalScore}/20점</p>
+                </div>
+                <RiskLevelBadge level={riskAssessmentData.overallRiskLevel} className="text-lg px-4 py-2" />
+              </div>
+
+              {/* Risk Factors */}
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">위험요소별 평가</h4>
+                <div className="space-y-4">
+                  {riskAssessmentData.riskFactors.map((risk, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <h5 className="font-medium text-gray-800">{risk.factor}</h5>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600">
+                            발생가능성: {risk.probability}/5 × 심각도: {risk.severity}/4
+                          </div>
+                          <div className="font-bold text-lg">
+                            위험점수: {risk.score}/20점
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h6 className="text-sm font-medium text-gray-700 mb-2">대응조치:</h6>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          {risk.measures.map((measure, idx) => (
+                            <li key={idx} className="flex items-start">
+                              <span className="text-blue-600 mr-2">•</span>
+                              {measure}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Compliance Notes */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="font-medium text-blue-800 mb-2">산업안전보건법 준수사항</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  {riskAssessmentData.complianceNotes.map((note, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      {note}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
