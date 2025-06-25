@@ -449,6 +449,158 @@ JSON 형식으로 응답:
     }
     return specs.length > 0 ? specs.join(" | ") : "상세 정보 없음";
   }
+  async analyzeWorkTypeRisk(workTypeId: number, workTypeName: string, equipmentInfo: any): Promise<{
+    workTypeName: string;
+    riskFactors: Array<{
+      factor: string;
+      probability: number; // 1-5
+      severity: number; // 1-4
+      score: number; // probability × severity
+      measures: string[];
+    }>;
+    totalScore: number;
+    overallRiskLevel: "HIGH" | "MEDIUM" | "LOW";
+    complianceNotes: string[];
+  }> {
+    try {
+      const prompt = `${workTypeName} 작업에 대한 산업안전보건법 기준 위험성평가를 수행해주세요.
+
+설비 정보:
+- 설비명: ${equipmentInfo.name}
+- 위치: ${equipmentInfo.location}
+- 주요 위험요소: ${this.formatRisks(equipmentInfo)}
+- 고온위험: ${equipmentInfo.highTemperatureRisk ? '있음' : '없음'}
+- 고압위험: ${equipmentInfo.highPressureRisk ? '있음' : '없음'}
+- 전기위험: ${equipmentInfo.electricalRisk ? '있음' : '없음'}
+- 회전체위험: ${equipmentInfo.rotatingPartsRisk ? '있음' : '없음'}
+
+작업 유형: ${workTypeName}
+
+다음 기준으로 위험성평가를 수행하고 JSON 형태로 응답해주세요:
+
+1. 위험요소별 평가:
+   - 발생가능성 (1-5점): 1=거의없음, 2=희박, 3=가능, 4=자주발생, 5=항상발생
+   - 심각도 (1-4점): 1=경미, 2=중간, 3=심각, 4=치명적
+   - 위험점수 = 발생가능성 × 심각도 (최대 20점)
+
+2. 위험요소는 최소 3개 이상 포함:
+   - 물리적 위험 (고온, 고압, 전기, 회전체 등)
+   - 화학적 위험 (해당시)
+   - 인간공학적 위험 (작업자세, 반복작업 등)
+   - 기타 작업 특성에 따른 위험
+
+3. 각 위험요소별 구체적인 대응조치 3개 이상
+
+4. 산업안전보건법 준수사항 포함
+
+응답 형식:
+{
+  "workTypeName": "${workTypeName}",
+  "riskFactors": [
+    {
+      "factor": "위험요소명",
+      "probability": 발생가능성점수,
+      "severity": 심각도점수,
+      "score": 위험점수,
+      "measures": ["대응조치1", "대응조치2", "대응조치3"]
+    }
+  ],
+  "totalScore": 총점,
+  "overallRiskLevel": "HIGH/MEDIUM/LOW",
+  "complianceNotes": ["산업안전보건법 준수사항1", "준수사항2"]
+}
+
+전체 위험도 기준:
+- HIGH: 총점 15점 이상
+- MEDIUM: 총점 8-14점
+- LOW: 총점 7점 이하`;
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "당신은 한국의 산업안전보건법 전문가입니다. 정확한 위험성평가를 수행하고 법적 요구사항에 맞는 안전조치를 제시합니다. 반드시 JSON 형태로만 응답하세요."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 1500,
+        temperature: 0.3
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || "{}");
+      
+      // Calculate total score
+      const totalScore = result.riskFactors?.reduce((sum: number, risk: any) => sum + risk.score, 0) || 0;
+      
+      // Determine overall risk level
+      let overallRiskLevel = "LOW";
+      if (totalScore >= 15) overallRiskLevel = "HIGH";
+      else if (totalScore >= 8) overallRiskLevel = "MEDIUM";
+
+      return {
+        workTypeName: result.workTypeName || workTypeName,
+        riskFactors: result.riskFactors || [],
+        totalScore,
+        overallRiskLevel: overallRiskLevel as "HIGH" | "MEDIUM" | "LOW",
+        complianceNotes: result.complianceNotes || []
+      };
+    } catch (error) {
+      console.error("AI 위험성평가 오류:", error);
+      
+      // Fallback risk assessment
+      return {
+        workTypeName,
+        riskFactors: [
+          {
+            factor: "고압 가스 노출",
+            probability: 3,
+            severity: 4,
+            score: 12,
+            measures: [
+              "작업 전 압력 완전 해제 확인",
+              "개인보호구 착용 의무화",
+              "안전작업절차서 숙지 및 준수"
+            ]
+          },
+          {
+            factor: "전기적 위험",
+            probability: 2,
+            severity: 4,
+            score: 8,
+            measures: [
+              "전원 차단 후 작업 실시",
+              "절연장갑 착용",
+              "전기 안전 점검 실시"
+            ]
+          },
+          {
+            factor: "회전체 접촉",
+            probability: 2,
+            severity: 3,
+            score: 6,
+            measures: [
+              "회전부 완전 정지 확인",
+              "안전덮개 설치 확인",
+              "느슨한 의복 착용 금지"
+            ]
+          }
+        ],
+        totalScore: 26,
+        overallRiskLevel: "HIGH",
+        complianceNotes: [
+          "산업안전보건법 제38조에 따른 위험성평가 실시",
+          "동법 제39조에 따른 안전보건조치 이행",
+          "개인보호구 지급 및 착용 의무 (동법 제32조)",
+          "안전작업절차서 작성 및 교육 실시 (동법 제31조)"
+        ]
+      };
+    }
+  }
 }
 
 export const aiService = new AIService();

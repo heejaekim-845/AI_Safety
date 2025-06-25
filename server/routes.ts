@@ -302,6 +302,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI work type risk assessment
+  app.post('/api/ai/risk-assessment/:workTypeId', async (req, res) => {
+    try {
+      const workTypeId = parseInt(req.params.workTypeId);
+      const workType = await storage.getWorkTypeById(workTypeId);
+      
+      if (!workType) {
+        return res.status(404).json({ message: "Work type not found" });
+      }
+
+      const equipment = await storage.getEquipmentById(workType.equipmentId);
+      if (!equipment) {
+        return res.status(404).json({ message: "Equipment not found" });
+      }
+
+      const assessment = await aiService.analyzeWorkTypeRisk(workTypeId, workType.name, equipment);
+      res.json(assessment);
+    } catch (error) {
+      console.error("Work type risk assessment error:", error);
+      res.status(500).json({ message: "Failed to perform risk assessment" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

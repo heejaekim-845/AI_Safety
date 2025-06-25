@@ -9,14 +9,31 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { 
   ArrowLeft, 
   CheckCircle, 
   Clock, 
   AlertTriangleIcon,
-  ChevronRight
+  ChevronRight,
+  X,
+  BarChart3
 } from "lucide-react";
 import type { Incident, WorkType } from "@shared/schema";
+
+interface RiskAssessment {
+  workTypeName: string;
+  riskFactors: Array<{
+    factor: string;
+    probability: number; // 1-5
+    severity: number; // 1-4
+    score: number; // probability × severity
+    measures: string[];
+  }>;
+  totalScore: number;
+  overallRiskLevel: "HIGH" | "MEDIUM" | "LOW";
+  complianceNotes: string[];
+}
 
 export default function WorkTypeSelection() {
   const { equipmentId } = useParams();
@@ -27,6 +44,8 @@ export default function WorkTypeSelection() {
   const [selectedWorkType, setSelectedWorkType] = useState<WorkType | null>(null);
   const [showChecklist, setShowChecklist] = useState(false);
   const [checklistItems, setChecklistItems] = useState<Record<string, boolean>>({});
+  const [showRiskAssessment, setShowRiskAssessment] = useState(false);
+  const [riskAssessmentData, setRiskAssessmentData] = useState<RiskAssessment | null>(null);
   
   const equipmentIdNum = parseInt(equipmentId || "0");
   
@@ -35,6 +54,22 @@ export default function WorkTypeSelection() {
   const { data: incidents } = useQuery({
     queryKey: [`/api/work-types/${selectedWorkType?.id}/incidents`],
     enabled: !!selectedWorkType?.id
+  });
+
+  const riskAssessmentMutation = useMutation({
+    mutationFn: async (workTypeId: number) => {
+      const response = await apiRequest(`/api/ai/risk-assessment/${workTypeId}`, {
+        method: 'POST'
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      setRiskAssessmentData(data);
+      setShowRiskAssessment(true);
+    },
+    onError: (error) => {
+      console.error('Risk assessment error:', error);
+    }
   });
 
   const createSessionMutation = useMutation({
