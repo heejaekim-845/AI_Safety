@@ -120,6 +120,7 @@ Changelog:
 - June 25, 2025. Added equipment image support with air compressor photo for sample equipment (압축기 A-101)
 - June 25, 2025. Implemented MSDS popup dialog for nitrogen gas with safety data sheet image display
 - June 25, 2025. Enhanced QR code scanner with real camera access using ZXing library for actual QR code detection
+- June 25, 2025. Implemented working QR scanner with manual input and quick test options due to browser video rendering limitations
 ```
 
 ## User Preferences
