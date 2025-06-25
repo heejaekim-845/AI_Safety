@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { X, Camera, AlertCircle } from "lucide-react";
+import { BrowserQRCodeReader } from "@zxing/library";
 
 interface QRScannerComponentProps {
   onScan: (code: string) => void;
@@ -14,6 +15,7 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
   const [isScanning, setIsScanning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const codeReaderRef = useRef<BrowserQRCodeReader | null>(null);
 
   useEffect(() => {
     startCamera();
@@ -42,6 +44,9 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
+        
+        // Start QR code scanning
+        startQRScanning();
       }
     } catch (err) {
       console.error("Camera access error:", err);
@@ -51,7 +56,36 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
     }
   };
 
+  const startQRScanning = async () => {
+    if (!videoRef.current) return;
+    
+    try {
+      const codeReader = new BrowserQRCodeReader();
+      codeReaderRef.current = codeReader;
+      
+      // Start continuous scanning
+      await codeReader.decodeFromVideoDevice(undefined, videoRef.current, (result, error) => {
+        if (result) {
+          console.log("QR Code detected:", result.getText());
+          onScan(result.getText());
+          stopCamera();
+        }
+        
+        if (error && !(error.name === 'NotFoundException')) {
+          console.error("QR scanning error:", error);
+        }
+      });
+    } catch (err) {
+      console.error("QR scanner initialization error:", err);
+    }
+  };
+
   const stopCamera = () => {
+    if (codeReaderRef.current) {
+      codeReaderRef.current.reset();
+      codeReaderRef.current = null;
+    }
+    
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -66,10 +100,8 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
     }
   };
 
-  // Simulate QR code scanning for demo purposes
+  // Demo QR code for testing
   const simulateQRScan = () => {
-    // In a real implementation, this would use a QR code scanning library
-    // For now, we'll simulate scanning the sample equipment code
     onScan("COMP-A-101");
   };
 
@@ -143,19 +175,19 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
               
               <div className="space-y-2">
                 <Button 
-                  onClick={simulateQRScan}
-                  className="w-full bg-primary hover:bg-primary/90"
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  샘플 QR 스캔 (데모)
-                </Button>
-                
-                <Button 
                   variant="outline" 
                   onClick={handleManualInput}
                   className="w-full"
                 >
                   수동 코드 입력
+                </Button>
+                
+                <Button 
+                  onClick={simulateQRScan}
+                  variant="ghost"
+                  className="w-full text-sm text-gray-500"
+                >
+                  데모: 샘플 장비 스캔
                 </Button>
               </div>
             </div>
