@@ -30,23 +30,45 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
       setError("");
       setIsScanning(true);
       
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: "environment", // Use back camera
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      });
+      // Try environment camera first, fallback to user camera
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: "environment", // Use back camera
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+      } catch (envError) {
+        console.log("Environment camera not available, trying user camera");
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: "user", // Use front camera
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+      }
       
       streamRef.current = stream;
       setHasPermission(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
         
-        // Start QR code scanning
-        startQRScanning();
+        // Wait for video to be ready before starting scanning
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().then(() => {
+              console.log("Video started playing");
+              // Start QR code scanning after video is playing
+              setTimeout(() => startQRScanning(), 500);
+            }).catch((err) => {
+              console.error("Video play error:", err);
+            });
+          }
+        };
       }
     } catch (err) {
       console.error("Camera access error:", err);
@@ -150,6 +172,8 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
                 className="w-full h-full object-cover"
                 playsInline
                 muted
+                autoPlay
+                style={{ transform: 'scaleX(-1)' }}
               />
               
               {/* Scanning overlay */}
