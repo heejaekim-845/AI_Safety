@@ -186,19 +186,43 @@ export class AIService {
     preventiveMeasures: string[];
   }> {
     try {
-      const prompt = `작업자가 입력한 특이사항을 분석하여 안전 조치사항을 제공해주세요.
+      const equipmentRisks = this.formatRisks(equipmentInfo);
+      const equipmentSpecs = this.formatEquipmentSpecifications(equipmentInfo);
+      
+      const prompt = `산업 안전 전문가로서 작업자가 입력한 특이사항을 종합적으로 분석하여 최적화된 안전 조치사항을 제공해주세요.
 
-작업 단계: ${stepInfo.title}
-작업 설명: ${stepInfo.description}
-설비 정보: ${equipmentInfo.name} (위험도: ${equipmentInfo.riskLevel})
-작업자 특이사항: "${stepNote}"
+【설비 정보 분석】
+- 설비명: ${equipmentInfo.name}
+- 설비 코드: ${equipmentInfo.code}
+- 설치 위치: ${equipmentInfo.location}
+- 제조업체: ${equipmentInfo.manufacturer || "미상"}
+- 모델명: ${equipmentInfo.modelName || "미상"}
+- 설치년도: ${equipmentInfo.installYear || "미상"}
+- 전체 위험도: ${equipmentInfo.riskLevel}
+- 주요 위험 요소: ${equipmentRisks}
+- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "없음"}
+- LOTO 포인트: ${equipmentInfo.lockoutTagoutPoints?.join(", ") || "없음"}
 
-위 특이사항을 분석하여 다음 형식으로 안전 조치사항을 제공해주세요:
+【작업 특성 분석】
+- 작업 단계: ${stepInfo.title}
+- 작업 내용: ${stepInfo.description}
+- 작업 카테고리: ${stepInfo.category || "일반"}
+
+【작업자 특이사항】
+"${stepNote}"
+
+【분석 요구사항】
+1. 설비의 특성과 위험 요소를 고려한 맞춤형 안전 조치
+2. 작업 유형에 특화된 실용적인 권고사항
+3. 특이사항의 심각도에 따른 적절한 대응 수준
+4. 실제 현장에서 즉시 적용 가능한 구체적인 행동 지침
+
+다음 JSON 형식으로 응답해주세요:
 {
   "riskLevel": "HIGH|MEDIUM|LOW",
-  "recommendations": ["조치사항1", "조치사항2"],
-  "immediateActions": ["즉시 수행할 작업1", "즉시 수행할 작업2"],
-  "preventiveMeasures": ["예방 조치1", "예방 조치2"]
+  "recommendations": ["구체적이고 실용적인 안전 조치사항"],
+  "immediateActions": ["즉시 수행해야 할 긴급 작업"],
+  "preventiveMeasures": ["향후 재발 방지를 위한 예방 조치"]
 }`;
 
       const response = await openai.chat.completions.create({
@@ -227,31 +251,53 @@ export class AIService {
     } catch (error) {
       console.error("작업 특이사항 분석 오류:", error);
       
-      // Provide fallback analysis based on keywords
+      // Enhanced fallback analysis based on equipment type and keywords
       const isHighRisk = stepNote.toLowerCase().includes('문제') || 
                         stepNote.toLowerCase().includes('고장') || 
                         stepNote.toLowerCase().includes('위험') ||
                         stepNote.toLowerCase().includes('이상') ||
                         stepNote.toLowerCase().includes('누수') ||
-                        stepNote.toLowerCase().includes('소음');
+                        stepNote.toLowerCase().includes('소음') ||
+                        stepNote.toLowerCase().includes('진동') ||
+                        stepNote.toLowerCase().includes('과열');
+      
+      const equipmentType = equipmentInfo.name?.toLowerCase() || "";
+      const isElectricalEquipment = equipmentType.includes('전기') || equipmentType.includes('모터') || equipmentInfo.highVoltageRisk;
+      const isPressureEquipment = equipmentType.includes('압축') || equipmentType.includes('보일러') || equipmentInfo.highPressureRisk;
+      const isHeightEquipment = equipmentType.includes('크레인') || equipmentType.includes('리프트') || equipmentInfo.heightRisk;
+      
+      // Equipment-specific recommendations
+      let recommendations = [
+        "작업을 일시 중단하고 상급자에게 즉시 보고하세요",
+        "안전 장비 착용 상태를 재확인하세요"
+      ];
+      
+      let immediateActions = ["현재 작업 중단", "안전 구역으로 이동"];
+      let preventiveMeasures = ["정기 점검 주기 단축 검토", "작업 절차 재검토"];
+      
+      if (isElectricalEquipment) {
+        recommendations.push("전원 차단 상태를 확인하고 LOTO 절차를 재검토하세요");
+        immediateActions.push("전기 안전 담당자 호출");
+        preventiveMeasures.push("전기 안전 점검 강화");
+      }
+      
+      if (isPressureEquipment) {
+        recommendations.push("압력 게이지와 안전밸브 상태를 점검하세요");
+        immediateActions.push("압력 해제 절차 준비");
+        preventiveMeasures.push("압력 시스템 정밀 진단");
+      }
+      
+      if (isHeightEquipment) {
+        recommendations.push("추락 방지 장비와 안전대 상태를 점검하세요");
+        immediateActions.push("고소작업 중단 및 하강");
+        preventiveMeasures.push("고소작업 안전 교육 강화");
+      }
       
       return {
         riskLevel: isHighRisk ? "HIGH" : "MEDIUM",
-        recommendations: [
-          "작업을 일시 중단하고 상급자에게 보고하세요",
-          "안전 장비 착용 상태를 재확인하세요",
-          "주변 작업자에게 상황을 알리세요"
-        ],
-        immediateActions: [
-          "현재 작업 중단",
-          "안전 구역으로 이동",
-          "상급자 연락"
-        ],
-        preventiveMeasures: [
-          "정기 점검 주기 단축 검토",
-          "작업 절차 재검토",
-          "추가 안전 교육 실시"
-        ]
+        recommendations,
+        immediateActions,
+        preventiveMeasures
       };
     }
   }
@@ -264,6 +310,21 @@ export class AIService {
     if (equipmentInfo.heightRisk) risks.push("고소");
     if (equipmentInfo.heavyWeightRisk) risks.push("고중량");
     return risks.length > 0 ? risks.join(", ") : "없음";
+  }
+
+  private formatEquipmentSpecifications(equipmentInfo: any): string {
+    const specs = [];
+    if (equipmentInfo.specification) {
+      specs.push(`사양: ${equipmentInfo.specification}`);
+    }
+    if (equipmentInfo.installYear) {
+      const age = new Date().getFullYear() - equipmentInfo.installYear;
+      specs.push(`사용연수: ${age}년`);
+    }
+    if (equipmentInfo.manufacturer) {
+      specs.push(`제조사: ${equipmentInfo.manufacturer}`);
+    }
+    return specs.length > 0 ? specs.join(" | ") : "상세 정보 없음";
   }
 }
 

@@ -77,7 +77,7 @@ export default function WorkProcedureComponent() {
   });
 
   const analyzeStepNoteMutation = useMutation({
-    mutationFn: async (data: { stepNote: string; stepInfo: any; equipmentId: number }) => {
+    mutationFn: async (data: { stepNote: string; stepInfo: any; equipmentId: number; workTypeId: number }) => {
       const response = await apiRequest("POST", "/api/ai/analyze-step-note", data);
       return response.json();
     },
@@ -124,9 +124,11 @@ export default function WorkProcedureComponent() {
       stepNote: specialNotes,
       stepInfo: {
         title: step.title,
-        description: step.description
+        description: step.description,
+        category: step.category
       },
-      equipmentId: session.equipmentId
+      equipmentId: session.equipmentId,
+      workTypeId: session.workTypeId
     });
   };
 

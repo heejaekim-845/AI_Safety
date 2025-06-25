@@ -269,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/ai/analyze-step-note", async (req, res) => {
     try {
-      const { stepNote, stepInfo, equipmentId } = req.body;
+      const { stepNote, stepInfo, equipmentId, workTypeId } = req.body;
       
       if (!stepNote || !stepNote.trim()) {
         return res.status(400).json({ message: "특이사항 내용이 필요합니다." });
@@ -280,7 +280,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "설비를 찾을 수 없습니다." });
       }
 
-      const analysis = await aiService.analyzeStepNote(stepNote, stepInfo, equipment);
+      // Get work type information for better context
+      let workType = null;
+      if (workTypeId) {
+        workType = await storage.getWorkTypeById(workTypeId);
+      }
+
+      // Enhanced step info with work type context
+      const enhancedStepInfo = {
+        ...stepInfo,
+        workType: workType?.name || "일반 작업",
+        workDescription: workType?.description || "",
+        category: stepInfo.category || workType?.name || "일반"
+      };
+
+      const analysis = await aiService.analyzeStepNote(stepNote, enhancedStepInfo, equipment);
       res.json(analysis);
     } catch (error) {
       console.error("특이사항 분석 오류:", error);
