@@ -99,9 +99,17 @@ export default function EquipmentDashboard() {
           <h2 className="text-lg font-medium">설비 정보</h2>
         </div>
         <div className="bg-white/10 rounded-lg p-4">
-          <h3 className="text-xl font-medium mb-2">{equipment.name}</h3>
-          <p className="text-primary-100 mb-1">CODE: {equipment.code}</p>
-          <p className="text-primary-100">위치: {equipment.location}</p>
+          <h3 className="text-xl font-medium mb-3">{equipment.name}</h3>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <p className="text-primary-100">CODE: {equipment.code}</p>
+            <p className="text-primary-100">모델: {equipment.modelName || 'N/A'}</p>
+            <p className="text-primary-100">위치: {equipment.location}</p>
+            <p className="text-primary-100">제조사: {equipment.manufacturer || 'N/A'}</p>
+            <p className="text-primary-100 col-span-2">설치년도: {equipment.installYear || 'N/A'}</p>
+            {equipment.specification && (
+              <p className="text-primary-100 col-span-2">규격: {equipment.specification}</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -131,6 +139,38 @@ export default function EquipmentDashboard() {
                 <p className="text-xs text-success font-medium">안전</p>
                 <p className="text-lg font-bold text-success">{riskCounts.low}</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Equipment Details Section */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <Settings className="mr-2 h-5 w-5" />
+              설비 상세 정보
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">제조사:</span>
+                <span className="font-medium">{equipment.manufacturer || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">모델명:</span>
+                <span className="font-medium">{equipment.modelName || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">설치년도:</span>
+                <span className="font-medium">{equipment.installYear || 'N/A'}</span>
+              </div>
+              {equipment.specification && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">규격:</span>
+                  <span className="font-medium text-right flex-1 ml-4">{equipment.specification}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

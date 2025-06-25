@@ -46,6 +46,8 @@ export default function AdminPanel() {
       location: "",
       manufacturer: "",
       installYear: new Date().getFullYear(),
+      specification: "",
+      modelName: "",
       riskLevel: "GREEN",
       highVoltageRisk: false,
       highPressureRisk: false,
@@ -211,22 +213,37 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="riskLevel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>위험도 등급</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="modelName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>모델명</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="위험도를 선택하세요" />
-                          </SelectTrigger>
+                          <Input placeholder="예: SC-500-15" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="GREEN">안전 (GREEN)</SelectItem>
-                          <SelectItem value="YELLOW">주의 (YELLOW)</SelectItem>
-                          <SelectItem value="RED">위험 (RED)</SelectItem>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="riskLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>위험도 등급</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="위험도를 선택하세요" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="GREEN">안전 (GREEN)</SelectItem>
+                            <SelectItem value="YELLOW">주의 (YELLOW)</SelectItem>
+                            <SelectItem value="RED">위험 (RED)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -319,6 +336,23 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
+                <FormField
+                  control={form.control}
+                  name="specification"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>규격/사양</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="예: 용량: 500L/min, 압력: 15bar, 전력: 75kW" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="flex space-x-3">
                   <Button 
                     type="button" 
@@ -335,6 +369,7 @@ export default function AdminPanel() {
                   >
                     {createEquipmentMutation.isPending ? "생성 중..." : "생성"}
                   </Button>
+                </div>
                 </div>
               </form>
             </Form>
