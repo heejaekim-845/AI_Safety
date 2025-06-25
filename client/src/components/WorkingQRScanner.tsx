@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, X } from 'lucide-react';
+import { BrowserMultiFormatReader } from '@zxing/library';
 
 interface WorkingQRScannerProps {
   onScan: (code: string) => void;
@@ -10,29 +11,63 @@ interface WorkingQRScannerProps {
 export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState("");
+  const [isScanning, setIsScanning] = useState(false);
+  const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopCamera = () => {
+    if (codeReaderRef.current) {
+      codeReaderRef.current.reset();
+      codeReaderRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setIsScanning(false);
+  };
 
   useEffect(() => {
-    const startCamera = async () => {
+    const startQRScanning = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setIsScanning(true);
+        const codeReader = new BrowserMultiFormatReader();
+        codeReaderRef.current = codeReader;
+
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' }
+        });
+        streamRef.current = stream;
+
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          
+          // Start scanning
+          codeReader.decodeFromVideoDevice(undefined, videoRef.current, (result, err) => {
+            if (result) {
+              console.log('QR Code detected:', result.getText());
+              onScan(result.getText());
+              stopCamera();
+            }
+            if (err && !(err.name === 'NotFoundException')) {
+              console.error('QR scanning error:', err);
+            }
+          });
         }
       } catch (err) {
         console.error('Camera error:', err);
         setError("카메라 접근이 거부되었습니다.");
+        setIsScanning(false);
       }
     };
     
-    startCamera();
+    startQRScanning();
     
-    return () => {
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
+    return stopCamera;
+  }, [onScan]);
 
   const handleManualInput = () => {
     const code = prompt("QR 코드를 직접 입력하세요 (예: COMP-A-101):");
@@ -42,7 +77,13 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
   };
 
   const handleQuickTest = () => {
+    stopCamera();
     onScan("COMP-A-101");
+  };
+
+  const handleClose = () => {
+    stopCamera();
+    onClose();
   };
 
   return (
@@ -50,7 +91,7 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">QR 코드 스캔</h3>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -144,7 +185,7 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
                 <Button onClick={handleManualInput} variant="outline" className="flex-1">
                   수동 입력
                 </Button>
-                <Button onClick={onClose} variant="secondary" className="flex-1">
+                <Button onClick={handleClose} variant="secondary" className="flex-1">
                   취소
                 </Button>
               </div>
@@ -155,8 +196,10 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
             </div>
             
             <div className="text-center text-sm text-gray-600 mt-4">
-              <p>QR 코드를 화면에 맞춰주세요</p>
-              <p className="mt-1">또는 아래 버튼으로 테스트하세요</p>
+              <p className={isScanning ? "text-green-600" : "text-gray-600"}>
+                {isScanning ? "QR 코드 인식 중..." : "카메라 준비 중..."}
+              </p>
+              <p className="mt-1">QR 코드를 화면에 맞춰주세요</p>
             </div>
           </>
         )}
