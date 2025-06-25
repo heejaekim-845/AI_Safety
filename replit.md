@@ -113,6 +113,9 @@ Changelog:
 - June 25, 2025. Initial setup
 - June 25, 2025. Enhanced AI analysis feature with equipment-specific and work-type-specific contextual recommendations
 - June 25, 2025. Added color coding for work procedure categories: 기기조작(GREEN), 상태인지(YELLOW), 안전조치(RED)
+- June 25, 2025. Added comprehensive equipment information fields: manufacturer, model name, installation year, specifications
+- June 25, 2025. Added Hazardous Chemicals section to equipment dashboard with not applicable status
+- June 25, 2025. Enhanced AI voice guidance to provide comprehensive coverage of all dashboard content including equipment details, hazardous chemicals, risk assessments, safety procedures, and emergency contacts
 ```
 
 ## User Preferences
