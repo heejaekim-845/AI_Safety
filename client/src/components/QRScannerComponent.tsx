@@ -46,33 +46,46 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
       if (videoRef.current) {
         console.log("Setting video source...");
         const video = videoRef.current;
-        video.srcObject = stream;
         
-        // Try immediate play
-        try {
-          await video.play();
-          console.log("Video playing immediately");
-          setTimeout(() => startQRScanning(), 1000);
-        } catch (playError) {
-          console.log("Immediate play failed, waiting for metadata");
-          // Fallback to metadata loading
-          video.onloadedmetadata = async () => {
-            console.log("Video metadata loaded");
-            try {
-              await video.play();
-              console.log("Video started playing after metadata");
-              setTimeout(() => startQRScanning(), 1000);
-            } catch (err) {
-              console.error("Video play error:", err);
-              setError("비디오 재생에 실패했습니다: " + err.message);
-            }
-          };
-        }
+        // Set up event handlers first
+        video.onloadedmetadata = () => {
+          console.log("Video metadata loaded, dimensions:", video.videoWidth, "x", video.videoHeight);
+        };
+        
+        video.onloadeddata = () => {
+          console.log("Video data loaded");
+        };
+        
+        video.oncanplay = () => {
+          console.log("Video can play");
+        };
+        
+        video.onplaying = () => {
+          console.log("Video is now playing");
+          setTimeout(() => {
+            console.log("Starting QR code detection...");
+            startQRScanning();
+          }, 1000);
+        };
         
         video.onerror = (e) => {
           console.error("Video error:", e);
           setError("비디오 로드 오류가 발생했습니다.");
         };
+        
+        // Now set the source and play
+        video.srcObject = stream;
+        
+        // Force play after a short delay
+        setTimeout(async () => {
+          try {
+            await video.play();
+            console.log("Video play() called successfully");
+          } catch (err) {
+            console.error("Video play error:", err);
+            setError("비디오 재생에 실패했습니다: " + err.message);
+          }
+        }, 100);
       }
     } catch (err) {
       console.error("Camera access error:", err);
@@ -170,33 +183,27 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
 
         {hasPermission === true && (
           <div className="space-y-4">
-            <div className="relative bg-gray-800 rounded-lg overflow-hidden" style={{ minHeight: '300px' }}>
+            <div className="relative bg-gray-800 rounded-lg overflow-hidden" style={{ width: '100%', height: '300px' }}>
               <video
                 ref={videoRef}
-                width="100%"
-                height="300"
+                className="absolute inset-0 w-full h-full object-cover"
                 playsInline
                 muted
                 autoPlay
-                style={{ 
-                  objectFit: 'cover',
-                  width: '100%',
-                  height: '100%',
-                  display: 'block'
-                }}
                 onCanPlay={() => console.log("Video can play")}
                 onPlaying={() => console.log("Video is playing")}
                 onLoadStart={() => console.log("Video load start")}
+                onLoadedData={() => console.log("Video data loaded")}
                 onError={(e) => console.error("Video element error:", e)}
               />
               
               {/* Scanning overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg animate-pulse">
-                  <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-primary"></div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-primary"></div>
-                  <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-primary"></div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-primary"></div>
+                  <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-blue-400"></div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-blue-400"></div>
+                  <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-blue-400"></div>
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-blue-400"></div>
                 </div>
               </div>
               

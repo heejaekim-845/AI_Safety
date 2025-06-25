@@ -118,6 +118,8 @@ Changelog:
 - June 25, 2025. Enhanced AI voice guidance to provide comprehensive coverage of all dashboard content including equipment details, hazardous chemicals, risk assessments, safety procedures, and emergency contacts
 - June 25, 2025. Added "Major Risk Factors" section title to organize high temperature, high pressure, electrical, and other equipment risk information
 - June 25, 2025. Added equipment image support with air compressor photo for sample equipment (압축기 A-101)
+- June 25, 2025. Implemented MSDS popup dialog for nitrogen gas with safety data sheet image display
+- June 25, 2025. Enhanced QR code scanner with real camera access using ZXing library for actual QR code detection
 ```
 
 ## User Preferences
