@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useEquipment } from "@/hooks/useEquipment";
-import QRScannerComponent from "@/components/QRScannerComponent";
+import SimpleQRScanner from "@/components/SimpleQRScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { Search, Camera, ChevronRight } from "lucide-react";
 

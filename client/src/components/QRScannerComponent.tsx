@@ -31,12 +31,8 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
       setIsScanning(true);
       console.log("Starting camera...");
       
-      // Try simpler constraints first
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        }
+        video: { facingMode: "environment" }
       });
       
       console.log("Got media stream:", stream);
@@ -44,53 +40,27 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
       setHasPermission(true);
       
       if (videoRef.current) {
-        console.log("Setting video source...");
         const video = videoRef.current;
+        console.log("Setting video source...");
         
-        // Set up event handlers first
-        video.onloadedmetadata = () => {
-          console.log("Video metadata loaded, dimensions:", video.videoWidth, "x", video.videoHeight);
-        };
-        
-        video.onloadeddata = () => {
-          console.log("Video data loaded");
-        };
-        
-        video.oncanplay = () => {
-          console.log("Video can play");
-        };
-        
-        video.onplaying = () => {
-          console.log("Video is now playing");
-          setTimeout(() => {
-            console.log("Starting QR code detection...");
-            startQRScanning();
-          }, 1000);
-        };
-        
-        video.onerror = (e) => {
-          console.error("Video error:", e);
-          setError("비디오 로드 오류가 발생했습니다.");
-        };
-        
-        // Now set the source and play
-        video.srcObject = stream;
-        
-        // Force play after a short delay
-        setTimeout(async () => {
-          try {
-            await video.play();
-            console.log("Video play() called successfully");
-          } catch (err) {
-            console.error("Video play error:", err);
-            setError("비디오 재생에 실패했습니다: " + err.message);
-          }
+        // Wait a moment then set the stream
+        setTimeout(() => {
+          video.srcObject = stream;
+          video.play()
+            .then(() => {
+              console.log("Video playing successfully");
+              setTimeout(() => startQRScanning(), 1000);
+            })
+            .catch(err => {
+              console.error("Video play error:", err);
+              setError(`비디오 재생 실패: ${err.message}`);
+            });
         }, 100);
       }
     } catch (err) {
       console.error("Camera access error:", err);
       setHasPermission(false);
-      setError(`카메라에 접근할 수 없습니다: ${err.message}`);
+      setError(`카메라 접근 실패: ${err.message}`);
       setIsScanning(false);
     }
   };
@@ -183,18 +153,16 @@ export default function QRScannerComponent({ onScan, onClose }: QRScannerCompone
 
         {hasPermission === true && (
           <div className="space-y-4">
-            <div className="relative bg-gray-800 rounded-lg overflow-hidden" style={{ width: '100%', height: '300px' }}>
+            <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden bg-black" style={{ width: '100%', height: '320px' }}>
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="w-full h-full"
                 playsInline
                 muted
-                autoPlay
-                onCanPlay={() => console.log("Video can play")}
-                onPlaying={() => console.log("Video is playing")}
-                onLoadStart={() => console.log("Video load start")}
-                onLoadedData={() => console.log("Video data loaded")}
-                onError={(e) => console.error("Video element error:", e)}
+                style={{
+                  objectFit: 'cover',
+                  transform: 'scaleX(-1)'
+                }}
               />
               
               {/* Scanning overlay */}
