@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -9,10 +9,24 @@ import WorkTypeSelection from "@/pages/WorkTypeSelection";
 import WorkProcedure from "@/pages/WorkProcedure";
 import AdminPanel from "@/pages/AdminPanel";
 import BottomNavigation from "@/components/BottomNavigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Router() {
+  const [location] = useLocation();
   const [activeTab, setActiveTab] = useState("scanner");
+
+  // Update active tab based on current route
+  useEffect(() => {
+    if (location === "/") {
+      setActiveTab("scanner");
+    } else if (location.startsWith("/equipment/") && location.includes("/work-types")) {
+      setActiveTab("work");
+    } else if (location.startsWith("/equipment/")) {
+      setActiveTab("dashboard");
+    } else if (location === "/admin") {
+      setActiveTab("admin");
+    }
+  }, [location]);
 
   return (
     <div className="min-h-screen bg-background">

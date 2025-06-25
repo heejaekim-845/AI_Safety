@@ -14,7 +14,11 @@ interface BottomNavigationProps {
 }
 
 export default function BottomNavigation({ activeTab, onTabChange }: BottomNavigationProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  // Extract equipment ID from current location if available
+  const equipmentIdMatch = location.match(/\/equipment\/(\d+)/);
+  const currentEquipmentId = equipmentIdMatch ? equipmentIdMatch[1] : "1";
 
   const tabs = [
     {
@@ -27,13 +31,13 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
       id: "dashboard",
       label: "대시보드",
       icon: LayoutDashboard,
-      path: "/equipment/1" // Default to first equipment for demo
+      path: `/equipment/${currentEquipmentId}`
     },
     {
       id: "work",
       label: "작업",
       icon: ClipboardList,
-      path: "/equipment/1/work-types"
+      path: `/equipment/${currentEquipmentId}/work-types`
     },
     {
       id: "admin",
