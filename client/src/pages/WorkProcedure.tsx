@@ -22,6 +22,38 @@ import {
 } from "lucide-react";
 import type { WorkSession, WorkProcedure } from "@shared/schema";
 
+// Function to get category color and styling
+const getCategoryStyle = (category: string) => {
+  const categoryLower = category?.toLowerCase() || "";
+  
+  if (categoryLower.includes("기기조작") || categoryLower.includes("조작") || categoryLower.includes("operation")) {
+    return {
+      badgeClass: "bg-green-100 text-green-800 border-green-200",
+      cardClass: "border-l-4 border-l-green-500",
+      dotClass: "bg-green-500"
+    };
+  } else if (categoryLower.includes("상태인지") || categoryLower.includes("확인") || categoryLower.includes("점검") || categoryLower.includes("check")) {
+    return {
+      badgeClass: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      cardClass: "border-l-4 border-l-yellow-500",
+      dotClass: "bg-yellow-500"
+    };
+  } else if (categoryLower.includes("안전조치") || categoryLower.includes("안전") || categoryLower.includes("safety")) {
+    return {
+      badgeClass: "bg-red-100 text-red-800 border-red-200",
+      cardClass: "border-l-4 border-l-red-500",
+      dotClass: "bg-red-500"
+    };
+  }
+  
+  // Default styling
+  return {
+    badgeClass: "bg-gray-100 text-gray-800 border-gray-200",
+    cardClass: "border-l-4 border-l-gray-300",
+    dotClass: "bg-gray-400"
+  };
+};
+
 export default function WorkProcedureComponent() {
   const { sessionId } = useParams();
   const [, setLocation] = useLocation();
@@ -207,99 +239,108 @@ export default function WorkProcedureComponent() {
       </div>
 
       {/* Current Step */}
-      {currentProcedure && (
-        <Card className="bg-primary/5 border-primary/20 mb-6 material-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-3">
-              <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium">
-                {currentProcedure.stepNumber}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <h3 className="font-medium text-primary mr-2">{currentProcedure.title}</h3>
-                  <Badge variant="outline" className="text-xs">
-                    {currentProcedure.category}
-                  </Badge>
+      {currentProcedure && (() => {
+        const categoryStyle = getCategoryStyle(currentProcedure.category);
+        return (
+          <Card className={`bg-primary/5 border-primary/20 mb-6 material-shadow ${categoryStyle.cardClass}`}>
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-3">
+                <div className={`${categoryStyle.dotClass} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium`}>
+                  {currentProcedure.stepNumber}
                 </div>
-                <p className="text-sm text-primary/80 mb-4">{currentProcedure.description}</p>
-                
-                {/* Step Checklist */}
-                {currentProcedure.checklistItems && currentProcedure.checklistItems.length > 0 && (
-                  <div className="space-y-3 mb-4">
-                    {currentProcedure.checklistItems.map((item, index) => (
-                      <label key={index} className="flex items-start space-x-3">
-                        <Checkbox className="mt-1" />
-                        <span className="text-sm">{item}</span>
-                      </label>
-                    ))}
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <h3 className="font-medium text-primary mr-2">{currentProcedure.title}</h3>
+                    <Badge variant="outline" className={`text-xs ${categoryStyle.badgeClass}`}>
+                      {currentProcedure.category}
+                    </Badge>
                   </div>
-                )}
+                  <p className="text-sm text-primary/80 mb-4">{currentProcedure.description}</p>
+                
+                  {/* Step Checklist */}
+                  {currentProcedure.checklistItems && currentProcedure.checklistItems.length > 0 && (
+                    <div className="space-y-3 mb-4">
+                      {currentProcedure.checklistItems.map((item, index) => (
+                        <label key={index} className="flex items-start space-x-3">
+                          <Checkbox className="mt-1" />
+                          <span className="text-sm">{item}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
 
-                {/* Safety Notes */}
-                {currentProcedure.safetyNotes && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                    <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
-                      <p className="text-sm text-yellow-800">{currentProcedure.safetyNotes}</p>
+                  {/* Safety Notes */}
+                  {currentProcedure.safetyNotes && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                      <div className="flex items-start space-x-2">
+                        <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                        <p className="text-sm text-yellow-800">{currentProcedure.safetyNotes}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Special Notes Input */}
+                  <div className="mt-4">
+                    <Label className="text-sm font-medium text-gray-700 mb-2">특이사항 입력</Label>
+                    <Textarea
+                      value={specialNotes}
+                      onChange={(e) => setSpecialNotes(e.target.value)}
+                      placeholder="이상 상황이나 주의사항을 입력하세요..."
+                      rows={3}
+                      className="w-full mb-3"
+                    />
+                    
+                    <div className="flex gap-2">
+                      {specialNotes.trim() && (
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleAnalyzeStepNote(currentProcedure)}
+                          disabled={analyzeStepNoteMutation.isPending}
+                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                        >
+                          {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => handleStepComplete(currentProcedure.stepNumber)}
+                        disabled={updateSessionMutation.isPending}
+                        className="flex-1 bg-primary hover:bg-primary/90"
+                      >
+                        {currentProcedure.stepNumber === totalSteps ? "작업 완료" : "다음 단계"}
+                      </Button>
                     </div>
                   </div>
-                )}
-
-                {/* Special Notes Input */}
-                <div className="mt-4">
-                  <Label className="text-sm font-medium text-gray-700 mb-2">특이사항 입력</Label>
-                  <Textarea
-                    value={specialNotes}
-                    onChange={(e) => setSpecialNotes(e.target.value)}
-                    placeholder="이상 상황이나 주의사항을 입력하세요..."
-                    rows={3}
-                    className="w-full mb-3"
-                  />
-                  
-                  <div className="flex gap-2">
-                    {specialNotes.trim() && (
-                      <Button 
-                        variant="outline"
-                        onClick={() => handleAnalyzeStepNote(currentProcedure)}
-                        disabled={analyzeStepNoteMutation.isPending}
-                        className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                      >
-                        {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => handleStepComplete(currentProcedure.stepNumber)}
-                      disabled={updateSessionMutation.isPending}
-                      className="flex-1 bg-primary hover:bg-primary/90"
-                    >
-                      {currentProcedure.stepNumber === totalSteps ? "작업 완료" : "다음 단계"}
-                    </Button>
-                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Completed Steps */}
       {completedProcedures.length > 0 && (
         <div className="space-y-3 mb-6">
           <h3 className="font-medium text-gray-900">완료된 단계</h3>
-          {completedProcedures.map((procedure) => (
-            <Card key={procedure.id} className="bg-green-50 border-green-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-success text-white rounded-full w-6 h-6 flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4" />
+          {completedProcedures.map((procedure) => {
+            const categoryStyle = getCategoryStyle(procedure.category);
+            return (
+              <Card key={procedure.id} className={`bg-green-50 border-green-200 ${categoryStyle.cardClass}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className={`${categoryStyle.dotClass} text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium`}>
+                      {procedure.stepNumber}
+                    </div>
+                    <div>
+                      <span className="text-sm text-success font-medium">{procedure.title}</span>
+                      <Badge variant="outline" className={`text-xs mt-1 ml-2 ${categoryStyle.badgeClass}`}>
+                        {procedure.category}
+                      </Badge>
+                    </div>
                   </div>
-                  <span className="text-sm text-success font-medium">
-                    {procedure.stepNumber}. {procedure.title}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -307,18 +348,26 @@ export default function WorkProcedureComponent() {
       {upcomingProcedures.length > 0 && (
         <div className="space-y-3 mb-6">
           <h3 className="font-medium text-gray-900">다음 단계</h3>
-          {upcomingProcedures.slice(0, 3).map((procedure) => (
-            <Card key={procedure.id} className="bg-gray-50 border-gray-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-gray-300 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center text-sm">
-                    {procedure.stepNumber}
+          {upcomingProcedures.slice(0, 3).map((procedure) => {
+            const categoryStyle = getCategoryStyle(procedure.category);
+            return (
+              <Card key={procedure.id} className={`bg-gray-50 border-gray-200 ${categoryStyle.cardClass}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className={`${categoryStyle.dotClass} text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium`}>
+                      {procedure.stepNumber}
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-600">{procedure.title}</span>
+                      <Badge variant="outline" className={`text-xs mt-1 ml-2 ${categoryStyle.badgeClass}`}>
+                        {procedure.category}
+                      </Badge>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-600">{procedure.title}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
