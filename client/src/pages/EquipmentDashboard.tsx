@@ -229,7 +229,7 @@ export default function EquipmentDashboard() {
                   >
                     <p className="text-sm font-medium">{incident.title}</p>
                     <p className="text-xs text-gray-600">
-                      {incident.incidentDate.toLocaleDateString('ko-KR')} - {incident.description}
+                      {new Date(incident.incidentDate).toLocaleDateString('ko-KR')} - {incident.description}
                     </p>
                   </div>
                 ))}

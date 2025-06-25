@@ -202,7 +202,7 @@ export default function WorkTypeSelection() {
                     {incident.title}
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
-                    {incident.incidentDate.toLocaleDateString('ko-KR')} - {incident.description}
+                    {new Date(incident.incidentDate).toLocaleDateString('ko-KR')} - {incident.description}
                   </p>
                 </div>
               ))}
