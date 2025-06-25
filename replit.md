@@ -122,6 +122,7 @@ Changelog:
 - June 25, 2025. Enhanced QR code scanner with real camera access using ZXing library for actual QR code detection
 - June 25, 2025. Implemented working QR scanner with manual input and quick test options due to browser video rendering limitations
 - June 25, 2025. Added "Check Safety Device Location" section to equipment dashboard with safety valve image popup showing device locations and inspection checklist
+- June 25, 2025. Added "View Safety Facilities Location" section with combined fire extinguisher & emergency escape route button (green) and separate AED button (red)
 ```
 
 ## User Preferences

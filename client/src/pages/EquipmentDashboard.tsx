@@ -37,7 +37,6 @@ export default function EquipmentDashboard() {
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
   const [showSafetyDevices, setShowSafetyDevices] = useState(false);
   const [showFireExtinguisher, setShowFireExtinguisher] = useState(false);
-  const [showEmergencyRoute, setShowEmergencyRoute] = useState(false);
   const [showAED, setShowAED] = useState(false);
   
   const equipmentId = parseInt(id || "0");
@@ -529,14 +528,7 @@ export default function EquipmentDashboard() {
                 className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 <Shield className="mr-2 h-4 w-4" />
-                소화기 위치
-              </Button>
-              <Button 
-                onClick={() => setShowEmergencyRoute(true)}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                비상 대피로
+                소화기 & 비상 대피로
               </Button>
               <Button 
                 onClick={() => setShowAED(true)}
@@ -735,34 +727,9 @@ export default function EquipmentDashboard() {
                     <li>1. 소화기를 바닥에 내려두고 안전핀을 뽑는다.</li>
                     <li>2. 바람을 등지고 나팔 모즘을 화염을 향한다.</li>
                     <li>3. 손잡이를 힘껏 누르고 빗자루로 쓸듯이 뿌린다.</li>
-                    <li style="color: red; font-weight: bold;">*주의) 2명 이상 같은 방향 방향이로 소화하기 사용하시오.</li>
+                    <li style={{color: "red", fontWeight: "bold"}}>*주의) 2명 이상 같은 방향 방향이로 소화하기 사용하시오.</li>
                   </ul>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Emergency Route Popup Dialog */}
-      {showEmergencyRoute && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-semibold">비상 대피로 위치</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowEmergencyRoute(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="p-4">
-              <img 
-                src={fireExtinguisherImage} 
-                alt="Emergency Escape Route" 
-                className="w-full h-auto rounded border"
-                onLoad={() => console.log("Emergency route image loaded successfully:", fireExtinguisherImage)}
-                onError={(e) => console.error("Emergency route image load error:", e)}
-              />
-              <div className="mt-4 space-y-3">
                 <div className="p-3 bg-orange-50 border border-orange-200 rounded">
                   <p className="text-sm font-medium text-orange-800">비상 대피 요령</p>
                   <ul className="text-xs text-orange-600 mt-1 space-y-1">
@@ -777,6 +744,8 @@ export default function EquipmentDashboard() {
           </div>
         </div>
       )}
+
+
 
       {/* AED Popup Dialog */}
       {showAED && (
