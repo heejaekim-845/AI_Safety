@@ -203,14 +203,10 @@ export class AIService {
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       
-      // Enhanced fallback guidance covering all dashboard content
-      return `${equipmentInfo.name} 종합 안전 작업 안내
+      // Safety-focused fallback guidance without basic equipment info
+      return `${equipmentInfo.name} 안전 작업 안내
 
-설비 기본 정보를 안내드립니다.
-설비명: ${equipmentInfo.name}, 코드: ${equipmentInfo.code}
-위치: ${equipmentInfo.location}
-제조사: ${equipmentInfo.manufacturer || '정보 없음'}, 모델: ${equipmentInfo.modelName || '정보 없음'}
-설치년도: ${equipmentInfo.installationYear || '정보 없음'}
+안전한 작업을 위한 주요 사항을 안내드립니다.
 
 유해화학물질 정보를 확인하세요.
 ${equipmentInfo.hazardousChemicalType ? 
