@@ -10,6 +10,8 @@ import { apiRequest } from "@/lib/api";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import nitrogenMsdsImage from "@assets/nitrogen_1_1750834174079.png";
 import safetyValveImage from "@assets/svalve_1750838843504.jpg";
+import fireExtinguisherImage from "@assets/Fire Extinguisher Emergency Escape Route_1750839863344.jpg";
+import aedImage from "@assets/AED_1750839869531.png";
 import { 
   ArrowLeft, 
   Shield, 
@@ -34,6 +36,9 @@ export default function EquipmentDashboard() {
   const [isPaused, setIsPaused] = useState(false);
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
   const [showSafetyDevices, setShowSafetyDevices] = useState(false);
+  const [showFireExtinguisher, setShowFireExtinguisher] = useState(false);
+  const [showEmergencyRoute, setShowEmergencyRoute] = useState(false);
+  const [showAED, setShowAED] = useState(false);
   
   const equipmentId = parseInt(id || "0");
   
@@ -506,6 +511,44 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
+        {/* View Safety Facilities Location */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <MapPin className="mr-2 h-5 w-5" />
+              안전시설 위치 확인
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              비상상황 시 필요한 안전시설의 위치를 확인하세요
+            </p>
+            <div className="space-y-2">
+              <Button 
+                onClick={() => setShowFireExtinguisher(true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                소화기 위치
+              </Button>
+              <Button 
+                onClick={() => setShowEmergencyRoute(true)}
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <AlertTriangle className="mr-2 h-4 w-4" />
+                비상 대피로
+              </Button>
+              <Button 
+                onClick={() => setShowAED(true)}
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+              >
+                <Phone className="mr-2 h-4 w-4" />
+                AED 위치
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Emergency Contacts */}
         {equipment.emergencyContacts && equipment.emergencyContacts.length > 0 && (
           <Card className="material-shadow">
@@ -652,6 +695,123 @@ export default function EquipmentDashboard() {
                     <li>• 드레인밸브: 응축수 배출 상태 확인</li>
                     <li>• 필터: 청결 상태 및 교체 시기 확인</li>
                   </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fire Extinguisher Popup Dialog */}
+      {showFireExtinguisher && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">소화기 & 비상 대피로 위치</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowFireExtinguisher(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-4">
+              <img 
+                src={fireExtinguisherImage} 
+                alt="Fire Extinguisher and Emergency Escape Route" 
+                className="w-full h-auto rounded border"
+                onLoad={() => console.log("Fire extinguisher image loaded successfully:", fireExtinguisherImage)}
+                onError={(e) => console.error("Fire extinguisher image load error:", e)}
+              />
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-red-50 border border-red-200 rounded">
+                  <p className="text-sm font-medium text-red-800">화재시 대피요령</p>
+                  <ul className="text-xs text-red-600 mt-1 space-y-1">
+                    <li>1. "불이야" 라고 크게 외치십시오.</li>
+                    <li>2. 화재경보 버튼을 눌러주십시오.</li>
+                    <li>3. 몸을잠낮게 피하고 안내도의 피난 통로를 따라 신속하게 대피하십시오.</li>
+                  </ul>
+                </div>
+                <div className="p-3 bg-green-50 border border-green-200 rounded">
+                  <p className="text-sm font-medium text-green-800">소화기 사용방법</p>
+                  <ul className="text-xs text-green-600 mt-1 space-y-1">
+                    <li>1. 소화기를 바닥에 내려두고 안전핀을 뽑는다.</li>
+                    <li>2. 바람을 등지고 나팔 모즘을 화염을 향한다.</li>
+                    <li>3. 손잡이를 힘껏 누르고 빗자루로 쓸듯이 뿌린다.</li>
+                    <li style="color: red; font-weight: bold;">*주의) 2명 이상 같은 방향 방향이로 소화하기 사용하시오.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Emergency Route Popup Dialog */}
+      {showEmergencyRoute && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">비상 대피로 위치</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowEmergencyRoute(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-4">
+              <img 
+                src={fireExtinguisherImage} 
+                alt="Emergency Escape Route" 
+                className="w-full h-auto rounded border"
+                onLoad={() => console.log("Emergency route image loaded successfully:", fireExtinguisherImage)}
+                onError={(e) => console.error("Emergency route image load error:", e)}
+              />
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-orange-50 border border-orange-200 rounded">
+                  <p className="text-sm font-medium text-orange-800">비상 대피 요령</p>
+                  <ul className="text-xs text-orange-600 mt-1 space-y-1">
+                    <li>• 침착하게 행동하고 당황하지 마십시오</li>
+                    <li>• 엘리베이터를 사용하지 말고 계단을 이용하십시오</li>
+                    <li>• 대피로 화살표를 따라 가장 가까운 출구로 이동하십시오</li>
+                    <li>• 연기가 있을 때는 몸을 낮추고 젖은 수건으로 코와 입을 막으십시오</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AED Popup Dialog */}
+      {showAED && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">AED 위치 및 사용법</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowAED(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-4">
+              <img 
+                src={aedImage} 
+                alt="AED Location" 
+                className="w-full h-auto rounded border"
+                onLoad={() => console.log("AED image loaded successfully:", aedImage)}
+                onError={(e) => console.error("AED image load error:", e)}
+              />
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-red-50 border border-red-200 rounded">
+                  <p className="text-sm font-medium text-red-800">AED (자동심장충격기) 사용법</p>
+                  <ul className="text-xs text-red-600 mt-1 space-y-1">
+                    <li>1. 전원을 켜고 음성 안내에 따라 행동하십시오</li>
+                    <li>2. 패드를 환자의 가슴에 부착하십시오</li>
+                    <li>3. 심장 리듬 분석 중에는 환자를 만지지 마십시오</li>
+                    <li>4. 충격이 필요하면 버튼을 눌러주십시오</li>
+                    <li>5. 즉시 심폐소생술을 시행하십시오</li>
+                  </ul>
+                </div>
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-sm font-medium text-blue-800">비상연락처</p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    응급상황 발생 시 즉시 119에 신고하고 사내 응급의료진에게 연락하십시오.
+                  </p>
                 </div>
               </div>
             </div>
