@@ -189,41 +189,39 @@ export class AIService {
       const equipmentRisks = this.formatRisks(equipmentInfo);
       const equipmentSpecs = this.formatEquipmentSpecifications(equipmentInfo);
       
-      const prompt = `산업 안전 전문가로서 작업자가 입력한 특이사항을 종합적으로 분석하여 최적화된 안전 조치사항을 제공해주세요.
+      const prompt = `산업 안전 전문가로서 작업자가 입력한 특이사항을 종합적으로 분석하여 맞춤형 안전 조치사항을 제공해주세요.
 
-【설비 정보 분석】
+【설비 정보】
 - 설비명: ${equipmentInfo.name}
-- 설비 코드: ${equipmentInfo.code}
-- 설치 위치: ${equipmentInfo.location}
-- 제조업체: ${equipmentInfo.manufacturer || "미상"}
-- 모델명: ${equipmentInfo.modelName || "미상"}
-- 설치년도: ${equipmentInfo.installYear || "미상"}
-- 전체 위험도: ${equipmentInfo.riskLevel}
+- 위치: ${equipmentInfo.location}
+- 위험도: ${equipmentInfo.riskLevel}
 - 주요 위험 요소: ${equipmentRisks}
-- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "없음"}
+- 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "없음"}
 - LOTO 포인트: ${equipmentInfo.lockoutTagoutPoints?.join(", ") || "없음"}
 
-【작업 특성 분석】
-- 작업 단계: ${stepInfo.title}
-- 작업 내용: ${stepInfo.description}
-- 작업 카테고리: ${stepInfo.category || "일반"}
+【작업 정보】
+- 작업: ${stepInfo.title}
+- 내용: ${stepInfo.description}
+- 유형: ${stepInfo.workType || stepInfo.category || "일반"}
 
 【작업자 특이사항】
 "${stepNote}"
 
-【분석 요구사항】
-1. 설비의 특성과 위험 요소를 고려한 맞춤형 안전 조치
-2. 작업 유형에 특화된 실용적인 권고사항
-3. 특이사항의 심각도에 따른 적절한 대응 수준
-4. 실제 현장에서 즉시 적용 가능한 구체적인 행동 지침
+위 특이사항을 바탕으로 다음을 분석해주세요:
+1. 이 특이사항이 설비와 작업에 미치는 구체적인 위험도
+2. 특이사항에 직접 대응하는 맞춤형 안전 조치
+3. 현재 상황에서 즉시 취해야 할 구체적 행동
+4. 이런 상황이 재발하지 않도록 하는 예방책
 
-다음 JSON 형식으로 응답해주세요:
+JSON 형식으로 응답:
 {
   "riskLevel": "HIGH|MEDIUM|LOW",
-  "recommendations": ["구체적이고 실용적인 안전 조치사항"],
-  "immediateActions": ["즉시 수행해야 할 긴급 작업"],
-  "preventiveMeasures": ["향후 재발 방지를 위한 예방 조치"]
-}`;
+  "recommendations": ["특이사항에 직접 대응하는 구체적 안전 조치 3-4개"],
+  "immediateActions": ["지금 당장 해야 할 구체적 행동 2-3개"],
+  "preventiveMeasures": ["재발 방지를 위한 구체적 예방책 2-3개"]
+}
+
+중요: 일반적인 조언이 아닌, 입력된 특이사항("${stepNote}")에 직접 관련된 구체적이고 실용적인 조치사항만 제공하세요.`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -251,53 +249,122 @@ export class AIService {
     } catch (error) {
       console.error("작업 특이사항 분석 오류:", error);
       
-      // Enhanced fallback analysis based on equipment type and keywords
-      const isHighRisk = stepNote.toLowerCase().includes('문제') || 
-                        stepNote.toLowerCase().includes('고장') || 
-                        stepNote.toLowerCase().includes('위험') ||
-                        stepNote.toLowerCase().includes('이상') ||
-                        stepNote.toLowerCase().includes('누수') ||
-                        stepNote.toLowerCase().includes('소음') ||
-                        stepNote.toLowerCase().includes('진동') ||
-                        stepNote.toLowerCase().includes('과열');
-      
+      // Enhanced contextual fallback analysis
+      const noteText = stepNote.toLowerCase();
       const equipmentType = equipmentInfo.name?.toLowerCase() || "";
-      const isElectricalEquipment = equipmentType.includes('전기') || equipmentType.includes('모터') || equipmentInfo.highVoltageRisk;
-      const isPressureEquipment = equipmentType.includes('압축') || equipmentType.includes('보일러') || equipmentInfo.highPressureRisk;
-      const isHeightEquipment = equipmentType.includes('크레인') || equipmentType.includes('리프트') || equipmentInfo.heightRisk;
       
-      // Equipment-specific recommendations
-      let recommendations = [
-        "작업을 일시 중단하고 상급자에게 즉시 보고하세요",
-        "안전 장비 착용 상태를 재확인하세요"
-      ];
+      // Analyze specific issues mentioned in the note
+      const hasLeakage = noteText.includes('누수') || noteText.includes('누출') || noteText.includes('새고');
+      const hasNoise = noteText.includes('소음') || noteText.includes('잡음') || noteText.includes('시끄러');
+      const hasVibration = noteText.includes('진동') || noteText.includes('떨림');
+      const hasOverheating = noteText.includes('과열') || noteText.includes('뜨거') || noteText.includes('온도');
+      const hasElectricalIssue = noteText.includes('스파크') || noteText.includes('전기') || noteText.includes('합선');
+      const hasSmell = noteText.includes('냄새') || noteText.includes('가스') || noteText.includes('연기');
+      const hasDamage = noteText.includes('손상') || noteText.includes('파손') || noteText.includes('금') || noteText.includes('균열');
+      const hasLoose = noteText.includes('헐거') || noteText.includes('느슨') || noteText.includes('흔들');
       
-      let immediateActions = ["현재 작업 중단", "안전 구역으로 이동"];
-      let preventiveMeasures = ["정기 점검 주기 단축 검토", "작업 절차 재검토"];
-      
-      if (isElectricalEquipment) {
-        recommendations.push("전원 차단 상태를 확인하고 LOTO 절차를 재검토하세요");
-        immediateActions.push("전기 안전 담당자 호출");
-        preventiveMeasures.push("전기 안전 점검 강화");
+      // Determine risk level based on specific issues
+      let riskLevel: "HIGH" | "MEDIUM" | "LOW" = "MEDIUM";
+      if (hasElectricalIssue || hasSmell || hasDamage || hasLeakage) {
+        riskLevel = "HIGH";
+      } else if (hasOverheating || hasVibration || hasLoose) {
+        riskLevel = "HIGH";
+      } else if (hasNoise) {
+        riskLevel = "MEDIUM";
       }
       
-      if (isPressureEquipment) {
-        recommendations.push("압력 게이지와 안전밸브 상태를 점검하세요");
-        immediateActions.push("압력 해제 절차 준비");
-        preventiveMeasures.push("압력 시스템 정밀 진단");
+      // Generate contextual recommendations
+      let recommendations: string[] = [];
+      let immediateActions: string[] = [];
+      let preventiveMeasures: string[] = [];
+      
+      if (hasLeakage) {
+        recommendations.push("누수 지점을 확인하고 주변을 격리하세요");
+        recommendations.push("유체 종류에 맞는 개인보호구를 착용하세요");
+        immediateActions.push("누수 부위 주변 작업 중단");
+        immediateActions.push("누수량과 확산 범위 확인");
+        preventiveMeasures.push("정기적인 배관 및 연결부 점검");
+        preventiveMeasures.push("개스킷 및 씰 교체 주기 단축");
       }
       
-      if (isHeightEquipment) {
-        recommendations.push("추락 방지 장비와 안전대 상태를 점검하세요");
-        immediateActions.push("고소작업 중단 및 하강");
-        preventiveMeasures.push("고소작업 안전 교육 강화");
+      if (hasNoise) {
+        recommendations.push("소음 발생 원인을 파악하고 베어링 상태를 점검하세요");
+        recommendations.push("청력 보호구를 반드시 착용하세요");
+        immediateActions.push("소음 레벨 측정");
+        immediateActions.push("작업자 청력 보호구 확인");
+        preventiveMeasures.push("정기적인 소음도 측정 및 기록");
+        preventiveMeasures.push("회전부품 윤활 및 정렬 점검 강화");
+      }
+      
+      if (hasVibration) {
+        recommendations.push("진동 원인을 찾아 기계 정렬 상태를 점검하세요");
+        recommendations.push("볼트 및 고정부 체결 상태를 확인하세요");
+        immediateActions.push("진동 수준 측정");
+        immediateActions.push("주변 구조물 안전성 확인");
+        preventiveMeasures.push("정기적인 진동 분석 실시");
+        preventiveMeasures.push("기계 기초 및 고정 상태 점검 강화");
+      }
+      
+      if (hasOverheating) {
+        recommendations.push("온도 상승 원인을 파악하고 냉각 시스템을 점검하세요");
+        recommendations.push("내열 장갑과 보호복을 착용하세요");
+        immediateActions.push("온도 측정 및 기록");
+        immediateActions.push("냉각 시스템 작동 상태 확인");
+        preventiveMeasures.push("정기적인 열화상 점검");
+        preventiveMeasures.push("냉각 시스템 청소 및 정비 주기 단축");
+      }
+      
+      if (hasElectricalIssue) {
+        recommendations.push("즉시 전원을 차단하고 전기 안전 절차를 따르세요");
+        recommendations.push("절연 보호구를 착용하고 접근하세요");
+        immediateActions.push("즉시 전원 차단");
+        immediateActions.push("전기 전문가 호출");
+        preventiveMeasures.push("전기 시설 정기 절연 저항 측정");
+        preventiveMeasures.push("전기 안전 교육 강화");
+      }
+      
+      if (hasSmell) {
+        recommendations.push("환기를 강화하고 가스 농도를 측정하세요");
+        recommendations.push("호흡 보호구를 착용하고 점화원을 제거하세요");
+        immediateActions.push("즉시 환기 실시");
+        immediateActions.push("가스 검지기로 농도 측정");
+        preventiveMeasures.push("정기적인 가스 누출 점검");
+        preventiveMeasures.push("환기 시설 점검 및 개선");
+      }
+      
+      if (hasDamage) {
+        recommendations.push("손상 범위를 정확히 파악하고 구조적 안전성을 평가하세요");
+        recommendations.push("손상 부위 접근을 제한하고 임시 보강을 검토하세요");
+        immediateActions.push("손상 부위 사진 촬영 및 기록");
+        immediateActions.push("구조 안전 전문가 상담");
+        preventiveMeasures.push("정기적인 비파괴 검사 실시");
+        preventiveMeasures.push("재료 피로도 평가 및 교체 계획 수립");
+      }
+      
+      if (hasLoose) {
+        recommendations.push("헐거운 부품의 체결 토크를 재확인하세요");
+        recommendations.push("연결부 전체의 고정 상태를 점검하세요");
+        immediateActions.push("즉시 체결 상태 점검");
+        immediateActions.push("토크 렌치로 규정 토크 재체결");
+        preventiveMeasures.push("정기적인 체결부 토크 점검");
+        preventiveMeasures.push("진동에 의한 풀림 방지 대책 적용");
+      }
+      
+      // Add general recommendations if no specific issue detected
+      if (recommendations.length === 0) {
+        recommendations.push("특이사항에 대해 상세한 점검을 실시하세요");
+        recommendations.push("관련 작업 매뉴얼을 재확인하세요");
+        immediateActions.push("현재 상황 상세 기록");
+        immediateActions.push("상급자에게 상황 보고");
+        preventiveMeasures.push("유사 상황 대응 절차 수립");
+        preventiveMeasures.push("작업자 교육 및 훈련 강화");
       }
       
       return {
-        riskLevel: isHighRisk ? "HIGH" : "MEDIUM",
-        recommendations,
-        immediateActions,
-        preventiveMeasures
+        riskLevel,
+        recommendations: recommendations.slice(0, 4),
+        immediateActions: immediateActions.slice(0, 3),
+        preventiveMeasures: preventiveMeasures.slice(0, 3)
       };
     }
   }
