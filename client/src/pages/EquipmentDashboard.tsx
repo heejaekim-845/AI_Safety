@@ -356,7 +356,11 @@ export default function EquipmentDashboard() {
                       <span className="material-icons text-danger mr-2">whatshot</span>
                       <span className="text-sm font-medium">고온 위험</span>
                     </div>
-                    <p className="text-xs text-gray-600">150°C 이상</p>
+                    {equipment.highTemperatureDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highTemperatureDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">150°C 이상</p>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -368,31 +372,27 @@ export default function EquipmentDashboard() {
                       <span className="material-icons text-warning mr-2">compress</span>
                       <span className="text-sm font-medium">고압 가스</span>
                     </div>
-                    <p className="text-xs text-gray-600">15 bar</p>
+                    {equipment.highPressureDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highPressureDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">15 bar</p>
+                    )}
                   </CardContent>
                 </Card>
               )}
               
-              {equipment.electricalRisk && (
+              {equipment.highVoltageRisk && (
                 <Card className="material-shadow">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-2">
                       <span className="material-icons text-warning mr-2">electrical_services</span>
-                      <span className="text-sm font-medium">전기적 위험</span>
+                      <span className="text-sm font-medium">고전압 위험</span>
                     </div>
-                    <p className="text-xs text-gray-600">전기 차단 필요</p>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {equipment.rotatingPartsRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">360</span>
-                      <span className="text-sm font-medium">회전체 위험</span>
-                    </div>
-                    <p className="text-xs text-gray-600">느슨한 의복 금지</p>
+                    {equipment.highVoltageDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highVoltageDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">전기 차단 필요</p>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -402,21 +402,13 @@ export default function EquipmentDashboard() {
                   <CardContent className="p-4">
                     <div className="flex items-center mb-2">
                       <span className="material-icons text-warning mr-2">height</span>
-                      <span className="text-sm font-medium">고소 작업</span>
+                      <span className="text-sm font-medium">고소 위험</span>
                     </div>
-                    <p className="text-xs text-gray-600">추락 위험</p>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {equipment.highVoltageRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-danger mr-2">flash_on</span>
-                      <span className="text-sm font-medium">고전압</span>
-                    </div>
-                    <p className="text-xs text-gray-600">위험 전압</p>
+                    {equipment.heightDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.heightDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">2m 이상 높이</p>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -426,87 +418,92 @@ export default function EquipmentDashboard() {
                   <CardContent className="p-4">
                     <div className="flex items-center mb-2">
                       <span className="material-icons text-warning mr-2">fitness_center</span>
-                      <span className="text-sm font-medium">고중량</span>
+                      <span className="text-sm font-medium">고중량 위험</span>
                     </div>
-                    <p className="text-xs text-gray-600">중량물 주의</p>
+                    {equipment.heavyWeightDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.heavyWeightDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">중량물 취급 주의</p>
+                    )}
                   </CardContent>
                 </Card>
               )}
             </div>
+            
+            {/* Show message if no risk factors are present */}
+            {!equipment.highTemperatureRisk && !equipment.highPressureRisk && !equipment.highVoltageRisk && !equipment.heightRisk && !equipment.heavyWeightRisk && (
+              <div className="text-center py-4">
+                <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                  <p className="text-sm text-green-800">
+                    ✓ 특별한 위험 요소가 확인되지 않음
+                  </p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        {/* Safety Equipment Information */}
-        {equipment.requiredSafetyEquipment && equipment.requiredSafetyEquipment.length > 0 && (
-          <Card className="material-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center text-gray-900">
-                <Shield className="mr-2 h-5 w-5" />
-                안전 장비 정보
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {equipment.requiredSafetyEquipment.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm">{item}</span>
-                    <Badge variant="secondary" className="bg-success text-white">필수</Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recent Incidents */}
-        {incidents && incidents.length > 0 && (
-          <Card className="material-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center text-gray-900">
-                <History className="mr-2 h-5 w-5" />
-                최근 사고 이력
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {(incidents as Incident[]).slice(0, 3).map((incident) => (
-                  <div 
-                    key={incident.id} 
-                    className={`border-l-4 pl-4 ${
-                      incident.severity === 'HIGH' ? 'border-danger' : 
-                      incident.severity === 'MEDIUM' ? 'border-warning' : 'border-success'
-                    }`}
-                  >
-                    <p className="text-sm font-medium">{incident.title}</p>
-                    <p className="text-xs text-gray-600">
-                      {new Date(incident.incidentDate).toLocaleDateString('ko-KR')} - {incident.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Check Safety Device Location */}
         <Card className="material-shadow">
           <CardHeader>
             <CardTitle className="flex items-center text-gray-900">
-              <MapPin className="mr-2 h-5 w-5" />
+              <Shield className="mr-2 h-5 w-5" />
               안전장치 위치 확인
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">
-              작업 전 안전장치의 위치와 상태를 확인하세요
-            </p>
-            <Button 
-              onClick={() => setShowSafetyDevices(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <MapPin className="mr-2 h-4 w-4" />
-              안전장치 위치 보기
-            </Button>
+            {equipment.safetyDeviceImages && equipment.safetyDeviceImages.length > 0 && (
+              <div className="flex justify-center">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <MapPin className="mr-2 h-4 w-4" />
+                      안전장치 위치 보기
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg font-bold">
+                        {equipment.name} - 안전장치 위치 및 점검사항
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4 space-y-4">
+                      {equipment.safetyDeviceImages.map((imageUrl: any, index: any) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <img 
+                            src={imageUrl} 
+                            alt={`안전장치 위치 ${index + 1}`}
+                            className="w-full h-auto border rounded-lg shadow-sm mb-2"
+                          />
+                          <div className="text-sm text-gray-600">
+                            <h4 className="font-medium mb-2">점검 체크리스트:</h4>
+                            <ul className="list-disc pl-4 space-y-1">
+                              <li>안전장치 정상 작동 여부 확인</li>
+                              <li>안전밸브 압력 설정값 점검</li>
+                              <li>안전장치 주변 접근성 확보</li>
+                              <li>비상정지 장치 작동 테스트</li>
+                            </ul>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
+            
+            {(!equipment.safetyDeviceImages || equipment.safetyDeviceImages.length === 0) && (
+              <div className="text-center py-4">
+                <div className="p-3 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                  <p className="text-sm text-gray-600">
+                    안전장치 위치 이미지가 등록되지 않았습니다
+                  </p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -515,295 +512,126 @@ export default function EquipmentDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center text-gray-900">
               <MapPin className="mr-2 h-5 w-5" />
-              안전시설 위치 확인
+              안전시설 위치 보기
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">
-              비상상황 시 필요한 안전시설의 위치를 확인하세요
-            </p>
-            <div className="space-y-2">
-              <Button 
-                onClick={() => setShowFireExtinguisher(true)}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                소화기 & 비상 대피로
-              </Button>
-              <Button 
-                onClick={() => setShowAED(true)}
-                className="w-full bg-red-600 hover:bg-red-700 text-white"
-              >
-                <Phone className="mr-2 h-4 w-4" />
-                AED 위치
-              </Button>
+            <div className="grid grid-cols-1 gap-3">
+              {/* Fire Extinguisher & Emergency Escape Route */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-green-700 border-green-200 hover:bg-green-50"
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    소화기 & 비상대피로 위치
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-bold">
+                      소화기 & 비상대피로 위치도
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <img 
+                      src={fireExtinguisherImage} 
+                      alt="소화기 및 비상대피로 위치도" 
+                      className="w-full h-auto border rounded-lg shadow-sm"
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* AED Location */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-red-700 border-red-200 hover:bg-red-50"
+                  >
+                    <Heart className="mr-2 h-4 w-4" />
+                    AED(자동심장충격기) 위치
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-bold">
+                      AED(자동심장충격기) 위치도
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <img 
+                      src={aedImage} 
+                      alt="AED 위치도" 
+                      className="w-full h-auto border rounded-lg shadow-sm"
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Continue with remaining cards */}
+        {/* Removed the old height risk section since it's now handled above */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <Shield className="mr-2 h-5 w-5" />
+              필수 안전장비
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {equipment.requiredSafetyEquipment && equipment.requiredSafetyEquipment.length > 0 ? (
+              <ul className="space-y-2">
+                {equipment.requiredSafetyEquipment.map((item, index) => (
+                  <li key={index} className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-sm">등록된 필수 안전장비가 없습니다.</p>
+            )}
           </CardContent>
         </Card>
 
         {/* Emergency Contacts */}
-        {equipment.emergencyContacts && equipment.emergencyContacts.length > 0 && (
-          <Card className="material-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center text-gray-900">
-                <Phone className="mr-2 h-5 w-5" />
-                비상연락처
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <Phone className="mr-2 h-5 w-5" />
+              비상연락처
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {Array.isArray(equipment.emergencyContacts) && equipment.emergencyContacts.length > 0 ? (
               <div className="space-y-3">
-                {equipment.emergencyContacts.map((contact, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm">{contact.role} - {contact.name}</span>
-                    <a href={`tel:${contact.phone}`} className="text-primary text-sm hover:underline">
-                      {contact.phone}
-                    </a>
+                {equipment.emergencyContacts.map((contact: any, index: any) => (
+                  <div key={index} className="p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-red-800">{contact}</span>
+                      <Button 
+                        size="sm" 
+                        className="bg-red-600 hover:bg-red-700"
+                        onClick={() => window.open(`tel:${contact}`, '_self')}
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        통화
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* AI Voice Guide */}
-        <Card className="bg-primary/5 border-primary/20 material-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <span className="material-icons text-primary">record_voice_over</span>
-              <div className="flex-1">
-                <h4 className="font-medium text-primary mb-1">AI 음성 안내</h4>
-                <p className="text-sm text-primary/80 mb-3">
-                  현재 설비의 주요 위험 요소와 안전 수칙을 음성으로 안내받을 수 있습니다.
-                </p>
-                <div className="flex gap-2">
-                  {!isPlayingGuide && !isPaused ? (
-                    <Button 
-                      onClick={handlePlayVoiceGuide}
-                      className="bg-primary hover:bg-primary/90 text-white"
-                      size="sm"
-                    >
-                      <Play className="mr-1 h-4 w-4" />
-                      음성 안내 시작
-                    </Button>
-                  ) : isPaused ? (
-                    <>
-                      <Button 
-                        onClick={handlePlayVoiceGuide}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        size="sm"
-                      >
-                        <Play className="mr-1 h-4 w-4" />
-                        재생
-                      </Button>
-                      <Button 
-                        onClick={handleStopVoiceGuide}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        <Square className="mr-1 h-4 w-4" />
-                        정지
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button 
-                        onClick={handlePauseVoiceGuide}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                        size="sm"
-                      >
-                        <Pause className="mr-1 h-4 w-4" />
-                        일시정지
-                      </Button>
-                      <Button 
-                        onClick={handleStopVoiceGuide}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        <Square className="mr-1 h-4 w-4" />
-                        정지
-                      </Button>
-                    </>
-                  )}
-                </div>
-                {isPlayingGuide && !isPaused && (
-                  <div className="mt-2 flex items-center text-xs text-primary/70">
-                    <div className="animate-pulse w-2 h-2 bg-primary rounded-full mr-2"></div>
-                    음성 안내 재생 중...
-                  </div>
-                )}
-                {isPaused && (
-                  <div className="mt-2 flex items-center text-xs text-yellow-600">
-                    <Pause className="w-3 h-3 mr-1" />
-                    일시정지됨
-                  </div>
-                )}
-              </div>
-            </div>
+            ) : (
+              <p className="text-gray-500 text-sm">등록된 비상연락처가 없습니다.</p>
+            )}
           </CardContent>
         </Card>
-
-        {/* Work Type Selection Button */}
-        <Button 
-          onClick={handleWorkTypeSelection}
-          className="w-full bg-primary hover:bg-primary/90 text-white py-4 font-medium material-shadow-lg"
-          size="lg"
-        >
-          <Equal className="mr-2 h-5 w-5" />
-          작업 유형 선택
-        </Button>
       </div>
-
-      {/* Safety Device Location Popup Dialog */}
-      {showSafetyDevices && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-semibold">안전장치 위치 확인</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowSafetyDevices(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="p-4">
-              {equipment.safetyDeviceImages && equipment.safetyDeviceImages.length > 0 ? (
-                <>
-                  {equipment.safetyDeviceImages.map((imageUrl, index) => (
-                    <div key={index} className="mb-4">
-                      <img 
-                        src={imageUrl} 
-                        alt={`Safety Device Location ${index + 1}`} 
-                        className="w-full h-auto rounded border"
-                        onLoad={() => console.log("Safety device image loaded successfully:", imageUrl)}
-                        onError={(e) => console.error("Safety device image load error:", e)}
-                      />
-                    </div>
-                  ))}
-                  <div className="mt-4 space-y-3">
-                    <div className="p-3 bg-red-50 border border-red-200 rounded">
-                      <p className="text-sm font-medium text-red-800">안전장치 점검 주의사항</p>
-                      <p className="text-xs text-red-600 mt-1">
-                        작업 전 모든 안전장치의 위치와 상태를 반드시 확인하세요.
-                        안전장치가 손상되었거나 작동하지 않는 경우 즉시 작업을 중단하고 관리자에게 보고하세요.
-                      </p>
-                    </div>
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-sm font-medium text-blue-800">주요 안전장치 점검사항</p>
-                      <ul className="text-xs text-blue-600 mt-1 space-y-1">
-                        <li>• 안전밸브: 누설 여부 및 작동 상태 확인</li>
-                        <li>• 압력게이지: 정확한 압력 표시 여부 확인</li>
-                        <li>• 드레인밸브: 응축수 배출 상태 확인</li>
-                        <li>• 비상정지 버튼: 정상 작동 여부 확인</li>
-                      </ul>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-400">
-                    <p className="text-sm text-gray-700 font-medium">등록된 안전장치 이미지가 없습니다</p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      관리자에게 문의하여 안전장치 위치 이미지를 등록해 주세요.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Fire Extinguisher Popup Dialog */}
-      {showFireExtinguisher && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-semibold">소화기 & 비상 대피로 위치</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowFireExtinguisher(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="p-4">
-              <img 
-                src={fireExtinguisherImage} 
-                alt="Fire Extinguisher and Emergency Escape Route" 
-                className="w-full h-auto rounded border"
-                onLoad={() => console.log("Fire extinguisher image loaded successfully:", fireExtinguisherImage)}
-                onError={(e) => console.error("Fire extinguisher image load error:", e)}
-              />
-              <div className="mt-4 space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded">
-                  <p className="text-sm font-medium text-red-800">화재시 대피요령</p>
-                  <ul className="text-xs text-red-600 mt-1 space-y-1">
-                    <li>1. "불이야" 라고 크게 외치십시오.</li>
-                    <li>2. 화재경보 버튼을 눌러주십시오.</li>
-                    <li>3. 몸을잠낮게 피하고 안내도의 피난 통로를 따라 신속하게 대피하십시오.</li>
-                  </ul>
-                </div>
-                <div className="p-3 bg-green-50 border border-green-200 rounded">
-                  <p className="text-sm font-medium text-green-800">소화기 사용방법</p>
-                  <ul className="text-xs text-green-600 mt-1 space-y-1">
-                    <li>1. 소화기를 바닥에 내려두고 안전핀을 뽑는다.</li>
-                    <li>2. 바람을 등지고 나팔 모즘을 화염을 향한다.</li>
-                    <li>3. 손잡이를 힘껏 누르고 빗자루로 쓸듯이 뿌린다.</li>
-                    <li style={{color: "red", fontWeight: "bold"}}>*주의) 2명 이상 같은 방향 방향이로 소화하기 사용하시오.</li>
-                  </ul>
-                </div>
-                <div className="p-3 bg-orange-50 border border-orange-200 rounded">
-                  <p className="text-sm font-medium text-orange-800">비상 대피 요령</p>
-                  <ul className="text-xs text-orange-600 mt-1 space-y-1">
-                    <li>• 침착하게 행동하고 당황하지 마십시오</li>
-                    <li>• 엘리베이터를 사용하지 말고 계단을 이용하십시오</li>
-                    <li>• 대피로 화살표를 따라 가장 가까운 출구로 이동하십시오</li>
-                    <li>• 연기가 있을 때는 몸을 낮추고 젖은 수건으로 코와 입을 막으십시오</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-
-      {/* AED Popup Dialog */}
-      {showAED && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-semibold">AED 위치 및 사용법</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowAED(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="p-4">
-              <img 
-                src={aedImage} 
-                alt="AED Location" 
-                className="w-full h-auto rounded border"
-                onLoad={() => console.log("AED image loaded successfully:", aedImage)}
-                onError={(e) => console.error("AED image load error:", e)}
-              />
-              <div className="mt-4 space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded">
-                  <p className="text-sm font-medium text-red-800">AED (자동심장충격기) 사용법</p>
-                  <ul className="text-xs text-red-600 mt-1 space-y-1">
-                    <li>1. 전원을 켜고 음성 안내에 따라 행동하십시오</li>
-                    <li>2. 패드를 환자의 가슴에 부착하십시오</li>
-                    <li>3. 심장 리듬 분석 중에는 환자를 만지지 마십시오</li>
-                    <li>4. 충격이 필요하면 버튼을 눌러주십시오</li>
-                    <li>5. 즉시 심폐소생술을 시행하십시오</li>
-                  </ul>
-                </div>
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-sm font-medium text-blue-800">비상연락처</p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    응급상황 발생 시 즉시 119에 신고하고 사내 응급의료진에게 연락하십시오.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

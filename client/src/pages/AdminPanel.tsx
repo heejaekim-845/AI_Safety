@@ -53,10 +53,15 @@ export default function AdminPanel() {
       modelName: "",
       riskLevel: "GREEN",
       highVoltageRisk: false,
+      highVoltageDetails: "",
       highPressureRisk: false,
+      highPressureDetails: "",
       highTemperatureRisk: false,
+      highTemperatureDetails: "",
       heightRisk: false,
+      heightDetails: "",
       heavyWeightRisk: false,
+      heavyWeightDetails: "",
       requiredSafetyEquipment: [],
       lotoPoints: [],
       safetyFacilityLocations: [],
@@ -129,10 +134,15 @@ export default function AdminPanel() {
       modelName: "",
       riskLevel: "GREEN",
       highVoltageRisk: false,
+      highVoltageDetails: "",
       highPressureRisk: false,
+      highPressureDetails: "",
       highTemperatureRisk: false,
+      highTemperatureDetails: "",
       heightRisk: false,
+      heightDetails: "",
       heavyWeightRisk: false,
+      heavyWeightDetails: "",
       requiredSafetyEquipment: [],
       lotoPoints: [],
       safetyFacilityLocations: [],
@@ -350,9 +360,11 @@ export default function AdminPanel() {
                   )}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <FormLabel>위험 요소</FormLabel>
-                  <div className="grid grid-cols-2 gap-2">
+                  
+                  {/* High Voltage Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="highVoltageRisk"
@@ -368,7 +380,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {form.watch("highVoltageRisk") && (
+                      <FormField
+                        control={form.control}
+                        name="highVoltageDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고전압 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고전압 위험에 대한 상세 정보를 입력하세요 (전압, 주의사항 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* High Pressure Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="highPressureRisk"
@@ -384,7 +418,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {form.watch("highPressureRisk") && (
+                      <FormField
+                        control={form.control}
+                        name="highPressureDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고압가스 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고압가스 위험에 대한 상세 정보를 입력하세요 (압력, 안전조치 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* High Temperature Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="highTemperatureRisk"
@@ -400,7 +456,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {form.watch("highTemperatureRisk") && (
+                      <FormField
+                        control={form.control}
+                        name="highTemperatureDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고온 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고온 위험에 대한 상세 정보를 입력하세요 (온도, 화상 위험 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Height Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="heightRisk"
@@ -416,7 +494,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {form.watch("heightRisk") && (
+                      <FormField
+                        control={form.control}
+                        name="heightDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고소 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고소 작업에 대한 상세 정보를 입력하세요 (높이, 추락 위험 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Heavy Weight Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="heavyWeightRisk"
@@ -432,6 +532,25 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
+                    {form.watch("heavyWeightRisk") && (
+                      <FormField
+                        control={form.control}
+                        name="heavyWeightDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고중량 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고중량에 대한 상세 정보를 입력하세요 (무게, 이동 방법 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -630,9 +749,11 @@ export default function AdminPanel() {
                   )}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <FormLabel>위험 요소</FormLabel>
-                  <div className="grid grid-cols-2 gap-2">
+                  
+                  {/* High Voltage Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={editForm.control}
                       name="highVoltageRisk"
@@ -648,7 +769,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {editForm.watch("highVoltageRisk") && (
+                      <FormField
+                        control={editForm.control}
+                        name="highVoltageDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고전압 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고전압 위험에 대한 상세 정보를 입력하세요 (전압, 주의사항 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* High Pressure Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={editForm.control}
                       name="highPressureRisk"
@@ -664,7 +807,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {editForm.watch("highPressureRisk") && (
+                      <FormField
+                        control={editForm.control}
+                        name="highPressureDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고압가스 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고압가스 위험에 대한 상세 정보를 입력하세요 (압력, 안전조치 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* High Temperature Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={editForm.control}
                       name="highTemperatureRisk"
@@ -680,7 +845,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {editForm.watch("highTemperatureRisk") && (
+                      <FormField
+                        control={editForm.control}
+                        name="highTemperatureDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고온 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고온 위험에 대한 상세 정보를 입력하세요 (온도, 화상 위험 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Height Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={editForm.control}
                       name="heightRisk"
@@ -696,7 +883,29 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
-                    
+                    {editForm.watch("heightRisk") && (
+                      <FormField
+                        control={editForm.control}
+                        name="heightDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고소 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고소 작업에 대한 상세 정보를 입력하세요 (높이, 추락 위험 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Heavy Weight Risk */}
+                  <div className="space-y-2">
                     <FormField
                       control={editForm.control}
                       name="heavyWeightRisk"
@@ -712,6 +921,25 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
+                    {editForm.watch("heavyWeightRisk") && (
+                      <FormField
+                        control={editForm.control}
+                        name="heavyWeightDetails"
+                        render={({ field }) => (
+                          <FormItem className="ml-6">
+                            <FormLabel className="text-xs text-muted-foreground">고중량 상세 정보</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="고중량에 대한 상세 정보를 입력하세요 (무게, 이동 방법 등)"
+                                {...field}
+                                rows={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
 
