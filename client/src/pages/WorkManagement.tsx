@@ -62,9 +62,11 @@ export default function WorkManagement() {
 
   // Fetch procedures for selected work type
   const { data: procedures = [], isLoading: proceduresLoading } = useQuery<WorkProcedure[]>({
-    queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"],
+    queryKey: [`/api/work-types/${selectedWorkType?.id}/procedures`],
     enabled: !!selectedWorkType?.id,
   });
+
+
 
   // Mutations
   const createWorkTypeMutation = useMutation({
