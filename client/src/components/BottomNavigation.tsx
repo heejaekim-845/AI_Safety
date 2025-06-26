@@ -53,7 +53,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto z-40">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto z-40 h-16">
       <div className="grid grid-cols-4 py-2">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;

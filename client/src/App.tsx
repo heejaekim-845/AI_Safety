@@ -45,7 +45,7 @@ function Router() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto bg-white min-h-[calc(100vh-140px)]">
+      <div className="max-w-md mx-auto bg-white min-h-[calc(100vh-140px)] pb-20">
         <Switch>
           <Route path="/" component={QRScanner} />
           <Route path="/equipment/:id" component={EquipmentDashboard} />
