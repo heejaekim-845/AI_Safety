@@ -275,6 +275,7 @@ export class MemStorage implements IStorage {
 
   // Equipment operations
   async getAllEquipment(): Promise<Equipment[]> {
+    console.log("Equipment in storage:", Array.from(this.equipment.keys()));
     return Array.from(this.equipment.values());
   }
 
