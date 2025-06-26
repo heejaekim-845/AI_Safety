@@ -1397,7 +1397,7 @@ export default function AdminPanel() {
                   variant="outline" 
                   size="sm" 
                   className="flex-1"
-                  onClick={() => setLocation(`/equipment/${eq.id}/work-types`)}
+                  onClick={() => setLocation(`/equipment/${eq.id}/work-management`)}
                 >
                   <Settings className="mr-1 h-3 w-3" />
                   작업 관리

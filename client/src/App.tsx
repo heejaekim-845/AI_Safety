@@ -7,6 +7,7 @@ import QRScanner from "@/pages/QRScanner";
 import EquipmentDashboard from "@/pages/EquipmentDashboard";
 import WorkTypeSelection from "@/pages/WorkTypeSelection";
 import WorkProcedure from "@/pages/WorkProcedure";
+import WorkManagement from "@/pages/WorkManagement";
 import AdminPanel from "@/pages/AdminPanel";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/" component={QRScanner} />
           <Route path="/equipment/:id" component={EquipmentDashboard} />
           <Route path="/equipment/:equipmentId/work-types" component={WorkTypeSelection} />
+          <Route path="/equipment/:equipmentId/work-management" component={WorkManagement} />
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
           <Route path="/admin" component={AdminPanel} />
         </Switch>
