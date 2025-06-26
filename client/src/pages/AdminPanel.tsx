@@ -594,6 +594,74 @@ export default function AdminPanel() {
                   )}
                 />
 
+                {/* Required Safety Equipment Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">필수 안전장비 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentEquipment = form.getValues("requiredSafetyEquipment") || [];
+                        form.setValue("requiredSafetyEquipment", [
+                          ...currentEquipment,
+                          ""
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      장비 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="requiredSafetyEquipment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {(field.value || []).map((equipment: string, index: number) => (
+                            <div key={index} className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50">
+                              <div className="flex-1">
+                                <Input
+                                  placeholder="예: 안전모, 보안경, 안전화 등"
+                                  value={equipment}
+                                  onChange={(e) => {
+                                    const newEquipment = [...(field.value || [])];
+                                    newEquipment[index] = e.target.value;
+                                    field.onChange(newEquipment);
+                                  }}
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  const newEquipment = [...(field.value || [])];
+                                  newEquipment.splice(index, 1);
+                                  field.onChange(newEquipment);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          {(!field.value || field.value.length === 0) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-sm">등록된 필수 안전장비가 없습니다.</p>
+                              <p className="text-xs">상단의 "장비 추가" 버튼을 클릭하여 추가해보세요.</p>
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="flex space-x-3">
                   <Button 
                     type="button" 
@@ -982,6 +1050,74 @@ export default function AdminPanel() {
                     </FormItem>
                   )}
                 />
+
+                {/* Required Safety Equipment Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">필수 안전장비 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentEquipment = editForm.getValues("requiredSafetyEquipment") || [];
+                        editForm.setValue("requiredSafetyEquipment", [
+                          ...currentEquipment,
+                          ""
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      장비 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="requiredSafetyEquipment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {(field.value || []).map((equipment: string, index: number) => (
+                            <div key={index} className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50">
+                              <div className="flex-1">
+                                <Input
+                                  placeholder="예: 안전모, 보안경, 안전화 등"
+                                  value={equipment}
+                                  onChange={(e) => {
+                                    const newEquipment = [...(field.value || [])];
+                                    newEquipment[index] = e.target.value;
+                                    field.onChange(newEquipment);
+                                  }}
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  const newEquipment = [...(field.value || [])];
+                                  newEquipment.splice(index, 1);
+                                  field.onChange(newEquipment);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          {(!field.value || field.value.length === 0) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-sm">등록된 필수 안전장비가 없습니다.</p>
+                              <p className="text-xs">상단의 "장비 추가" 버튼을 클릭하여 추가해보세요.</p>
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Emergency Contacts Management */}
                 <div className="space-y-4 border-t pt-4">

@@ -128,6 +128,8 @@ Changelog:
 - June 25, 2025. Modified risk assessment popup to show count of risk factors instead of overall risk level
 - June 26, 2025. Changed app name from '스마트안전파트너' to '지능형 안전정보 시스템(스마트 안전 파트너)'
 - June 26, 2025. Fixed bottom navigation bar overlay issue by adding proper padding to all pages
+- June 26, 2025. Added emergency contact management feature to equipment edit screen with equipment-specific contact storage
+- June 26, 2025. Added required safety equipment management feature to equipment edit screen with equipment-specific safety equipment lists
 ```
 
 ## User Preferences
