@@ -26,7 +26,8 @@ import {
   FileText,
   MapPin,
   X,
-  Heart
+  Heart,
+  CheckCircle
 } from "lucide-react";
 import type { Incident } from "@shared/schema";
 
