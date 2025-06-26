@@ -60,11 +60,6 @@ export default function WorkManagement() {
     enabled: !!equipmentId,
   });
 
-  // Debug logging
-  console.log("WorkManagement - equipmentId:", equipmentId);
-  console.log("WorkManagement - workTypes:", workTypes);
-  console.log("WorkManagement - workTypesLoading:", workTypesLoading);
-
   // Fetch procedures for selected work type
   const { data: procedures = [], isLoading: proceduresLoading } = useQuery<WorkProcedure[]>({
     queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"],
