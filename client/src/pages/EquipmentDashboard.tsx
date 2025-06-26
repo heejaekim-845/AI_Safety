@@ -172,15 +172,9 @@ export default function EquipmentDashboard() {
             )}
             <div className="flex-1">
               <h3 className="text-xl font-medium mb-3">{equipment.name}</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="space-y-1 text-sm">
                 <p className="text-primary-100">CODE: {equipment.code}</p>
-                <p className="text-primary-100">모델: {equipment.modelName || 'N/A'}</p>
                 <p className="text-primary-100">위치: {equipment.location}</p>
-                <p className="text-primary-100">제조사: {equipment.manufacturer || 'N/A'}</p>
-                <p className="text-primary-100 col-span-2">설치년도: {equipment.installYear || 'N/A'}</p>
-                {equipment.specification && (
-                  <p className="text-primary-100 col-span-2">규격: {equipment.specification}</p>
-                )}
               </div>
             </div>
           </div>
