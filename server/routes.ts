@@ -126,6 +126,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/work-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const workTypeData = insertWorkTypeSchema.partial().parse(req.body);
+      const workType = await storage.updateWorkType(id, workTypeData);
+      res.json(workType);
+    } catch (error) {
+      console.error("작업 유형 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "작업 유형을 수정할 수 없습니다." });
+    }
+  });
+
+  app.delete("/api/work-types/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteWorkType(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("작업 유형 삭제 오류:", error);
+      res.status(500).json({ message: "작업 유형을 삭제할 수 없습니다." });
+    }
+  });
+
   // Work procedures routes
   app.get("/api/work-types/:workTypeId/procedures", async (req, res) => {
     try {
@@ -138,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/procedures", async (req, res) => {
+  app.post("/api/work-procedures", async (req, res) => {
     try {
       const procedureData = insertWorkProcedureSchema.parse(req.body);
       const procedure = await storage.createWorkProcedure(procedureData);
@@ -149,6 +175,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
       }
       res.status(500).json({ message: "작업 절차를 생성할 수 없습니다." });
+    }
+  });
+
+  app.patch("/api/work-procedures/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const procedureData = insertWorkProcedureSchema.partial().parse(req.body);
+      const procedure = await storage.updateWorkProcedure(id, procedureData);
+      res.json(procedure);
+    } catch (error) {
+      console.error("작업 절차 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "작업 절차를 수정할 수 없습니다." });
+    }
+  });
+
+  app.delete("/api/work-procedures/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteWorkProcedure(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("작업 절차 삭제 오류:", error);
+      res.status(500).json({ message: "작업 절차를 삭제할 수 없습니다." });
     }
   });
 

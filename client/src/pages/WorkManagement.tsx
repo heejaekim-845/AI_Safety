@@ -49,19 +49,19 @@ export default function WorkManagement() {
   const [safetyNotes, setSafetyNotes] = useState("");
 
   // Fetch equipment data
-  const { data: equipment, isLoading: equipmentLoading } = useQuery({
+  const { data: equipment, isLoading: equipmentLoading } = useQuery<Equipment>({
     queryKey: ["/api/equipment", equipmentId],
     enabled: !!equipmentId,
   });
 
   // Fetch work types for this equipment
-  const { data: workTypes, isLoading: workTypesLoading } = useQuery({
+  const { data: workTypes = [], isLoading: workTypesLoading } = useQuery<WorkType[]>({
     queryKey: ["/api/equipment", equipmentId, "work-types"],
     enabled: !!equipmentId,
   });
 
   // Fetch procedures for selected work type
-  const { data: procedures, isLoading: proceduresLoading } = useQuery({
+  const { data: procedures = [], isLoading: proceduresLoading } = useQuery<WorkProcedure[]>({
     queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"],
     enabled: !!selectedWorkType?.id,
   });
@@ -228,7 +228,9 @@ export default function WorkManagement() {
           </Button>
           <div>
             <h1 className="text-xl font-bold">작업 관리</h1>
-            <p className="text-primary-100">{equipment.name} ({equipment.code})</p>
+            {equipment && (
+              <p className="text-primary-100">{equipment.name} ({equipment.code})</p>
+            )}
           </div>
         </div>
       </div>
@@ -312,7 +314,7 @@ export default function WorkManagement() {
           <CardContent>
             {workTypesLoading ? (
               <div>작업 유형을 불러오는 중...</div>
-            ) : !workTypes || workTypes.length === 0 ? (
+            ) : workTypes.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 등록된 작업 유형이 없습니다. 새 작업 유형을 추가해보세요.
               </div>
@@ -453,7 +455,7 @@ export default function WorkManagement() {
             <CardContent>
               {proceduresLoading ? (
                 <div>작업 절차를 불러오는 중...</div>
-              ) : !procedures || procedures.length === 0 ? (
+              ) : procedures.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   등록된 작업 절차가 없습니다. 새 절차를 추가해보세요.
                 </div>
