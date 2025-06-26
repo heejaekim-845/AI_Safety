@@ -80,6 +80,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/equipment/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      console.log("PATCH 요청 데이터:", JSON.stringify(req.body, null, 2));
+      const equipmentData = insertEquipmentSchema.partial().parse(req.body);
+      console.log("검증된 설비 데이터:", JSON.stringify(equipmentData, null, 2));
+      const equipment = await storage.updateEquipment(id, equipmentData);
+      console.log("업데이트 완료:", equipment);
+      res.json(equipment);
+    } catch (error) {
+      console.error("설비 업데이트 오류:", error);
+      console.error("오류 스택:", error.stack);
+      if (error instanceof z.ZodError) {
+        console.error("Zod 검증 오류:", error.errors);
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "설비를 업데이트할 수 없습니다." });
+    }
+  });
+
   // Work types routes
   app.get("/api/equipment/:equipmentId/work-types", async (req, res) => {
     try {
