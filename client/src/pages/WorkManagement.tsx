@@ -86,7 +86,7 @@ export default function WorkManagement() {
       return apiRequest("POST", `/api/work-procedures`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/work-types/${selectedWorkType?.id}/procedures`] });
       setIsAddingProcedure(false);
       setEditingProcedure(null);
       resetProcedureForm();
@@ -99,7 +99,7 @@ export default function WorkManagement() {
       return apiRequest("PATCH", `/api/work-procedures/${id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/work-types/${selectedWorkType?.id}/procedures`] });
       setEditingProcedure(null);
       setIsAddingProcedure(false);
       resetProcedureForm();
@@ -112,7 +112,7 @@ export default function WorkManagement() {
       return apiRequest("DELETE", `/api/work-procedures/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/work-types", selectedWorkType?.id, "procedures"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/work-types/${selectedWorkType?.id}/procedures`] });
       toast({ title: "작업 절차가 삭제되었습니다" });
     },
   });
