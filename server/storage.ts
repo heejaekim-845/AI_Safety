@@ -64,7 +64,7 @@ export class MemStorage implements IStorage {
   private incidents: Map<number, Incident> = new Map();
   private workSessions: Map<number, WorkSession> = new Map();
   private riskReports: Map<number, RiskReport> = new Map();
-  private currentId = 1;
+  private currentId = 3;
 
   constructor() {
     this.initializeTestData();
@@ -111,6 +111,50 @@ export class MemStorage implements IStorage {
 
     this.equipment.set(1, sampleEquipment);
 
+    // Add second sample equipment - Boiler B-102
+    const sampleEquipment2: Equipment = {
+      id: 2,
+      name: "보일러 B-102",
+      code: "BOILER-B-102",
+      location: "보일러실 2층",
+      manufacturer: "한국보일러공업",
+      installYear: 2019,
+      specification: "최대압력: 10kg/cm², 증기량: 5000kg/h",
+      imageUrl: null,
+      modelName: "KB-5000",
+      blueprintInfo: "도면번호: DWG-BOILER-B102-2019",
+      riskLevel: "RED",
+      highVoltageRisk: true,
+      highPressureRisk: true,
+      highTemperatureRisk: true,
+      heightRisk: false,
+      heavyWeightRisk: false,
+      hazardousChemicalType: "증기",
+      hazardousChemicalName: "고온증기",
+      riskManagementZone: "특별관리구역",
+      requiredSafetyEquipment: ["내열복", "안전모", "보안경", "내열장갑", "안전화"],
+      lotoPoints: [
+        { id: "LOTO-003", location: "주증기밸브", type: "압력" },
+        { id: "LOTO-004", location: "급수차단밸브", type: "압력" },
+        { id: "LOTO-005", location: "연료차단밸브", type: "가스" },
+        { id: "LOTO-006", location: "제어전원", type: "전기" }
+      ],
+      safetyFacilityLocations: [
+        { id: "SF-003", type: "소화기", location: "보일러실 입구" },
+        { id: "SF-004", type: "비상정지버튼", location: "제어실" },
+        { id: "SF-005", type: "가스누출감지기", location: "연료공급라인" }
+      ],
+      emergencyContacts: [
+        { role: "보일러기술자", name: "박보일", phone: "010-5678-9012" },
+        { role: "안전관리자", name: "김안전", phone: "010-1234-5678" },
+        { role: "소방서", name: "119", phone: "119" }
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.equipment.set(2, sampleEquipment2);
+
     // Sample work types
     const workType1: WorkType = {
       id: 1,
@@ -140,8 +184,39 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
 
+    // Work types for Boiler B-102
+    const workType3: WorkType = {
+      id: 3,
+      equipmentId: 2,
+      name: "보일러 점화",
+      description: "보일러 안전 점화 및 운전 준비",
+      requiresPermit: true,
+      estimatedDuration: 60,
+      requiredQualifications: ["보일러기능사", "고압가스 안전교육"],
+      requiredEquipment: ["압력계", "수위계", "점화장치"],
+      environmentalRequirements: ["환기 상태 양호", "가스 누출 없음"],
+      legalRequirements: ["점화 허가서", "안전작업 허가서"],
+      createdAt: new Date()
+    };
+
+    const workType4: WorkType = {
+      id: 4,
+      equipmentId: 2,
+      name: "보일러 정지",
+      description: "보일러 안전 정지 및 점검",
+      requiresPermit: false,
+      estimatedDuration: 45,
+      requiredQualifications: ["보일러운전자"],
+      requiredEquipment: ["압력계", "온도계"],
+      environmentalRequirements: ["작업 공간 확보"],
+      legalRequirements: ["정지 절차서 준수"],
+      createdAt: new Date()
+    };
+
     this.workTypes.set(1, workType1);
     this.workTypes.set(2, workType2);
+    this.workTypes.set(3, workType3);
+    this.workTypes.set(4, workType4);
 
     // Sample procedures for 일상 점검
     const procedures: WorkProcedure[] = [
