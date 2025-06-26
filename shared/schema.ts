@@ -27,6 +27,7 @@ export const equipment = pgTable("equipment", {
   lotoPoints: jsonb("loto_points").$type<{ id: string; location: string; type: string }[]>(),
   safetyFacilityLocations: jsonb("safety_facility_locations").$type<{ id: string; type: string; location: string }[]>(),
   emergencyContacts: jsonb("emergency_contacts").$type<{ role: string; name: string; phone: string }[]>(),
+  safetyDeviceImages: jsonb("safety_device_images").$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

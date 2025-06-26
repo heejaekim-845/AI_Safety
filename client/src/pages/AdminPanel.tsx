@@ -58,7 +58,8 @@ export default function AdminPanel() {
       requiredSafetyEquipment: [],
       lotoPoints: [],
       safetyFacilityLocations: [],
-      emergencyContacts: []
+      emergencyContacts: [],
+      safetyDeviceImages: []
     }
   });
 

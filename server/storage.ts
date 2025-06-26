@@ -105,6 +105,7 @@ export class MemStorage implements IStorage {
         { role: "안전관리자", name: "김안전", phone: "010-1234-5678" },
         { role: "기술지원", name: "이기술", phone: "010-9876-5432" }
       ],
+      safetyDeviceImages: ["/attached_assets/svalve_1750838843504.jpg"],
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -149,6 +150,7 @@ export class MemStorage implements IStorage {
         { role: "안전관리자", name: "김안전", phone: "010-1234-5678" },
         { role: "소방서", name: "119", phone: "119" }
       ],
+      safetyDeviceImages: [],
       createdAt: new Date(),
       updatedAt: new Date()
     };
