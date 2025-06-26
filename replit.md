@@ -131,6 +131,8 @@ Changelog:
 - June 26, 2025. Added emergency contact management feature to equipment edit screen with equipment-specific contact storage
 - June 26, 2025. Added required safety equipment management feature to equipment edit screen with equipment-specific safety equipment lists
 - June 26, 2025. Reorganized equipment dashboard section order: 설비상세정보 → 위험도분석 → 주요위험요소 → 필수안전장비 → 유해화학물질정보 → 안전장치위치확인 → 안전시설위치보기 → 비상연락처
+- June 26, 2025. Implemented complete work procedure editing functionality for all equipment with proper cache invalidation, enabling real-time updates when editing work steps
+- June 26, 2025. Added comprehensive sample work procedures for boiler equipment (연료 공급 차단, 압력 및 온도 확인, 연소실 점검, 연소 정지, 냉각 대기) to match compressor procedures
 - June 26, 2025. Simplified equipment header blue box to show only 4 essential items: thumbnail image, equipment name, code, and location
 ```
 

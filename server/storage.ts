@@ -269,6 +269,71 @@ export class MemStorage implements IStorage {
 
     procedures.forEach(proc => this.workProcedures.set(proc.id, proc));
 
+    // Sample procedures for 보일러 점검 (workTypeId: 3)
+    const boilerProcedures: WorkProcedure[] = [
+      {
+        id: 4,
+        workTypeId: 3,
+        stepNumber: 1,
+        category: "안전조치",
+        title: "연료 공급 차단",
+        description: "보일러 작업 전 연료 밸브 완전 차단 및 확인",
+        checklistItems: ["주 연료 밸브 차단", "보조 연료 밸브 차단", "차단 확인"],
+        safetyNotes: "연료 차단 후 반드시 압력계로 확인하세요.",
+        createdAt: new Date()
+      },
+      {
+        id: 5,
+        workTypeId: 3,
+        stepNumber: 2,
+        category: "상태인지",
+        title: "압력 및 온도 확인",
+        description: "보일러 시스템의 압력과 온도 상태 점검",
+        checklistItems: ["압력계 확인", "온도계 확인", "안전밸브 상태 점검"],
+        safetyNotes: "정상 범위를 벗어나면 즉시 작업을 중단하세요.",
+        createdAt: new Date()
+      },
+      {
+        id: 6,
+        workTypeId: 3,
+        stepNumber: 3,
+        category: "기기조작",
+        title: "연소실 점검",
+        description: "연소실 내부 상태 및 버너 점검",
+        checklistItems: ["연소실 내부 확인", "버너 상태 점검", "배기 덕트 확인"],
+        safetyNotes: "연소실 점검 시 충분한 환기를 확보하세요.",
+        createdAt: new Date()
+      }
+    ];
+
+    // Sample procedures for 보일러 정지 (workTypeId: 4)
+    const boilerShutdownProcedures: WorkProcedure[] = [
+      {
+        id: 7,
+        workTypeId: 4,
+        stepNumber: 1,
+        category: "기기조작",
+        title: "연소 정지",
+        description: "버너 운전 정지 및 연료 공급 차단",
+        checklistItems: ["버너 정지", "연료 밸브 차단", "정지 확인"],
+        safetyNotes: "정지 절차를 순서대로 진행하세요.",
+        createdAt: new Date()
+      },
+      {
+        id: 8,
+        workTypeId: 4,
+        stepNumber: 2,
+        category: "안전조치",
+        title: "냉각 대기",
+        description: "보일러 온도 하강 대기 및 모니터링",
+        checklistItems: ["온도 모니터링", "압력 감소 확인", "냉각수 순환 확인"],
+        safetyNotes: "충분한 냉각 시간을 확보하세요.",
+        createdAt: new Date()
+      }
+    ];
+
+    [...boilerProcedures, ...boilerShutdownProcedures].forEach(proc => this.workProcedures.set(proc.id, proc));
+
     // Sample incidents
     const incident1: Incident = {
       id: 1,
@@ -282,7 +347,7 @@ export class MemStorage implements IStorage {
     };
 
     this.incidents.set(1, incident1);
-    this.currentId = 10;
+    this.currentId = 15;
   }
 
   // Equipment operations
