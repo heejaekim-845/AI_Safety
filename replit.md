@@ -130,6 +130,7 @@ Changelog:
 - June 26, 2025. Fixed bottom navigation bar overlay issue by adding proper padding to all pages
 - June 26, 2025. Added emergency contact management feature to equipment edit screen with equipment-specific contact storage
 - June 26, 2025. Added required safety equipment management feature to equipment edit screen with equipment-specific safety equipment lists
+- June 26, 2025. Reorganized equipment dashboard section order: 설비상세정보 → 위험도분석 → 주요위험요소 → 필수안전장비 → 유해화학물질정보 → 안전장치위치확인 → 안전시설위치보기 → 비상연락처
 ```
 
 ## User Preferences

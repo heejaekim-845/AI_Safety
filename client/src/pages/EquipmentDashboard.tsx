@@ -188,37 +188,7 @@ export default function EquipmentDashboard() {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Risk Level Visualization */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <AlertTriangle className="mr-2 h-5 w-5" />
-              위험도 분석
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium">전체 위험도</span>
-              <RiskLevelBadge level={equipment.riskLevel} />
-            </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-danger/10 rounded-lg">
-                <div className="text-2xl font-bold text-danger">{riskCounts.high}</div>
-                <div className="text-xs text-danger">고위험</div>
-              </div>
-              <div className="p-3 bg-warning/10 rounded-lg">
-                <div className="text-2xl font-bold text-warning">{riskCounts.medium}</div>
-                <div className="text-xs text-warning">중위험</div>
-              </div>
-              <div className="p-3 bg-success/10 rounded-lg">
-                <div className="text-2xl font-bold text-success">{riskCounts.low}</div>
-                <div className="text-xs text-success">저위험</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Equipment Details */}
+        {/* 1. Equipment Details */}
         <Card className="material-shadow">
           <CardHeader>
             <CardTitle className="flex items-center text-gray-900">
@@ -266,7 +236,165 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
-        {/* Hazardous Chemicals Information */}
+        {/* 2. Risk Level Visualization */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <AlertTriangle className="mr-2 h-5 w-5" />
+              위험도 분석
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium">전체 위험도</span>
+              <RiskLevelBadge level={equipment.riskLevel} />
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-3 bg-danger/10 rounded-lg">
+                <div className="text-2xl font-bold text-danger">{riskCounts.high}</div>
+                <div className="text-xs text-danger">고위험</div>
+              </div>
+              <div className="p-3 bg-warning/10 rounded-lg">
+                <div className="text-2xl font-bold text-warning">{riskCounts.medium}</div>
+                <div className="text-xs text-warning">중위험</div>
+              </div>
+              <div className="p-3 bg-success/10 rounded-lg">
+                <div className="text-2xl font-bold text-success">{riskCounts.low}</div>
+                <div className="text-xs text-success">저위험</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 3. Major Risk Factors */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <AlertTriangle className="mr-2 h-5 w-5" />
+              주요 위험 요소
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {equipment.highTemperatureRisk && (
+                <Card className="material-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-danger mr-2">whatshot</span>
+                      <span className="text-sm font-medium">고온 위험</span>
+                    </div>
+                    {equipment.highTemperatureDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highTemperatureDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">150°C 이상</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {equipment.highPressureRisk && (
+                <Card className="material-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-warning mr-2">compress</span>
+                      <span className="text-sm font-medium">고압 가스</span>
+                    </div>
+                    {equipment.highPressureDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highPressureDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">15 bar</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {equipment.highVoltageRisk && (
+                <Card className="material-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-warning mr-2">electrical_services</span>
+                      <span className="text-sm font-medium">고전압 위험</span>
+                    </div>
+                    {equipment.highVoltageDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.highVoltageDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">전기 차단 필요</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {equipment.heightRisk && (
+                <Card className="material-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-warning mr-2">height</span>
+                      <span className="text-sm font-medium">고소 위험</span>
+                    </div>
+                    {equipment.heightDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.heightDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">2m 이상 높이</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {equipment.heavyWeightRisk && (
+                <Card className="material-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-warning mr-2">fitness_center</span>
+                      <span className="text-sm font-medium">고중량 위험</span>
+                    </div>
+                    {equipment.heavyWeightDetails ? (
+                      <p className="text-xs text-gray-600">{equipment.heavyWeightDetails}</p>
+                    ) : (
+                      <p className="text-xs text-gray-600">중량물 취급 주의</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            
+            {/* Show message if no risk factors are present */}
+            {!equipment.highTemperatureRisk && !equipment.highPressureRisk && !equipment.highVoltageRisk && !equipment.heightRisk && !equipment.heavyWeightRisk && (
+              <div className="text-center py-4">
+                <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                  <p className="text-sm text-green-800">
+                    ✓ 특별한 위험 요소가 확인되지 않음
+                  </p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 4. Required Safety Equipment */}
+        <Card className="material-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-gray-900">
+              <Shield className="mr-2 h-5 w-5" />
+              필수 안전장비
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {equipment.requiredSafetyEquipment && equipment.requiredSafetyEquipment.length > 0 ? (
+              <ul className="space-y-2">
+                {equipment.requiredSafetyEquipment.map((item: string, index: number) => (
+                  <li key={index} className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-sm">등록된 필수 안전장비가 없습니다.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 5. Hazardous Chemicals Information */}
         <Card className="material-shadow">
           <CardHeader>
             <CardTitle className="flex items-center text-gray-900">
