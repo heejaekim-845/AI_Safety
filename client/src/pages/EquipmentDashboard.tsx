@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import nitrogenMsdsImage from "@assets/nitrogen_1_1750834174079.png";
-import safetyValveImage from "@assets/svalve_1750838843504.jpg";
+
 import fireExtinguisherImage from "@assets/Fire Extinguisher Emergency Escape Route_1750839863344.jpg";
 import aedImage from "@assets/AED_1750839869531.png";
 import { 
@@ -664,31 +664,48 @@ export default function EquipmentDashboard() {
               </Button>
             </div>
             <div className="p-4">
-              <img 
-                src={safetyValveImage} 
-                alt="Safety Device Locations" 
-                className="w-full h-auto rounded border"
-                onLoad={() => console.log("Safety valve image loaded successfully:", safetyValveImage)}
-                onError={(e) => console.error("Safety valve image load error:", e)}
-              />
-              <div className="mt-4 space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded">
-                  <p className="text-sm font-medium text-red-800">안전밸브 (Safety Valve)</p>
-                  <p className="text-xs text-red-600 mt-1">
-                    압력이 설정값을 초과할 때 자동으로 작동하여 압력을 방출합니다. 
-                    작업 전 안전밸브의 위치와 상태를 반드시 확인하세요.
-                  </p>
+              {equipment.safetyDeviceImages && equipment.safetyDeviceImages.length > 0 ? (
+                <>
+                  {equipment.safetyDeviceImages.map((imageUrl, index) => (
+                    <div key={index} className="mb-4">
+                      <img 
+                        src={imageUrl} 
+                        alt={`Safety Device Location ${index + 1}`} 
+                        className="w-full h-auto rounded border"
+                        onLoad={() => console.log("Safety device image loaded successfully:", imageUrl)}
+                        onError={(e) => console.error("Safety device image load error:", e)}
+                      />
+                    </div>
+                  ))}
+                  <div className="mt-4 space-y-3">
+                    <div className="p-3 bg-red-50 border border-red-200 rounded">
+                      <p className="text-sm font-medium text-red-800">안전장치 점검 주의사항</p>
+                      <p className="text-xs text-red-600 mt-1">
+                        작업 전 모든 안전장치의 위치와 상태를 반드시 확인하세요.
+                        안전장치가 손상되었거나 작동하지 않는 경우 즉시 작업을 중단하고 관리자에게 보고하세요.
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-sm font-medium text-blue-800">주요 안전장치 점검사항</p>
+                      <ul className="text-xs text-blue-600 mt-1 space-y-1">
+                        <li>• 안전밸브: 누설 여부 및 작동 상태 확인</li>
+                        <li>• 압력게이지: 정확한 압력 표시 여부 확인</li>
+                        <li>• 드레인밸브: 응축수 배출 상태 확인</li>
+                        <li>• 비상정지 버튼: 정상 작동 여부 확인</li>
+                      </ul>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                    <p className="text-sm text-gray-700 font-medium">등록된 안전장치 이미지가 없습니다</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      관리자에게 문의하여 안전장치 위치 이미지를 등록해 주세요.
+                    </p>
+                  </div>
                 </div>
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-sm font-medium text-blue-800">주요 안전장치 점검사항</p>
-                  <ul className="text-xs text-blue-600 mt-1 space-y-1">
-                    <li>• 안전밸브: 누설 여부 및 작동 상태 확인</li>
-                    <li>• 압력게이지: 정확한 압력 표시 여부 확인</li>
-                    <li>• 드레인밸브: 응축수 배출 상태 확인</li>
-                    <li>• 필터: 청결 상태 및 교체 시기 확인</li>
-                  </ul>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

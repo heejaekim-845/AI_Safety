@@ -369,6 +369,26 @@ export default function AdminPanel() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="safetyDeviceImages"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>안전장치 위치 이미지</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="안전장치 위치 이미지 URL (한 줄당 하나씩)&#10;예: /attached_assets/safety_device1.jpg"
+                          {...field}
+                          value={Array.isArray(field.value) ? field.value.join('\n') : field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="flex space-x-3">
                   <Button 
                     type="button" 
