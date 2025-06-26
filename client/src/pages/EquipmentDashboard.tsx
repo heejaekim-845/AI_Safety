@@ -615,11 +615,16 @@ export default function EquipmentDashboard() {
                 {equipment.emergencyContacts.map((contact: any, index: any) => (
                   <div key={index} className="p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
                     <div className="flex justify-between items-center">
-                      <span className="font-medium text-red-800">{contact}</span>
+                      <div>
+                        <div className="font-medium text-red-800">{contact.role || contact.name || contact}</div>
+                        {contact.name && contact.role && (
+                          <div className="text-sm text-red-600">{contact.name}</div>
+                        )}
+                      </div>
                       <Button 
                         size="sm" 
                         className="bg-red-600 hover:bg-red-700"
-                        onClick={() => window.open(`tel:${contact}`, '_self')}
+                        onClick={() => window.open(`tel:${contact.phone || contact}`, '_self')}
                       >
                         <Phone className="h-4 w-4 mr-1" />
                         통화
