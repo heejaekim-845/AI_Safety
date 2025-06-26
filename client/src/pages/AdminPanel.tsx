@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +24,8 @@ import {
   MoreVertical, 
   Edit, 
   Settings,
+  Phone,
+  Trash2,
   Factory,
   Shield,
   AlertTriangle
@@ -979,6 +982,101 @@ export default function AdminPanel() {
                     </FormItem>
                   )}
                 />
+
+                {/* Emergency Contacts Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">비상연락처 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentContacts = editForm.getValues("emergencyContacts") || [];
+                        editForm.setValue("emergencyContacts", [
+                          ...currentContacts,
+                          { role: "", name: "", phone: "" }
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      연락처 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="emergencyContacts"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {(field.value || []).map((contact: any, index: number) => (
+                            <div key={index} className="grid grid-cols-12 gap-2 items-end p-3 border rounded-lg bg-gray-50">
+                              <div className="col-span-3">
+                                <Label className="text-xs text-muted-foreground">역할</Label>
+                                <Input
+                                  placeholder="안전관리자"
+                                  value={contact.role}
+                                  onChange={(e) => {
+                                    const newContacts = [...(field.value || [])];
+                                    newContacts[index] = { ...contact, role: e.target.value };
+                                    field.onChange(newContacts);
+                                  }}
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <Label className="text-xs text-muted-foreground">이름</Label>
+                                <Input
+                                  placeholder="김안전"
+                                  value={contact.name}
+                                  onChange={(e) => {
+                                    const newContacts = [...(field.value || [])];
+                                    newContacts[index] = { ...contact, name: e.target.value };
+                                    field.onChange(newContacts);
+                                  }}
+                                />
+                              </div>
+                              <div className="col-span-4">
+                                <Label className="text-xs text-muted-foreground">연락처</Label>
+                                <Input
+                                  placeholder="010-1234-5678"
+                                  value={contact.phone}
+                                  onChange={(e) => {
+                                    const newContacts = [...(field.value || [])];
+                                    newContacts[index] = { ...contact, phone: e.target.value };
+                                    field.onChange(newContacts);
+                                  }}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newContacts = [...(field.value || [])];
+                                    newContacts.splice(index, 1);
+                                    field.onChange(newContacts);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          {(!field.value || field.value.length === 0) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <Phone className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-sm">등록된 비상연락처가 없습니다.</p>
+                              <p className="text-xs">상단의 "연락처 추가" 버튼을 클릭하여 추가해보세요.</p>
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="flex space-x-3">
                   <Button 
