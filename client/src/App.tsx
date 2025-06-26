@@ -35,7 +35,7 @@ function Router() {
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center space-x-3">
             <span className="material-icons text-2xl">security</span>
-            <h1 className="text-lg font-medium">스마트 안전 파트너</h1>
+            <h1 className="text-lg font-medium">지능형 안전정보 시스템(스마트 안전 파트너)</h1>
           </div>
           <div className="flex items-center space-x-2">
             <span className="material-icons cursor-pointer">notifications</span>

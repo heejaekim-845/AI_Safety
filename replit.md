@@ -1,4 +1,4 @@
-# Smart Safety Partner - Industrial Equipment Safety Management System
+# 지능형 안전정보 시스템(스마트 안전 파트너) - Industrial Equipment Safety Management System
 
 ## Overview
 
@@ -126,6 +126,8 @@ Changelog:
 - June 25, 2025. Modified AI voice guidance to exclude basic equipment information (manufacturer, model, specifications) and focus only on safety-critical content
 - June 25, 2025. Added AI risk assessment feature for work types with Korean Industrial Safety and Health Act compliance, including risk scoring (probability × severity, max 20 points) and mitigation measures popup
 - June 25, 2025. Modified risk assessment popup to show count of risk factors instead of overall risk level
+- June 26, 2025. Changed app name from '스마트안전파트너' to '지능형 안전정보 시스템(스마트 안전 파트너)'
+- June 26, 2025. Fixed bottom navigation bar overlay issue by adding proper padding to all pages
 ```
 
 ## User Preferences
