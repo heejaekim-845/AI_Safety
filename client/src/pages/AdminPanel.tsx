@@ -13,7 +13,7 @@ import { useEquipment } from "@/hooks/useEquipment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertEquipmentSchema, type InsertEquipment } from "@shared/schema";
+import { insertEquipmentSchema, type InsertEquipment, type Equipment } from "@shared/schema";
 import { apiRequest } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
@@ -35,6 +35,8 @@ export default function AdminPanel() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRisk, setFilterRisk] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
   
   const { data: equipment, isLoading } = useEquipment();
 
@@ -86,8 +88,89 @@ export default function AdminPanel() {
     }
   });
 
+  const updateEquipmentMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: Partial<InsertEquipment> }) => {
+      const response = await apiRequest("PATCH", `/api/equipment/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "설비 수정 완료",
+        description: "설비 정보가 성공적으로 업데이트되었습니다.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/equipment"] });
+      setShowEditDialog(false);
+      setEditingEquipment(null);
+      editForm.reset();
+    },
+    onError: (error) => {
+      toast({
+        title: "설비 수정 실패",
+        description: "설비 정보를 수정하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const onSubmit = (data: InsertEquipment) => {
     createEquipmentMutation.mutate(data);
+  };
+
+  const editForm = useForm<InsertEquipment>({
+    resolver: zodResolver(insertEquipmentSchema),
+    defaultValues: {
+      name: "",
+      code: "",
+      location: "",
+      manufacturer: "",
+      installYear: new Date().getFullYear(),
+      specification: "",
+      imageUrl: "",
+      modelName: "",
+      riskLevel: "GREEN",
+      highVoltageRisk: false,
+      highPressureRisk: false,
+      highTemperatureRisk: false,
+      heightRisk: false,
+      heavyWeightRisk: false,
+      requiredSafetyEquipment: [],
+      lotoPoints: [],
+      safetyFacilityLocations: [],
+      emergencyContacts: [],
+      safetyDeviceImages: []
+    }
+  });
+
+  const onEditSubmit = (data: InsertEquipment) => {
+    if (editingEquipment) {
+      updateEquipmentMutation.mutate({ id: editingEquipment.id, data });
+    }
+  };
+
+  const handleEditEquipment = (equipment: Equipment) => {
+    setEditingEquipment(equipment);
+    editForm.reset({
+      name: equipment.name,
+      code: equipment.code,
+      location: equipment.location,
+      manufacturer: equipment.manufacturer || "",
+      installYear: equipment.installYear || new Date().getFullYear(),
+      specification: equipment.specification || "",
+      imageUrl: equipment.imageUrl || "",
+      modelName: equipment.modelName || "",
+      riskLevel: equipment.riskLevel,
+      highVoltageRisk: equipment.highVoltageRisk || false,
+      highPressureRisk: equipment.highPressureRisk || false,
+      highTemperatureRisk: equipment.highTemperatureRisk || false,
+      heightRisk: equipment.heightRisk || false,
+      heavyWeightRisk: equipment.heavyWeightRisk || false,
+      requiredSafetyEquipment: equipment.requiredSafetyEquipment || [],
+      lotoPoints: equipment.lotoPoints || [],
+      safetyFacilityLocations: equipment.safetyFacilityLocations || [],
+      emergencyContacts: equipment.emergencyContacts || [],
+      safetyDeviceImages: equipment.safetyDeviceImages || []
+    });
+    setShowEditDialog(true);
   };
 
   const filteredEquipment = equipment?.filter(eq => {
@@ -411,6 +494,285 @@ export default function AdminPanel() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Equipment Dialog */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>설비 편집</DialogTitle>
+            </DialogHeader>
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>설비명</FormLabel>
+                        <FormControl>
+                          <Input placeholder="설비명을 입력하세요" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editForm.control}
+                    name="code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>설비 코드</FormLabel>
+                        <FormControl>
+                          <Input placeholder="예: COMP-A-101" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={editForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>설치 위치</FormLabel>
+                      <FormControl>
+                        <Input placeholder="예: 1공장 동쪽 구역" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="manufacturer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>제조사</FormLabel>
+                        <FormControl>
+                          <Input placeholder="제조사명" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editForm.control}
+                    name="installYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>설치년도</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="2025" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="modelName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>모델명</FormLabel>
+                        <FormControl>
+                          <Input placeholder="모델명" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editForm.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>설비 사진 URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="설비 사진 URL을 입력하세요" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={editForm.control}
+                  name="riskLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>위험도 등급</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="위험도를 선택하세요" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="GREEN">안전 (GREEN)</SelectItem>
+                          <SelectItem value="YELLOW">주의 (YELLOW)</SelectItem>
+                          <SelectItem value="RED">위험 (RED)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="space-y-2">
+                  <FormLabel>위험 요소</FormLabel>
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormField
+                      control={editForm.control}
+                      name="highVoltageRisk"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm">고전압</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={editForm.control}
+                      name="highPressureRisk"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm">고압가스</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={editForm.control}
+                      name="highTemperatureRisk"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm">고온</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={editForm.control}
+                      name="heightRisk"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm">고소</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={editForm.control}
+                      name="heavyWeightRisk"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm">고중량</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <FormField
+                  control={editForm.control}
+                  name="specification"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>규격/사양</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="예: 용량: 500L/min, 압력: 15bar, 전력: 75kW" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="safetyDeviceImages"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>안전장치 위치 이미지</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="안전장치 위치 이미지 URL (한 줄당 하나씩)&#10;예: /attached_assets/safety_device1.jpg"
+                          {...field}
+                          value={Array.isArray(field.value) ? field.value.join('\n') : field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex space-x-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => setShowEditDialog(false)}
+                  >
+                    취소
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1 bg-primary hover:bg-primary/90"
+                    disabled={updateEquipmentMutation.isPending}
+                  >
+                    {updateEquipmentMutation.isPending ? "수정 중..." : "수정"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Statistics Cards */}
@@ -564,7 +926,7 @@ export default function AdminPanel() {
                   variant="outline" 
                   size="sm" 
                   className="flex-1"
-                  onClick={() => setLocation(`/equipment/${eq.id}`)}
+                  onClick={() => handleEditEquipment(eq)}
                 >
                   <Edit className="mr-1 h-3 w-3" />
                   편집
