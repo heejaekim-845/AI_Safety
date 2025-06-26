@@ -97,13 +97,38 @@ export default function QRScanner() {
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-1">{eq.name}</h4>
-                    <p className="text-sm text-gray-600 mb-1">{eq.location}</p>
-                    <p className="text-xs text-gray-500 mb-2">{eq.code}</p>
-                    <RiskLevelBadge level={eq.riskLevel} />
+                  <div className="flex items-start space-x-3 flex-1">
+                    {/* Equipment Thumbnail */}
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      {eq.imageUrl ? (
+                        <img 
+                          src={eq.imageUrl} 
+                          alt={eq.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-full h-full bg-gray-200 flex items-center justify-center ${eq.imageUrl ? 'hidden' : 'flex'}`}
+                      >
+                        <span className="text-gray-400 text-xs font-medium">
+                          {eq.name.substring(0, 2)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Equipment Details */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 mb-1 truncate">{eq.name}</h4>
+                      <p className="text-sm text-gray-600 mb-1 truncate">{eq.location}</p>
+                      <p className="text-xs text-gray-500 mb-2">{eq.code}</p>
+                      <RiskLevelBadge level={eq.riskLevel} />
+                    </div>
                   </div>
-                  <ChevronRight className="text-gray-400 h-5 w-5 mt-1" />
+                  <ChevronRight className="text-gray-400 h-5 w-5 mt-1 flex-shrink-0" />
                 </div>
               </CardContent>
             </Card>
