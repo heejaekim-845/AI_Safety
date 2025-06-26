@@ -108,6 +108,14 @@ export const insertEquipmentSchema = createInsertSchema(equipment).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  installYear: z.union([z.string(), z.number()]).transform((val) => {
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? null : parsed;
+    }
+    return val;
+  }).nullable(),
 });
 
 export const insertWorkTypeSchema = createInsertSchema(workTypes).omit({
