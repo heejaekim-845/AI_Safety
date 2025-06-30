@@ -467,90 +467,90 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* Major Risk Factors */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <AlertTriangle className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <AlertTriangle className="mr-3 h-6 w-6 text-red-600" />
               주요 위험 요소
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               {equipment.highTemperatureRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-danger mr-2">whatshot</span>
-                      <span className="text-sm font-medium">고온 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-red-600 mr-3 text-2xl">whatshot</span>
+                      <span className="font-semibold text-gray-900">고온 위험</span>
                     </div>
                     {equipment.highTemperatureDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highTemperatureDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highTemperatureDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">150°C 이상</p>
+                      <p className="text-sm text-gray-600">150°C 이상</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.highPressureRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">compress</span>
-                      <span className="text-sm font-medium">고압 가스</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-orange-600 mr-3 text-2xl">compress</span>
+                      <span className="font-semibold text-gray-900">고압 가스</span>
                     </div>
                     {equipment.highPressureDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highPressureDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highPressureDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">15 bar</p>
+                      <p className="text-sm text-gray-600">15 bar</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.highVoltageRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">electrical_services</span>
-                      <span className="text-sm font-medium">고전압 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-yellow-600 mr-3 text-2xl">electrical_services</span>
+                      <span className="font-semibold text-gray-900">고전압 위험</span>
                     </div>
                     {equipment.highVoltageDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highVoltageDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highVoltageDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">전기 차단 필요</p>
+                      <p className="text-sm text-gray-600">전기 차단 필요</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.heightRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">height</span>
-                      <span className="text-sm font-medium">고소 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-purple-600 mr-3 text-2xl">height</span>
+                      <span className="font-semibold text-gray-900">고소 위험</span>
                     </div>
                     {equipment.heightDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.heightDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.heightDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">2m 이상 높이</p>
+                      <p className="text-sm text-gray-600">2m 이상 높이</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.heavyWeightRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">fitness_center</span>
-                      <span className="text-sm font-medium">고중량 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-blue-600 mr-3 text-2xl">fitness_center</span>
+                      <span className="font-semibold text-gray-900">고중량 위험</span>
                     </div>
                     {equipment.heavyWeightDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.heavyWeightDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.heavyWeightDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">중량물 취급 주의</p>
+                      <p className="text-sm text-gray-600">중량물 취급 주의</p>
                     )}
                   </CardContent>
                 </Card>
