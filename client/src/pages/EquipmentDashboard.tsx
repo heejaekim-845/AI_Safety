@@ -138,55 +138,58 @@ export default function EquipmentDashboard() {
   };
 
   return (
-    <div>
+    <div className="pb-20 fade-in">
       {/* Equipment Header */}
-      <div className="bg-primary text-white p-6">
-        <div className="flex items-center mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/")}
-            className="text-white hover:bg-white/10 p-1 mr-3"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h2 className="text-lg font-medium">설비 정보</h2>
-        </div>
-        <div className="bg-white/10 rounded-lg p-4">
-          <div className="flex gap-4">
-            {equipment.imageUrl && (
-              <div className="flex-shrink-0">
-                <img 
-                  src={equipment.imageUrl} 
-                  alt={equipment.name}
-                  className="w-24 h-24 object-cover rounded-lg border-2 border-white/20"
-                  onError={(e) => {
-                    console.error('Image failed to load:', equipment.imageUrl);
-                    e.currentTarget.style.display = 'none';
-                  }}
-                  onLoad={() => {
-                    console.log('Image loaded successfully:', equipment.imageUrl);
-                  }}
-                />
-              </div>
-            )}
-            <div className="flex-1">
-              <h3 className="text-xl font-medium mb-3">{equipment.name}</h3>
-              <div className="space-y-1 text-sm">
-                <p className="text-primary-100">CODE: {equipment.code}</p>
-                <p className="text-primary-100">위치: {equipment.location}</p>
+      <div className="safety-gradient text-white p-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
+        <div className="relative z-10">
+          <div className="flex items-center mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/")}
+              className="text-white hover:bg-white/20 p-2 mr-4 rounded-xl"
+            >
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
+            <h2 className="text-xl font-semibold">설비 정보</h2>
+          </div>
+          <div className="glass-effect p-6">
+            <div className="flex gap-6">
+              {equipment.imageUrl && (
+                <div className="flex-shrink-0">
+                  <img 
+                    src={equipment.imageUrl} 
+                    alt={equipment.name}
+                    className="w-28 h-28 object-cover rounded-2xl border-2 border-white/30 shadow-xl"
+                    onError={(e) => {
+                      console.error('Image failed to load:', equipment.imageUrl);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    onLoad={() => {
+                      console.log('Image loaded successfully:', equipment.imageUrl);
+                    }}
+                  />
+                </div>
+              )}
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-4 text-white">{equipment.name}</h3>
+                <div className="space-y-2 text-white/90">
+                  <p className="text-lg">CODE: {equipment.code}</p>
+                  <p className="text-lg">위치: {equipment.location}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-8">
         {/* 1. Equipment Details */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <Settings className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <Settings className="mr-3 h-6 w-6 text-blue-600" />
               설비 상세 정보
             </CardTitle>
           </CardHeader>
@@ -231,30 +234,30 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 2. Risk Level Visualization */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <AlertTriangle className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <AlertTriangle className="mr-3 h-6 w-6 text-orange-600" />
               위험도 분석
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium">전체 위험도</span>
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-gray-700 font-medium">전체 위험도</span>
               <RiskLevelBadge level={equipment.riskLevel} />
             </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-danger/10 rounded-lg">
-                <div className="text-2xl font-bold text-danger">{riskCounts.high}</div>
-                <div className="text-xs text-danger">고위험</div>
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div className="p-5 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200/50 shadow-md">
+                <div className="text-3xl font-bold text-red-600 mb-1">{riskCounts.high}</div>
+                <div className="text-sm text-red-700 font-medium">고위험</div>
               </div>
-              <div className="p-3 bg-warning/10 rounded-lg">
-                <div className="text-2xl font-bold text-warning">{riskCounts.medium}</div>
-                <div className="text-xs text-warning">중위험</div>
+              <div className="p-5 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border border-yellow-200/50 shadow-md">
+                <div className="text-3xl font-bold text-yellow-600 mb-1">{riskCounts.medium}</div>
+                <div className="text-sm text-yellow-700 font-medium">중위험</div>
               </div>
-              <div className="p-3 bg-success/10 rounded-lg">
-                <div className="text-2xl font-bold text-success">{riskCounts.low}</div>
-                <div className="text-xs text-success">저위험</div>
+              <div className="p-5 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200/50 shadow-md">
+                <div className="text-3xl font-bold text-green-600 mb-1">{riskCounts.low}</div>
+                <div className="text-sm text-green-700 font-medium">저위험</div>
               </div>
             </div>
           </CardContent>
