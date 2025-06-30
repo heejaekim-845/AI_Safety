@@ -138,6 +138,8 @@ Changelog:
 - June 30, 2025. Successfully migrated to Supabase PostgreSQL database with complete data persistence - all equipment, work procedures, and safety data now stored in cloud database with stable operation
 - June 30, 2025. Completed comprehensive visual transformation with modern design system featuring gradient backgrounds, hover animations, and safety-themed color schemes across all UI components
 - June 30, 2025. Fixed duplicate major risk factors section that was displaying twice in equipment dashboard
+- June 30, 2025. Added risk factor detail fields to database schema and admin panel - equipment now supports detailed descriptions for high voltage, high pressure, high temperature, height, and mechanical risks with proper data persistence
+- June 30, 2025. Enhanced visual hierarchy with subtle gradient backgrounds (slate-50 to blue-50) on dashboard and work selection pages to improve card distinction and overall UI readability
 ```
 
 ## User Preferences

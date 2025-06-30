@@ -138,7 +138,7 @@ export default function EquipmentDashboard() {
   };
 
   return (
-    <div className="pb-20 fade-in">
+    <div className="pb-20 fade-in bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
       {/* Equipment Header */}
       <div className="safety-gradient text-white p-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
@@ -321,6 +321,37 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
+              {equipment.heightRisk && (
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-purple-600 mr-3 text-2xl">height</span>
+                      <span className="font-semibold text-gray-900">추락 위험</span>
+                    </div>
+                    {equipment.heightDetails ? (
+                      <p className="text-sm text-gray-600">{equipment.heightDetails}</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">2m 이상 고소작업</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {equipment.heavyWeightRisk && (
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-gray-600 mr-3 text-2xl">fitness_center</span>
+                      <span className="font-semibold text-gray-900">중량물 위험</span>
+                    </div>
+                    {equipment.heavyWeightDetails ? (
+                      <p className="text-sm text-gray-600">{equipment.heavyWeightDetails}</p>
+                    ) : (
+                      <p className="text-sm text-gray-600">50kg 이상 중량물</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
             </div>
             
