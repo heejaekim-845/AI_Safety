@@ -50,8 +50,7 @@ async function setupDatabase() {
   }
 }
 
-if (require.main === module) {
-  setupDatabase();
-}
+// Run setup if called directly
+setupDatabase().catch(console.error);
 
 export { setupDatabase };

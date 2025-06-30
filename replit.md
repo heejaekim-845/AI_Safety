@@ -135,7 +135,7 @@ Changelog:
 - June 26, 2025. Added comprehensive sample work procedures for boiler equipment (연료 공급 차단, 압력 및 온도 확인, 연소실 점검, 연소 정지, 냉각 대기) to match compressor procedures
 - June 26, 2025. Simplified equipment header blue box to show only 4 essential items: thumbnail image, equipment name, code, and location
 - June 26, 2025. Added equipment photo thumbnails to main equipment selection screen with 64x64 pixel display, fallback initials for equipment without images, and error handling for failed image loads
-- June 30, 2025. Prepared Supabase database connection setup with migration scripts and connection testing tools, app currently running with stable in-memory storage as fallback
+- June 30, 2025. Successfully migrated to Supabase PostgreSQL database with complete data persistence - all equipment, work procedures, and safety data now stored in cloud database with stable operation
 ```
 
 ## User Preferences
