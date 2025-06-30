@@ -1126,6 +1126,49 @@ export default function AdminPanel() {
                   />
                 </div>
 
+                {/* Hazardous Chemicals Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">유해화학물질 정보</Label>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={editForm.control}
+                      name="hazardousChemicalType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질 유형</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="예: 가스, 액체, 고체"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={editForm.control}
+                      name="hazardousChemicalName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질명</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="예: 질소가스, 암모니아"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
                 {/* Emergency Contacts Management */}
                 <div className="space-y-4 border-t pt-4">
                   <div className="flex items-center justify-between">
