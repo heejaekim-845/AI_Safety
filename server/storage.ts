@@ -563,4 +563,163 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Database storage implementation - commented out due to connection issues
+// To enable: fix DATABASE_URL format and uncomment this class
+/*
+class DatabaseStorage implements IStorage {
+  // Equipment operations
+  async getAllEquipment(): Promise<Equipment[]> {
+    return await db.select().from(equipment);
+  }
+
+  async getEquipmentById(id: number): Promise<Equipment | undefined> {
+    const [result] = await db.select().from(equipment).where(eq(equipment.id, id));
+    return result;
+  }
+
+  async getEquipmentByCode(code: string): Promise<Equipment | undefined> {
+    const [result] = await db.select().from(equipment).where(eq(equipment.code, code));
+    return result;
+  }
+
+  async createEquipment(equipmentData: InsertEquipment): Promise<Equipment> {
+    const [result] = await db.insert(equipment).values(equipmentData).returning();
+    return result;
+  }
+
+  async updateEquipment(id: number, equipmentData: Partial<InsertEquipment>): Promise<Equipment> {
+    const [result] = await db
+      .update(equipment)
+      .set({ ...equipmentData, updatedAt: new Date() })
+      .where(eq(equipment.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteEquipment(id: number): Promise<void> {
+    await db.delete(equipment).where(eq(equipment.id, id));
+  }
+
+  // Work types operations
+  async getWorkTypesByEquipmentId(equipmentId: number): Promise<WorkType[]> {
+    return await db.select().from(workTypes).where(eq(workTypes.equipmentId, equipmentId));
+  }
+
+  async getWorkTypeById(id: number): Promise<WorkType | undefined> {
+    const [result] = await db.select().from(workTypes).where(eq(workTypes.id, id));
+    return result;
+  }
+
+  async createWorkType(workTypeData: InsertWorkType): Promise<WorkType> {
+    const [result] = await db.insert(workTypes).values(workTypeData).returning();
+    return result;
+  }
+
+  async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
+    const [result] = await db
+      .update(workTypes)
+      .set({ ...workTypeData, updatedAt: new Date() })
+      .where(eq(workTypes.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteWorkType(id: number): Promise<void> {
+    await db.delete(workTypes).where(eq(workTypes.id, id));
+  }
+
+  // Work procedures operations
+  async getProceduresByWorkTypeId(workTypeId: number): Promise<WorkProcedure[]> {
+    return await db
+      .select()
+      .from(workProcedures)
+      .where(eq(workProcedures.workTypeId, workTypeId))
+      .orderBy(workProcedures.stepNumber);
+  }
+
+  async createWorkProcedure(procedureData: InsertWorkProcedure): Promise<WorkProcedure> {
+    const [result] = await db.insert(workProcedures).values(procedureData).returning();
+    return result;
+  }
+
+  async updateWorkProcedure(id: number, procedureData: Partial<InsertWorkProcedure>): Promise<WorkProcedure> {
+    const [result] = await db
+      .update(workProcedures)
+      .set({ ...procedureData, updatedAt: new Date() })
+      .where(eq(workProcedures.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteWorkProcedure(id: number): Promise<void> {
+    await db.delete(workProcedures).where(eq(workProcedures.id, id));
+  }
+
+  // Incidents operations
+  async getIncidentsByEquipmentId(equipmentId: number): Promise<Incident[]> {
+    return await db
+      .select()
+      .from(incidents)
+      .where(eq(incidents.equipmentId, equipmentId))
+      .orderBy(desc(incidents.incidentDate));
+  }
+
+  async getIncidentsByWorkTypeId(workTypeId: number): Promise<Incident[]> {
+    return await db
+      .select()
+      .from(incidents)
+      .where(eq(incidents.workTypeId, workTypeId))
+      .orderBy(desc(incidents.incidentDate));
+  }
+
+  async createIncident(incidentData: InsertIncident): Promise<Incident> {
+    const [result] = await db.insert(incidents).values(incidentData).returning();
+    return result;
+  }
+
+  // Work sessions operations
+  async createWorkSession(sessionData: InsertWorkSession): Promise<WorkSession> {
+    const [result] = await db.insert(workSessions).values(sessionData).returning();
+    return result;
+  }
+
+  async getWorkSessionById(id: number): Promise<WorkSession | undefined> {
+    const [result] = await db.select().from(workSessions).where(eq(workSessions.id, id));
+    return result;
+  }
+
+  async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
+    const [result] = await db
+      .update(workSessions)
+      .set({ ...sessionData, updatedAt: new Date() })
+      .where(eq(workSessions.id, id))
+      .returning();
+    return result;
+  }
+
+  async getActiveWorkSessions(): Promise<WorkSession[]> {
+    return await db
+      .select()
+      .from(workSessions)
+      .where(eq(workSessions.status, "IN_PROGRESS"))
+      .orderBy(desc(workSessions.startedAt));
+  }
+
+  // Risk reports operations
+  async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
+    const [result] = await db.insert(riskReports).values(reportData).returning();
+    return result;
+  }
+
+  async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
+    return await db
+      .select()
+      .from(riskReports)
+      .where(eq(riskReports.equipmentId, equipmentId))
+      .orderBy(desc(riskReports.createdAt));
+  }
+}
+*/
+
+// Using memory storage for now - switch to DatabaseStorage once Supabase connection is fixed
 export const storage = new MemStorage();
