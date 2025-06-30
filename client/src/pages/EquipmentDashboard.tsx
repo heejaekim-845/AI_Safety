@@ -264,58 +264,58 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 3. Major Risk Factors */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <AlertTriangle className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <AlertTriangle className="mr-3 h-6 w-6 text-red-600" />
               주요 위험 요소
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               {equipment.highTemperatureRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-danger mr-2">whatshot</span>
-                      <span className="text-sm font-medium">고온 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-red-600 mr-3 text-2xl">whatshot</span>
+                      <span className="font-semibold text-gray-900">고온 위험</span>
                     </div>
                     {equipment.highTemperatureDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highTemperatureDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highTemperatureDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">150°C 이상</p>
+                      <p className="text-sm text-gray-600">150°C 이상</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.highPressureRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">compress</span>
-                      <span className="text-sm font-medium">고압 가스</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-orange-600 mr-3 text-2xl">compress</span>
+                      <span className="font-semibold text-gray-900">고압 가스</span>
                     </div>
                     {equipment.highPressureDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highPressureDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highPressureDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">15 bar</p>
+                      <p className="text-sm text-gray-600">15 bar</p>
                     )}
                   </CardContent>
                 </Card>
               )}
               
               {equipment.highVoltageRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">electrical_services</span>
-                      <span className="text-sm font-medium">고전압 위험</span>
+                <Card className="safety-card scale-on-hover">
+                  <CardContent className="p-5">
+                    <div className="flex items-center mb-3">
+                      <span className="material-icons text-yellow-600 mr-3 text-2xl">electrical_services</span>
+                      <span className="font-semibold text-gray-900">고전압 위험</span>
                     </div>
                     {equipment.highVoltageDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.highVoltageDetails}</p>
+                      <p className="text-sm text-gray-600">{equipment.highVoltageDetails}</p>
                     ) : (
-                      <p className="text-xs text-gray-600">전기 차단 필요</p>
+                      <p className="text-sm text-gray-600">전기 차단 필요</p>
                     )}
                   </CardContent>
                 </Card>
@@ -368,10 +368,10 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 4. Required Safety Equipment */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <Shield className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <Shield className="mr-3 h-6 w-6 text-green-600" />
               필수 안전장비
             </CardTitle>
           </CardHeader>
@@ -392,10 +392,10 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 5. Hazardous Chemicals Information */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <AlertTriangle className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <AlertTriangle className="mr-3 h-6 w-6 text-orange-600" />
               유해화학물질 정보
             </CardTitle>
           </CardHeader>
@@ -571,10 +571,10 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* Check Safety Device Location */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <Shield className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <Shield className="mr-3 h-6 w-6 text-blue-600" />
               안전장치 위치 확인
             </CardTitle>
           </CardHeader>
@@ -635,10 +635,10 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* View Safety Facilities Location */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <MapPin className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <MapPin className="mr-3 h-6 w-6 text-green-600" />
               안전시설 위치 보기
             </CardTitle>
           </CardHeader>
@@ -701,57 +701,32 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
-        {/* Continue with remaining cards */}
-        {/* Removed the old height risk section since it's now handled above */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <Shield className="mr-2 h-5 w-5" />
-              필수 안전장비
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {equipment.requiredSafetyEquipment && equipment.requiredSafetyEquipment.length > 0 ? (
-              <ul className="space-y-2">
-                {equipment.requiredSafetyEquipment.map((item, index) => (
-                  <li key={index} className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                    <span className="text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-sm">등록된 필수 안전장비가 없습니다.</p>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Emergency Contacts */}
-        <Card className="material-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-900">
-              <Phone className="mr-2 h-5 w-5" />
+        <Card className="safety-card">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <Phone className="mr-3 h-6 w-6 text-red-600" />
               비상연락처
             </CardTitle>
           </CardHeader>
           <CardContent>
             {Array.isArray(equipment.emergencyContacts) && equipment.emergencyContacts.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {equipment.emergencyContacts.map((contact: any, index: any) => (
-                  <div key={index} className="p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+                  <div key={index} className="p-4 bg-red-50 rounded-lg border-l-4 border-red-400 hover:bg-red-100 transition-colors">
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="font-medium text-red-800">{contact.role || contact.name || contact}</div>
+                        <div className="font-semibold text-red-800">{contact.role || contact.name || contact}</div>
                         {contact.name && contact.role && (
                           <div className="text-sm text-red-600">{contact.name}</div>
                         )}
                       </div>
                       <Button 
                         size="sm" 
-                        className="bg-red-600 hover:bg-red-700"
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-all duration-200 hover:scale-105"
                         onClick={() => window.open(`tel:${contact.phone || contact}`, '_self')}
                       >
-                        <Phone className="h-4 w-4 mr-1" />
+                        <Phone className="h-4 w-4 mr-2" />
                         통화
                       </Button>
                     </div>
@@ -759,7 +734,11 @@ export default function EquipmentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">등록된 비상연락처가 없습니다.</p>
+              <div className="text-center py-6">
+                <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                  <p className="text-sm text-gray-600">등록된 비상연락처가 없습니다.</p>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
