@@ -184,11 +184,15 @@ export default function AdminPanel() {
       heightDetails: equipment.heightDetails || "",
       heavyWeightRisk: equipment.heavyWeightRisk || false,
       heavyWeightDetails: equipment.heavyWeightDetails || "",
-      requiredSafetyEquipment: equipment.requiredSafetyEquipment || [],
-      lotoPoints: equipment.lotoPoints || [],
-      safetyFacilityLocations: equipment.safetyFacilityLocations || [],
-      emergencyContacts: equipment.emergencyContacts || [],
-      safetyDeviceImages: equipment.safetyDeviceImages || [],
+      requiredSafetyEquipment: Array.isArray(equipment.requiredSafetyEquipment) ? equipment.requiredSafetyEquipment : [],
+      lotoPoints: Array.isArray(equipment.lotoPoints) ? equipment.lotoPoints : [],
+      safetyFacilityLocations: Array.isArray(equipment.safetyFacilityLocations) ? equipment.safetyFacilityLocations : [],
+      emergencyContacts: Array.isArray(equipment.emergencyContacts) 
+        ? equipment.emergencyContacts 
+        : equipment.emergencyContacts 
+          ? Object.entries(equipment.emergencyContacts).map(([role, contact]) => ({ role, contact: contact as string }))
+          : [],
+      safetyDeviceImages: Array.isArray(equipment.safetyDeviceImages) ? equipment.safetyDeviceImages : [],
       hazardousChemicalType: equipment.hazardousChemicalType || "",
       hazardousChemicalName: equipment.hazardousChemicalName || "",
       msdsImageUrl: equipment.msdsImageUrl || ""
