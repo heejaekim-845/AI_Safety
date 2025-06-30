@@ -144,6 +144,7 @@ Changelog:
 - June 30, 2025. Enhanced MSDS popup dialog to use dynamic database-stored images instead of hardcoded images, supporting any chemical type with proper error handling and fallback images
 - June 30, 2025. Implemented complete safety device location management system in admin panel allowing users to add, edit, and delete safety devices with names, locations, and image URLs for each equipment
 - June 30, 2025. Enhanced equipment dashboard to dynamically display safety device location buttons based on database data, with individual popups showing device-specific information and inspection checklists
+- June 30, 2025. Fixed critical data persistence issue: changed from memory storage (MemStorage) to database storage (DatabaseStorage) to prevent equipment data loss on application restarts - all user edits now permanently saved to Supabase database
 ```
 
 ## User Preferences
