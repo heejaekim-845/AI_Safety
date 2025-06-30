@@ -1,11 +1,11 @@
-import { 
-  equipment, 
-  workTypes, 
-  workProcedures, 
-  incidents, 
-  workSessions, 
+import {
+  equipment,
+  workTypes,
+  workProcedures,
+  incidents,
+  workSessions,
   riskReports,
-  type Equipment, 
+  type Equipment,
   type InsertEquipment,
   type WorkType,
   type InsertWorkType,
@@ -16,9 +16,10 @@ import {
   type WorkSession,
   type InsertWorkSession,
   type RiskReport,
-  type InsertRiskReport
+  type InsertRiskReport,
 } from "@shared/schema";
 
+// Interface for storage operations
 export interface IStorage {
   // Equipment operations
   getAllEquipment(): Promise<Equipment[]>;
@@ -76,153 +77,176 @@ export class MemStorage implements IStorage {
       id: 1,
       name: "압축기 A-101",
       code: "COMP-A-101",
-      location: "1공장 동쪽 구역",
-      manufacturer: "삼성중공업",
-      installYear: 2020,
-      specification: "용량: 500L/min, 압력: 15bar",
-      imageUrl: "/attached_assets/air-compressor-solution_1750831656695.jpg",
-      modelName: "SC-500-15",
-      blueprintInfo: "도면번호: DWG-COMP-A101-2020",
+      location: "공장 A동 1층",
       riskLevel: "YELLOW",
-      highVoltageRisk: false,
-      highVoltageDetails: null,
-      highPressureRisk: true,
-      highPressureDetails: "작업압력 15bar, 최대압력 20bar까지 상승 가능. 압력 릴리프 밸브 점검 필수",
-      highTemperatureRisk: true,
-      highTemperatureDetails: "압축 과정에서 최대 150°C까지 온도 상승. 냉각시스템 정상 작동 확인 필요",
-      heightRisk: false,
-      heightDetails: null,
-      heavyWeightRisk: true,
-      heavyWeightDetails: "장비 무게 850kg, 이동 시 크레인 사용 필수. 안전 작업 반경 3m 이상 확보",
-      hazardousChemicalType: "압축가스",
-      hazardousChemicalName: "질소가스",
-      riskManagementZone: "일반관리구역",
-      requiredSafetyEquipment: ["안전모", "보안경", "내열장갑", "안전화"],
+      manufacturer: "현대중공업",
+      installYear: 2020,
+      modelName: "HHI-AC-500",
+      imageUrl: "/attached_assets/air-compressor-solution_1750831656695.jpg",
+      specification: "압력: 8bar, 용량: 500L, 전력: 37kW",
+      highVoltage: true,
+      highPressure: true,
+      highTemperature: false,
+      chemical: false,
+      moving: true,
+      lifting: false,
+      confined: false,
+      height: false,
+      noise: true,
+      requiredSafetyItems: ["안전모", "안전화", "보호안경", "귀마개"],
+      hazardousChemicals: [],
       lotoPoints: [
-        { id: "LOTO-001", location: "주전원 차단기", type: "전기" },
-        { id: "LOTO-002", location: "메인 밸브", type: "압력" }
-      ],
-      safetyFacilityLocations: [
-        { id: "SF-001", type: "소화기", location: "장비 좌측 3m" },
-        { id: "SF-002", type: "비상정지버튼", location: "제어패널" }
+        {
+          id: "주 전원 차단기",
+          type: "전기",
+          location: "제어반 상단"
+        },
+        {
+          id: "에어 공급 밸브",
+          type: "에너지원",
+          location: "압축기 입구"
+        }
       ],
       emergencyContacts: [
-        { role: "안전관리자", name: "김안전", phone: "010-1234-5678" },
-        { role: "기술지원", name: "이기술", phone: "010-9876-5432" }
+        {
+          name: "설비 담당자",
+          phone: "010-1234-5678",
+          role: "정비"
+        },
+        {
+          name: "안전 관리자",
+          phone: "010-9876-5432",
+          role: "안전"
+        }
       ],
-      safetyDeviceImages: ["/attached_assets/svalve_1750838843504.jpg"],
+      safetyDeviceImages: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const sampleEquipment2: Equipment = {
+      id: 2,
+      name: "보일러 B-201",
+      code: "BOILER-B-201",
+      location: "공장 B동 지하 1층",
+      riskLevel: "RED",
+      manufacturer: "삼성보일러",
+      installYear: 2018,
+      modelName: "SB-HT-1000",
+      imageUrl: null,
+      specification: "압력: 16bar, 온도: 180°C, 연료: 천연가스",
+      highVoltage: true,
+      highPressure: true,
+      highTemperature: true,
+      chemical: true,
+      moving: false,
+      lifting: false,
+      confined: true,
+      height: false,
+      noise: true,
+      requiredSafetyItems: ["안전모", "안전화", "보호안경", "내열장갑", "가스검지기"],
+      hazardousChemicals: [
+        {
+          name: "천연가스",
+          cas: "74-82-8",
+          msdsUrl: "/msds/natural-gas.pdf"
+        }
+      ],
+      lotoPoints: [
+        {
+          id: "가스 공급 밸브",
+          type: "가스",
+          location: "보일러실 입구"
+        },
+        {
+          id: "주 전원 스위치",
+          type: "전기",
+          location: "제어판넬"
+        }
+      ],
+      emergencyContacts: [
+        {
+          name: "보일러 기술자",
+          phone: "010-2468-1357",
+          role: "정비"
+        },
+        {
+          name: "가스안전공사",
+          phone: "1544-4500",
+          role: "응급"
+        }
+      ],
+      safetyDeviceImages: null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
     this.equipment.set(1, sampleEquipment);
-
-    // Add second sample equipment - Boiler B-102
-    const sampleEquipment2: Equipment = {
-      id: 2,
-      name: "보일러 B-102",
-      code: "BOILER-B-102",
-      location: "보일러실 2층",
-      manufacturer: "한국보일러공업",
-      installYear: 2019,
-      specification: "최대압력: 10kg/cm², 증기량: 5000kg/h",
-      imageUrl: null,
-      modelName: "KB-5000",
-      blueprintInfo: "도면번호: DWG-BOILER-B102-2019",
-      riskLevel: "RED",
-      highVoltageRisk: true,
-      highVoltageDetails: "제어반 내 480V 고전압 회로. 전기작업 시 반드시 LOTO 실시",
-      highPressureRisk: true,
-      highPressureDetails: "최대 10kg/cm² 고압증기. 밸브 개방 시 화상 위험 높음",
-      highTemperatureRisk: true,
-      highTemperatureDetails: "증기 온도 200°C 이상. 단열재 손상 시 화상 위험",
-      heightRisk: false,
-      heightDetails: null,
-      heavyWeightRisk: false,
-      heavyWeightDetails: null,
-      hazardousChemicalType: "증기",
-      hazardousChemicalName: "고온증기",
-      riskManagementZone: "특별관리구역",
-      requiredSafetyEquipment: ["내열복", "안전모", "보안경", "내열장갑", "안전화"],
-      lotoPoints: [
-        { id: "LOTO-003", location: "주증기밸브", type: "압력" },
-        { id: "LOTO-004", location: "급수차단밸브", type: "압력" },
-        { id: "LOTO-005", location: "연료차단밸브", type: "가스" },
-        { id: "LOTO-006", location: "제어전원", type: "전기" }
-      ],
-      safetyFacilityLocations: [
-        { id: "SF-003", type: "소화기", location: "보일러실 입구" },
-        { id: "SF-004", type: "비상정지버튼", location: "제어실" },
-        { id: "SF-005", type: "가스누출감지기", location: "연료공급라인" }
-      ],
-      emergencyContacts: [
-        { role: "보일러기술자", name: "박보일", phone: "010-5678-9012" },
-        { role: "안전관리자", name: "김안전", phone: "010-1234-5678" },
-        { role: "소방서", name: "119", phone: "119" }
-      ],
-      safetyDeviceImages: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
     this.equipment.set(2, sampleEquipment2);
 
     // Sample work types
     const workType1: WorkType = {
       id: 1,
+      name: "일반 점검",
       equipmentId: 1,
-      name: "일상 점검",
-      description: "정기적인 설비 상태 확인 작업",
+      description: "압축기 일반 점검 작업",
       requiresPermit: false,
       estimatedDuration: 30,
-      requiredQualifications: ["기본 안전교육 이수"],
-      requiredEquipment: ["점검표", "토크렌치"],
-      environmentalRequirements: ["작업장 환기 양호", "조도 300lux 이상"],
-      legalRequirements: ["일일점검 기록 작성"],
-      createdAt: new Date()
+      requiredQualifications: ["기계정비기능사"],
+      requiredEquipment: null,
+      environmentalRequirements: null,
+      safetyPrecautions: null,
+      legalRequirements: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     const workType2: WorkType = {
       id: 2,
+      name: "오일 교환",
       equipmentId: 1,
-      name: "정밀 점검",
-      description: "상세한 설비 진단 및 측정 작업",
-      requiresPermit: true,
-      estimatedDuration: 120,
-      requiredQualifications: ["압축기 전문교육 이수", "고압가스 취급 자격"],
-      requiredEquipment: ["압력계", "온도계", "진동측정기"],
-      environmentalRequirements: ["작업장 환기 양호", "주변 화기 제거"],
-      legalRequirements: ["작업허가서 승인", "안전교육 이수 확인"],
-      createdAt: new Date()
-    };
-
-    // Work types for Boiler B-102
-    const workType3: WorkType = {
-      id: 3,
-      equipmentId: 2,
-      name: "보일러 점화",
-      description: "보일러 안전 점화 및 운전 준비",
+      description: "압축기 오일 교환 작업",
       requiresPermit: true,
       estimatedDuration: 60,
-      requiredQualifications: ["보일러기능사", "고압가스 안전교육"],
-      requiredEquipment: ["압력계", "수위계", "점화장치"],
-      environmentalRequirements: ["환기 상태 양호", "가스 누출 없음"],
-      legalRequirements: ["점화 허가서", "안전작업 허가서"],
-      createdAt: new Date()
+      requiredQualifications: ["기계정비기능사", "환경안전교육"],
+      requiredEquipment: null,
+      environmentalRequirements: null,
+      safetyPrecautions: null,
+      legalRequirements: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const workType3: WorkType = {
+      id: 3,
+      name: "연료 공급 차단",
+      equipmentId: 2,
+      description: "보일러 연료 공급 차단 작업",
+      requiresPermit: true,
+      estimatedDuration: 45,
+      requiredQualifications: ["보일러기능사", "가스안전교육"],
+      requiredEquipment: null,
+      environmentalRequirements: null,
+      safetyPrecautions: null,
+      legalRequirements: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     const workType4: WorkType = {
       id: 4,
+      name: "압력 및 온도 확인",
       equipmentId: 2,
-      name: "보일러 정지",
-      description: "보일러 안전 정지 및 점검",
+      description: "보일러 압력 및 온도 확인 작업",
       requiresPermit: false,
-      estimatedDuration: 45,
-      requiredQualifications: ["보일러운전자"],
-      requiredEquipment: ["압력계", "온도계"],
-      environmentalRequirements: ["작업 공간 확보"],
-      legalRequirements: ["정지 절차서 준수"],
-      createdAt: new Date()
+      estimatedDuration: 20,
+      requiredQualifications: ["보일러기능사"],
+      requiredEquipment: null,
+      environmentalRequirements: null,
+      safetyPrecautions: null,
+      legalRequirements: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     this.workTypes.set(1, workType1);
@@ -230,129 +254,53 @@ export class MemStorage implements IStorage {
     this.workTypes.set(3, workType3);
     this.workTypes.set(4, workType4);
 
-    // Sample procedures for 일상 점검
-    const procedures: WorkProcedure[] = [
+    // Sample work procedures
+    const procedures = [
       {
         id: 1,
         workTypeId: 1,
         stepNumber: 1,
         category: "안전조치",
-        title: "작업 준비",
-        description: "작업 전 안전 장비 착용 및 주변 환경 점검",
-        checklistItems: ["안전모 착용", "보안경 착용", "작업 구역 정리"],
-        safetyNotes: "모든 안전 장비를 올바르게 착용했는지 확인하세요.",
+        title: "전원 차단 및 LOTO 적용",
+        description: "주 전원을 차단하고 잠금 장치를 설치합니다.",
+        checklistItems: ["주 전원 차단 확인", "LOTO 태그 부착", "에너지 격리 확인"],
+        safetyNotes: "전원 차단 후 반드시 전압 측정기로 무전압 상태를 확인하세요.",
         createdAt: new Date()
       },
       {
         id: 2,
         workTypeId: 1,
         stepNumber: 2,
-        category: "상태인지",
-        title: "외관 점검",
-        description: "압축기 외부 상태 및 누출 여부 확인",
-        checklistItems: ["외관 손상 확인", "오일 누출 점검", "볼트 체결 상태 확인"],
-        safetyNotes: "누출 발견 시 즉시 작업을 중단하고 안전관리자에게 보고하세요.",
-        createdAt: new Date()
-      },
-      {
-        id: 3,
-        workTypeId: 1,
-        stepNumber: 3,
         category: "기기조작",
-        title: "압력 확인",
-        description: "시스템 압력 게이지 확인 및 기록",
-        checklistItems: ["압력계 지시값 확인", "정상 범위 내 여부 판단", "기록표 작성"],
-        safetyNotes: "압력이 정상 범위를 벗어나면 즉시 운전을 중단하세요.",
+        title: "압력 게이지 확인",
+        description: "압축기의 압력 게이지를 확인합니다.",
+        checklistItems: ["압력 게이지 수치 기록", "이상 유무 확인"],
+        safetyNotes: "압력이 완전히 해제된 후 작업을 진행하세요.",
         createdAt: new Date()
       }
     ];
 
-    procedures.forEach(proc => this.workProcedures.set(proc.id, proc));
+    procedures.forEach(proc => {
+      this.workProcedures.set(proc.id, proc as WorkProcedure);
+    });
 
-    // Sample procedures for 보일러 점검 (workTypeId: 3)
-    const boilerProcedures: WorkProcedure[] = [
-      {
-        id: 4,
-        workTypeId: 3,
-        stepNumber: 1,
-        category: "안전조치",
-        title: "연료 공급 차단",
-        description: "보일러 작업 전 연료 밸브 완전 차단 및 확인",
-        checklistItems: ["주 연료 밸브 차단", "보조 연료 밸브 차단", "차단 확인"],
-        safetyNotes: "연료 차단 후 반드시 압력계로 확인하세요.",
-        createdAt: new Date()
-      },
-      {
-        id: 5,
-        workTypeId: 3,
-        stepNumber: 2,
-        category: "상태인지",
-        title: "압력 및 온도 확인",
-        description: "보일러 시스템의 압력과 온도 상태 점검",
-        checklistItems: ["압력계 확인", "온도계 확인", "안전밸브 상태 점검"],
-        safetyNotes: "정상 범위를 벗어나면 즉시 작업을 중단하세요.",
-        createdAt: new Date()
-      },
-      {
-        id: 6,
-        workTypeId: 3,
-        stepNumber: 3,
-        category: "기기조작",
-        title: "연소실 점검",
-        description: "연소실 내부 상태 및 버너 점검",
-        checklistItems: ["연소실 내부 확인", "버너 상태 점검", "배기 덕트 확인"],
-        safetyNotes: "연소실 점검 시 충분한 환기를 확보하세요.",
-        createdAt: new Date()
-      }
-    ];
-
-    // Sample procedures for 보일러 정지 (workTypeId: 4)
-    const boilerShutdownProcedures: WorkProcedure[] = [
-      {
-        id: 7,
-        workTypeId: 4,
-        stepNumber: 1,
-        category: "기기조작",
-        title: "연소 정지",
-        description: "버너 운전 정지 및 연료 공급 차단",
-        checklistItems: ["버너 정지", "연료 밸브 차단", "정지 확인"],
-        safetyNotes: "정지 절차를 순서대로 진행하세요.",
-        createdAt: new Date()
-      },
-      {
-        id: 8,
-        workTypeId: 4,
-        stepNumber: 2,
-        category: "안전조치",
-        title: "냉각 대기",
-        description: "보일러 온도 하강 대기 및 모니터링",
-        checklistItems: ["온도 모니터링", "압력 감소 확인", "냉각수 순환 확인"],
-        safetyNotes: "충분한 냉각 시간을 확보하세요.",
-        createdAt: new Date()
-      }
-    ];
-
-    [...boilerProcedures, ...boilerShutdownProcedures].forEach(proc => this.workProcedures.set(proc.id, proc));
-
-    // Sample incidents
+    // Sample incident
     const incident1: Incident = {
       id: 1,
       equipmentId: 1,
-      workTypeId: 1,
-      title: "압력 센서 이상",
-      description: "일상 점검 중 압력 센서의 지시값 이상으로 경미한 누출 발생",
+      workTypeId: null,
+      title: "압력 게이지 이상",
+      description: "압력 게이지가 정상 범위를 벗어남",
       severity: "MEDIUM",
-      incidentDate: new Date("2024-01-15"),
+      incidentDate: new Date(),
       createdAt: new Date()
     };
 
     this.incidents.set(1, incident1);
-    this.currentId = 15;
   }
 
   // Equipment operations
   async getAllEquipment(): Promise<Equipment[]> {
-    console.log("Equipment in storage:", Array.from(this.equipment.keys()));
     return Array.from(this.equipment.values());
   }
 
@@ -361,41 +309,14 @@ export class MemStorage implements IStorage {
   }
 
   async getEquipmentByCode(code: string): Promise<Equipment | undefined> {
-    return Array.from(this.equipment.values()).find(eq => eq.code === code);
+    return Array.from(this.equipment.values()).find(e => e.code === code);
   }
 
   async createEquipment(equipmentData: InsertEquipment): Promise<Equipment> {
     const id = this.currentId++;
     const newEquipment: Equipment = {
       id,
-      name: equipmentData.name,
-      code: equipmentData.code,
-      location: equipmentData.location,
-      manufacturer: equipmentData.manufacturer || null,
-      installYear: equipmentData.installYear || null,
-      specification: equipmentData.specification || null,
-      imageUrl: equipmentData.imageUrl || null,
-      modelName: equipmentData.modelName || null,
-      blueprintInfo: equipmentData.blueprintInfo || null,
-      riskLevel: equipmentData.riskLevel,
-      highVoltageRisk: equipmentData.highVoltageRisk || false,
-      highVoltageDetails: equipmentData.highVoltageDetails || null,
-      highPressureRisk: equipmentData.highPressureRisk || false,
-      highPressureDetails: equipmentData.highPressureDetails || null,
-      highTemperatureRisk: equipmentData.highTemperatureRisk || false,
-      highTemperatureDetails: equipmentData.highTemperatureDetails || null,
-      heightRisk: equipmentData.heightRisk || false,
-      heightDetails: equipmentData.heightDetails || null,
-      heavyWeightRisk: equipmentData.heavyWeightRisk || false,
-      heavyWeightDetails: equipmentData.heavyWeightDetails || null,
-      hazardousChemicalType: equipmentData.hazardousChemicalType || null,
-      hazardousChemicalName: equipmentData.hazardousChemicalName || null,
-      riskManagementZone: equipmentData.riskManagementZone || null,
-      requiredSafetyEquipment: equipmentData.requiredSafetyEquipment ? [...equipmentData.requiredSafetyEquipment] : null,
-      lotoPoints: equipmentData.lotoPoints ? [...equipmentData.lotoPoints] : null,
-      safetyFacilityLocations: equipmentData.safetyFacilityLocations ? [...equipmentData.safetyFacilityLocations] : null,
-      emergencyContacts: equipmentData.emergencyContacts ? [...equipmentData.emergencyContacts] : null,
-      safetyDeviceImages: equipmentData.safetyDeviceImages ? [...equipmentData.safetyDeviceImages] : null,
+      ...equipmentData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -429,16 +350,9 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newWorkType: WorkType = {
       id,
-      name: workTypeData.name,
-      equipmentId: workTypeData.equipmentId || null,
-      description: workTypeData.description || null,
-      requiresPermit: workTypeData.requiresPermit || null,
-      estimatedDuration: workTypeData.estimatedDuration || null,
-      requiredQualifications: workTypeData.requiredQualifications ? [...workTypeData.requiredQualifications] : null,
-      requiredEquipment: workTypeData.requiredEquipment ? [...workTypeData.requiredEquipment] : null,
-      environmentalRequirements: workTypeData.environmentalRequirements ? [...workTypeData.environmentalRequirements] : null,
-      legalRequirements: workTypeData.legalRequirements ? [...workTypeData.legalRequirements] : null,
-      createdAt: new Date()
+      ...workTypeData,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.workTypes.set(id, newWorkType);
     return newWorkType;
@@ -446,9 +360,9 @@ export class MemStorage implements IStorage {
 
   async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
     const existing = this.workTypes.get(id);
-    if (!existing) throw new Error(`Work type with id ${id} not found`);
+    if (!existing) throw new Error(`WorkType with id ${id} not found`);
     
-    const updated = { ...existing, ...workTypeData };
+    const updated = { ...existing, ...workTypeData, updatedAt: new Date() };
     this.workTypes.set(id, updated);
     return updated;
   }
@@ -467,8 +381,8 @@ export class MemStorage implements IStorage {
   async createWorkProcedure(procedureData: InsertWorkProcedure): Promise<WorkProcedure> {
     const id = this.currentId++;
     const newProcedure: WorkProcedure = {
-      ...procedureData,
       id,
+      ...procedureData,
       createdAt: new Date()
     };
     this.workProcedures.set(id, newProcedure);
@@ -477,7 +391,7 @@ export class MemStorage implements IStorage {
 
   async updateWorkProcedure(id: number, procedureData: Partial<InsertWorkProcedure>): Promise<WorkProcedure> {
     const existing = this.workProcedures.get(id);
-    if (!existing) throw new Error(`Work procedure with id ${id} not found`);
+    if (!existing) throw new Error(`WorkProcedure with id ${id} not found`);
     
     const updated = { ...existing, ...procedureData };
     this.workProcedures.set(id, updated);
@@ -490,22 +404,18 @@ export class MemStorage implements IStorage {
 
   // Incidents operations
   async getIncidentsByEquipmentId(equipmentId: number): Promise<Incident[]> {
-    return Array.from(this.incidents.values())
-      .filter(inc => inc.equipmentId === equipmentId)
-      .sort((a, b) => b.incidentDate.getTime() - a.incidentDate.getTime());
+    return Array.from(this.incidents.values()).filter(i => i.equipmentId === equipmentId);
   }
 
   async getIncidentsByWorkTypeId(workTypeId: number): Promise<Incident[]> {
-    return Array.from(this.incidents.values())
-      .filter(inc => inc.workTypeId === workTypeId)
-      .sort((a, b) => b.incidentDate.getTime() - a.incidentDate.getTime());
+    return Array.from(this.incidents.values()).filter(i => i.workTypeId === workTypeId);
   }
 
   async createIncident(incidentData: InsertIncident): Promise<Incident> {
     const id = this.currentId++;
     const newIncident: Incident = {
-      ...incidentData,
       id,
+      ...incidentData,
       createdAt: new Date()
     };
     this.incidents.set(id, newIncident);
@@ -516,12 +426,10 @@ export class MemStorage implements IStorage {
   async createWorkSession(sessionData: InsertWorkSession): Promise<WorkSession> {
     const id = this.currentId++;
     const newSession: WorkSession = {
-      ...sessionData,
       id,
-      completedSteps: sessionData.completedSteps || [],
-      specialNotes: sessionData.specialNotes || [],
-      startedAt: new Date(),
-      completedAt: null
+      ...sessionData,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.workSessions.set(id, newSession);
     return newSession;
@@ -533,23 +441,25 @@ export class MemStorage implements IStorage {
 
   async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
     const existing = this.workSessions.get(id);
-    if (!existing) throw new Error(`Work session with id ${id} not found`);
+    if (!existing) throw new Error(`WorkSession with id ${id} not found`);
     
-    const updated = { ...existing, ...sessionData };
+    const updated = { ...existing, ...sessionData, updatedAt: new Date() };
     this.workSessions.set(id, updated);
     return updated;
   }
 
   async getActiveWorkSessions(): Promise<WorkSession[]> {
-    return Array.from(this.workSessions.values()).filter(ws => !ws.isCompleted);
+    return Array.from(this.workSessions.values())
+      .filter(ws => !ws.completedAt)
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
   }
 
   // Risk reports operations
   async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
     const id = this.currentId++;
     const newReport: RiskReport = {
-      ...reportData,
       id,
+      ...reportData,
       createdAt: new Date()
     };
     this.riskReports.set(id, newReport);
@@ -559,167 +469,13 @@ export class MemStorage implements IStorage {
   async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
     return Array.from(this.riskReports.values())
       .filter(rr => rr.equipmentId === equipmentId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => {
+        const aTime = a.createdAt?.getTime() ?? 0;
+        const bTime = b.createdAt?.getTime() ?? 0;
+        return bTime - aTime;
+      });
   }
 }
 
-// Database storage implementation - commented out due to connection issues
-// To enable: fix DATABASE_URL format and uncomment this class
-/*
-class DatabaseStorage implements IStorage {
-  // Equipment operations
-  async getAllEquipment(): Promise<Equipment[]> {
-    return await db.select().from(equipment);
-  }
-
-  async getEquipmentById(id: number): Promise<Equipment | undefined> {
-    const [result] = await db.select().from(equipment).where(eq(equipment.id, id));
-    return result;
-  }
-
-  async getEquipmentByCode(code: string): Promise<Equipment | undefined> {
-    const [result] = await db.select().from(equipment).where(eq(equipment.code, code));
-    return result;
-  }
-
-  async createEquipment(equipmentData: InsertEquipment): Promise<Equipment> {
-    const [result] = await db.insert(equipment).values(equipmentData).returning();
-    return result;
-  }
-
-  async updateEquipment(id: number, equipmentData: Partial<InsertEquipment>): Promise<Equipment> {
-    const [result] = await db
-      .update(equipment)
-      .set({ ...equipmentData, updatedAt: new Date() })
-      .where(eq(equipment.id, id))
-      .returning();
-    return result;
-  }
-
-  async deleteEquipment(id: number): Promise<void> {
-    await db.delete(equipment).where(eq(equipment.id, id));
-  }
-
-  // Work types operations
-  async getWorkTypesByEquipmentId(equipmentId: number): Promise<WorkType[]> {
-    return await db.select().from(workTypes).where(eq(workTypes.equipmentId, equipmentId));
-  }
-
-  async getWorkTypeById(id: number): Promise<WorkType | undefined> {
-    const [result] = await db.select().from(workTypes).where(eq(workTypes.id, id));
-    return result;
-  }
-
-  async createWorkType(workTypeData: InsertWorkType): Promise<WorkType> {
-    const [result] = await db.insert(workTypes).values(workTypeData).returning();
-    return result;
-  }
-
-  async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
-    const [result] = await db
-      .update(workTypes)
-      .set({ ...workTypeData, updatedAt: new Date() })
-      .where(eq(workTypes.id, id))
-      .returning();
-    return result;
-  }
-
-  async deleteWorkType(id: number): Promise<void> {
-    await db.delete(workTypes).where(eq(workTypes.id, id));
-  }
-
-  // Work procedures operations
-  async getProceduresByWorkTypeId(workTypeId: number): Promise<WorkProcedure[]> {
-    return await db
-      .select()
-      .from(workProcedures)
-      .where(eq(workProcedures.workTypeId, workTypeId))
-      .orderBy(workProcedures.stepNumber);
-  }
-
-  async createWorkProcedure(procedureData: InsertWorkProcedure): Promise<WorkProcedure> {
-    const [result] = await db.insert(workProcedures).values(procedureData).returning();
-    return result;
-  }
-
-  async updateWorkProcedure(id: number, procedureData: Partial<InsertWorkProcedure>): Promise<WorkProcedure> {
-    const [result] = await db
-      .update(workProcedures)
-      .set({ ...procedureData, updatedAt: new Date() })
-      .where(eq(workProcedures.id, id))
-      .returning();
-    return result;
-  }
-
-  async deleteWorkProcedure(id: number): Promise<void> {
-    await db.delete(workProcedures).where(eq(workProcedures.id, id));
-  }
-
-  // Incidents operations
-  async getIncidentsByEquipmentId(equipmentId: number): Promise<Incident[]> {
-    return await db
-      .select()
-      .from(incidents)
-      .where(eq(incidents.equipmentId, equipmentId))
-      .orderBy(desc(incidents.incidentDate));
-  }
-
-  async getIncidentsByWorkTypeId(workTypeId: number): Promise<Incident[]> {
-    return await db
-      .select()
-      .from(incidents)
-      .where(eq(incidents.workTypeId, workTypeId))
-      .orderBy(desc(incidents.incidentDate));
-  }
-
-  async createIncident(incidentData: InsertIncident): Promise<Incident> {
-    const [result] = await db.insert(incidents).values(incidentData).returning();
-    return result;
-  }
-
-  // Work sessions operations
-  async createWorkSession(sessionData: InsertWorkSession): Promise<WorkSession> {
-    const [result] = await db.insert(workSessions).values(sessionData).returning();
-    return result;
-  }
-
-  async getWorkSessionById(id: number): Promise<WorkSession | undefined> {
-    const [result] = await db.select().from(workSessions).where(eq(workSessions.id, id));
-    return result;
-  }
-
-  async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
-    const [result] = await db
-      .update(workSessions)
-      .set({ ...sessionData, updatedAt: new Date() })
-      .where(eq(workSessions.id, id))
-      .returning();
-    return result;
-  }
-
-  async getActiveWorkSessions(): Promise<WorkSession[]> {
-    return await db
-      .select()
-      .from(workSessions)
-      .where(eq(workSessions.status, "IN_PROGRESS"))
-      .orderBy(desc(workSessions.startedAt));
-  }
-
-  // Risk reports operations
-  async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
-    const [result] = await db.insert(riskReports).values(reportData).returning();
-    return result;
-  }
-
-  async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
-    return await db
-      .select()
-      .from(riskReports)
-      .where(eq(riskReports.equipmentId, equipmentId))
-      .orderBy(desc(riskReports.createdAt));
-  }
-}
-*/
-
-// Using memory storage for now - switch to DatabaseStorage once Supabase connection is fixed
+// Create storage instance
 export const storage = new MemStorage();
