@@ -136,6 +136,8 @@ Changelog:
 - June 26, 2025. Simplified equipment header blue box to show only 4 essential items: thumbnail image, equipment name, code, and location
 - June 26, 2025. Added equipment photo thumbnails to main equipment selection screen with 64x64 pixel display, fallback initials for equipment without images, and error handling for failed image loads
 - June 30, 2025. Successfully migrated to Supabase PostgreSQL database with complete data persistence - all equipment, work procedures, and safety data now stored in cloud database with stable operation
+- June 30, 2025. Completed comprehensive visual transformation with modern design system featuring gradient backgrounds, hover animations, and safety-themed color schemes across all UI components
+- June 30, 2025. Fixed duplicate major risk factors section that was displaying twice in equipment dashboard
 ```
 
 ## User Preferences

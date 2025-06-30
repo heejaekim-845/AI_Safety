@@ -321,37 +321,7 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
-              {equipment.heightRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">height</span>
-                      <span className="text-sm font-medium">고소 위험</span>
-                    </div>
-                    {equipment.heightDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.heightDetails}</p>
-                    ) : (
-                      <p className="text-xs text-gray-600">2m 이상 높이</p>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-              
-              {equipment.heavyWeightRisk && (
-                <Card className="material-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <span className="material-icons text-warning mr-2">fitness_center</span>
-                      <span className="text-sm font-medium">고중량 위험</span>
-                    </div>
-                    {equipment.heavyWeightDetails ? (
-                      <p className="text-xs text-gray-600">{equipment.heavyWeightDetails}</p>
-                    ) : (
-                      <p className="text-xs text-gray-600">중량물 취급 주의</p>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+
             </div>
             
             {/* Show message if no risk factors are present */}
