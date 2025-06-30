@@ -101,13 +101,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         emergencyContacts: Array.isArray(req.body.emergencyContacts) 
           ? req.body.emergencyContacts 
           : [],
-        // Handle detail fields by removing them since they don't exist in the current schema
-        highTemperatureDetails: undefined,
-        highPressureDetails: undefined,
-        highVoltageDetails: undefined,
-        heightDetails: undefined,
-        heavyWeightDetails: undefined,
-        safetyDeviceImages: undefined
+        // Keep detail fields as they now exist in the schema
+        highTemperatureDetails: req.body.highTemperatureDetails,
+        highPressureDetails: req.body.highPressureDetails,
+        highVoltageDetails: req.body.highVoltageDetails,
+        heightDetails: req.body.heightDetails,
+        heavyWeightDetails: req.body.heavyWeightDetails
       };
       
       console.log("변환된 데이터:", JSON.stringify(transformedData, null, 2));
