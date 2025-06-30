@@ -84,7 +84,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       console.log("PATCH 요청 데이터:", JSON.stringify(req.body, null, 2));
-      const equipmentData = insertEquipmentSchema.partial().parse(req.body);
+      
+      // Transform frontend field names to database column names
+      const transformedData = {
+        ...req.body,
+        // Ensure arrays are properly handled
+        requiredSafetyEquipment: Array.isArray(req.body.requiredSafetyEquipment) 
+          ? req.body.requiredSafetyEquipment 
+          : [],
+        lotoPoints: Array.isArray(req.body.lotoPoints) 
+          ? req.body.lotoPoints 
+          : [],
+        safetyFacilityLocations: Array.isArray(req.body.safetyFacilityLocations) 
+          ? req.body.safetyFacilityLocations 
+          : [],
+        emergencyContacts: Array.isArray(req.body.emergencyContacts) 
+          ? req.body.emergencyContacts 
+          : [],
+        // Handle detail fields by removing them since they don't exist in the current schema
+        highTemperatureDetails: undefined,
+        highPressureDetails: undefined,
+        highVoltageDetails: undefined,
+        heightDetails: undefined,
+        heavyWeightDetails: undefined,
+        safetyDeviceImages: undefined
+      };
+      
+      console.log("변환된 데이터:", JSON.stringify(transformedData, null, 2));
+      
+      const equipmentData = insertEquipmentSchema.partial().parse(transformedData);
       console.log("검증된 설비 데이터:", JSON.stringify(equipmentData, null, 2));
       const equipment = await storage.updateEquipment(id, equipmentData);
       console.log("업데이트 완료:", equipment);

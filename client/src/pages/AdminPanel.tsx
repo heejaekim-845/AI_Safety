@@ -156,6 +156,8 @@ export default function AdminPanel() {
 
   const onEditSubmit = (data: InsertEquipment) => {
     if (editingEquipment) {
+      console.log('Submitting equipment update:', data);
+      console.log('Form validation errors:', editForm.formState.errors);
       updateEquipmentMutation.mutate({ id: editingEquipment.id, data });
     }
   };
