@@ -412,7 +412,7 @@ export default function EquipmentDashboard() {
                     <span className="text-gray-600">화학물질명:</span>
                     <span className="font-medium">{equipment.hazardousChemicalName || 'N/A'}</span>
                   </div>
-                  {equipment.hazardousChemicalName === "질소가스" && (
+                  {equipment.hazardousChemicalName && equipment.msdsImageUrl && (
                     <div className="flex justify-center">
                       <Dialog>
                         <DialogTrigger asChild>
@@ -428,14 +428,17 @@ export default function EquipmentDashboard() {
                         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle className="text-lg font-bold">
-                              질소가스 MSDS (Material Safety Data Sheet)
+                              {equipment.hazardousChemicalName} MSDS (Material Safety Data Sheet)
                             </DialogTitle>
                           </DialogHeader>
                           <div className="mt-4">
                             <img 
-                              src={nitrogenMsdsImage} 
-                              alt="질소가스 MSDS 정보" 
+                              src={equipment.msdsImageUrl} 
+                              alt={`${equipment.hazardousChemicalName} MSDS 정보`} 
                               className="w-full h-auto border rounded-lg shadow-sm"
+                              onError={(e) => {
+                                e.currentTarget.src = "/placeholder-msds.png";
+                              }}
                             />
                           </div>
                         </DialogContent>

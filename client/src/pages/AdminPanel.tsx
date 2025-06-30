@@ -188,7 +188,10 @@ export default function AdminPanel() {
       lotoPoints: equipment.lotoPoints || [],
       safetyFacilityLocations: equipment.safetyFacilityLocations || [],
       emergencyContacts: equipment.emergencyContacts || [],
-      safetyDeviceImages: equipment.safetyDeviceImages || []
+      safetyDeviceImages: equipment.safetyDeviceImages || [],
+      hazardousChemicalType: equipment.hazardousChemicalType || "",
+      hazardousChemicalName: equipment.hazardousChemicalName || "",
+      msdsImageUrl: equipment.msdsImageUrl || ""
     });
     setShowEditDialog(true);
   };
@@ -1166,6 +1169,43 @@ export default function AdminPanel() {
                         </FormItem>
                       )}
                     />
+                  </div>
+                  
+                  {/* MSDS Image Management */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">MSDS 이미지 관리</Label>
+                    <FormField
+                      control={editForm.control}
+                      name="msdsImageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">MSDS 이미지 URL</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="MSDS 이미지 파일 경로를 입력하세요 (예: /attached_assets/msds_nitrogen.png)"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {editForm.watch("msdsImageUrl") && (
+                      <div className="mt-2">
+                        <Label className="text-xs text-muted-foreground">미리보기:</Label>
+                        <div className="mt-1 p-2 border rounded-lg bg-gray-50">
+                          <img 
+                            src={editForm.watch("msdsImageUrl")} 
+                            alt="MSDS 미리보기" 
+                            className="max-w-full h-32 object-contain rounded"
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder-image.png";
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

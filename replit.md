@@ -140,6 +140,8 @@ Changelog:
 - June 30, 2025. Fixed duplicate major risk factors section that was displaying twice in equipment dashboard
 - June 30, 2025. Added risk factor detail fields to database schema and admin panel - equipment now supports detailed descriptions for high voltage, high pressure, high temperature, height, and mechanical risks with proper data persistence
 - June 30, 2025. Enhanced visual hierarchy with subtle gradient backgrounds (slate-50 to blue-50) on dashboard and work selection pages to improve card distinction and overall UI readability
+- June 30, 2025. Completed hazardous chemicals editing functionality in admin panel with chemical type and name fields, and MSDS image management system allowing users to upload, edit, and delete MSDS images dynamically
+- June 30, 2025. Enhanced MSDS popup dialog to use dynamic database-stored images instead of hardcoded images, supporting any chemical type with proper error handling and fallback images
 ```
 
 ## User Preferences

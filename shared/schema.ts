@@ -30,6 +30,7 @@ export const equipment = pgTable("equipment", {
   requiredSafetyEquipment: jsonb("required_safety_equipment").$type<string[]>(),
   hazardousChemicalType: text("hazardous_chemical_type"),
   hazardousChemicalName: text("hazardous_chemical_name"),
+  msdsImageUrl: text("msds_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
