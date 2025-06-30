@@ -142,6 +142,8 @@ Changelog:
 - June 30, 2025. Enhanced visual hierarchy with subtle gradient backgrounds (slate-50 to blue-50) on dashboard and work selection pages to improve card distinction and overall UI readability
 - June 30, 2025. Completed hazardous chemicals editing functionality in admin panel with chemical type and name fields, and MSDS image management system allowing users to upload, edit, and delete MSDS images dynamically
 - June 30, 2025. Enhanced MSDS popup dialog to use dynamic database-stored images instead of hardcoded images, supporting any chemical type with proper error handling and fallback images
+- June 30, 2025. Implemented complete safety device location management system in admin panel allowing users to add, edit, and delete safety devices with names, locations, and image URLs for each equipment
+- June 30, 2025. Enhanced equipment dashboard to dynamically display safety device location buttons based on database data, with individual popups showing device-specific information and inspection checklists
 ```
 
 ## User Preferences

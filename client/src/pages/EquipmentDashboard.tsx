@@ -481,50 +481,58 @@ export default function EquipmentDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {equipment.safetyDeviceImages && equipment.safetyDeviceImages.length > 0 && (
-              <div className="flex justify-center">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                    >
-                      <MapPin className="mr-2 h-4 w-4" />
-                      안전장치 위치 보기
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle className="text-lg font-bold">
-                        {equipment.name} - 안전장치 위치 및 점검사항
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="mt-4 space-y-4">
-                      {equipment.safetyDeviceImages.map((imageUrl: any, index: any) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <img 
-                            src={imageUrl} 
-                            alt={`안전장치 위치 ${index + 1}`}
-                            className="w-full h-auto border rounded-lg shadow-sm mb-2"
-                          />
-                          <div className="text-sm text-gray-600">
-                            <h4 className="font-medium mb-2">점검 체크리스트:</h4>
-                            <ul className="list-disc pl-4 space-y-1">
-                              <li>안전장치 정상 작동 여부 확인</li>
-                              <li>안전밸브 압력 설정값 점검</li>
-                              <li>안전장치 주변 접근성 확보</li>
-                              <li>비상정지 장치 작동 테스트</li>
+            {equipment.safetyDeviceImages && equipment.safetyDeviceImages.length > 0 ? (
+              <div className="space-y-3">
+                {equipment.safetyDeviceImages.map((device: any, index: number) => (
+                  <div key={index} className="flex justify-center">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                        >
+                          <MapPin className="mr-2 h-4 w-4" />
+                          {device.name || `안전장치 ${index + 1}`} 위치보기
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="text-lg font-bold">
+                            {device.name || `안전장치 ${index + 1}`} 위치 및 점검사항
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="mt-4">
+                          {device.imageUrl && (
+                            <img 
+                              src={device.imageUrl} 
+                              alt={`${device.name} 위치도`} 
+                              className="w-full h-auto border rounded-lg shadow-sm"
+                              onError={(e) => {
+                                e.currentTarget.src = "/placeholder-safety-device.png";
+                              }}
+                            />
+                          )}
+                          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <h3 className="font-bold text-blue-900 mb-2">장치 정보</h3>
+                            <div className="text-sm text-blue-800 space-y-1">
+                              <div><strong>장치명:</strong> {device.name}</div>
+                              <div><strong>위치:</strong> {device.location}</div>
+                            </div>
+                            <h3 className="font-bold text-blue-900 mb-2 mt-4">점검 체크리스트</h3>
+                            <ul className="text-sm text-blue-800 space-y-1">
+                              <li>• 안전장치 주변에 장애물이 없는지 확인</li>
+                              <li>• 장치 작동 상태 확인 (매월 1회)</li>
+                              <li>• 계기 정상 작동 확인</li>
+                              <li>• 누출 흔적이 없는지 육안 점검</li>
                             </ul>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                ))}
               </div>
-            )}
-            
-            {(!equipment.safetyDeviceImages || equipment.safetyDeviceImages.length === 0) && (
+            ) : (
               <div className="text-center py-4">
                 <div className="p-3 bg-gray-50 rounded-lg border-l-4 border-gray-400">
                   <p className="text-sm text-gray-600">
