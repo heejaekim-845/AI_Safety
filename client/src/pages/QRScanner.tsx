@@ -51,7 +51,11 @@ export default function QRScanner() {
       <div className="text-center mb-4">
         <div className="floating">
           <div className="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-2xl flex items-center justify-center">
-            <Search className="h-8 w-8 text-white" />
+            <img 
+              src="/attached_assets/d38a3897-2e42-47b1-9feb-3970364f22e1_1751375612245.jpg" 
+              alt="QR Scanner" 
+              className="w-8 h-8"
+            />
           </div>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">설비 인식</h2>
