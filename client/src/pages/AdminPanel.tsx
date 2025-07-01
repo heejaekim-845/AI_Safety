@@ -262,8 +262,8 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-heading-1 text-gray-900 mb-2">설비 관리</h1>
-          <p className="text-body text-gray-600">산업 설비의 안전 정보를 관리합니다</p>
+          <h1 className="text-heading-1 mb-2">설비 관리</h1>
+          <p className="text-body">산업 설비의 안전 정보를 관리합니다</p>
         </div>
 
         {/* Add Equipment Dialog */}
@@ -1719,30 +1719,30 @@ export default function AdminPanel() {
       <div className="grid grid-cols-4 gap-6 mb-8">
         <div className="card-minimal card-hover">
           <div className="p-6 text-center">
-            <Factory className="h-8 w-8 text-gray-700 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.total}</p>
-            <p className="text-caption text-gray-600">총 설비</p>
+            <Factory className="h-8 w-8 text-blue-700 mx-auto mb-3" />
+            <p className="text-heading-2 mb-1">{riskCounts.total}</p>
+            <p className="text-caption">총 설비</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
           <div className="p-6 text-center">
             <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.high}</p>
-            <p className="text-caption text-gray-600">고위험</p>
+            <p className="text-heading-2 mb-1">{riskCounts.high}</p>
+            <p className="text-caption">고위험</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
           <div className="p-6 text-center">
             <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.medium}</p>
-            <p className="text-caption text-gray-600">중위험</p>
+            <p className="text-heading-2 mb-1">{riskCounts.medium}</p>
+            <p className="text-caption">중위험</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
           <div className="p-6 text-center">
             <Shield className="h-8 w-8 text-green-600 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.low}</p>
-            <p className="text-caption text-gray-600">저위험</p>
+            <p className="text-heading-2 mb-1">{riskCounts.low}</p>
+            <p className="text-caption">저위험</p>
           </div>
         </div>
       </div>
@@ -1752,16 +1752,16 @@ export default function AdminPanel() {
         <div className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-4 w-4" />
               <Input
                 placeholder="설비명, 코드, 위치로 검색..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-200 focus:border-gray-400 focus:ring-gray-400"
+                className="pl-10"
               />
             </div>
             <Select value={filterRisk} onValueChange={setFilterRisk}>
-              <SelectTrigger className="w-full md:w-48 border-gray-200">
+              <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="위험도 필터" />
               </SelectTrigger>
               <SelectContent>
@@ -1784,8 +1784,8 @@ export default function AdminPanel() {
                 {/* 첫 번째 줄: 설비명, 설비코드, 안전등급 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <h3 className="text-heading-3 text-gray-900">{eq.name}</h3>
-                    <span className="text-body text-gray-600">{eq.code}</span>
+                    <h3 className="text-heading-3">{eq.name}</h3>
+                    <span className="text-body">{eq.code}</span>
                     <RiskLevelBadge level={eq.riskLevel} />
                   </div>
                 </div>

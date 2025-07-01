@@ -135,27 +135,27 @@
 
   /* Modern typography scale */
   .text-heading-1 {
-    @apply text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-tight text-blue-900;
   }
   
   .text-heading-2 {
-    @apply text-xl font-semibold tracking-tight;
+    @apply text-xl font-semibold tracking-tight text-blue-900;
   }
   
   .text-heading-3 {
-    @apply text-lg font-medium;
+    @apply text-lg font-medium text-blue-800;
   }
   
   .text-body-large {
-    @apply text-base;
+    @apply text-base text-blue-700;
   }
   
   .text-body {
-    @apply text-sm;
+    @apply text-sm text-blue-700;
   }
   
   .text-caption {
-    @apply text-xs text-muted-foreground;
+    @apply text-xs text-blue-600;
   }
 
   /* Modern card styles */
