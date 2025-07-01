@@ -110,16 +110,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("검증된 설비 데이터:", JSON.stringify(equipmentData, null, 2));
       
       // AI 위험도 재평가 수행
+      console.log("AI 위험도 재평가 시작...");
       try {
         const currentEquipment = await storage.getEquipmentById(id);
+        console.log("현재 설비 정보:", currentEquipment?.name);
         if (currentEquipment) {
           const updatedEquipmentForAI = { ...currentEquipment, ...equipmentData };
+          console.log("AI 평가용 설비 데이터 준비 완료");
           const aiRiskLevel = await aiService.evaluateEquipmentRiskLevel(updatedEquipmentForAI);
+          console.log(`AI 위험도 평가 결과: ${aiRiskLevel}`);
           equipmentData.riskLevel = aiRiskLevel;
           console.log(`AI 위험도 평가 완료: ${updatedEquipmentForAI.name} -> ${aiRiskLevel}`);
+        } else {
+          console.log("현재 설비를 찾을 수 없음");
         }
       } catch (aiError) {
         console.error("AI 위험도 평가 실패:", aiError);
+        console.error("AI 오류 스택:", aiError.stack);
         // AI 평가 실패 시 기존 값 유지
       }
       
