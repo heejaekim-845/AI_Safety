@@ -46,6 +46,8 @@ export interface IStorage {
   getIncidentsByEquipmentId(equipmentId: number): Promise<Incident[]>;
   getIncidentsByWorkTypeId(workTypeId: number): Promise<Incident[]>;
   createIncident(incident: InsertIncident): Promise<Incident>;
+  updateIncident(id: number, incident: Partial<InsertIncident>): Promise<Incident>;
+  deleteIncident(id: number): Promise<void>;
 
   // Work sessions operations
   createWorkSession(session: InsertWorkSession): Promise<WorkSession>;

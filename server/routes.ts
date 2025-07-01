@@ -403,6 +403,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Incidents routes
+  app.post("/api/incidents", async (req, res) => {
+    try {
+      const validatedData = insertIncidentSchema.parse(req.body);
+      const incident = await storage.createIncident(validatedData);
+      res.status(201).json(incident);
+    } catch (error) {
+      console.error("사고 등록 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "사고를 등록할 수 없습니다." });
+    }
+  });
+
+  app.put("/api/incidents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertIncidentSchema.partial().parse(req.body);
+      const incident = await storage.updateIncident(id, validatedData);
+      res.json(incident);
+    } catch (error) {
+      console.error("사고 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "사고를 수정할 수 없습니다." });
+    }
+  });
+
+  app.delete("/api/incidents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteIncident(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("사고 삭제 오류:", error);
+      res.status(500).json({ message: "사고를 삭제할 수 없습니다." });
+    }
+  });
+
   // AI services routes
   app.post("/api/ai/safety-analysis", async (req, res) => {
     try {

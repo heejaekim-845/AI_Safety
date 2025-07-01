@@ -266,4 +266,20 @@ export class DatabaseStorage implements IStorage {
   async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
     return await db.select().from(riskReports).where(eq(riskReports.equipmentId, equipmentId));
   }
+
+  // Incidents operations
+  async updateIncident(id: number, incidentData: Partial<InsertIncident>): Promise<Incident> {
+    const [result] = await db.update(incidents)
+      .set({
+        ...incidentData,
+        updatedAt: new Date(),
+      })
+      .where(eq(incidents.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteIncident(id: number): Promise<void> {
+    await db.delete(incidents).where(eq(incidents.id, id));
+  }
 }
