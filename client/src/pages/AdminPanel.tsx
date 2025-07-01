@@ -1722,31 +1722,31 @@ export default function AdminPanel() {
         </Dialog>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-4 gap-3 mb-4">
         <div className="card-minimal card-hover">
-          <div className="p-6 text-center">
-            <Factory className="h-8 w-8 text-gray-700 mx-auto mb-3" />
+          <div className="p-4 text-center">
+            <Factory className="h-8 w-8 text-gray-700 mx-auto mb-2" />
             <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.total}</p>
             <p className="text-caption text-gray-600">총 설비</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
-          <div className="p-6 text-center">
-            <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+          <div className="p-4 text-center">
+            <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
             <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.high}</p>
             <p className="text-caption text-gray-600">고위험</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
-          <div className="p-6 text-center">
-            <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
+          <div className="p-4 text-center">
+            <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-2" />
             <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.medium}</p>
             <p className="text-caption text-gray-600">중위험</p>
           </div>
         </div>
         <div className="card-minimal card-hover">
-          <div className="p-6 text-center">
-            <Shield className="h-8 w-8 text-green-600 mx-auto mb-3" />
+          <div className="p-4 text-center">
+            <Shield className="h-8 w-8 text-green-600 mx-auto mb-2" />
             <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.low}</p>
             <p className="text-caption text-gray-600">저위험</p>
           </div>
@@ -1754,8 +1754,8 @@ export default function AdminPanel() {
       </div>
 
       {/* Search and Filter */}
-      <div className="card-minimal mb-8">
-        <div className="p-6">
+      <div className="card-minimal mb-4">
+        <div className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -1782,11 +1782,11 @@ export default function AdminPanel() {
       </div>
 
       {/* Equipment List */}
-      <div className="grid gap-6">
+      <div className="grid gap-3">
         {filteredEquipment?.map((eq) => (
           <div key={eq.id} className="card-minimal card-hover">
-            <div className="p-6">
-              <div className="space-y-4">
+            <div className="p-4">
+              <div className="space-y-2">
                 {/* 첫 번째 줄: 설비명, 설비코드, 안전등급 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
