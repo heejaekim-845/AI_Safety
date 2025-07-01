@@ -1795,7 +1795,7 @@ export default function AdminPanel() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setLocation(`/equipment/${eq.id}`)}
+                    onClick={() => setLocation(`/work-management/${eq.id}`)}
                   >
                     <Settings className="h-4 w-4 mr-1" />
                     작업관리
