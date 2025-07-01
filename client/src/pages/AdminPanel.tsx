@@ -1462,30 +1462,30 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                {/* Safety Facility Locations Management */}
+                {/* Safety Device Location Management */}
                 <div className="space-y-4 border-t pt-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">안전시설 위치 관리</Label>
+                    <Label className="text-base font-medium">안전장치 위치 관리</Label>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const currentFacilities = editForm.getValues("safetyFacilityLocations") || [];
-                        editForm.setValue("safetyFacilityLocations", [
-                          ...currentFacilities,
-                          { name: "", location: "", type: "FIRE_EXTINGUISHER", imageUrl: "" }
+                        const currentDevices = editForm.getValues("safetyDeviceImages") || [];
+                        editForm.setValue("safetyDeviceImages", [
+                          ...currentDevices,
+                          { name: "", location: "", imageUrl: "" }
                         ]);
                       }}
                     >
                       <Plus className="h-4 w-4 mr-1" />
-                      시설 추가
+                      장치 추가
                     </Button>
                   </div>
                   
                   <FormField
                     control={editForm.control}
-                    name="safetyFacilityLocations"
+                    name="safetyDeviceImages"
                     render={({ field }) => (
                       <FormItem>
                         <div className="space-y-4">
@@ -1584,105 +1584,7 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                {/* Safety Device Location Management */}
-                <div className="space-y-4 border-t pt-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">안전장치 위치 관리</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const currentDevices = editForm.getValues("safetyDeviceImages") || [];
-                        editForm.setValue("safetyDeviceImages", [
-                          ...currentDevices,
-                          { name: "", location: "", imageUrl: "" }
-                        ]);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      장치 추가
-                    </Button>
-                  </div>
-                  
-                  <FormField
-                    control={editForm.control}
-                    name="safetyDeviceImages"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="space-y-4">
-                          {(Array.isArray(field.value) ? field.value : []).map((device: any, index) => (
-                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-medium">{device.name || `안전장치 ${index + 1}`}</h4>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                    devices.splice(index, 1);
-                                    field.onChange(devices);
-                                  }}
-                                  className="text-red-600 border-red-200 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              
-                              <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">장치명</Label>
-                                  <Input
-                                    placeholder="예: 안전밸브, 압력계"
-                                    value={device.name || ""}
-                                    onChange={(e) => {
-                                      const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                      devices[index] = { ...devices[index], name: e.target.value };
-                                      field.onChange(devices);
-                                    }}
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">위치</Label>
-                                  <Input
-                                    placeholder="예: 상단, 측면"
-                                    value={device.location || ""}
-                                    onChange={(e) => {
-                                      const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                      devices[index] = { ...devices[index], location: e.target.value };
-                                      field.onChange(devices);
-                                    }}
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">이미지 URL</Label>
-                                  <Input
-                                    placeholder="장치 위치 이미지 경로"
-                                    value={device.imageUrl || ""}
-                                    onChange={(e) => {
-                                      const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                      devices[index] = { ...devices[index], imageUrl: e.target.value };
-                                      field.onChange(devices);
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
-                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-                              안전장치를 추가하려면 "장치 추가" 버튼을 클릭하세요
-                            </div>
-                          )}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Emergency Contacts Management */}
+                {/* Emergency Contact Management */}
                 <div className="space-y-4 border-t pt-4">
                   <div className="flex items-center justify-between">
                     <Label className="text-base font-medium">비상연락처 관리</Label>
@@ -1694,7 +1596,7 @@ export default function AdminPanel() {
                         const currentContacts = editForm.getValues("emergencyContacts") || [];
                         editForm.setValue("emergencyContacts", [
                           ...currentContacts,
-                          { role: "", contact: "" }
+                          { name: "", role: "", phone: "" }
                         ]);
                       }}
                     >
