@@ -295,20 +295,27 @@ export default function AdminPanel() {
     
     // Load existing incidents for this equipment
     try {
-      const response = await apiRequest("GET", `/api/equipment/${equipment.id}/incidents`);
-      const incidents = await response.json();
-      
-      // Convert existing incidents to the format expected by newIncidents state
-      const existingIncidents = incidents.map((incident: any) => ({
-        id: incident.id, // Keep track of existing incident IDs
-        description: incident.description,
-        severity: incident.severity,
-        occurredAt: new Date(incident.occurredAt).toISOString().slice(0, 16),
-        reportedBy: incident.reportedBy,
-        actions: incident.actions
-      }));
-      
-      setNewIncidents(existingIncidents);
+      const response = await fetch(`/api/equipment/${equipment.id}/incidents`);
+      if (response.ok) {
+        const incidents = await response.json();
+        console.log("Loaded incidents:", incidents);
+        
+        // Convert existing incidents to the format expected by newIncidents state
+        const existingIncidents = incidents.map((incident: any) => ({
+          id: incident.id, // Keep track of existing incident IDs
+          description: incident.description || "",
+          severity: incident.severity || "MEDIUM",
+          occurredAt: incident.occurredAt ? new Date(incident.occurredAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+          reportedBy: incident.reportedBy || "",
+          actions: incident.actions || ""
+        }));
+        
+        console.log("Converted incidents:", existingIncidents);
+        setNewIncidents(existingIncidents);
+      } else {
+        console.error("Failed to load incidents: HTTP", response.status);
+        setNewIncidents([]);
+      }
     } catch (error) {
       console.error("Failed to load incidents:", error);
       setNewIncidents([]);
