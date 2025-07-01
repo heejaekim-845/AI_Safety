@@ -615,6 +615,60 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
+        {/* Accident History */}
+        <Card className="card-minimal">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <History className="mr-3 h-6 w-6 text-orange-600" />
+              사고이력
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {incidents && incidents.length > 0 ? (
+              <div className="space-y-3">
+                {(incidents as Incident[]).slice(0, 3).map((incident) => (
+                  <div 
+                    key={incident.id} 
+                    className={`rounded-lg p-4 border-l-4 hover:shadow-md transition-all duration-200 ${
+                      incident.severity === 'HIGH' 
+                        ? 'bg-red-50 border-red-400 hover:bg-red-100' 
+                        : incident.severity === 'MEDIUM' 
+                        ? 'bg-orange-50 border-orange-400 hover:bg-orange-100' 
+                        : 'bg-yellow-50 border-yellow-400 hover:bg-yellow-100'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <RiskLevelBadge level={incident.severity} />
+                      <span className="text-xs text-gray-500">
+                        {new Date(incident.incidentDate).toLocaleDateString('ko-KR')}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mb-2">
+                      {incident.description}
+                    </p>
+                    {incident.actionsTaken && (
+                      <p className="text-xs text-gray-600">
+                        조치사항: {incident.actionsTaken}
+                      </p>
+                    )}
+                  </div>
+                ))}
+                {incidents.length > 3 && (
+                  <p className="text-xs text-gray-500 text-center mt-3">
+                    최근 3건의 사고이력을 표시합니다.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                  <p className="text-sm text-gray-600">등록된 사고이력이 없습니다.</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Emergency Contacts */}
         <Card className="card-minimal">
           <CardHeader className="pb-4">

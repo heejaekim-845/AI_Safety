@@ -1032,6 +1032,37 @@ export default function AdminPanel() {
                   />
                 </div>
 
+                {/* Accident History Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">사고이력 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Note: This will be implemented as a separate API call
+                        toast({
+                          title: "기능 예정",
+                          description: "사고이력 추가 기능은 별도 API로 구현됩니다.",
+                        });
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      사고 추가
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-2">
+                      사고이력은 별도의 관리 시스템에서 등록됩니다.
+                    </p>
+                    <div className="text-xs text-gray-500">
+                      포함 정보: 사고 설명, 심각도(HIGH/MEDIUM/LOW), 발생일시, 보고자, 조치사항
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
                     취소

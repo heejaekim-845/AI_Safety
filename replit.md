@@ -166,6 +166,7 @@ Changelog:
 - July 1, 2025. Enhanced risk analysis dashboard clarity by separating "(AI) 종합 위험도" from "사고이력 위험수준 통계" - improved user understanding of different risk assessment methods
 - July 1, 2025. Implemented automatic AI risk re-evaluation system when equipment information changes and modified admin panel to display AI-determined risk levels as read-only, preventing manual overrides
 - July 1, 2025. Unified risk level system to HIGH/MEDIUM/LOW format across entire application - updated RiskLevelBadge component to support both old (RED/YELLOW/GREEN) and new formats, executed data migration script to convert existing equipment risk levels
+- July 1, 2025. Implemented accident history feature: added incidents card to equipment dashboard between safety facilities and emergency contacts, fixed incidents schema to match database structure, added sample incident data, and included accident history management placeholder in admin panel
 ```
 
 ## User Preferences

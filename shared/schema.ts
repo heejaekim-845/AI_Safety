@@ -81,10 +81,11 @@ export const incidents = pgTable("incidents", {
   id: serial("id").primaryKey(),
   equipmentId: integer("equipment_id").references(() => equipment.id),
   workTypeId: integer("work_type_id").references(() => workTypes.id),
-  title: text("title").notNull(),
   description: text("description").notNull(),
   severity: text("severity").notNull(), // HIGH, MEDIUM, LOW
-  incidentDate: timestamp("incident_date").notNull(),
+  reporterName: text("reporter_name").notNull(),
+  incidentDate: timestamp("incident_date").defaultNow(),
+  actionsTaken: text("actions_taken"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
