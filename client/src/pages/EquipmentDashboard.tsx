@@ -138,7 +138,7 @@ export default function EquipmentDashboard() {
   };
 
   return (
-    <div className="pb-20 fade-in min-h-screen">
+    <div className="pb-20 fade-in min-h-screen bg-gray-50">
       {/* Equipment Header */}
       <div className="bg-blue-600 text-white p-8 relative overflow-hidden">
         <div className="relative z-10">

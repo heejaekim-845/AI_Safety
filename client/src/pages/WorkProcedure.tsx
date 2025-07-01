@@ -215,7 +215,7 @@ export default function WorkProcedureComponent() {
   const upcomingProcedures = procedures.filter(p => p.stepNumber > currentStep);
 
   return (
-    <div className="p-4 pb-24 min-h-screen">
+    <div className="p-4 pb-24 min-h-screen bg-gray-50">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <Button

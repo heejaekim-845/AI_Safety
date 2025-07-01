@@ -198,7 +198,7 @@ export default function WorkTypeSelection() {
   }
 
   return (
-    <div className="p-4 pb-24 min-h-screen">
+    <div className="p-4 pb-24 min-h-screen bg-gray-50">
       <div className="flex items-center mb-4">
         <Button
           variant="ghost"
