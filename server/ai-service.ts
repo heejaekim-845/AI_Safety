@@ -416,6 +416,58 @@ JSON 형식으로 응답:
     }
     return specs.length > 0 ? specs.join(" | ") : "상세 정보 없음";
   }
+  async evaluateEquipmentRiskLevel(equipmentInfo: any): Promise<"HIGH" | "MEDIUM" | "LOW"> {
+    try {
+      const prompt = `다음 산업 설비의 종합적인 위험도를 평가하고 HIGH/MEDIUM/LOW 중 하나로 분류해주세요.
+
+설비 정보:
+- 설비명: ${equipmentInfo.name}
+- 위치: ${equipmentInfo.location}
+- 제조사: ${equipmentInfo.manufacturer || '정보 없음'}
+- 설치년도: ${equipmentInfo.installYear || '정보 없음'}
+- 사양: ${equipmentInfo.specification || '정보 없음'}
+
+위험 요소:
+${this.formatRisks(equipmentInfo)}
+
+위험 요소 상세:
+- 고전압: ${equipmentInfo.riskFactors?.highVoltage ? 'O' : 'X'} ${equipmentInfo.riskFactors?.highVoltageDetail || ''}
+- 고압: ${equipmentInfo.riskFactors?.highPressure ? 'O' : 'X'} ${equipmentInfo.riskFactors?.highPressureDetail || ''}
+- 고온: ${equipmentInfo.riskFactors?.highTemperature ? 'O' : 'X'} ${equipmentInfo.riskFactors?.highTemperatureDetail || ''}
+- 고소: ${equipmentInfo.riskFactors?.height ? 'O' : 'X'} ${equipmentInfo.riskFactors?.heightDetail || ''}
+- 기계적: ${equipmentInfo.riskFactors?.mechanical ? 'O' : 'X'} ${equipmentInfo.riskFactors?.mechanicalDetail || ''}
+
+유해화학물질: ${equipmentInfo.hazardousChemicalType || '없음'}
+필수 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(', ') || '기본 안전장비'}
+
+평가 기준:
+- HIGH: 생명에 직접적 위험, 중대재해 가능성, 복수 고위험 요소
+- MEDIUM: 부상 가능성, 단일 위험 요소, 적절한 안전조치로 관리 가능
+- LOW: 경미한 위험, 기본 안전수칙으로 충분
+
+위험도만 응답하세요: HIGH, MEDIUM, LOW 중 하나`;
+
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "산업안전 전문가로서 설비의 종합 위험도를 평가합니다. HIGH, MEDIUM, LOW 중 하나만 응답하세요."
+        },
+        contents: prompt
+      });
+
+      const result = response.text?.trim().toUpperCase();
+      
+      if (result === 'HIGH' || result === 'MEDIUM' || result === 'LOW') {
+        return result as "HIGH" | "MEDIUM" | "LOW";
+      }
+      
+      return "MEDIUM"; // 기본값
+    } catch (error) {
+      console.error("AI 위험도 평가 오류:", error);
+      return "MEDIUM";
+    }
+  }
+
   async analyzeWorkTypeRisk(workTypeId: number, workTypeName: string, equipmentInfo: any): Promise<{
     workTypeName: string;
     riskFactors: Array<{

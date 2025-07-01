@@ -1167,19 +1167,21 @@ export default function AdminPanel() {
                   name="riskLevel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>위험도 등급</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="위험도를 선택하세요" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="RED">RED (고위험)</SelectItem>
-                          <SelectItem value="YELLOW">YELLOW (중위험)</SelectItem>
-                          <SelectItem value="GREEN">GREEN (저위험)</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel className="flex items-center gap-2">
+                        위험도 등급
+                        <Badge variant="outline" className="text-xs">AI 자동 설정</Badge>
+                      </FormLabel>
+                      <FormControl>
+                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">AI가 평가한 위험도:</span>
+                            <RiskLevelBadge level={field.value || "MEDIUM"} />
+                          </div>
+                        </div>
+                      </FormControl>
+                      <div className="text-xs text-gray-500 mt-1">
+                        설비 정보 변경 시 AI가 자동으로 위험도를 재평가합니다
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
