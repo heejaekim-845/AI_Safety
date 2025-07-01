@@ -148,6 +148,7 @@ Changelog:
 - July 1, 2025. Unified card/section ordering between equipment dashboard and admin panel editing screen to match user requirements: 설비상세정보 → 위험도분석 → 주요위험요소 → 필수안전장비 → 유해화학물질정보 → 안전장치위치확인 → 안전시설위치보기 → 비상연락처
 - July 1, 2025. Simplified admin panel equipment list to show only equipment name, equipment code, and edit button for cleaner management interface
 - July 1, 2025. Added equipment deletion functionality to admin panel with confirmation dialog and proper error handling
+- July 1, 2025. Enhanced admin panel equipment list to display safety risk level badges alongside equipment name and code for better visibility
 ```
 
 ## User Preferences

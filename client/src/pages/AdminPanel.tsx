@@ -1782,7 +1782,10 @@ export default function AdminPanel() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-1">{eq.name}</h3>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h3 className="text-lg font-semibold">{eq.name}</h3>
+                    <RiskLevelBadge level={eq.riskLevel} />
+                  </div>
                   <p className="text-sm text-gray-600">{eq.code}</p>
                 </div>
                 <div className="flex items-center space-x-2">
