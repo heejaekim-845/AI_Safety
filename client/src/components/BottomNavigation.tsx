@@ -71,7 +71,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
               )}
               onClick={() => handleTabClick(tab)}
             >
-              <IconComponent className={cn("h-6 w-6", isActive && "animate-pulse")} />
+              <IconComponent className={cn("h-12 w-12", isActive && "animate-pulse")} />
               <span className="text-xs font-medium">{tab.label}</span>
             </Button>
           );
