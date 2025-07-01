@@ -665,7 +665,15 @@ export default function WorkManagement() {
                 <div className="space-y-2">
                   {requiredQualifications.map((qual, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Input value={qual} readOnly className="flex-1" />
+                      <Input 
+                        value={qual} 
+                        onChange={(e) => {
+                          const updated = [...requiredQualifications];
+                          updated[index] = e.target.value;
+                          setRequiredQualifications(updated);
+                        }}
+                        className="flex-1" 
+                      />
                       <Button
                         size="sm"
                         variant="outline"
@@ -698,7 +706,15 @@ export default function WorkManagement() {
                 <div className="space-y-2">
                   {safetyEquipmentRequirements.map((equip, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Input value={equip} readOnly className="flex-1" />
+                      <Input 
+                        value={equip} 
+                        onChange={(e) => {
+                          const updated = [...safetyEquipmentRequirements];
+                          updated[index] = e.target.value;
+                          setSafetyEquipmentRequirements(updated);
+                        }}
+                        className="flex-1" 
+                      />
                       <Button
                         size="sm"
                         variant="outline"
@@ -731,7 +747,15 @@ export default function WorkManagement() {
                 <div className="space-y-2">
                   {environmentalRequirements.map((env, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Input value={env} readOnly className="flex-1" />
+                      <Input 
+                        value={env} 
+                        onChange={(e) => {
+                          const updated = [...environmentalRequirements];
+                          updated[index] = e.target.value;
+                          setEnvironmentalRequirements(updated);
+                        }}
+                        className="flex-1" 
+                      />
                       <Button
                         size="sm"
                         variant="outline"
@@ -764,7 +788,15 @@ export default function WorkManagement() {
                 <div className="space-y-2">
                   {legalRequirements.map((legal, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Input value={legal} readOnly className="flex-1" />
+                      <Input 
+                        value={legal} 
+                        onChange={(e) => {
+                          const updated = [...legalRequirements];
+                          updated[index] = e.target.value;
+                          setLegalRequirements(updated);
+                        }}
+                        className="flex-1" 
+                      />
                       <Button
                         size="sm"
                         variant="outline"
