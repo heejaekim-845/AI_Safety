@@ -204,19 +204,19 @@
   }
   
   .safety-gradient {
-    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white shadow-lg;
+    @apply bg-blue-600 text-white shadow-lg;
   }
   
   .risk-high {
-    @apply bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg;
+    @apply bg-red-600 text-white shadow-lg;
   }
   
   .risk-medium {
-    @apply bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg;
+    @apply bg-orange-500 text-white shadow-lg;
   }
   
   .risk-low {
-    @apply bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg;
+    @apply bg-green-600 text-white shadow-lg;
   }
 
   .floating {

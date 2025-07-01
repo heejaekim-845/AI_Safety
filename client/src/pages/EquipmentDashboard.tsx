@@ -140,8 +140,7 @@ export default function EquipmentDashboard() {
   return (
     <div className="pb-20 fade-in min-h-screen">
       {/* Equipment Header */}
-      <div className="safety-gradient text-white p-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
+      <div className="bg-blue-600 text-white p-8 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center mb-6">
             <Button

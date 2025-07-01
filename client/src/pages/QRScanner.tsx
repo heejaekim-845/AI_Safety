@@ -50,7 +50,7 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       <div className="text-center mb-4">
         <div className="floating">
-          <div className="w-16 h-16 mx-auto mb-4 safety-gradient rounded-2xl flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-2xl flex items-center justify-center">
             <Search className="h-8 w-8 text-white" />
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function QRScanner() {
           <p className="text-gray-600 mb-4 text-base">카메라로 QR 코드를 스캔하세요</p>
           <Button 
             onClick={() => setShowScanner(true)}
-            className="safety-gradient hover:shadow-xl text-white font-medium px-8 py-3 rounded-xl transition-all duration-300"
+            className="bg-blue-600 hover:bg-blue-700 hover:shadow-xl text-white font-medium px-8 py-3 rounded-xl transition-all duration-300"
           >
             <Camera className="mr-2 h-5 w-5" />
             QR 스캔 시작
