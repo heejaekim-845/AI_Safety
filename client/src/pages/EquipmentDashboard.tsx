@@ -392,38 +392,7 @@ export default function EquipmentDashboard() {
           </CardContent>
         </Card>
 
-        {/* 5. Emergency Contacts */}
-        <Card className="safety-card">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center text-gray-900 text-lg">
-              <Phone className="mr-3 h-6 w-6 text-blue-600" />
-              비상연락처
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {equipment.emergencyContacts && equipment.emergencyContacts.length > 0 ? (
-              <div className="space-y-3">
-                {equipment.emergencyContacts.map((contact: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center">
-                      <Phone className="h-4 w-4 text-blue-500 mr-2" />
-                      <span className="text-sm font-medium capitalize">
-                        {contact.role === 'emergency' ? '응급상황' : 
-                         contact.role === 'supervisor' ? '관리감독자' : 
-                         contact.role === 'maintenance' ? '정비담당자' : contact.role}
-                      </span>
-                    </div>
-                    <span className="text-sm text-gray-600">{contact.contact}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">등록된 비상연락처가 없습니다.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 6. Hazardous Chemicals Information */}
+        {/* 5. Hazardous Chemicals Information */}
         <Card className="safety-card">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">

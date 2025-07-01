@@ -145,6 +145,7 @@ Changelog:
 - June 30, 2025. Implemented complete safety device location management system in admin panel allowing users to add, edit, and delete safety devices with names, locations, and image URLs for each equipment
 - June 30, 2025. Enhanced equipment dashboard to dynamically display safety device location buttons based on database data, with individual popups showing device-specific information and inspection checklists
 - June 30, 2025. Fixed critical data persistence issue: changed from memory storage (MemStorage) to database storage (DatabaseStorage) to prevent equipment data loss on application restarts - all user edits now permanently saved to Supabase database
+- July 1, 2025. Unified card/section ordering between equipment dashboard and admin panel editing screen to match user requirements: 설비상세정보 → 위험도분석 → 주요위험요소 → 필수안전장비 → 유해화학물질정보 → 안전장치위치확인 → 안전시설위치보기 → 비상연락처
 ```
 
 ## User Preferences
