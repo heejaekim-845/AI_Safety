@@ -53,7 +53,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/50 max-w-md mx-auto z-40 h-28 shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/50 max-w-md mx-auto z-40 h-32 shadow-2xl">
       <div className="grid grid-cols-4 py-2 px-2">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
@@ -71,7 +71,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
               )}
               onClick={() => handleTabClick(tab)}
             >
-              <IconComponent className={cn("h-12 w-12", isActive && "animate-pulse")} />
+              <IconComponent className={cn("h-16 w-16", isActive && "animate-pulse")} style={{ width: '64px', height: '64px', minWidth: '64px', minHeight: '64px' }} />
               <span className="text-xs font-medium">{tab.label}</span>
             </Button>
           );
