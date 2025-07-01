@@ -217,13 +217,13 @@ export default function WorkManagement() {
   if (!equipment) return <div className="p-4">설비를 찾을 수 없습니다.</div>;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="bg-primary text-primary-foreground p-4">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation(`/equipment/${equipmentId}`)}
+            onClick={() => setLocation(`/admin`)}
             className="text-primary-foreground hover:bg-primary/80"
           >
             <ArrowLeft className="h-4 w-4" />

@@ -152,6 +152,7 @@ Changelog:
 - July 1, 2025. Added work management button back to admin panel equipment list for quick access to equipment dashboard and work type management
 - July 1, 2025. Reorganized admin panel equipment list layout into two lines: first line shows equipment name, code, and safety level badge; second line shows work management, edit, and delete buttons
 - July 1, 2025. Fixed admin panel work management button routing to navigate to proper WorkManagement page (/work-management/:equipmentId) instead of equipment dashboard for dedicated work type and procedure management
+- July 1, 2025. Resolved WorkManagement page blank screen issue by adding correct route mapping in App.tsx and ensuring proper back navigation to admin panel
 ```
 
 ## User Preferences

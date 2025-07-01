@@ -52,6 +52,7 @@ function Router() {
           <Route path="/equipment/:id" component={EquipmentDashboard} />
           <Route path="/equipment/:equipmentId/work-types" component={WorkTypeSelection} />
           <Route path="/equipment/:equipmentId/work-management" component={WorkManagement} />
+          <Route path="/work-management/:equipmentId" component={WorkManagement} />
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
           <Route path="/admin" component={AdminPanel} />
         </Switch>
