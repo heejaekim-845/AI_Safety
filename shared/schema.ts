@@ -24,6 +24,18 @@ export const equipment = pgTable("equipment", {
   heightDetails: text("fall_risk_details"),
   heavyWeightRisk: boolean("mechanical").default(false),
   heavyWeightDetails: text("mechanical_details"),
+  riskFactors: jsonb("risk_factors").$type<{
+    highVoltage?: boolean;
+    highPressure?: boolean;
+    highTemperature?: boolean;
+    height?: boolean;
+    mechanical?: boolean;
+    highVoltageDetail?: string;
+    highPressureDetail?: string;
+    highTemperatureDetail?: string;
+    heightDetail?: string;
+    mechanicalDetail?: string;
+  }>(),
   lotoPoints: jsonb("other_risks").$type<any[]>(),
   safetyFacilityLocations: jsonb("required_ppe").$type<any[]>(),
   emergencyContacts: jsonb("emergency_contacts"),

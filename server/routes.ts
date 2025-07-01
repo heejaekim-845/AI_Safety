@@ -94,6 +94,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         safetyFacilityLocations: processArrayField(req.body.safetyFacilityLocations),
         emergencyContacts: processArrayField(req.body.emergencyContacts),
         safetyDeviceImages: processArrayField(req.body.safetyDeviceImages),
+        // Handle riskFactors object
+        riskFactors: req.body.riskFactors || null,
         // Keep detail fields as they now exist in the schema
         highTemperatureDetails: req.body.highTemperatureDetails,
         highPressureDetails: req.body.highPressureDetails,

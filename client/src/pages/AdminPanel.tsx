@@ -160,6 +160,8 @@ export default function AdminPanel() {
   };
 
   const onEditSubmit = (data: InsertEquipment) => {
+    console.log("편집 폼 제출 데이터:", data);
+    console.log("riskFactors:", data.riskFactors);
     updateEquipmentMutation.mutate(data);
   };
 
@@ -174,16 +176,16 @@ export default function AdminPanel() {
       modelName: equipment.modelName,
       riskLevel: equipment.riskLevel,
       riskFactors: equipment.riskFactors || {
-        highVoltage: false,
-        highPressure: false,
-        highTemperature: false,
-        height: false,
-        mechanical: false,
-        highVoltageDetail: "",
-        highPressureDetail: "",
-        highTemperatureDetail: "",
-        heightDetail: "",
-        mechanicalDetail: ""
+        highVoltage: equipment.highVoltageRisk || false,
+        highPressure: equipment.highPressureRisk || false,
+        highTemperature: equipment.highTemperatureRisk || false,
+        height: equipment.heightRisk || false,
+        mechanical: equipment.heavyWeightRisk || false,
+        highVoltageDetail: equipment.highVoltageDetails || "",
+        highPressureDetail: equipment.highPressureDetails || "",
+        highTemperatureDetail: equipment.highTemperatureDetails || "",
+        heightDetail: equipment.heightDetails || "",
+        mechanicalDetail: equipment.heavyWeightDetails || ""
       },
       requiredSafetyEquipment: Array.isArray(equipment.requiredSafetyEquipment) 
         ? equipment.requiredSafetyEquipment 
