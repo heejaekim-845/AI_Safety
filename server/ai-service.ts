@@ -150,48 +150,30 @@ export class AIService {
 
   async generateVoiceGuide(equipmentInfo: any): Promise<string> {
     try {
-      const prompt = `다음 산업 설비에 대한 포괄적인 음성 안내 스크립트를 한국어로 작성해주세요. 
-실제 작업 현장에서 작업자가 들을 수 있도록 체계적이고 상세하게 작성하세요.
+      const prompt = `다음 산업 설비에 대한 간결한 안전 음성 안내를 한국어로 작성해주세요. 
+30초 이내로 읽을 수 있도록 핵심 안전사항만 포함하세요.
 
-설비 기본 정보:
-- 설비명: ${equipmentInfo.name}
-- 설비 코드: ${equipmentInfo.code}
-- 위치: ${equipmentInfo.location}
-- 제조사: ${equipmentInfo.manufacturer || '정보 없음'}
-- 모델명: ${equipmentInfo.modelName || '정보 없음'}
-- 설치년도: ${equipmentInfo.installationYear || '정보 없음'}
-- 주요 사양: ${this.formatEquipmentSpecifications(equipmentInfo)}
+설비명: ${equipmentInfo.name}
+위치: ${equipmentInfo.location}
 
-유해화학물질 정보:
-- 화학물질 유형: ${equipmentInfo.hazardousChemicalType || '해당 없음'}
-- 화학물질명: ${equipmentInfo.hazardousChemicalName || '해당 없음'}
-- 위험관리구역: ${equipmentInfo.riskManagementZone || '해당 없음'}
+주요 위험 요소:
+${this.formatRisks(equipmentInfo)}
 
-위험성 평가:
-- 주요 위험 요소: ${this.formatRisks(equipmentInfo)}
-- 고온 위험: ${equipmentInfo.highTemperatureRisk ? '있음 (150°C 이상)' : '없음'}
-- 고압 위험: ${equipmentInfo.highPressureRisk ? '있음 (15 bar)' : '없음'}
-- 전기적 위험: ${equipmentInfo.electricalRisk ? '있음' : '없음'}
-- 회전체 위험: ${equipmentInfo.rotatingPartsRisk ? '있음' : '없음'}
+유해화학물질: ${equipmentInfo.hazardousChemicalType || '해당 없음'}
 
-안전 장비 및 절차:
-- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
-- LOTO 포인트: ${equipmentInfo.lockoutTagoutPoints?.join(", ") || "해당 없음"}
+필수 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
 
-비상 연락처: ${equipmentInfo.emergencyContact || '관제실'}
+다음 순서로 30초 이내 간결한 안내 멘트를 작성하세요:
+1. 설비명과 위치 (5초)
+2. 핵심 위험요소와 주의사항 (15초)
+3. 필수 안전장비 및 비상연락처 (10초)
 
-다음 구조로 5-6분 분량의 상세한 안내 멘트를 작성해주세요:
-1. 설비 소개 및 기본 정보
-2. 유해화학물질 관련 주의사항 (해당 시)
-3. 주요 위험요소별 안전수칙
-4. 필수 안전장비 착용 안내
-5. 작업 전 점검사항
-6. 비상상황 대응절차`;
+간결하고 명확하게 작성하여 작업자가 빠르게 이해할 수 있도록 해주세요.`;
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash",
         config: {
-          systemInstruction: "당신은 산업 안전 음성 안내 전문가입니다. 실제 작업 현장에서 작업자의 안전을 보장하기 위한 체계적이고 포괄적인 음성 안내를 제공합니다. 전문적이면서도 이해하기 쉽게 설명하세요."
+          systemInstruction: "당신은 산업 안전 음성 안내 전문가입니다. 30초 이내로 읽을 수 있는 간결하고 핵심적인 안전 안내를 제공합니다. 불필요한 설명은 생략하고 꼭 필요한 안전 정보만 포함하세요."
         },
         contents: prompt
       });
@@ -200,35 +182,23 @@ export class AIService {
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       
-      // Safety-focused fallback guidance without basic equipment info
-      return `${equipmentInfo.name} 안전 작업 안내
+      // 간결한 안전 중심 폴백 안내
+      const riskMessages = [];
+      if (equipmentInfo.highTemperature) riskMessages.push("고온 위험");
+      if (equipmentInfo.highPressure) riskMessages.push("고압 위험");
+      if (equipmentInfo.highVoltage) riskMessages.push("전기 위험");
+      if (equipmentInfo.height) riskMessages.push("추락 위험");
+      if (equipmentInfo.mechanical) riskMessages.push("기계적 위험");
 
-안전한 작업을 위한 주요 사항을 안내드립니다.
+      return `${equipmentInfo.name} 안전 안내
 
-유해화학물질 정보를 확인하세요.
-${equipmentInfo.hazardousChemicalType ? 
-  `화학물질 유형: ${equipmentInfo.hazardousChemicalType}, 화학물질명: ${equipmentInfo.hazardousChemicalName || '정보 없음'}
-  위험관리구역: ${equipmentInfo.riskManagementZone || '일반관리구역'}
-  유해화학물질 취급 시 반드시 전용 보호장비를 착용하고 안전수칙을 준수하세요.` :
-  '이 설비는 유해화학물질을 사용하지 않습니다.'
-}
+${equipmentInfo.location}에 위치한 ${equipmentInfo.name}입니다.
 
-주요 위험요소를 안내드립니다.
-${this.formatRisks(equipmentInfo)}
-${equipmentInfo.highTemperatureRisk ? '고온 위험이 있으니 내열 장갑을 착용하세요. ' : ''}
-${equipmentInfo.highPressureRisk ? '고압 가스 위험이 있으니 압력 해제 후 작업하세요. ' : ''}
-${equipmentInfo.electricalRisk ? '전기적 위험이 있으니 전원 차단 후 작업하세요. ' : ''}
-${equipmentInfo.rotatingPartsRisk ? '회전체 위험이 있으니 느슨한 옷이나 장신구를 제거하세요. ' : ''}
+${riskMessages.length > 0 ? `주요 위험: ${riskMessages.join(", ")}이 있습니다.` : '일반적인 안전수칙을 준수하세요.'}
 
-필수 안전장비를 착용하세요.
-${equipmentInfo.requiredSafetyEquipment?.join(", ") || "안전모, 안전화, 보안경, 작업복"}
+${equipmentInfo.hazardousChemicalType ? `${equipmentInfo.hazardousChemicalType} 화학물질 주의. ` : ''}필수 안전장비를 착용하고 작업하세요.
 
-작업 전 반드시 안전점검을 실시하고, LOTO 절차를 준수하세요.
-${equipmentInfo.lockoutTagoutPoints?.length ? `LOTO 포인트: ${equipmentInfo.lockoutTagoutPoints.join(", ")}` : ''}
-
-비상상황 발생 시 즉시 ${equipmentInfo.emergencyContact || '관제실'}로 연락하여 주시기 바랍니다.
-
-안전한 작업을 위해 모든 안전수칙을 준수해 주세요.`;
+비상시 관제실에 즉시 연락하시기 바랍니다.`;
     }
   }
 

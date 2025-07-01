@@ -160,6 +160,7 @@ Changelog:
 - July 1, 2025. Removed gradient backgrounds from scan screen, dashboard screen, and bottom navigation menu for cleaner appearance - replaced with solid backgrounds while maintaining modern design
 - July 1, 2025. Added light gray backgrounds (bg-gray-50) to dashboard and work screens to match admin panel design - improves card visibility and provides better visual hierarchy
 - July 1, 2025. Restored AI 요약 음성재생 (AI Summary Voice Playback) feature to equipment dashboard with play/pause/stop controls for Korean language equipment safety guidance
+- July 1, 2025. Optimized AI voice guide to provide concise 30-second safety-focused summaries instead of lengthy 5-6 minute detailed guidance for improved user experience
 ```
 
 ## User Preferences
