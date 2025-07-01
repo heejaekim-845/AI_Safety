@@ -50,13 +50,11 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       <div className="text-center mb-4">
         <div className="floating">
-          <div className="w-16 h-16 mx-auto mb-4 bg-blue-600 rounded-2xl flex items-center justify-center">
-            <img 
-              src="/attached_assets/d38a3897-2e42-47b1-9feb-3970364f22e1_1751375612245.jpg" 
-              alt="QR Scanner" 
-              className="w-8 h-8"
-            />
-          </div>
+          <img 
+            src="/attached_assets/d38a3897-2e42-47b1-9feb-3970364f22e1_1751375612245.jpg" 
+            alt="QR Scanner" 
+            className="w-16 h-16 mx-auto mb-4"
+          />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">설비 인식</h2>
         <p className="text-gray-600">QR 코드를 스캔하거나 설비를 직접 선택하세요</p>
