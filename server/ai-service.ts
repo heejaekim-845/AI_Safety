@@ -150,30 +150,20 @@ export class AIService {
 
   async generateVoiceGuide(equipmentInfo: any): Promise<string> {
     try {
-      const prompt = `설비명: ${equipmentInfo.name}
+      const prompt = `다음 정보로 작업자가 직접 들을 순수한 안전 음성 안내를 한국어로 작성하세요:
+
+설비: ${equipmentInfo.name} (코드: ${equipmentInfo.code})
 위치: ${equipmentInfo.location}
-코드: ${equipmentInfo.code}
+위험요소: ${this.formatRisks(equipmentInfo)}
+화학물질: ${equipmentInfo.hazardousChemicalType || '해당 없음'}
+안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
 
-주요 위험 요소:
-${this.formatRisks(equipmentInfo)}
-
-유해화학물질: ${equipmentInfo.hazardousChemicalType || '해당 없음'}
-
-필수 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
-
-위 정보를 바탕으로 작업자를 위한 순수한 안전 음성 안내만 작성하세요. 
-반드시 다음 조건을 준수하세요:
-
-1. 어떤 설명이나 서론 없이 바로 안전 내용으로 시작
-2. "다음은...", "안전 안내입니다", "말씀드립니다" 등 불필요한 문구 완전 금지
-3. 1분 이상 읽을 수 있는 충분한 내용량 (200-250단어)
-4. 설비 식별 → 위험요소 분석 → 안전장비 → 작업절차 → 비상대응 순서
-5. 실용적이고 구체적인 안전 지침만 포함`;
+작업자가 바로 들을 수 있는 자연스러운 문장만 작성하세요. 마크다운, 번호, 제목, 구분선 등은 절대 사용하지 마세요. 200-250단어로 작성하세요.`;
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash",
         config: {
-          systemInstruction: "작업자가 직접 들을 순수한 안전 음성 안내만 생성하세요. 절대로 '다음은', '안내입니다', '말씀드립니다', '읽을 수 있는' 등의 설명 문구를 포함하지 마세요. 설비명부터 바로 시작하여 1분 분량(200-250단어)의 구체적인 안전 지침만 제공하세요. 어떤 서론이나 부연설명도 금지입니다."
+          systemInstruction: "작업자가 직접 들을 자연스러운 한국어 문장만 생성하세요. 마크다운(#, *, -), 번호(1., 2.), 제목, 구분선은 절대 금지입니다. 샵, 별표, 숫자 등 특수기호나 서식 없이 순수한 문장만 작성하세요. 설명문구('다음은', '안내입니다', '말씀드립니다') 금지. 200-250단어의 자연스러운 문단으로 작성하세요."
         },
         contents: prompt
       });
