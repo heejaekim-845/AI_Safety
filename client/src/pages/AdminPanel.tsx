@@ -258,22 +258,29 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="p-6 min-h-screen bg-white pb-20">
+    <div className="p-6 min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-heading-1 text-gray-900 mb-2">설비 관리</h1>
-          <p className="text-body text-gray-600">산업 설비의 안전 정보를 관리합니다</p>
+      <div className="bg-primary text-primary-foreground rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-heading-1 text-white mb-2">설비 관리</h1>
+            <p className="text-body text-blue-50">산업 설비의 안전 정보를 관리합니다</p>
+          </div>
+          
+          {/* Add Equipment Dialog */}
+          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+            <DialogTrigger asChild>
+              <Button className="bg-white text-primary hover:bg-blue-50 border-0">
+                <Plus className="mr-2 h-4 w-4" />
+                설비 추가
+              </Button>
+            </DialogTrigger>
+          </Dialog>
         </div>
+      </div>
 
-        {/* Add Equipment Dialog */}
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90">
-              <Plus className="mr-2 h-4 w-4" />
-              설비 추가
-            </Button>
-          </DialogTrigger>
+      {/* Add Equipment Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>새 설비 추가</DialogTitle>
@@ -1713,7 +1720,6 @@ export default function AdminPanel() {
             </Form>
           </DialogContent>
         </Dialog>
-      </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-4 gap-6 mb-8">

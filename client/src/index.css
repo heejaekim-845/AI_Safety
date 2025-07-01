@@ -7,7 +7,7 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
+  --background: hsl(220, 13%, 97%);
   --foreground: hsl(224, 71%, 4%);
   --muted: hsl(220, 14%, 96%);
   --muted-foreground: hsl(220, 9%, 46%);
@@ -17,15 +17,15 @@
   --card-foreground: hsl(224, 71%, 4%);
   --border: hsl(220, 13%, 91%);
   --input: hsl(220, 13%, 91%);
-  --primary: hsl(220, 14%, 11%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 14%, 96%);
-  --secondary-foreground: hsl(220, 9%, 15%);
-  --accent: hsl(220, 14%, 96%);
-  --accent-foreground: hsl(220, 9%, 15%);
+  --primary: hsl(214, 84%, 56%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(214, 26%, 95%);
+  --secondary-foreground: hsl(224, 71%, 4%);
+  --accent: hsl(214, 26%, 95%);
+  --accent-foreground: hsl(224, 71%, 4%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(224, 71%, 4%);
+  --ring: hsl(214, 84%, 56%);
   --radius: 0.75rem;
   
   /* Custom safety colors - minimal modern version */
@@ -177,7 +177,7 @@
   }
   
   .btn-minimal-primary:hover {
-    background-color: hsl(var(--primary) / 0.9);
+    background-color: hsl(214, 84%, 48%);
   }
   
   .btn-minimal-secondary {
