@@ -109,11 +109,8 @@ export default function AdminPanel() {
 
   const createEquipmentMutation = useMutation({
     mutationFn: async (data: InsertEquipment) => {
-      const response = await apiRequest("/api/equipment", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      return response;
+      const response = await apiRequest("POST", "/api/equipment", data);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/equipment"] });
@@ -136,11 +133,8 @@ export default function AdminPanel() {
   const updateEquipmentMutation = useMutation({
     mutationFn: async (data: InsertEquipment) => {
       if (!editingEquipment) throw new Error("No equipment selected for editing");
-      const response = await apiRequest(`/api/equipment/${editingEquipment.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-      return response;
+      const response = await apiRequest("PATCH", `/api/equipment/${editingEquipment.id}`, data);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/equipment"] });
