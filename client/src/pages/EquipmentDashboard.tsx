@@ -27,7 +27,8 @@ import {
   MapPin,
   X,
   Heart,
-  CheckCircle
+  CheckCircle,
+  Volume2
 } from "lucide-react";
 import type { Incident } from "@shared/schema";
 
@@ -649,6 +650,52 @@ export default function EquipmentDashboard() {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* AI Voice Summary */}
+        <Card className="card-minimal">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-gray-900 text-lg">
+              <Volume2 className="mr-3 h-6 w-6 text-blue-600" />
+              AI 요약 음성재생
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 mb-4">
+                이 설비의 안전 정보를 AI가 음성으로 요약해 드립니다.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handlePlayVoiceGuide}
+                  disabled={!voiceGuide?.guide || (isPlayingGuide && !isPaused)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isPaused ? <Play className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
+                  {isPaused ? '재생' : '음성 재생'}
+                </Button>
+                
+                {isPlayingGuide && (
+                  <>
+                    <Button 
+                      onClick={handlePauseVoiceGuide}
+                      disabled={isPaused}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    >
+                      <Pause className="w-4 h-4" />
+                    </Button>
+                    
+                    <Button 
+                      onClick={handleStopVoiceGuide}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <Square className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
