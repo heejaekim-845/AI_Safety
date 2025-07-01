@@ -582,6 +582,328 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
+                {/* Required Safety Equipment Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">필수 안전장비 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentEquipment = form.getValues("requiredSafetyEquipment") || [];
+                        form.setValue("requiredSafetyEquipment", [
+                          ...currentEquipment,
+                          ""
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      장비 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="requiredSafetyEquipment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {(Array.isArray(field.value) ? field.value : []).map((equipment, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <Input
+                                placeholder="예: 안전모, 안전화, 안전대"
+                                value={equipment}
+                                onChange={(e) => {
+                                  const newEquipment = [...(Array.isArray(field.value) ? field.value : [])];
+                                  newEquipment[index] = e.target.value;
+                                  field.onChange(newEquipment);
+                                }}
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newEquipment = Array.isArray(field.value) ? [...field.value] : [];
+                                  newEquipment.splice(index, 1);
+                                  field.onChange(newEquipment);
+                                }}
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              안전장비를 추가하려면 "장비 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Emergency Contacts Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">비상연락처 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentContacts = form.getValues("emergencyContacts") || [];
+                        form.setValue("emergencyContacts", [
+                          ...currentContacts,
+                          { role: "", contact: "" }
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      연락처 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="emergencyContacts"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          {(Array.isArray(field.value) ? field.value : []).map((contact: any, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-medium">{contact.role || `연락처 ${index + 1}`}</h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                    contacts.splice(index, 1);
+                                    field.onChange(contacts);
+                                  }}
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">역할/직책</Label>
+                                  <Input
+                                    placeholder="예: 안전관리자, 설비담당자"
+                                    value={contact.role || ""}
+                                    onChange={(e) => {
+                                      const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                      contacts[index] = { ...contacts[index], role: e.target.value };
+                                      field.onChange(contacts);
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">연락처</Label>
+                                  <Input
+                                    placeholder="예: 010-1234-5678"
+                                    value={contact.contact || ""}
+                                    onChange={(e) => {
+                                      const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                      contacts[index] = { ...contacts[index], contact: e.target.value };
+                                      field.onChange(contacts);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              비상연락처를 추가하려면 "연락처 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Hazardous Chemicals Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <Label className="text-base font-medium">유해화학물질 정보</Label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="hazardousChemicalType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질 종류</FormLabel>
+                          <FormControl>
+                            <Input placeholder="예: 질소, 산소, 아세틸렌" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="hazardousChemicalName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질명</FormLabel>
+                          <FormControl>
+                            <Input placeholder="예: 액체질소" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="msdsImageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>MSDS 이미지 URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="예: /attached_assets/nitrogen_msds.png" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Safety Facility Locations Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">안전시설 위치 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentFacilities = form.getValues("safetyFacilityLocations") || [];
+                        form.setValue("safetyFacilityLocations", [
+                          ...currentFacilities,
+                          { name: "", location: "", type: "FIRE_EXTINGUISHER", imageUrl: "" }
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      시설 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="safetyFacilityLocations"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          {(Array.isArray(field.value) ? field.value : []).map((facility: any, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-medium">{facility.name || `시설 ${index + 1}`}</h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                    facilities.splice(index, 1);
+                                    field.onChange(facilities);
+                                  }}
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">시설명</Label>
+                                  <Input
+                                    placeholder="예: 소화기, AED"
+                                    value={facility.name || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], name: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">위치</Label>
+                                  <Input
+                                    placeholder="예: 1층 입구, 복도 끝"
+                                    value={facility.location || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], location: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">시설 유형</Label>
+                                  <Select
+                                    value={facility.type || "FIRE_EXTINGUISHER"}
+                                    onValueChange={(value) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], type: value };
+                                      field.onChange(facilities);
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="FIRE_EXTINGUISHER">소화기</SelectItem>
+                                      <SelectItem value="AED">자동심장충격기</SelectItem>
+                                      <SelectItem value="EMERGENCY_EXIT">비상구</SelectItem>
+                                      <SelectItem value="FIRST_AID">응급처치함</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">이미지 URL</Label>
+                                  <Input
+                                    placeholder="시설 위치 이미지 경로"
+                                    value={facility.imageUrl || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], imageUrl: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              안전시설을 추가하려면 "시설 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
                     취소
@@ -930,6 +1252,328 @@ export default function AdminPanel() {
                       )}
                     />
                   </div>
+                </div>
+
+                {/* Required Safety Equipment Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">필수 안전장비 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentEquipment = editForm.getValues("requiredSafetyEquipment") || [];
+                        editForm.setValue("requiredSafetyEquipment", [
+                          ...currentEquipment,
+                          ""
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      장비 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="requiredSafetyEquipment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-3">
+                          {(Array.isArray(field.value) ? field.value : []).map((equipment, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <Input
+                                placeholder="예: 안전모, 안전화, 안전대"
+                                value={equipment}
+                                onChange={(e) => {
+                                  const newEquipment = [...(Array.isArray(field.value) ? field.value : [])];
+                                  newEquipment[index] = e.target.value;
+                                  field.onChange(newEquipment);
+                                }}
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newEquipment = Array.isArray(field.value) ? [...field.value] : [];
+                                  newEquipment.splice(index, 1);
+                                  field.onChange(newEquipment);
+                                }}
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              안전장비를 추가하려면 "장비 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Emergency Contacts Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">비상연락처 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentContacts = editForm.getValues("emergencyContacts") || [];
+                        editForm.setValue("emergencyContacts", [
+                          ...currentContacts,
+                          { role: "", contact: "" }
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      연락처 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="emergencyContacts"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          {(Array.isArray(field.value) ? field.value : []).map((contact: any, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-medium">{contact.role || `연락처 ${index + 1}`}</h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                    contacts.splice(index, 1);
+                                    field.onChange(contacts);
+                                  }}
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">역할/직책</Label>
+                                  <Input
+                                    placeholder="예: 안전관리자, 설비담당자"
+                                    value={contact.role || ""}
+                                    onChange={(e) => {
+                                      const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                      contacts[index] = { ...contacts[index], role: e.target.value };
+                                      field.onChange(contacts);
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">연락처</Label>
+                                  <Input
+                                    placeholder="예: 010-1234-5678"
+                                    value={contact.contact || ""}
+                                    onChange={(e) => {
+                                      const contacts = Array.isArray(field.value) ? [...field.value] : [];
+                                      contacts[index] = { ...contacts[index], contact: e.target.value };
+                                      field.onChange(contacts);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              비상연락처를 추가하려면 "연락처 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Hazardous Chemicals Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <Label className="text-base font-medium">유해화학물질 정보</Label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={editForm.control}
+                      name="hazardousChemicalType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질 종류</FormLabel>
+                          <FormControl>
+                            <Input placeholder="예: 질소, 산소, 아세틸렌" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={editForm.control}
+                      name="hazardousChemicalName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>화학물질명</FormLabel>
+                          <FormControl>
+                            <Input placeholder="예: 액체질소" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={editForm.control}
+                    name="msdsImageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>MSDS 이미지 URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="예: /attached_assets/nitrogen_msds.png" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Safety Facility Locations Management */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">안전시설 위치 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const currentFacilities = editForm.getValues("safetyFacilityLocations") || [];
+                        editForm.setValue("safetyFacilityLocations", [
+                          ...currentFacilities,
+                          { name: "", location: "", type: "FIRE_EXTINGUISHER", imageUrl: "" }
+                        ]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      시설 추가
+                    </Button>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="safetyFacilityLocations"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-4">
+                          {(Array.isArray(field.value) ? field.value : []).map((facility: any, index) => (
+                            <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-medium">{facility.name || `시설 ${index + 1}`}</h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                    facilities.splice(index, 1);
+                                    field.onChange(facilities);
+                                  }}
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">시설명</Label>
+                                  <Input
+                                    placeholder="예: 소화기, AED"
+                                    value={facility.name || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], name: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">위치</Label>
+                                  <Input
+                                    placeholder="예: 1층 입구, 복도 끝"
+                                    value={facility.location || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], location: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">시설 유형</Label>
+                                  <Select
+                                    value={facility.type || "FIRE_EXTINGUISHER"}
+                                    onValueChange={(value) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], type: value };
+                                      field.onChange(facilities);
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="FIRE_EXTINGUISHER">소화기</SelectItem>
+                                      <SelectItem value="AED">자동심장충격기</SelectItem>
+                                      <SelectItem value="EMERGENCY_EXIT">비상구</SelectItem>
+                                      <SelectItem value="FIRST_AID">응급처치함</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">이미지 URL</Label>
+                                  <Input
+                                    placeholder="시설 위치 이미지 경로"
+                                    value={facility.imageUrl || ""}
+                                    onChange={(e) => {
+                                      const facilities = Array.isArray(field.value) ? [...field.value] : [];
+                                      facilities[index] = { ...facilities[index], imageUrl: e.target.value };
+                                      field.onChange(facilities);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {(!field.value || (Array.isArray(field.value) && field.value.length === 0)) && (
+                            <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                              안전시설을 추가하려면 "시설 추가" 버튼을 클릭하세요
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-4">
