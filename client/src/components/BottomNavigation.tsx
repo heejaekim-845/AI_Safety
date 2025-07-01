@@ -64,7 +64,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
               key={tab.id}
               variant="ghost"
               className={cn(
-                "flex flex-col items-center py-1 h-auto space-y-1 rounded-2xl transition-all duration-300",
+                "flex flex-col items-center py-1 h-auto space-y-0.5 rounded-2xl transition-all duration-300",
                 isActive 
                   ? "bg-blue-600 text-white shadow-lg scale-105" 
                   : "text-gray-400 hover:text-gray-600 hover:bg-gray-100/60"
