@@ -1754,52 +1754,18 @@ export default function AdminPanel() {
           <Card key={eq.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  {eq.imageUrl && (
-                    <img 
-                      src={eq.imageUrl} 
-                      alt={eq.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="text-lg font-semibold">{eq.name}</h3>
-                      <RiskLevelBadge level={eq.riskLevel} />
-                    </div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      코드: {eq.code} | 위치: {eq.location}
-                    </p>
-                    {eq.manufacturer && (
-                      <p className="text-sm text-gray-500">
-                        {eq.manufacturer} {eq.modelName && `- ${eq.modelName}`}
-                        {eq.installYear && ` (${eq.installYear}년)`}
-                      </p>
-                    )}
-                  </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold mb-1">{eq.name}</h3>
+                  <p className="text-sm text-gray-600">{eq.code}</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setLocation(`/equipment/${eq.id}`)}
-                  >
-                    <Settings className="h-4 w-4 mr-1" />
-                    상세보기
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditEquipment(eq)}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    편집
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditEquipment(eq)}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  편집
+                </Button>
               </div>
             </CardContent>
           </Card>
