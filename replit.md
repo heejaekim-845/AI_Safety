@@ -162,6 +162,7 @@ Changelog:
 - July 1, 2025. Restored AI 요약 음성재생 (AI Summary Voice Playback) feature to equipment dashboard with play/pause/stop controls for Korean language equipment safety guidance
 - July 1, 2025. Optimized AI voice guide to provide concise 30-second safety-focused summaries instead of lengthy 5-6 minute detailed guidance for improved user experience
 - July 1, 2025. Enhanced AI voice guide with user-requested improvements: removed greeting messages, extended to 1-minute duration, increased speech rate to 1.1 (20% faster), and eliminated time reference mentions for smoother delivery
+- July 1, 2025. Cleaned up AI voice guide content by removing unnecessary explanatory phrases like "다음은...안내입니다" - now generates pure safety instruction content that starts directly with equipment information
 ```
 
 ## User Preferences
