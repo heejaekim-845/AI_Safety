@@ -1251,6 +1251,109 @@ export default function AdminPanel() {
                     )}
                   </div>
 
+                  {/* Safety Device Images Management */}
+                  <div className="space-y-4 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-medium">안전장치 위치 관리</Label>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 gap-4">
+                        {(editForm.watch("safetyDeviceImages") as any[] || []).map((device: any, index: number) => (
+                          <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-sm font-medium">{device.name || `안전장치 ${index + 1}`}</h4>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const devices = editForm.getValues("safetyDeviceImages") as any[] || [];
+                                  devices.splice(index, 1);
+                                  editForm.setValue("safetyDeviceImages", devices);
+                                }}
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div>
+                                <Label className="text-xs text-muted-foreground">장치명</Label>
+                                <Input
+                                  placeholder="예: 안전밸브, 압력계"
+                                  value={device.name || ""}
+                                  onChange={(e) => {
+                                    const devices = [...(editForm.getValues("safetyDeviceImages") as any[] || [])];
+                                    devices[index] = { ...devices[index], name: e.target.value };
+                                    editForm.setValue("safetyDeviceImages", devices);
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">위치</Label>
+                                <Input
+                                  placeholder="예: 압축기 상단, 제어판넬"
+                                  value={device.location || ""}
+                                  onChange={(e) => {
+                                    const devices = [...(editForm.getValues("safetyDeviceImages") as any[] || [])];
+                                    devices[index] = { ...devices[index], location: e.target.value };
+                                    editForm.setValue("safetyDeviceImages", devices);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="mb-3">
+                              <Label className="text-xs text-muted-foreground">이미지 URL</Label>
+                              <Input
+                                placeholder="안전장치 위치 이미지 경로 (예: /attached_assets/safety_valve.jpg)"
+                                value={device.imageUrl || ""}
+                                onChange={(e) => {
+                                  const devices = [...(editForm.getValues("safetyDeviceImages") as any[] || [])];
+                                  devices[index] = { ...devices[index], imageUrl: e.target.value };
+                                  editForm.setValue("safetyDeviceImages", devices);
+                                }}
+                              />
+                            </div>
+                            
+                            {device.imageUrl && (
+                              <div className="mt-2">
+                                <Label className="text-xs text-muted-foreground">미리보기:</Label>
+                                <div className="mt-1 p-2 border rounded-lg bg-white">
+                                  <img 
+                                    src={device.imageUrl} 
+                                    alt={`${device.name} 위치 이미지`} 
+                                    className="max-w-full h-24 object-contain rounded"
+                                    onError={(e) => {
+                                      e.currentTarget.src = "/placeholder-safety-device.png";
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          const devices = editForm.getValues("safetyDeviceImages") as any[] || [];
+                          devices.push({ name: "", location: "", imageUrl: "" });
+                          editForm.setValue("safetyDeviceImages", devices);
+                        }}
+                        className="w-full border-dashed border-gray-300 text-gray-600 hover:bg-gray-50"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        안전장치 추가
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Emergency Contacts Management */}
                 <div className="space-y-4 border-t pt-4">
                   <div className="flex items-center justify-between">
