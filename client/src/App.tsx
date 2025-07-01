@@ -38,7 +38,7 @@ function Router() {
             <img 
               src="/attached_assets/shield_1495706_1751374227319.png" 
               alt="Safety Shield" 
-              className="w-8 h-8"
+              className="w-12 h-12"
             />
             <div className="flex flex-col">
               <h1 className="text-xl font-bold leading-tight" style={{ fontFamily: 'HakgyoansimAllimjangTTF-B', fontWeight: 700 }}>

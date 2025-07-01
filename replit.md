@@ -169,6 +169,7 @@ Changelog:
 - July 1, 2025. Implemented accident history feature: added incidents card to equipment dashboard between safety facilities and emergency contacts, fixed incidents schema to match database structure, added sample incident data, and included accident history management placeholder in admin panel
 - July 1, 2025. Updated header design with custom Korean font (HakgyoansimAllimjangTTF-B): first line shows "지능형 안전정보 시스템" (weight 700), second line shows "Smart Safety Partner" (weight 400) in two-line layout
 - July 1, 2025. Fixed admin panel risk statistics display by updating risk level calculations from old format (RED/YELLOW/GREEN) to new format (HIGH/MEDIUM/LOW) throughout the filtering and counting system
+- July 1, 2025. Updated header icon from Material Icons 'security' to custom QR code shield image (48x48 pixels) for better visual representation of the safety scanning system
 ```
 
 ## User Preferences
