@@ -165,6 +165,7 @@ Changelog:
 - July 1, 2025. Cleaned up AI voice guide content by removing unnecessary explanatory phrases like "다음은...안내입니다" - now generates pure safety instruction content that starts directly with equipment information
 - July 1, 2025. Enhanced risk analysis dashboard clarity by separating "(AI) 종합 위험도" from "사고이력 위험수준 통계" - improved user understanding of different risk assessment methods
 - July 1, 2025. Implemented automatic AI risk re-evaluation system when equipment information changes and modified admin panel to display AI-determined risk levels as read-only, preventing manual overrides
+- July 1, 2025. Unified risk level system to HIGH/MEDIUM/LOW format across entire application - updated RiskLevelBadge component to support both old (RED/YELLOW/GREEN) and new formats, executed data migration script to convert existing equipment risk levels
 ```
 
 ## User Preferences

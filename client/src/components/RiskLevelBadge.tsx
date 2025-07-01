@@ -9,21 +9,24 @@ interface RiskLevelBadgeProps {
 export default function RiskLevelBadge({ level, className }: RiskLevelBadgeProps) {
   const getRiskConfig = (riskLevel: string) => {
     switch (riskLevel) {
+      case "HIGH":
       case "RED":
         return {
           label: "고위험",
           className: "bg-danger text-white border-danger",
           icon: "🔴"
         };
+      case "MEDIUM":
       case "YELLOW":
         return {
-          label: "주의",
+          label: "중위험",
           className: "bg-warning text-white border-warning",
           icon: "🟡"
         };
+      case "LOW":
       case "GREEN":
         return {
-          label: "안전",
+          label: "저위험",
           className: "bg-success text-white border-success",
           icon: "🟢"
         };
