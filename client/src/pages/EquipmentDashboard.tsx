@@ -243,21 +243,25 @@ export default function EquipmentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-6">
-              <span className="text-gray-700 font-medium">전체 위험도</span>
+              <span className="text-gray-700 font-medium">(AI) 종합 위험도</span>
               <RiskLevelBadge level={equipment.riskLevel} />
             </div>
-            <div className="grid grid-cols-3 gap-6 text-center">
-              <div className="p-5 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200/50 shadow-md">
-                <div className="text-3xl font-bold text-red-600 mb-1">{riskCounts.high}</div>
-                <div className="text-sm text-red-700 font-medium">고위험</div>
-              </div>
-              <div className="p-5 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border border-yellow-200/50 shadow-md">
-                <div className="text-3xl font-bold text-yellow-600 mb-1">{riskCounts.medium}</div>
-                <div className="text-sm text-yellow-700 font-medium">중위험</div>
-              </div>
-              <div className="p-5 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200/50 shadow-md">
-                <div className="text-3xl font-bold text-green-600 mb-1">{riskCounts.low}</div>
-                <div className="text-sm text-green-700 font-medium">저위험</div>
+            
+            <div className="mb-4">
+              <h4 className="text-gray-700 font-medium mb-3 text-center">사고이력 위험수준 통계</h4>
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div className="p-5 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200/50 shadow-md">
+                  <div className="text-3xl font-bold text-red-600 mb-1">{riskCounts.high}</div>
+                  <div className="text-sm text-red-700 font-medium">고위험</div>
+                </div>
+                <div className="p-5 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border border-yellow-200/50 shadow-md">
+                  <div className="text-3xl font-bold text-yellow-600 mb-1">{riskCounts.medium}</div>
+                  <div className="text-sm text-yellow-700 font-medium">중위험</div>
+                </div>
+                <div className="p-5 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200/50 shadow-md">
+                  <div className="text-3xl font-bold text-green-600 mb-1">{riskCounts.low}</div>
+                  <div className="text-sm text-green-700 font-medium">저위험</div>
+                </div>
               </div>
             </div>
           </CardContent>

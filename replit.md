@@ -163,6 +163,7 @@ Changelog:
 - July 1, 2025. Optimized AI voice guide to provide concise 30-second safety-focused summaries instead of lengthy 5-6 minute detailed guidance for improved user experience
 - July 1, 2025. Enhanced AI voice guide with user-requested improvements: removed greeting messages, extended to 1-minute duration, increased speech rate to 1.1 (20% faster), and eliminated time reference mentions for smoother delivery
 - July 1, 2025. Cleaned up AI voice guide content by removing unnecessary explanatory phrases like "다음은...안내입니다" - now generates pure safety instruction content that starts directly with equipment information
+- July 1, 2025. Enhanced risk analysis dashboard clarity by separating "(AI) 종합 위험도" from "사고이력 위험수준 통계" - improved user understanding of different risk assessment methods
 ```
 
 ## User Preferences
