@@ -1723,51 +1723,54 @@ export default function AdminPanel() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="card-minimal card-hover">
+        <div className="bg-white rounded-xl shadow-sm border border-blue-100 hover:shadow-md transition-all duration-200 hover:border-blue-200">
           <div className="p-6 text-center">
-            <Factory className="h-8 w-8 text-gray-700 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.total}</p>
-            <p className="text-caption text-gray-600">총 설비</p>
+            <Factory className="h-8 w-8 text-primary mx-auto mb-3" />
+            <p className="text-2xl font-bold text-gray-900 mb-1">{riskCounts.total}</p>
+            <p className="text-sm text-blue-600">총 설비</p>
           </div>
         </div>
-        <div className="card-minimal card-hover">
+        <div className="bg-white rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-all duration-200 hover:border-red-200">
           <div className="p-6 text-center">
             <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.high}</p>
-            <p className="text-caption text-gray-600">고위험</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{riskCounts.high}</p>
+            <p className="text-sm text-red-600">고위험</p>
           </div>
         </div>
-        <div className="card-minimal card-hover">
+        <div className="bg-white rounded-xl shadow-sm border border-amber-100 hover:shadow-md transition-all duration-200 hover:border-amber-200">
           <div className="p-6 text-center">
             <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.medium}</p>
-            <p className="text-caption text-gray-600">중위험</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{riskCounts.medium}</p>
+            <p className="text-sm text-amber-600">중위험</p>
           </div>
         </div>
-        <div className="card-minimal card-hover">
+        <div className="bg-white rounded-xl shadow-sm border border-green-100 hover:shadow-md transition-all duration-200 hover:border-green-200">
           <div className="p-6 text-center">
             <Shield className="h-8 w-8 text-green-600 mx-auto mb-3" />
-            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.low}</p>
-            <p className="text-caption text-gray-600">저위험</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{riskCounts.low}</p>
+            <p className="text-sm text-green-600">저위험</p>
           </div>
         </div>
       </div>
 
       {/* Search and Filter */}
-      <div className="card-minimal mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-blue-100 mb-8">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 rounded-t-xl border-b border-blue-200">
+          <h3 className="text-lg font-semibold text-primary">검색 및 필터</h3>
+        </div>
         <div className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-4 w-4" />
               <Input
                 placeholder="설비명, 코드, 위치로 검색..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-200 focus:border-gray-400 focus:ring-gray-400"
+                className="pl-10 border-blue-200 focus:border-primary focus:ring-primary/20"
               />
             </div>
             <Select value={filterRisk} onValueChange={setFilterRisk}>
-              <SelectTrigger className="w-full md:w-48 border-gray-200">
+              <SelectTrigger className="w-full md:w-48 border-blue-200 focus:border-primary">
                 <SelectValue placeholder="위험도 필터" />
               </SelectTrigger>
               <SelectContent>
@@ -1782,16 +1785,19 @@ export default function AdminPanel() {
       </div>
 
       {/* Equipment List */}
-      <div className="grid gap-6">
-        {filteredEquipment?.map((eq) => (
-          <div key={eq.id} className="card-minimal card-hover">
-            <div className="p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-blue-100">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 rounded-t-xl border-b border-blue-200">
+          <h3 className="text-lg font-semibold text-primary">설비 목록</h3>
+        </div>
+        <div className="divide-y divide-blue-100">
+          {filteredEquipment?.map((eq) => (
+            <div key={eq.id} className="p-6 hover:bg-blue-50/30 transition-colors duration-200">
               <div className="space-y-4">
                 {/* 첫 번째 줄: 설비명, 설비코드, 안전등급 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <h3 className="text-heading-3 text-gray-900">{eq.name}</h3>
-                    <span className="text-body text-gray-600">{eq.code}</span>
+                    <h3 className="text-lg font-semibold text-gray-900">{eq.name}</h3>
+                    <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">{eq.code}</span>
                     <RiskLevelBadge level={eq.riskLevel} />
                   </div>
                 </div>
@@ -1802,7 +1808,7 @@ export default function AdminPanel() {
                     variant="outline"
                     size="sm"
                     onClick={() => setLocation(`/work-management/${eq.id}`)}
-                    className="btn-minimal-secondary"
+                    className="border-blue-200 text-primary hover:bg-blue-50 hover:border-primary"
                   >
                     <Settings className="h-4 w-4 mr-2" />
                     작업관리
@@ -1811,7 +1817,7 @@ export default function AdminPanel() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEditEquipment(eq)}
-                    className="btn-minimal-secondary"
+                    className="border-blue-200 text-primary hover:bg-blue-50 hover:border-primary"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     편집
@@ -1829,17 +1835,17 @@ export default function AdminPanel() {
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {!filteredEquipment?.length && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Factory className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">등록된 설비가 없습니다.</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-xl shadow-sm border border-blue-100">
+          <div className="p-8 text-center">
+            <Factory className="h-12 w-12 text-blue-300 mx-auto mb-4" />
+            <p className="text-blue-600">등록된 설비가 없습니다.</p>
+          </div>
+        </div>
       )}
     </div>
   );
