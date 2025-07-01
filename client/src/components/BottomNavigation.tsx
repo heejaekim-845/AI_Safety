@@ -66,7 +66,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
               className={cn(
                 "flex flex-col items-center py-3 h-auto space-y-1 rounded-2xl transition-all duration-300",
                 isActive 
-                  ? "safety-gradient text-white shadow-lg scale-105" 
+                  ? "bg-blue-600 text-white shadow-lg scale-105" 
                   : "text-gray-400 hover:text-gray-600 hover:bg-gray-100/60"
               )}
               onClick={() => handleTabClick(tab)}

@@ -47,7 +47,7 @@ export default function QRScanner() {
   }
 
   return (
-    <div className="p-4 pb-20 fade-in bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div className="p-4 pb-20 fade-in min-h-screen">
       <div className="text-center mb-4">
         <div className="floating">
           <div className="w-16 h-16 mx-auto mb-4 safety-gradient rounded-2xl flex items-center justify-center">

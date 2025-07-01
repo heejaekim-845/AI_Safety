@@ -138,7 +138,7 @@ export default function EquipmentDashboard() {
   };
 
   return (
-    <div className="pb-20 fade-in bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div className="pb-20 fade-in min-h-screen">
       {/* Equipment Header */}
       <div className="safety-gradient text-white p-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
