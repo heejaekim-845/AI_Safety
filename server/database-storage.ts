@@ -65,9 +65,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateEquipment(id: number, equipmentData: Partial<InsertEquipment>): Promise<Equipment> {
+    // Handle array fields properly for PostgreSQL
+    const updateData = { ...equipmentData };
+    
+    // Handle all array fields that might be empty
+    if (updateData.safetyEquipment && Array.isArray(updateData.safetyEquipment)) {
+      if (updateData.safetyEquipment.length === 0) {
+        updateData.safetyEquipment = null;
+      }
+    }
+    if (updateData.emergencyContacts && Array.isArray(updateData.emergencyContacts)) {
+      if (updateData.emergencyContacts.length === 0) {
+        updateData.emergencyContacts = null;
+      }
+    }
+    if (updateData.chemicalInfo && Array.isArray(updateData.chemicalInfo)) {
+      if (updateData.chemicalInfo.length === 0) {
+        updateData.chemicalInfo = null;
+      }
+    }
+    if (updateData.safetyDevices && Array.isArray(updateData.safetyDevices)) {
+      if (updateData.safetyDevices.length === 0) {
+        updateData.safetyDevices = null;
+      }
+    }
+    if (updateData.safetyFacilities && Array.isArray(updateData.safetyFacilities)) {
+      if (updateData.safetyFacilities.length === 0) {
+        updateData.safetyFacilities = null;
+      }
+    }
+    
     const [result] = await db.update(equipment)
       .set({
-        ...equipmentData,
+        ...updateData,
         updatedAt: new Date(),
       })
       .where(eq(equipment.id, id))
@@ -98,8 +128,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
+    // Handle array fields properly for PostgreSQL
+    const updateData = { ...workTypeData };
+    if (updateData.legalRequirements && Array.isArray(updateData.legalRequirements)) {
+      // Convert empty arrays to null for PostgreSQL compatibility
+      if (updateData.legalRequirements.length === 0) {
+        updateData.legalRequirements = null;
+      }
+    }
+    
     const [result] = await db.update(workTypes)
-      .set(workTypeData)
+      .set(updateData)
       .where(eq(workTypes.id, id))
       .returning();
     return result;
@@ -115,16 +154,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createWorkProcedure(procedureData: InsertWorkProcedure): Promise<WorkProcedure> {
+    // Handle array fields properly for PostgreSQL
+    const insertData = { ...procedureData };
+    if (insertData.checklistItems && Array.isArray(insertData.checklistItems)) {
+      // Convert empty arrays to null for PostgreSQL compatibility
+      if (insertData.checklistItems.length === 0) {
+        insertData.checklistItems = null;
+      }
+    }
+    
     const [result] = await db.insert(workProcedures).values({
-      ...procedureData,
+      ...insertData,
       createdAt: new Date(),
     }).returning();
     return result;
   }
 
   async updateWorkProcedure(id: number, procedureData: Partial<InsertWorkProcedure>): Promise<WorkProcedure> {
+    // Handle array fields properly for PostgreSQL
+    const updateData = { ...procedureData };
+    if (updateData.checklistItems && Array.isArray(updateData.checklistItems)) {
+      // Convert empty arrays to null for PostgreSQL compatibility
+      if (updateData.checklistItems.length === 0) {
+        updateData.checklistItems = null;
+      }
+    }
+    
     const [result] = await db.update(workProcedures)
-      .set(procedureData)
+      .set(updateData)
       .where(eq(workProcedures.id, id))
       .returning();
     return result;
@@ -179,8 +236,17 @@ export class DatabaseStorage implements IStorage {
 
   // Risk reports operations
   async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
+    // Handle array fields properly for PostgreSQL
+    const insertData = { ...reportData };
+    if (insertData.mitigationActions && Array.isArray(insertData.mitigationActions)) {
+      // Convert empty arrays to null for PostgreSQL compatibility
+      if (insertData.mitigationActions.length === 0) {
+        insertData.mitigationActions = null;
+      }
+    }
+    
     const [result] = await db.insert(riskReports).values({
-      ...reportData,
+      ...insertData,
       createdAt: new Date(),
     }).returning();
     return result;

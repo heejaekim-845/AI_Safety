@@ -188,7 +188,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/work-procedures", async (req, res) => {
     try {
-      const procedureData = insertWorkProcedureSchema.parse(req.body);
+      // Preprocess array fields to handle empty string arrays properly
+      const bodyData = { ...req.body };
+      if (bodyData.checklistItems) {
+        if (typeof bodyData.checklistItems === 'string') {
+          try {
+            bodyData.checklistItems = JSON.parse(bodyData.checklistItems);
+          } catch {
+            // If it's not valid JSON, treat as empty array
+            bodyData.checklistItems = [];
+          }
+        }
+        // Convert empty arrays to null for PostgreSQL compatibility
+        if (Array.isArray(bodyData.checklistItems) && bodyData.checklistItems.length === 0) {
+          bodyData.checklistItems = null;
+        }
+      }
+      
+      const procedureData = insertWorkProcedureSchema.parse(bodyData);
       const procedure = await storage.createWorkProcedure(procedureData);
       res.status(201).json(procedure);
     } catch (error) {
@@ -203,7 +220,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/work-procedures/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const procedureData = insertWorkProcedureSchema.partial().parse(req.body);
+      
+      // Preprocess array fields to handle empty string arrays properly
+      const bodyData = { ...req.body };
+      if (bodyData.checklistItems) {
+        if (typeof bodyData.checklistItems === 'string') {
+          try {
+            bodyData.checklistItems = JSON.parse(bodyData.checklistItems);
+          } catch {
+            // If it's not valid JSON, treat as empty array
+            bodyData.checklistItems = [];
+          }
+        }
+        // Convert empty arrays to null for PostgreSQL compatibility
+        if (Array.isArray(bodyData.checklistItems) && bodyData.checklistItems.length === 0) {
+          bodyData.checklistItems = null;
+        }
+      }
+      
+      const procedureData = insertWorkProcedureSchema.partial().parse(bodyData);
       const procedure = await storage.updateWorkProcedure(id, procedureData);
       res.json(procedure);
     } catch (error) {
