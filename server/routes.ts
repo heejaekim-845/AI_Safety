@@ -65,42 +65,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/equipment/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const equipmentData = insertEquipmentSchema.partial().parse(req.body);
-      const equipment = await storage.updateEquipment(id, equipmentData);
-      res.json(equipment);
-    } catch (error) {
-      console.error("설비 업데이트 오류:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
-      }
-      res.status(500).json({ message: "설비를 업데이트할 수 없습니다." });
-    }
-  });
+  // Remove duplicate PUT route - use PATCH instead
 
   app.patch("/api/equipment/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       console.log("PATCH 요청 데이터:", JSON.stringify(req.body, null, 2));
       
-      // Transform frontend field names to database column names
+      // Parse and validate input data properly
+      const processArrayField = (field: any) => {
+        if (Array.isArray(field)) return field;
+        if (typeof field === 'string') {
+          try {
+            const parsed = JSON.parse(field);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
       const transformedData = {
         ...req.body,
-        // Ensure arrays are properly handled
-        requiredSafetyEquipment: Array.isArray(req.body.requiredSafetyEquipment) 
-          ? req.body.requiredSafetyEquipment 
-          : [],
-        lotoPoints: Array.isArray(req.body.lotoPoints) 
-          ? req.body.lotoPoints 
-          : [],
-        safetyFacilityLocations: Array.isArray(req.body.safetyFacilityLocations) 
-          ? req.body.safetyFacilityLocations 
-          : [],
-        emergencyContacts: Array.isArray(req.body.emergencyContacts) 
-          ? req.body.emergencyContacts 
-          : [],
+        // Ensure arrays are properly handled and parsed
+        requiredSafetyEquipment: processArrayField(req.body.requiredSafetyEquipment),
+        lotoPoints: processArrayField(req.body.lotoPoints),
+        safetyFacilityLocations: processArrayField(req.body.safetyFacilityLocations),
+        emergencyContacts: processArrayField(req.body.emergencyContacts),
+        safetyDeviceImages: processArrayField(req.body.safetyDeviceImages),
         // Keep detail fields as they now exist in the schema
         highTemperatureDetails: req.body.highTemperatureDetails,
         highPressureDetails: req.body.highPressureDetails,
