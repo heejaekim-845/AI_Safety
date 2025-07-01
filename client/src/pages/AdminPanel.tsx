@@ -334,8 +334,8 @@ export default function AdminPanel() {
 
   const riskCounts = equipment?.reduce((acc, eq) => {
     acc.total++;
-    if (eq.riskLevel === "RED") acc.high++;
-    else if (eq.riskLevel === "YELLOW") acc.medium++;
+    if (eq.riskLevel === "HIGH") acc.high++;
+    else if (eq.riskLevel === "MEDIUM") acc.medium++;
     else acc.low++;
     return acc;
   }, { total: 0, high: 0, medium: 0, low: 0 }) || { total: 0, high: 0, medium: 0, low: 0 };
@@ -2123,9 +2123,9 @@ export default function AdminPanel() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">전체</SelectItem>
-                <SelectItem value="RED">RED (고위험)</SelectItem>
-                <SelectItem value="YELLOW">YELLOW (중위험)</SelectItem>
-                <SelectItem value="GREEN">GREEN (저위험)</SelectItem>
+                <SelectItem value="HIGH">HIGH (고위험)</SelectItem>
+                <SelectItem value="MEDIUM">MEDIUM (중위험)</SelectItem>
+                <SelectItem value="LOW">LOW (저위험)</SelectItem>
               </SelectContent>
             </Select>
           </div>
