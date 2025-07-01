@@ -155,6 +155,33 @@ export default function AdminPanel() {
     },
   });
 
+  const deleteEquipmentMutation = useMutation({
+    mutationFn: async (equipmentId: number) => {
+      const response = await apiRequest("DELETE", `/api/equipment/${equipmentId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/equipment"] });
+      toast({
+        title: "설비 삭제 완료",
+        description: "설비가 성공적으로 삭제되었습니다.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "설비 삭제 실패",
+        description: "설비 삭제 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteEquipment = (equipment: Equipment) => {
+    if (window.confirm(`"${equipment.name}" 설비를 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+      deleteEquipmentMutation.mutate(equipment.id);
+    }
+  };
+
   const onSubmit = (data: InsertEquipment) => {
     createEquipmentMutation.mutate(data);
   };
@@ -1758,14 +1785,26 @@ export default function AdminPanel() {
                   <h3 className="text-lg font-semibold mb-1">{eq.name}</h3>
                   <p className="text-sm text-gray-600">{eq.code}</p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEditEquipment(eq)}
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  편집
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditEquipment(eq)}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    편집
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteEquipment(eq)}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    disabled={deleteEquipmentMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    삭제
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
