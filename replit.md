@@ -153,6 +153,7 @@ Changelog:
 - July 1, 2025. Reorganized admin panel equipment list layout into two lines: first line shows equipment name, code, and safety level badge; second line shows work management, edit, and delete buttons
 - July 1, 2025. Fixed admin panel work management button routing to navigate to proper WorkManagement page (/work-management/:equipmentId) instead of equipment dashboard for dedicated work type and procedure management
 - July 1, 2025. Resolved WorkManagement page blank screen issue by adding correct route mapping in App.tsx and ensuring proper back navigation to admin panel
+- July 1, 2025. Migrated AI service from OpenAI to Google Gemini to resolve quota limitations and improve service reliability - all AI functions now use Gemini 2.5 Flash model with structured JSON responses
 ```
 
 ## User Preferences

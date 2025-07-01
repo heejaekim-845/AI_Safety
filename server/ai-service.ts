@@ -1,9 +1,7 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
-});
+// Using Google Gemini for AI-powered safety analysis
+const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export interface SafetyAnalysis {
   riskLevel: "HIGH" | "MEDIUM" | "LOW";
@@ -49,23 +47,26 @@ export class AIService {
   "emergencyProcedures": ["비상절차1", "비상절차2", ...]
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "당신은 산업 안전 전문가입니다. 설비 안전 분석을 수행하고 실용적인 안전 권장사항을 제공합니다."
-          },
-          {
-            role: "user",
-            content: prompt
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업 안전 전문가입니다. 설비 안전 분석을 수행하고 실용적인 안전 권장사항을 제공합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              riskLevel: { type: "string", enum: ["HIGH", "MEDIUM", "LOW"] },
+              recommendations: { type: "array", items: { type: "string" } },
+              procedureAdjustments: { type: "array", items: { type: "string" } },
+              emergencyProcedures: { type: "array", items: { type: "string" } }
+            },
+            required: ["riskLevel", "recommendations", "procedureAdjustments", "emergencyProcedures"]
           }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 1000
+        },
+        contents: prompt
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const result = JSON.parse(response.text || "{}");
       
       return {
         riskLevel: result.riskLevel || "MEDIUM",
@@ -109,23 +110,26 @@ export class AIService {
   "preventiveMeasures": ["예방조치1", "예방조치2", ...]
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "당신은 산업 안전 전문가입니다. 위험 보고서를 분석하고 실용적인 대응 방안을 제공합니다."
-          },
-          {
-            role: "user",
-            content: prompt
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업 안전 전문가입니다. 위험 보고서를 분석하고 실용적인 대응 방안을 제공합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              severity: { type: "string", enum: ["HIGH", "MEDIUM", "LOW"] },
+              recommendations: { type: "array", items: { type: "string" } },
+              immediateActions: { type: "array", items: { type: "string" } },
+              preventiveMeasures: { type: "array", items: { type: "string" } }
+            },
+            required: ["severity", "recommendations", "immediateActions", "preventiveMeasures"]
           }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 1000
+        },
+        contents: prompt
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const result = JSON.parse(response.text || "{}");
       
       return {
         severity: result.severity || "MEDIUM",
@@ -184,22 +188,15 @@ export class AIService {
 5. 작업 전 점검사항
 6. 비상상황 대응절차`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: "system",
-            content: "당신은 산업 안전 음성 안내 전문가입니다. 실제 작업 현장에서 작업자의 안전을 보장하기 위한 체계적이고 포괄적인 음성 안내를 제공합니다. 전문적이면서도 이해하기 쉽게 설명하세요."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 1500
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업 안전 음성 안내 전문가입니다. 실제 작업 현장에서 작업자의 안전을 보장하기 위한 체계적이고 포괄적인 음성 안내를 제공합니다. 전문적이면서도 이해하기 쉽게 설명하세요."
+        },
+        contents: prompt
       });
 
-      return response.choices[0].message.content || "안전 수칙을 준수하여 작업하시기 바랍니다.";
+      return response.text || "안전 수칙을 준수하여 작업하시기 바랍니다.";
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       
@@ -279,22 +276,26 @@ JSON 형식으로 응답:
 
 중요: 일반적인 조언이 아닌, 입력된 특이사항("${stepNote}")에 직접 관련된 구체적이고 실용적인 조치사항만 제공하세요.`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "당신은 산업 안전 전문가입니다. 작업자의 특이사항을 분석하여 적절한 안전 조치사항을 JSON 형식으로 제공합니다."
-          },
-          {
-            role: "user",
-            content: prompt
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업 안전 전문가입니다. 작업자의 특이사항을 분석하여 적절한 안전 조치사항을 JSON 형식으로 제공합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              riskLevel: { type: "string", enum: ["HIGH", "MEDIUM", "LOW"] },
+              recommendations: { type: "array", items: { type: "string" } },
+              immediateActions: { type: "array", items: { type: "string" } },
+              preventiveMeasures: { type: "array", items: { type: "string" } }
+            },
+            required: ["riskLevel", "recommendations", "immediateActions", "preventiveMeasures"]
           }
-        ],
-        response_format: { type: "json_object" }
+        },
+        contents: prompt
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const result = JSON.parse(response.text || "{}");
       
       return {
         riskLevel: result.riskLevel || "MEDIUM",
@@ -515,24 +516,41 @@ JSON 형식으로 응답:
 - MEDIUM: 총점 8-14점
 - LOW: 총점 7점 이하`;
 
-      const response = await this.openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [
-          {
-            role: "system",
-            content: "당신은 한국의 산업안전보건법 전문가입니다. 정확한 위험성평가를 수행하고 법적 요구사항에 맞는 안전조치를 제시합니다. 반드시 JSON 형태로만 응답하세요."
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 한국의 산업안전보건법 전문가입니다. 정확한 위험성평가를 수행하고 법적 요구사항에 맞는 안전조치를 제시합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              workTypeName: { type: "string" },
+              riskFactors: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    factor: { type: "string" },
+                    probability: { type: "number", minimum: 1, maximum: 5 },
+                    severity: { type: "number", minimum: 1, maximum: 4 },
+                    score: { type: "number" },
+                    measures: { type: "array", items: { type: "string" } }
+                  },
+                  required: ["factor", "probability", "severity", "score", "measures"]
+                }
+              },
+              totalScore: { type: "number" },
+              overallRiskLevel: { type: "string", enum: ["HIGH", "MEDIUM", "LOW"] },
+              complianceNotes: { type: "array", items: { type: "string" } }
+            },
+            required: ["workTypeName", "riskFactors", "totalScore", "overallRiskLevel", "complianceNotes"]
           },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 1500,
-        temperature: 0.3
+          temperature: 0.3
+        },
+        contents: prompt
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const result = JSON.parse(response.text || "{}");
       
       // Calculate total score
       const totalScore = result.riskFactors?.reduce((sum: number, risk: any) => sum + risk.score, 0) || 0;
