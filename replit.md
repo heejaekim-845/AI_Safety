@@ -167,6 +167,8 @@ Changelog:
 - July 1, 2025. Implemented automatic AI risk re-evaluation system when equipment information changes and modified admin panel to display AI-determined risk levels as read-only, preventing manual overrides
 - July 1, 2025. Unified risk level system to HIGH/MEDIUM/LOW format across entire application - updated RiskLevelBadge component to support both old (RED/YELLOW/GREEN) and new formats, executed data migration script to convert existing equipment risk levels
 - July 1, 2025. Implemented accident history feature: added incidents card to equipment dashboard between safety facilities and emergency contacts, fixed incidents schema to match database structure, added sample incident data, and included accident history management placeholder in admin panel
+- July 1, 2025. Updated header design with custom Korean font (HakgyoansimAllimjangTTF-B): first line shows "지능형 안전정보 시스템" (weight 700), second line shows "Smart Safety Partner" (weight 400) in two-line layout
+- July 1, 2025. Fixed admin panel risk statistics display by updating risk level calculations from old format (RED/YELLOW/GREEN) to new format (HIGH/MEDIUM/LOW) throughout the filtering and counting system
 ```
 
 ## User Preferences
