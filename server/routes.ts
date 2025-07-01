@@ -407,7 +407,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Incidents routes
   app.post("/api/incidents", async (req, res) => {
     try {
-      const validatedData = insertIncidentSchema.parse(req.body);
+      // Convert incidentDate string to Date object if provided
+      const requestData = { ...req.body };
+      if (requestData.incidentDate && typeof requestData.incidentDate === 'string') {
+        requestData.incidentDate = new Date(requestData.incidentDate);
+      }
+      
+      const validatedData = insertIncidentSchema.parse(requestData);
       const incident = await storage.createIncident(validatedData);
       res.status(201).json(incident);
     } catch (error) {
@@ -422,7 +428,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/incidents/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const validatedData = insertIncidentSchema.partial().parse(req.body);
+      
+      // Convert incidentDate string to Date object if provided
+      const requestData = { ...req.body };
+      if (requestData.incidentDate && typeof requestData.incidentDate === 'string') {
+        requestData.incidentDate = new Date(requestData.incidentDate);
+      }
+      
+      const validatedData = insertIncidentSchema.partial().parse(requestData);
       const incident = await storage.updateIncident(id, validatedData);
       res.json(incident);
     } catch (error) {
