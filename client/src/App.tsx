@@ -35,7 +35,11 @@ function Router() {
       <nav className="bg-primary text-white p-4 shadow-lg sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center space-x-3">
-            <span className="material-icons text-2xl">security</span>
+            <img 
+              src="/attached_assets/shield_1495706_1751374227319.png" 
+              alt="Safety Shield" 
+              className="w-8 h-8"
+            />
             <div className="flex flex-col">
               <h1 className="text-xl font-bold leading-tight" style={{ fontFamily: 'HakgyoansimAllimjangTTF-B', fontWeight: 700 }}>
                 지능형 안전정보 시스템
