@@ -49,6 +49,7 @@ export default function WorkTypeSelection() {
   const [workerName, setWorkerName] = useState("");
   const [showRiskAssessment, setShowRiskAssessment] = useState(false);
   const [riskAssessmentData, setRiskAssessmentData] = useState<RiskAssessment | null>(null);
+  const [analyzingWorkTypeId, setAnalyzingWorkTypeId] = useState<number | null>(null);
   
   const equipmentIdNum = parseInt(equipmentId || "0");
   
@@ -64,12 +65,22 @@ export default function WorkTypeSelection() {
       const response = await apiRequest("POST", `/api/ai/risk-assessment/${workTypeId}`, {});
       return response.json();
     },
+    onMutate: (workTypeId: number) => {
+      setAnalyzingWorkTypeId(workTypeId);
+    },
     onSuccess: (data) => {
       setRiskAssessmentData(data);
       setShowRiskAssessment(true);
+      setAnalyzingWorkTypeId(null);
     },
     onError: (error) => {
       console.error('Risk assessment error:', error);
+      setAnalyzingWorkTypeId(null);
+      toast({
+        title: "오류",
+        description: "위험성 평가를 수행할 수 없습니다.",
+        variant: "destructive",
+      });
     }
   });
 
@@ -143,6 +154,18 @@ export default function WorkTypeSelection() {
         workerName: workerName.trim()
       });
     }
+  };
+
+  const handleRiskAssessment = (workTypeId: number) => {
+    if (analyzingWorkTypeId !== null) {
+      toast({
+        title: "분석 진행 중",
+        description: "현재 다른작업의 위험성 평가를 수행중입니다",
+        variant: "destructive",
+      });
+      return;
+    }
+    riskAssessmentMutation.mutate(workTypeId);
   };
 
   const getPermitStatusBadge = (requiresPermit: boolean) => {
@@ -228,13 +251,13 @@ export default function WorkTypeSelection() {
                 <Button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    riskAssessmentMutation.mutate(workType.id);
+                    handleRiskAssessment(workType.id);
                   }}
-                  disabled={riskAssessmentMutation.isPending}
+                  disabled={analyzingWorkTypeId !== null}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-3"
                 >
                   <BarChart3 className="h-4 w-4" />
-                  {riskAssessmentMutation.isPending ? '분석중...' : 'AI 위험성평가'}
+                  {analyzingWorkTypeId === workType.id ? '분석중...' : 'AI 위험성평가'}
                 </Button>
               </div>
             </CardContent>
