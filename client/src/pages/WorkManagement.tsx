@@ -34,6 +34,8 @@ export default function WorkManagement() {
   const [isAddingWorkType, setIsAddingWorkType] = useState(false);
   const [isAddingProcedure, setIsAddingProcedure] = useState(false);
   const [editingProcedure, setEditingProcedure] = useState<WorkProcedure | null>(null);
+  const [isEditingChecklist, setIsEditingChecklist] = useState(false);
+  const [editingWorkTypeId, setEditingWorkTypeId] = useState<number | null>(null);
   
   // Work Type Form States
   const [workTypeName, setWorkTypeName] = useState("");
@@ -47,6 +49,16 @@ export default function WorkManagement() {
   const [procedureStepNumber, setProcedureStepNumber] = useState(1);
   const [procedureCategory, setProcedureCategory] = useState<"기기조작" | "상태인지" | "안전조치">("기기조작");
   const [safetyNotes, setSafetyNotes] = useState("");
+  
+  // Checklist Form States
+  const [requiredQualifications, setRequiredQualifications] = useState<string[]>([]);
+  const [safetyEquipmentRequirements, setSafetyEquipmentRequirements] = useState<string[]>([]);
+  const [environmentalRequirements, setEnvironmentalRequirements] = useState<string[]>([]);
+  const [legalRequirements, setLegalRequirements] = useState<string[]>([]);
+  const [newQualification, setNewQualification] = useState("");
+  const [newSafetyEquipment, setNewSafetyEquipment] = useState("");
+  const [newEnvironmentalReq, setNewEnvironmentalReq] = useState("");
+  const [newLegalReq, setNewLegalReq] = useState("");
 
   // Fetch equipment data
   const { data: equipment, isLoading: equipmentLoading } = useQuery<Equipment>({
@@ -128,6 +140,26 @@ export default function WorkManagement() {
     },
   });
 
+  const updateChecklistMutation = useMutation({
+    mutationFn: async ({ id, data }: { 
+      id: number; 
+      data: {
+        requiredQualifications?: string[];
+        safetyEquipmentRequirements?: string[];
+        environmentalRequirements?: string[];
+        legalRequirements?: string[];
+      } 
+    }) => {
+      return apiRequest("PATCH", `/api/work-types/${id}/checklist`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/equipment/${equipmentId}/work-types`] });
+      setIsEditingChecklist(false);
+      setEditingWorkTypeId(null);
+      toast({ title: "작업 전 점검사항이 수정되었습니다" });
+    },
+  });
+
   // Form reset functions
   const resetWorkTypeForm = () => {
     setWorkTypeName("");
@@ -142,6 +174,92 @@ export default function WorkManagement() {
     setProcedureStepNumber(1);
     setProcedureCategory("기기조작");
     setSafetyNotes("");
+  };
+
+  const resetChecklistForm = () => {
+    setRequiredQualifications([]);
+    setSafetyEquipmentRequirements([]);
+    setEnvironmentalRequirements([]);
+    setLegalRequirements([]);
+    setNewQualification("");
+    setNewSafetyEquipment("");
+    setNewEnvironmentalReq("");
+    setNewLegalReq("");
+  };
+
+  // Checklist editing functions
+  const handleEditChecklist = (workType: WorkType) => {
+    setEditingWorkTypeId(workType.id);
+    setRequiredQualifications(workType.requiredQualifications || []);
+    setSafetyEquipmentRequirements(workType.requiredEquipment || []);
+    setEnvironmentalRequirements(workType.environmentalRequirements || []);
+    setLegalRequirements(workType.legalRequirements || []);
+    setIsEditingChecklist(true);
+  };
+
+  const handleSaveChecklist = () => {
+    if (!editingWorkTypeId) return;
+
+    updateChecklistMutation.mutate({
+      id: editingWorkTypeId,
+      data: {
+        requiredQualifications,
+        requiredEquipment: safetyEquipmentRequirements,
+        environmentalRequirements,
+        legalRequirements,
+      },
+    });
+  };
+
+  const handleCancelEditChecklist = () => {
+    setIsEditingChecklist(false);
+    setEditingWorkTypeId(null);
+    resetChecklistForm();
+  };
+
+  // Functions to add/remove checklist items
+  const addQualification = () => {
+    if (newQualification.trim()) {
+      setRequiredQualifications([...requiredQualifications, newQualification.trim()]);
+      setNewQualification("");
+    }
+  };
+
+  const removeQualification = (index: number) => {
+    setRequiredQualifications(requiredQualifications.filter((_, i) => i !== index));
+  };
+
+  const addSafetyEquipment = () => {
+    if (newSafetyEquipment.trim()) {
+      setSafetyEquipmentRequirements([...safetyEquipmentRequirements, newSafetyEquipment.trim()]);
+      setNewSafetyEquipment("");
+    }
+  };
+
+  const removeSafetyEquipment = (index: number) => {
+    setSafetyEquipmentRequirements(safetyEquipmentRequirements.filter((_, i) => i !== index));
+  };
+
+  const addEnvironmentalReq = () => {
+    if (newEnvironmentalReq.trim()) {
+      setEnvironmentalRequirements([...environmentalRequirements, newEnvironmentalReq.trim()]);
+      setNewEnvironmentalReq("");
+    }
+  };
+
+  const removeEnvironmentalReq = (index: number) => {
+    setEnvironmentalRequirements(environmentalRequirements.filter((_, i) => i !== index));
+  };
+
+  const addLegalReq = () => {
+    if (newLegalReq.trim()) {
+      setLegalRequirements([...legalRequirements, newLegalReq.trim()]);
+      setNewLegalReq("");
+    }
+  };
+
+  const removeLegalReq = (index: number) => {
+    setLegalRequirements(legalRequirements.filter((_, i) => i !== index));
   };
 
   // Form handlers
@@ -327,7 +445,20 @@ export default function WorkManagement() {
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium">{workType.name}</h3>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => setSelectedWorkType(workType)}>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleEditChecklist(workType)}
+                          title="작업 전 점검사항 편집"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => setSelectedWorkType(workType)}
+                          title="작업 절차 관리"
+                        >
                           <FileText className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -335,6 +466,7 @@ export default function WorkManagement() {
                           variant="outline" 
                           onClick={() => deleteWorkTypeMutation.mutate(workType.id)}
                           disabled={deleteWorkTypeMutation.isPending}
+                          title="작업 유형 삭제"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -512,6 +644,164 @@ export default function WorkManagement() {
             </CardContent>
           </Card>
         )}
+
+        {/* Checklist Edit Dialog */}
+        <Dialog open={isEditingChecklist} onOpenChange={(open) => {
+          if (!open) {
+            handleCancelEditChecklist();
+          }
+        }}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>작업 전 점검사항 편집</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Required Qualifications */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <CheckCircle className="h-4 w-4" />
+                  필수 자격 요건
+                </Label>
+                <div className="space-y-2">
+                  {requiredQualifications.map((qual, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input value={qual} readOnly className="flex-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeQualification(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 자격 요건 추가"
+                      value={newQualification}
+                      onChange={(e) => setNewQualification(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addQualification()}
+                    />
+                    <Button onClick={addQualification} disabled={!newQualification.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Safety Equipment Requirements */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <AlertTriangle className="h-4 w-4" />
+                  안전장비 요구사항
+                </Label>
+                <div className="space-y-2">
+                  {safetyEquipmentRequirements.map((equip, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input value={equip} readOnly className="flex-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeSafetyEquipment(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 안전장비 요구사항 추가"
+                      value={newSafetyEquipment}
+                      onChange={(e) => setNewSafetyEquipment(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addSafetyEquipment()}
+                    />
+                    <Button onClick={addSafetyEquipment} disabled={!newSafetyEquipment.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Environmental Requirements */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <Settings className="h-4 w-4" />
+                  환경 요구사항
+                </Label>
+                <div className="space-y-2">
+                  {environmentalRequirements.map((env, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input value={env} readOnly className="flex-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeEnvironmentalReq(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 환경 요구사항 추가"
+                      value={newEnvironmentalReq}
+                      onChange={(e) => setNewEnvironmentalReq(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addEnvironmentalReq()}
+                    />
+                    <Button onClick={addEnvironmentalReq} disabled={!newEnvironmentalReq.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legal Requirements */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <FileText className="h-4 w-4" />
+                  법적 요구사항
+                </Label>
+                <div className="space-y-2">
+                  {legalRequirements.map((legal, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input value={legal} readOnly className="flex-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeLegalReq(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 법적 요구사항 추가"
+                      value={newLegalReq}
+                      onChange={(e) => setNewLegalReq(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addLegalReq()}
+                    />
+                    <Button onClick={addLegalReq} disabled={!newLegalReq.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <Button variant="outline" onClick={handleCancelEditChecklist}>
+                  취소
+                </Button>
+                <Button 
+                  onClick={handleSaveChecklist} 
+                  disabled={updateChecklistMutation.isPending}
+                >
+                  {updateChecklistMutation.isPending ? "저장 중..." : "저장"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

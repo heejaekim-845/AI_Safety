@@ -163,6 +163,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/work-types/:id/checklist", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const checklistSchema = z.object({
+        requiredQualifications: z.array(z.string()).optional(),
+        safetyEquipmentRequirements: z.array(z.string()).optional(),
+        environmentalRequirements: z.array(z.string()).optional(),
+        legalRequirements: z.array(z.string()).optional(),
+      });
+      
+      const checklistData = checklistSchema.parse(req.body);
+      const workType = await storage.updateWorkType(id, checklistData);
+      res.json(workType);
+    } catch (error) {
+      console.error("작업 전 점검사항 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "작업 전 점검사항을 수정할 수 없습니다." });
+    }
+  });
+
   app.delete("/api/work-types/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
