@@ -99,6 +99,9 @@ export const workSessions = pgTable("work_sessions", {
   status: text("status").default("in_progress"),
   notes: text("notes"),
   safetyChecklistCompleted: boolean("safety_checklist_completed").default(false),
+  currentStep: integer("current_step").default(1),
+  completedSteps: integer("completed_steps").array(),
+  specialNotes: jsonb("special_notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -223,8 +223,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
+    // Filter out any fields that don't exist in the workSessions table
+    const allowedFields = {
+      equipmentId: sessionData.equipmentId,
+      workTypeId: sessionData.workTypeId,
+      workerName: sessionData.workerName,
+      startTime: sessionData.startTime,
+      endTime: sessionData.endTime,
+      status: sessionData.status,
+      notes: sessionData.notes,
+      safetyChecklistCompleted: sessionData.safetyChecklistCompleted,
+      currentStep: sessionData.currentStep,
+      completedSteps: sessionData.completedSteps,
+      specialNotes: sessionData.specialNotes,
+    };
+    
+    // Remove undefined fields
+    const updateData = Object.fromEntries(
+      Object.entries(allowedFields).filter(([_, value]) => value !== undefined)
+    );
+    
     const [result] = await db.update(workSessions)
-      .set(sessionData)
+      .set(updateData)
       .where(eq(workSessions.id, id))
       .returning();
     return result;
