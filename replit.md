@@ -149,6 +149,7 @@ Changelog:
 - July 1, 2025. Simplified admin panel equipment list to show only equipment name, equipment code, and edit button for cleaner management interface
 - July 1, 2025. Added equipment deletion functionality to admin panel with confirmation dialog and proper error handling
 - July 1, 2025. Enhanced admin panel equipment list to display safety risk level badges alongside equipment name and code for better visibility
+- July 1, 2025. Added work management button back to admin panel equipment list for quick access to equipment dashboard and work type management
 ```
 
 ## User Preferences
