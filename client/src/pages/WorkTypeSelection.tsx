@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useWorkTypes } from "@/hooks/useWorkTypes";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
@@ -44,6 +46,7 @@ export default function WorkTypeSelection() {
   const [selectedWorkType, setSelectedWorkType] = useState<WorkType | null>(null);
   const [showChecklist, setShowChecklist] = useState(false);
   const [checklistItems, setChecklistItems] = useState<Record<string, boolean>>({});
+  const [workerName, setWorkerName] = useState("");
   const [showRiskAssessment, setShowRiskAssessment] = useState(false);
   const [riskAssessmentData, setRiskAssessmentData] = useState<RiskAssessment | null>(null);
   
@@ -71,7 +74,7 @@ export default function WorkTypeSelection() {
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: async (data: { equipmentId: number; workTypeId: number }) => {
+    mutationFn: async (data: { equipmentId: number; workTypeId: number; workerName: string }) => {
       const response = await apiRequest("POST", "/api/work-sessions", data);
       return response.json();
     },
@@ -124,10 +127,20 @@ export default function WorkTypeSelection() {
       return;
     }
 
+    if (!workerName.trim()) {
+      toast({
+        title: "작업자 이름 필수",
+        description: "작업자 이름을 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (selectedWorkType) {
       createSessionMutation.mutate({
         equipmentId: equipmentIdNum,
-        workTypeId: selectedWorkType.id
+        workTypeId: selectedWorkType.id,
+        workerName: workerName.trim()
       });
     }
   };
@@ -364,6 +377,21 @@ export default function WorkTypeSelection() {
                   </div>
                 </div>
               )}
+
+              {/* Worker Name Input */}
+              <div>
+                <Label htmlFor="workerName" className="text-sm font-medium text-gray-900 mb-2 block">
+                  작업자 이름 <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="workerName"
+                  type="text"
+                  placeholder="작업자 이름을 입력해주세요"
+                  value={workerName}
+                  onChange={(e) => setWorkerName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
 
               <div className="flex space-x-3">
                 <Button 
