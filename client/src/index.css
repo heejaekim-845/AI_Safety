@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
@@ -6,32 +7,33 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 98%);
-  --foreground: hsl(0, 0%, 10%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215, 16%, 47%);
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(224, 71%, 4%);
+  --muted: hsl(220, 14%, 96%);
+  --muted-foreground: hsl(220, 9%, 46%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(224, 71%, 4%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(222, 84%, 5%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(222, 47%, 11%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(222, 47%, 11%);
+  --card-foreground: hsl(224, 71%, 4%);
+  --border: hsl(220, 13%, 91%);
+  --input: hsl(220, 13%, 91%);
+  --primary: hsl(220, 14%, 11%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(220, 14%, 96%);
+  --secondary-foreground: hsl(220, 9%, 15%);
+  --accent: hsl(220, 14%, 96%);
+  --accent-foreground: hsl(220, 9%, 15%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(222, 84%, 5%);
-  --radius: 0.5rem;
+  --ring: hsl(224, 71%, 4%);
+  --radius: 0.75rem;
   
-  /* Custom safety colors */
-  --danger: hsl(0, 71%, 51%);
-  --warning: hsl(36, 100%, 48%);
-  --success: hsl(122, 39%, 49%);
+  /* Custom safety colors - minimal modern version */
+  --danger: hsl(0, 72%, 51%);
+  --warning: hsl(32, 95%, 44%);
+  --success: hsl(142, 76%, 36%);
   --surface: hsl(0, 0%, 100%);
+  --subtle: hsl(220, 14%, 96%);
 }
 
 .dark {
@@ -62,20 +64,35 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-foreground min-h-screen;
-    font-family: 'Roboto', sans-serif;
+    @apply bg-white dark:bg-slate-900 text-foreground min-h-screen;
+    font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer utilities {
+  /* Minimal modern shadows */
+  .minimal-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .minimal-shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .minimal-shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Legacy shadow support */
   .material-shadow {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+    @apply minimal-shadow;
   }
   
   .material-shadow-lg {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.12);
+    @apply minimal-shadow-lg;
   }
 
+  /* Safety colors with modern approach */
   .text-danger {
     color: var(--danger);
   }
@@ -114,6 +131,65 @@
   
   .border-success {
     border-color: var(--success);
+  }
+
+  /* Modern typography scale */
+  .text-heading-1 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  
+  .text-heading-2 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+  
+  .text-heading-3 {
+    @apply text-lg font-medium;
+  }
+  
+  .text-body-large {
+    @apply text-base;
+  }
+  
+  .text-body {
+    @apply text-sm;
+  }
+  
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+  }
+
+  /* Modern card styles */
+  .card-minimal {
+    @apply bg-white border border-border rounded-xl minimal-shadow;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:minimal-shadow-md hover:border-gray-300;
+  }
+
+  /* Modern button variants */
+  .btn-minimal {
+    @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+  }
+  
+  .btn-minimal-primary {
+    @apply btn-minimal bg-primary text-primary-foreground;
+  }
+  
+  .btn-minimal-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
+  }
+  
+  .btn-minimal-secondary {
+    @apply btn-minimal bg-secondary text-secondary-foreground;
+  }
+  
+  .btn-minimal-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.8);
+  }
+  
+  .btn-minimal-ghost {
+    @apply btn-minimal bg-transparent hover:bg-secondary/50;
   }
 
   .glass-effect {

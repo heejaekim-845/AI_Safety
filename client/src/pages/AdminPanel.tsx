@@ -251,19 +251,19 @@ export default function AdminPanel() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-lg">로딩 중...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-lg text-gray-700">로딩 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-20">
+    <div className="p-6 min-h-screen bg-white pb-20">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">설비 관리</h1>
-          <p className="text-gray-600">산업 설비의 안전 정보를 관리합니다</p>
+          <h1 className="text-heading-1 text-gray-900 mb-2">설비 관리</h1>
+          <p className="text-body text-gray-600">산업 설비의 안전 정보를 관리합니다</p>
         </div>
 
         {/* Add Equipment Dialog */}
@@ -1716,40 +1716,40 @@ export default function AdminPanel() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Factory className="h-8 w-8 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold">{riskCounts.total}</p>
-            <p className="text-xs text-gray-600">총 설비</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{riskCounts.high}</p>
-            <p className="text-xs text-gray-600">고위험</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <AlertTriangle className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{riskCounts.medium}</p>
-            <p className="text-xs text-gray-600">중위험</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Shield className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{riskCounts.low}</p>
-            <p className="text-xs text-gray-600">저위험</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="card-minimal card-hover">
+          <div className="p-6 text-center">
+            <Factory className="h-8 w-8 text-gray-700 mx-auto mb-3" />
+            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.total}</p>
+            <p className="text-caption text-gray-600">총 설비</p>
+          </div>
+        </div>
+        <div className="card-minimal card-hover">
+          <div className="p-6 text-center">
+            <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.high}</p>
+            <p className="text-caption text-gray-600">고위험</p>
+          </div>
+        </div>
+        <div className="card-minimal card-hover">
+          <div className="p-6 text-center">
+            <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
+            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.medium}</p>
+            <p className="text-caption text-gray-600">중위험</p>
+          </div>
+        </div>
+        <div className="card-minimal card-hover">
+          <div className="p-6 text-center">
+            <Shield className="h-8 w-8 text-green-600 mx-auto mb-3" />
+            <p className="text-heading-2 text-gray-900 mb-1">{riskCounts.low}</p>
+            <p className="text-caption text-gray-600">저위험</p>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filter */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
+      <div className="card-minimal mb-8">
+        <div className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -1757,11 +1757,11 @@ export default function AdminPanel() {
                 placeholder="설비명, 코드, 위치로 검색..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-gray-200 focus:border-gray-400 focus:ring-gray-400"
               />
             </div>
             <Select value={filterRisk} onValueChange={setFilterRisk}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 border-gray-200">
                 <SelectValue placeholder="위험도 필터" />
               </SelectTrigger>
               <SelectContent>
@@ -1772,56 +1772,58 @@ export default function AdminPanel() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Equipment List */}
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {filteredEquipment?.map((eq) => (
-          <Card key={eq.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="space-y-3">
+          <div key={eq.id} className="card-minimal card-hover">
+            <div className="p-6">
+              <div className="space-y-4">
                 {/* 첫 번째 줄: 설비명, 설비코드, 안전등급 */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-semibold">{eq.name}</h3>
-                    <span className="text-sm text-gray-600">{eq.code}</span>
+                  <div className="flex items-center space-x-4">
+                    <h3 className="text-heading-3 text-gray-900">{eq.name}</h3>
+                    <span className="text-body text-gray-600">{eq.code}</span>
                     <RiskLevelBadge level={eq.riskLevel} />
                   </div>
                 </div>
                 
                 {/* 두 번째 줄: 버튼들 */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setLocation(`/work-management/${eq.id}`)}
+                    className="btn-minimal-secondary"
                   >
-                    <Settings className="h-4 w-4 mr-1" />
+                    <Settings className="h-4 w-4 mr-2" />
                     작업관리
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleEditEquipment(eq)}
+                    className="btn-minimal-secondary"
                   >
-                    <Edit className="h-4 w-4 mr-1" />
+                    <Edit className="h-4 w-4 mr-2" />
                     편집
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteEquipment(eq)}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors"
                     disabled={deleteEquipmentMutation.isPending}
                   >
-                    <Trash2 className="h-4 w-4 mr-1" />
+                    <Trash2 className="h-4 w-4 mr-2" />
                     삭제
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
