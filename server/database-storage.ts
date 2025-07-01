@@ -30,7 +30,24 @@ export class DatabaseStorage implements IStorage {
 
   async getEquipmentById(id: number): Promise<Equipment | undefined> {
     const [result] = await db.select().from(equipment).where(eq(equipment.id, id));
-    return result;
+    if (!result) return result;
+    
+    // Parse JSON strings back to arrays if needed
+    const processedResult = { ...result };
+    const arrayFields = ['requiredPpe', 'emergencyContacts', 'requiredSafetyEquipment', 'lotoPoints', 'safetyFacilityLocations', 'safetyDeviceImages'];
+    
+    for (const field of arrayFields) {
+      const value = processedResult[field as keyof Equipment];
+      if (typeof value === 'string') {
+        try {
+          processedResult[field as keyof Equipment] = JSON.parse(value);
+        } catch (e) {
+          // If parsing fails, keep the original value
+        }
+      }
+    }
+    
+    return processedResult;
   }
 
   async getEquipmentByCode(code: string): Promise<Equipment | undefined> {
