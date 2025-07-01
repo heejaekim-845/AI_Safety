@@ -706,8 +706,11 @@ export default function AdminPanel() {
               <DialogTitle>설비 편집</DialogTitle>
             </DialogHeader>
             <Form {...editForm}>
-              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-6">
+                {/* 기본 설비 정보 섹션 */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">기본 설비 정보</Label>
+                  <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={editForm.control}
                     name="name"
@@ -781,35 +784,71 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={editForm.control}
-                    name="modelName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>모델명</FormLabel>
-                        <FormControl>
-                          <Input placeholder="모델명" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={editForm.control}
+                  name="modelName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>모델명</FormLabel>
+                      <FormControl>
+                        <Input placeholder="모델명" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                   <FormField
                     control={editForm.control}
-                    name="imageUrl"
+                    name="specification"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>설비 사진 URL</FormLabel>
+                        <FormLabel>사양</FormLabel>
                         <FormControl>
-                          <Input placeholder="설비 사진 URL을 입력하세요" {...field} />
+                          <Textarea placeholder="설비 사양을 입력하세요" {...field} rows={2} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+
+                {/* 설비 사진 섹션 */}
+                <div className="space-y-4 border-t pt-4">
+                  <Label className="text-base font-medium">설비 사진</Label>
+                <FormField
+                  control={editForm.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>설비 사진 URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="/attached_assets/equipment_photo.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                      {field.value && (
+                        <div className="mt-2">
+                          <Label className="text-xs text-muted-foreground">미리보기:</Label>
+                          <div className="mt-1 p-2 border rounded-lg bg-gray-50">
+                            <img 
+                              src={field.value} 
+                              alt="설비 사진 미리보기" 
+                              className="max-w-full h-32 object-contain rounded"
+                              onError={(e) => {
+                                e.currentTarget.src = "/placeholder-equipment.png";
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* 위험도 및 위험 요소 섹션 */}
+              <div className="space-y-4 border-t pt-4">
+                <Label className="text-base font-medium">위험도 분석</Label>
 
                 <FormField
                   control={editForm.control}
@@ -1223,7 +1262,7 @@ export default function AdminPanel() {
                         {(editForm.watch("safetyDeviceImages") as any[] || []).map((device: any, index: number) => (
                           <div key={index} className="border rounded-lg p-4 bg-gray-50">
                             <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-sm font-medium">안전장치 {index + 1}</h4>
+                              <h4 className="text-sm font-medium">{device.name || `안전장치 ${index + 1}`}</h4>
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1426,6 +1465,7 @@ export default function AdminPanel() {
                   >
                     {updateEquipmentMutation.isPending ? "수정 중..." : "수정"}
                   </Button>
+                </div>
                 </div>
               </form>
             </Form>
