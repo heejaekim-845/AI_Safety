@@ -41,6 +41,7 @@ export default function AdminPanel() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
   const [newIncidents, setNewIncidents] = useState<{
+    id?: number; // For existing incidents
     description: string;
     severity: "HIGH" | "MEDIUM" | "LOW";
     occurredAt: string;
@@ -200,19 +201,31 @@ export default function AdminPanel() {
     // First update the equipment
     updateEquipmentMutation.mutate(data, {
       onSuccess: async () => {
-        // Then create any new incidents
+        // Then handle incidents (update existing and create new ones)
         if (newIncidents.length > 0 && editingEquipment) {
           try {
             for (const incident of newIncidents) {
-              await apiRequest("POST", "/api/incidents", {
-                description: incident.description,
-                severity: incident.severity,
-                occurredAt: new Date(incident.occurredAt).toISOString(),
-                reportedBy: incident.reportedBy,
-                actions: incident.actions,
-                equipmentId: editingEquipment.id,
-                workTypeId: null
-              });
+              if (incident.id) {
+                // Update existing incident
+                await apiRequest("PUT", `/api/incidents/${incident.id}`, {
+                  description: incident.description,
+                  severity: incident.severity,
+                  occurredAt: new Date(incident.occurredAt).toISOString(),
+                  reportedBy: incident.reportedBy,
+                  actions: incident.actions,
+                });
+              } else {
+                // Create new incident
+                await apiRequest("POST", "/api/incidents", {
+                  description: incident.description,
+                  severity: incident.severity,
+                  occurredAt: new Date(incident.occurredAt).toISOString(),
+                  reportedBy: incident.reportedBy,
+                  actions: incident.actions,
+                  equipmentId: editingEquipment.id,
+                  workTypeId: null
+                });
+              }
             }
             // Clear the incidents array after saving
             setNewIncidents([]);
@@ -224,18 +237,24 @@ export default function AdminPanel() {
               description: `설비 정보와 ${newIncidents.length}건의 사고이력이 저장되었습니다.`,
             });
           } catch (error) {
+            console.error("사고이력 저장 오류:", error);
             toast({
               title: "사고이력 저장 실패",
               description: "사고이력 저장 중 오류가 발생했습니다.",
               variant: "destructive",
             });
           }
+        } else {
+          toast({
+            title: "저장 완료",
+            description: "설비 정보가 성공적으로 업데이트되었습니다.",
+          });
         }
       }
     });
   };
 
-  const handleEditEquipment = (equipment: Equipment) => {
+  const handleEditEquipment = async (equipment: Equipment) => {
     setEditingEquipment(equipment);
     editForm.reset({
       name: equipment.name,
@@ -273,7 +292,28 @@ export default function AdminPanel() {
         : [],
       imageUrl: equipment.imageUrl || ""
     });
-    setNewIncidents([]); // Clear incidents when opening edit dialog
+    
+    // Load existing incidents for this equipment
+    try {
+      const response = await apiRequest("GET", `/api/equipment/${equipment.id}/incidents`);
+      const incidents = await response.json();
+      
+      // Convert existing incidents to the format expected by newIncidents state
+      const existingIncidents = incidents.map((incident: any) => ({
+        id: incident.id, // Keep track of existing incident IDs
+        description: incident.description,
+        severity: incident.severity,
+        occurredAt: new Date(incident.occurredAt).toISOString().slice(0, 16),
+        reportedBy: incident.reportedBy,
+        actions: incident.actions
+      }));
+      
+      setNewIncidents(existingIncidents);
+    } catch (error) {
+      console.error("Failed to load incidents:", error);
+      setNewIncidents([]);
+    }
+    
     setShowEditDialog(true);
   };
 
