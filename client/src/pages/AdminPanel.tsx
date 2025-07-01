@@ -1879,6 +1879,135 @@ export default function AdminPanel() {
                   />
                 </div>
 
+                {/* Accident History Management - Edit Dialog */}
+                <div className="space-y-4 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium">사고이력 관리</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setNewIncidents([...newIncidents, {
+                          description: "",
+                          severity: "MEDIUM",
+                          occurredAt: new Date().toISOString().slice(0, 16),
+                          reportedBy: "",
+                          actions: ""
+                        }]);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      사고 추가
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {newIncidents.map((incident, index) => (
+                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium">사고 {index + 1}</h4>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const updated = [...newIncidents];
+                              updated.splice(index, 1);
+                              setNewIncidents(updated);
+                            }}
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          <div>
+                            <Label className="text-xs text-muted-foreground">심각도</Label>
+                            <Select
+                              value={incident.severity}
+                              onValueChange={(value) => {
+                                const updated = [...newIncidents];
+                                updated[index] = { ...updated[index], severity: value as "HIGH" | "MEDIUM" | "LOW" };
+                                setNewIncidents(updated);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="HIGH">높음 (HIGH)</SelectItem>
+                                <SelectItem value="MEDIUM">보통 (MEDIUM)</SelectItem>
+                                <SelectItem value="LOW">낮음 (LOW)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground">발생일시</Label>
+                            <Input
+                              type="datetime-local"
+                              value={incident.occurredAt}
+                              onChange={(e) => {
+                                const updated = [...newIncidents];
+                                updated[index] = { ...updated[index], occurredAt: e.target.value };
+                                setNewIncidents(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <Label className="text-xs text-muted-foreground">사고 설명</Label>
+                            <Textarea
+                              placeholder="사고 내용을 상세히 기술하세요"
+                              value={incident.description}
+                              onChange={(e) => {
+                                const updated = [...newIncidents];
+                                updated[index] = { ...updated[index], description: e.target.value };
+                                setNewIncidents(updated);
+                              }}
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground">보고자</Label>
+                            <Input
+                              placeholder="보고자 이름"
+                              value={incident.reportedBy}
+                              onChange={(e) => {
+                                const updated = [...newIncidents];
+                                updated[index] = { ...updated[index], reportedBy: e.target.value };
+                                setNewIncidents(updated);
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground">조치사항</Label>
+                            <Textarea
+                              placeholder="취한 조치사항을 기술하세요"
+                              value={incident.actions}
+                              onChange={(e) => {
+                                const updated = [...newIncidents];
+                                updated[index] = { ...updated[index], actions: e.target.value };
+                                setNewIncidents(updated);
+                              }}
+                              rows={2}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {newIncidents.length === 0 && (
+                      <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                        사고이력을 추가하려면 "사고 추가" 버튼을 클릭하세요
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
                     취소
