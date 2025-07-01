@@ -32,7 +32,7 @@ function Router() {
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Navigation Bar */}
-      <nav className="bg-primary text-white p-4 shadow-lg sticky top-0 z-50">
+      <nav className="gradient-wave-bg text-white p-4 shadow-lg sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center space-x-3">
             <img 
