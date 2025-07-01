@@ -56,10 +56,10 @@ export const workTypes = pgTable("work_types", {
   description: text("description"),
   requiresPermit: boolean("requires_permit").default(false),
   estimatedDuration: integer("estimated_duration"), // in minutes
-  requiredQualifications: jsonb("required_qualifications").$type<string[]>(),
-  requiredEquipment: jsonb("required_equipment").$type<string[]>(),
-  environmentalRequirements: jsonb("environmental_requirements").$type<string[]>(),
-  legalRequirements: jsonb("legal_requirements").$type<string[]>(),
+  requiredQualifications: text("required_qualifications").array(),
+  requiredEquipment: text("required_equipment").array(),
+  environmentalRequirements: text("environmental_requirements").array(),
+  legalRequirements: text("legal_requirements").array(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

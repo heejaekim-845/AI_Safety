@@ -128,22 +128,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
-    // Handle array fields properly for PostgreSQL
-    const updateData = { ...workTypeData };
-    
-    // Handle all array fields
-    const arrayFields = ['requiredQualifications', 'requiredEquipment', 'environmentalRequirements', 'legalRequirements'];
-    arrayFields.forEach(field => {
-      if (updateData[field] && Array.isArray(updateData[field])) {
-        // Convert empty arrays to null for PostgreSQL compatibility
-        if (updateData[field].length === 0) {
-          updateData[field] = null;
-        }
-      }
-    });
-    
     const [result] = await db.update(workTypes)
-      .set(updateData)
+      .set(workTypeData)
       .where(eq(workTypes.id, id))
       .returning();
     return result;
