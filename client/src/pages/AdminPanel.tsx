@@ -206,22 +206,22 @@ export default function AdminPanel() {
           try {
             for (const incident of newIncidents) {
               if (incident.id) {
-                // Update existing incident
+                // Update existing incident - map fields to database schema
                 await apiRequest("PUT", `/api/incidents/${incident.id}`, {
                   description: incident.description,
                   severity: incident.severity,
-                  occurredAt: new Date(incident.occurredAt).toISOString(),
-                  reportedBy: incident.reportedBy,
-                  actions: incident.actions,
+                  incidentDate: new Date(incident.occurredAt).toISOString(),
+                  reporterName: incident.reportedBy,
+                  actionsTaken: incident.actions,
                 });
               } else {
-                // Create new incident
+                // Create new incident - map fields to database schema
                 await apiRequest("POST", "/api/incidents", {
                   description: incident.description,
                   severity: incident.severity,
-                  occurredAt: new Date(incident.occurredAt).toISOString(),
-                  reportedBy: incident.reportedBy,
-                  actions: incident.actions,
+                  incidentDate: new Date(incident.occurredAt).toISOString(),
+                  reporterName: incident.reportedBy,
+                  actionsTaken: incident.actions,
                   equipmentId: editingEquipment.id,
                   workTypeId: null
                 });
@@ -305,9 +305,9 @@ export default function AdminPanel() {
           id: incident.id, // Keep track of existing incident IDs
           description: incident.description || "",
           severity: incident.severity || "MEDIUM",
-          occurredAt: incident.occurredAt ? new Date(incident.occurredAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
-          reportedBy: incident.reportedBy || "",
-          actions: incident.actions || ""
+          occurredAt: incident.incidentDate ? new Date(incident.incidentDate).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+          reportedBy: incident.reporterName || "",
+          actions: incident.actionsTaken || ""
         }));
         
         console.log("Converted incidents:", existingIncidents);

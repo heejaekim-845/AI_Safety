@@ -8,7 +8,8 @@ import {
   insertWorkTypeSchema, 
   insertWorkProcedureSchema,
   insertWorkSessionSchema,
-  insertRiskReportSchema
+  insertRiskReportSchema,
+  insertIncidentSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
