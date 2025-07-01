@@ -273,15 +273,15 @@ export default function EquipmentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-6">
-              {equipment.highTemperatureRisk && (
+              {equipment.riskFactors?.highTemperature && (
                 <Card className="safety-card scale-on-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-red-600 mr-3 text-2xl">whatshot</span>
                       <span className="font-semibold text-gray-900">고온 위험</span>
                     </div>
-                    {equipment.highTemperatureDetails ? (
-                      <p className="text-sm text-gray-600">{equipment.highTemperatureDetails}</p>
+                    {equipment.riskFactors?.highTemperatureDetail ? (
+                      <p className="text-sm text-gray-600">{equipment.riskFactors.highTemperatureDetail}</p>
                     ) : (
                       <p className="text-sm text-gray-600">150°C 이상</p>
                     )}
@@ -289,15 +289,15 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
-              {equipment.highPressureRisk && (
+              {equipment.riskFactors?.highPressure && (
                 <Card className="safety-card scale-on-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-orange-600 mr-3 text-2xl">compress</span>
                       <span className="font-semibold text-gray-900">고압 가스</span>
                     </div>
-                    {equipment.highPressureDetails ? (
-                      <p className="text-sm text-gray-600">{equipment.highPressureDetails}</p>
+                    {equipment.riskFactors?.highPressureDetail ? (
+                      <p className="text-sm text-gray-600">{equipment.riskFactors.highPressureDetail}</p>
                     ) : (
                       <p className="text-sm text-gray-600">15 bar</p>
                     )}
@@ -305,15 +305,15 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
-              {equipment.highVoltageRisk && (
+              {equipment.riskFactors?.highVoltage && (
                 <Card className="safety-card scale-on-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-yellow-600 mr-3 text-2xl">electrical_services</span>
                       <span className="font-semibold text-gray-900">고전압 위험</span>
                     </div>
-                    {equipment.highVoltageDetails ? (
-                      <p className="text-sm text-gray-600">{equipment.highVoltageDetails}</p>
+                    {equipment.riskFactors?.highVoltageDetail ? (
+                      <p className="text-sm text-gray-600">{equipment.riskFactors.highVoltageDetail}</p>
                     ) : (
                       <p className="text-sm text-gray-600">전기 차단 필요</p>
                     )}
@@ -321,15 +321,15 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
-              {equipment.heightRisk && (
+              {equipment.riskFactors?.height && (
                 <Card className="safety-card scale-on-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-purple-600 mr-3 text-2xl">height</span>
                       <span className="font-semibold text-gray-900">추락 위험</span>
                     </div>
-                    {equipment.heightDetails ? (
-                      <p className="text-sm text-gray-600">{equipment.heightDetails}</p>
+                    {equipment.riskFactors?.heightDetail ? (
+                      <p className="text-sm text-gray-600">{equipment.riskFactors.heightDetail}</p>
                     ) : (
                       <p className="text-sm text-gray-600">2m 이상 고소작업</p>
                     )}
@@ -337,17 +337,17 @@ export default function EquipmentDashboard() {
                 </Card>
               )}
               
-              {equipment.heavyWeightRisk && (
+              {equipment.riskFactors?.mechanical && (
                 <Card className="safety-card scale-on-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-gray-600 mr-3 text-2xl">fitness_center</span>
-                      <span className="font-semibold text-gray-900">중량물 위험</span>
+                      <span className="font-semibold text-gray-900">기계적 위험</span>
                     </div>
-                    {equipment.heavyWeightDetails ? (
-                      <p className="text-sm text-gray-600">{equipment.heavyWeightDetails}</p>
+                    {equipment.riskFactors?.mechanicalDetail ? (
+                      <p className="text-sm text-gray-600">{equipment.riskFactors.mechanicalDetail}</p>
                     ) : (
-                      <p className="text-sm text-gray-600">50kg 이상 중량물</p>
+                      <p className="text-sm text-gray-600">회전체 및 중량물</p>
                     )}
                   </CardContent>
                 </Card>
@@ -356,7 +356,7 @@ export default function EquipmentDashboard() {
             </div>
             
             {/* Show message if no risk factors are present */}
-            {!equipment.highTemperatureRisk && !equipment.highPressureRisk && !equipment.highVoltageRisk && !equipment.heightRisk && !equipment.heavyWeightRisk && (
+            {!equipment.riskFactors?.highTemperature && !equipment.riskFactors?.highPressure && !equipment.riskFactors?.highVoltage && !equipment.riskFactors?.height && !equipment.riskFactors?.mechanical && (
               <div className="text-center py-4">
                 <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
                   <p className="text-sm text-green-800">
