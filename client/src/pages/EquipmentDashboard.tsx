@@ -74,7 +74,7 @@ export default function EquipmentDashboard() {
       setIsPaused(false);
       const utterance = new SpeechSynthesisUtterance(voiceGuide.guide);
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.9; // Slightly slower for better comprehension
+      utterance.rate = 1.1; // 20% faster speed for improved user experience
       utterance.onend = () => {
         setIsPlayingGuide(false);
         setIsPaused(false);

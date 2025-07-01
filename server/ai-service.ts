@@ -150,8 +150,8 @@ export class AIService {
 
   async generateVoiceGuide(equipmentInfo: any): Promise<string> {
     try {
-      const prompt = `다음 산업 설비에 대한 간결한 안전 음성 안내를 한국어로 작성해주세요. 
-30초 이내로 읽을 수 있도록 핵심 안전사항만 포함하세요.
+      const prompt = `다음 산업 설비에 대한 상세한 안전 음성 안내를 한국어로 작성해주세요. 
+약 1분 정도 길이로 읽을 수 있도록 작성하되, 인사말은 제외하고 바로 본론으로 시작하세요.
 
 설비명: ${equipmentInfo.name}
 위치: ${equipmentInfo.location}
@@ -163,17 +163,23 @@ ${this.formatRisks(equipmentInfo)}
 
 필수 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
 
-다음 순서로 30초 이내 간결한 안내 멘트를 작성하세요:
-1. 설비명과 위치 (5초)
-2. 핵심 위험요소와 주의사항 (15초)
-3. 필수 안전장비 및 비상연락처 (10초)
+다음 순서로 1분 길이의 상세한 안내 멘트를 작성하세요:
+1. 설비명과 위치
+2. 핵심 위험요소와 구체적인 주의사항
+3. 필수 안전장비 착용 방법
+4. 작업 전 점검사항
+5. 비상상황 대응절차
 
-간결하고 명확하게 작성하여 작업자가 빠르게 이해할 수 있도록 해주세요.`;
+주의사항:
+- 인사말 제외하고 바로 본론으로 시작
+- "몇 초" 같은 시간 관련 멘트는 포함하지 말 것
+- 구체적이고 실용적인 안전 지침 제공
+- 자연스러운 흐름으로 작성`;
 
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash",
         config: {
-          systemInstruction: "당신은 산업 안전 음성 안내 전문가입니다. 30초 이내로 읽을 수 있는 간결하고 핵심적인 안전 안내를 제공합니다. 불필요한 설명은 생략하고 꼭 필요한 안전 정보만 포함하세요."
+          systemInstruction: "당신은 산업 안전 음성 안내 전문가입니다. 1분 길이의 상세하고 실용적인 안전 안내를 제공합니다. 인사말 없이 바로 본론으로 시작하고, 시간 관련 멘트는 포함하지 마세요. 구체적인 안전 지침에 집중하세요."
         },
         contents: prompt
       });
@@ -182,7 +188,7 @@ ${this.formatRisks(equipmentInfo)}
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       
-      // 간결한 안전 중심 폴백 안내
+      // 상세한 안전 중심 폴백 안내
       const riskMessages = [];
       if (equipmentInfo.highTemperature) riskMessages.push("고온 위험");
       if (equipmentInfo.highPressure) riskMessages.push("고압 위험");
@@ -190,15 +196,21 @@ ${this.formatRisks(equipmentInfo)}
       if (equipmentInfo.height) riskMessages.push("추락 위험");
       if (equipmentInfo.mechanical) riskMessages.push("기계적 위험");
 
-      return `${equipmentInfo.name} 안전 안내
+      return `${equipmentInfo.location}에 위치한 ${equipmentInfo.name} 작업 시 다음 안전수칙을 준수하시기 바랍니다.
 
-${equipmentInfo.location}에 위치한 ${equipmentInfo.name}입니다.
+${riskMessages.length > 0 ? 
+  `이 설비는 ${riskMessages.join(", ")}이 있어 특별한 주의가 필요합니다. ` : 
+  '이 설비는 일반적인 기계 안전수칙을 적용합니다. '
+}
 
-${riskMessages.length > 0 ? `주요 위험: ${riskMessages.join(", ")}이 있습니다.` : '일반적인 안전수칙을 준수하세요.'}
+${equipmentInfo.hazardousChemicalType ? 
+  `${equipmentInfo.hazardousChemicalType} 유해화학물질이 사용되므로 반드시 전용 보호장비를 착용하고 환기가 잘 되는 곳에서 작업하세요. ` : 
+  ''
+}
 
-${equipmentInfo.hazardousChemicalType ? `${equipmentInfo.hazardousChemicalType} 화학물질 주의. ` : ''}필수 안전장비를 착용하고 작업하세요.
+작업 전 반드시 안전모, 안전화, 보안경을 착용하고 작업복을 정리하세요. 전원 차단 및 압력 해제를 확인한 후 작업을 시작하세요.
 
-비상시 관제실에 즉시 연락하시기 바랍니다.`;
+설비 주변에 다른 작업자가 있는지 확인하고, 위험 구역 표시를 설치하세요. 작업 중 이상 징후 발견 시 즉시 작업을 중단하고 관제실에 연락하시기 바랍니다.`;
     }
   }
 
