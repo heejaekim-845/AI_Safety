@@ -1780,14 +1780,17 @@ export default function AdminPanel() {
         {filteredEquipment?.map((eq) => (
           <Card key={eq.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
+              <div className="space-y-3">
+                {/* 첫 번째 줄: 설비명, 설비코드, 안전등급 */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
                     <h3 className="text-lg font-semibold">{eq.name}</h3>
+                    <span className="text-sm text-gray-600">{eq.code}</span>
                     <RiskLevelBadge level={eq.riskLevel} />
                   </div>
-                  <p className="text-sm text-gray-600">{eq.code}</p>
                 </div>
+                
+                {/* 두 번째 줄: 버튼들 */}
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
