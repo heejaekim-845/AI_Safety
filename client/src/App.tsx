@@ -37,7 +37,7 @@ function Router() {
           <div className="flex items-center space-x-3">
             <span className="material-icons text-2xl">security</span>
             <div className="flex flex-col">
-              <h1 className="text-sm font-bold leading-tight" style={{ fontFamily: 'HakgyoansimAllimjangTTF-B', fontWeight: 700 }}>
+              <h1 className="text-xl font-bold leading-tight" style={{ fontFamily: 'HakgyoansimAllimjangTTF-B', fontWeight: 700 }}>
                 지능형 안전정보 시스템
               </h1>
               <h2 className="text-xs font-normal leading-tight" style={{ fontFamily: 'HakgyoansimAllimjangTTF-B', fontWeight: 400 }}>
