@@ -154,6 +154,8 @@ Changelog:
 - July 1, 2025. Fixed admin panel work management button routing to navigate to proper WorkManagement page (/work-management/:equipmentId) instead of equipment dashboard for dedicated work type and procedure management
 - July 1, 2025. Resolved WorkManagement page blank screen issue by adding correct route mapping in App.tsx and ensuring proper back navigation to admin panel
 - July 1, 2025. Migrated AI service from OpenAI to Google Gemini to resolve quota limitations and improve service reliability - all AI functions now use Gemini 2.5 Flash model with structured JSON responses
+- July 1, 2025. Fixed work pre-inspection checklist editing functionality by correcting PostgreSQL array schema from JSONB to text().array() type and resolving API field mapping inconsistencies
+- July 1, 2025. Simplified work management page header display by removing equipment code parentheses - now shows only equipment name under title
 ```
 
 ## User Preferences

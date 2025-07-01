@@ -349,7 +349,7 @@ export default function WorkManagement() {
           <div>
             <h1 className="text-xl font-bold">작업 관리</h1>
             {equipment && (
-              <p className="text-primary-100">{equipment.name} ({equipment.code})</p>
+              <p className="text-primary-100">{equipment.name}</p>
             )}
           </div>
         </div>
