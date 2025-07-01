@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const checklistSchema = z.object({
         requiredQualifications: z.array(z.string()).optional(),
-        safetyEquipmentRequirements: z.array(z.string()).optional(),
+        requiredEquipment: z.array(z.string()).optional(),
         environmentalRequirements: z.array(z.string()).optional(),
         legalRequirements: z.array(z.string()).optional(),
       });

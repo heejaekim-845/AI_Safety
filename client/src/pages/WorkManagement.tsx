@@ -145,7 +145,7 @@ export default function WorkManagement() {
       id: number; 
       data: {
         requiredQualifications?: string[];
-        safetyEquipmentRequirements?: string[];
+        requiredEquipment?: string[];
         environmentalRequirements?: string[];
         legalRequirements?: string[];
       } 
