@@ -154,7 +154,7 @@ export default function EquipmentDashboard() {
             </Button>
             <h2 className="text-xl font-semibold">설비 정보</h2>
           </div>
-          <div className="glass-effect p-6">
+          <div className="glass-effect p-4">
             <div className="flex gap-6">
               {equipment.imageUrl && (
                 <div className="flex-shrink-0">
@@ -184,9 +184,9 @@ export default function EquipmentDashboard() {
         </div>
       </div>
 
-      <div className="p-6 space-y-8">
+      <div className="p-4 space-y-4">
         {/* 1. Equipment Details */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <Settings className="mr-3 h-6 w-6 text-blue-600" />
@@ -234,7 +234,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 2. Risk Level Visualization */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <AlertTriangle className="mr-3 h-6 w-6 text-orange-600" />
@@ -264,7 +264,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 3. Major Risk Factors */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <AlertTriangle className="mr-3 h-6 w-6 text-red-600" />
@@ -274,7 +274,7 @@ export default function EquipmentDashboard() {
           <CardContent>
             <div className="grid grid-cols-2 gap-6">
               {equipment.riskFactors?.highTemperature && (
-                <Card className="safety-card scale-on-hover">
+                <Card className="card-minimal card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-red-600 mr-3 text-2xl">whatshot</span>
@@ -290,7 +290,7 @@ export default function EquipmentDashboard() {
               )}
               
               {equipment.riskFactors?.highPressure && (
-                <Card className="safety-card scale-on-hover">
+                <Card className="card-minimal card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-orange-600 mr-3 text-2xl">compress</span>
@@ -306,7 +306,7 @@ export default function EquipmentDashboard() {
               )}
               
               {equipment.riskFactors?.highVoltage && (
-                <Card className="safety-card scale-on-hover">
+                <Card className="card-minimal card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-yellow-600 mr-3 text-2xl">electrical_services</span>
@@ -322,7 +322,7 @@ export default function EquipmentDashboard() {
               )}
               
               {equipment.riskFactors?.height && (
-                <Card className="safety-card scale-on-hover">
+                <Card className="card-minimal card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-purple-600 mr-3 text-2xl">height</span>
@@ -338,7 +338,7 @@ export default function EquipmentDashboard() {
               )}
               
               {equipment.riskFactors?.mechanical && (
-                <Card className="safety-card scale-on-hover">
+                <Card className="card-minimal card-hover">
                   <CardContent className="p-5">
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-gray-600 mr-3 text-2xl">fitness_center</span>
@@ -369,7 +369,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 4. Required Safety Equipment */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <Shield className="mr-3 h-6 w-6 text-green-600" />
@@ -393,7 +393,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* 5. Hazardous Chemicals Information */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <AlertTriangle className="mr-3 h-6 w-6 text-orange-600" />
@@ -473,7 +473,7 @@ export default function EquipmentDashboard() {
 
 
         {/* Check Safety Device Location */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <Shield className="mr-3 h-6 w-6 text-blue-600" />
@@ -545,7 +545,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* View Safety Facilities Location */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <MapPin className="mr-3 h-6 w-6 text-green-600" />
@@ -612,7 +612,7 @@ export default function EquipmentDashboard() {
         </Card>
 
         {/* Emergency Contacts */}
-        <Card className="safety-card">
+        <Card className="card-minimal">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center text-gray-900 text-lg">
               <Phone className="mr-3 h-6 w-6 text-red-600" />

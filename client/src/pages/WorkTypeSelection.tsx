@@ -198,8 +198,8 @@ export default function WorkTypeSelection() {
   }
 
   return (
-    <div className="p-6 pb-24 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-      <div className="flex items-center mb-6">
+    <div className="p-4 pb-24 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      <div className="flex items-center mb-4">
         <Button
           variant="ghost"
           size="sm"
@@ -211,13 +211,13 @@ export default function WorkTypeSelection() {
         <h2 className="text-xl font-medium">작업 유형 선택</h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {workTypes?.map((workType) => (
           <Card 
             key={workType.id}
-            className="hover:bg-gray-50 transition-colors material-shadow"
+            className="card-minimal card-hover"
           >
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900 mb-1">{workType.name}</h3>

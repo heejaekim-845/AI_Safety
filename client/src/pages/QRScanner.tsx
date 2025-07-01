@@ -47,8 +47,8 @@ export default function QRScanner() {
   }
 
   return (
-    <div className="p-6 pb-20 fade-in">
-      <div className="text-center mb-8">
+    <div className="p-4 pb-20 fade-in bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      <div className="text-center mb-4">
         <div className="floating">
           <div className="w-16 h-16 mx-auto mb-4 safety-gradient rounded-2xl flex items-center justify-center">
             <Search className="h-8 w-8 text-white" />
@@ -65,11 +65,11 @@ export default function QRScanner() {
           onClose={() => setShowScanner(false)}
         />
       ) : (
-        <div className="safety-card p-8 mb-8 text-center scale-on-hover">
-          <div className="w-20 h-20 mx-auto mb-6 glass-effect flex items-center justify-center">
-            <Camera size={48} className="text-blue-600" />
+        <div className="card-minimal p-4 mb-4 text-center card-hover">
+          <div className="w-16 h-16 mx-auto mb-3 glass-effect flex items-center justify-center">
+            <Camera size={32} className="text-blue-600" />
           </div>
-          <p className="text-gray-600 mb-6 text-lg">카메라로 QR 코드를 스캔하세요</p>
+          <p className="text-gray-600 mb-4 text-base">카메라로 QR 코드를 스캔하세요</p>
           <Button 
             onClick={() => setShowScanner(true)}
             className="safety-gradient hover:shadow-xl text-white font-medium px-8 py-3 rounded-xl transition-all duration-300"
@@ -81,11 +81,11 @@ export default function QRScanner() {
       )}
       
       {/* Manual Equipment Selection */}
-      <div className="border-t border-gray-200/50 pt-8">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">또는 설비 직접 선택</h3>
+      <div className="border-t border-gray-200/50 pt-4">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">또는 설비 직접 선택</h3>
         
         {/* Search */}
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <Input
             placeholder="설비명, 코드, 위치로 검색..."
@@ -95,14 +95,14 @@ export default function QRScanner() {
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredEquipment.map((eq) => (
             <Card 
               key={eq.id}
-              className="safety-card cursor-pointer scale-on-hover mb-4"
+              className="card-minimal cursor-pointer card-hover"
               onClick={() => handleEquipmentSelect(eq.id)}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-5 flex-1">
                     {/* Equipment Thumbnail */}

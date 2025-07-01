@@ -156,6 +156,7 @@ Changelog:
 - July 1, 2025. Migrated AI service from OpenAI to Google Gemini to resolve quota limitations and improve service reliability - all AI functions now use Gemini 2.5 Flash model with structured JSON responses
 - July 1, 2025. Fixed work pre-inspection checklist editing functionality by correcting PostgreSQL array schema from JSONB to text().array() type and resolving API field mapping inconsistencies
 - July 1, 2025. Simplified work management page header display by removing equipment code parentheses - now shows only equipment name under title
+- July 1, 2025. Completed comprehensive design unification across all pages with AdminPanel's material blue design system (#1976D2), 50% spacing reduction (gap-6→gap-3, mb-8→mb-4, p-6→p-4), card-minimal styling, and gradient backgrounds for improved visual consistency
 ```
 
 ## User Preferences

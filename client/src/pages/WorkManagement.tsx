@@ -357,7 +357,7 @@ export default function WorkManagement() {
 
       <div className="p-4 space-y-4">
         {/* Work Types Section */}
-        <Card>
+        <Card className="card-minimal">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
@@ -488,7 +488,7 @@ export default function WorkManagement() {
 
         {/* Work Procedures Section */}
         {selectedWorkType && (
-          <Card>
+          <Card className="card-minimal">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">

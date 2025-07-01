@@ -215,8 +215,8 @@ export default function WorkProcedureComponent() {
   const upcomingProcedures = procedures.filter(p => p.stepNumber > currentStep);
 
   return (
-    <div className="p-6 pb-24">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 pb-24 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <Button
             variant="ghost"
@@ -234,7 +234,7 @@ export default function WorkProcedureComponent() {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-6">
+      <div className="mb-4">
         <Progress value={progress} className="h-2" />
       </div>
 
@@ -242,8 +242,8 @@ export default function WorkProcedureComponent() {
       {currentProcedure && (() => {
         const categoryStyle = getCategoryStyle(currentProcedure.category);
         return (
-          <Card className={`bg-primary/5 border-primary/20 mb-6 material-shadow ${categoryStyle.cardClass}`}>
-            <CardContent className="p-6">
+          <Card className={`card-minimal bg-primary/5 border-primary/20 mb-4 ${categoryStyle.cardClass}`}>
+            <CardContent className="p-4">
               <div className="flex items-start space-x-3">
                 <div className={`${categoryStyle.dotClass} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium`}>
                   {currentProcedure.stepNumber}
@@ -319,7 +319,7 @@ export default function WorkProcedureComponent() {
 
       {/* Completed Steps */}
       {completedProcedures.length > 0 && (
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-4">
           <h3 className="font-medium text-gray-900">완료된 단계</h3>
           {completedProcedures.map((procedure) => {
             const categoryStyle = getCategoryStyle(procedure.category);
@@ -346,7 +346,7 @@ export default function WorkProcedureComponent() {
 
       {/* Upcoming Steps */}
       {upcomingProcedures.length > 0 && (
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-4">
           <h3 className="font-medium text-gray-900">다음 단계</h3>
           {upcomingProcedures.slice(0, 3).map((procedure) => {
             const categoryStyle = getCategoryStyle(procedure.category);
