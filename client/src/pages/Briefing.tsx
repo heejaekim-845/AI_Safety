@@ -248,33 +248,34 @@ export default function Briefing() {
                               </div>
                             )}
                           </div>
-                          <div className="flex gap-2 ml-4">
-                            <WorkScheduleForm 
-                              trigger={
-                                <Button variant="outline" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              }
-                              editData={schedule}
-                              onSuccess={() => queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] })}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteSchedule(schedule.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                          <div className="flex flex-col gap-2 ml-4">
                             <Button
                               onClick={() => handleGenerateBriefing(schedule)}
                               disabled={isGenerating}
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700"
                             >
-                              <Shield className="w-4 h-4 mr-2" />
                               AI 안전브리핑
                             </Button>
+                            <div className="flex gap-2">
+                              <WorkScheduleForm 
+                                trigger={
+                                  <Button variant="outline" size="sm">
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                }
+                                editData={schedule}
+                                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] })}
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteSchedule(schedule.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                         
