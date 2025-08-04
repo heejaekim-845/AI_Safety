@@ -154,7 +154,7 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
@@ -168,8 +168,9 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="flex-1 overflow-y-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Equipment Selection */}
               <FormField
@@ -338,8 +339,9 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
                 }
               </Button>
             </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );
