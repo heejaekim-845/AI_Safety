@@ -62,15 +62,18 @@ export default function Briefing() {
   // Fetch work schedules for selected date
   const { data: workSchedules = [], isLoading: schedulesLoading } = useQuery({
     queryKey: ['/api/work-schedules', dateString],
-    queryFn: () => apiRequest(`/api/work-schedules?date=${dateString}`),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/work-schedules?date=${dateString}`);
+      return response.json();
+    },
   });
 
   // Generate safety briefing mutation
   const generateBriefingMutation = useMutation({
-    mutationFn: (workScheduleId: number) => 
-      apiRequest(`/api/generate-safety-briefing/${workScheduleId}`, {
-        method: 'POST'
-      }),
+    mutationFn: async (workScheduleId: number) => {
+      const response = await apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
+      return response.json();
+    },
     onSuccess: (data) => {
       setBriefingData(data);
       setIsGenerating(false);

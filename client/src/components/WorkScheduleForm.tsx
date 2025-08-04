@@ -89,26 +89,31 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
   // Fetch equipment list
   const { data: equipmentList = [] } = useQuery({
     queryKey: ['/api/equipment'],
-    queryFn: () => apiRequest('/api/equipment'),
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/equipment');
+      return response.json();
+    },
   });
 
   // Fetch work types for selected equipment
   const { data: workTypes = [] } = useQuery({
     queryKey: ['/api/equipment', selectedEquipmentId, 'work-types'],
-    queryFn: () => apiRequest(`/api/equipment/${selectedEquipmentId}/work-types`),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/equipment/${selectedEquipmentId}/work-types`);
+      return response.json();
+    },
     enabled: !!selectedEquipmentId,
   });
 
   // Create work schedule mutation
   const createScheduleMutation = useMutation({
-    mutationFn: (data: WorkScheduleFormData) =>
-      apiRequest('/api/work-schedules', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...data,
-          scheduledDate: new Date(data.scheduledDate).toISOString(),
-        }),
-      }),
+    mutationFn: async (data: WorkScheduleFormData) => {
+      const response = await apiRequest('POST', '/api/work-schedules', {
+        ...data,
+        scheduledDate: new Date(data.scheduledDate).toISOString(),
+      });
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] });
       setOpen(false);
