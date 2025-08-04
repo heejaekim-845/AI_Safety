@@ -18,6 +18,7 @@ interface WorkSchedule {
   scheduledDate: string;
   briefingTime: string;
   workerName: string;
+  workLocation?: string;
   specialNotes: string;
   status: string;
   createdAt: string;
@@ -208,6 +209,12 @@ export default function Briefing() {
                                 {schedule.briefingTime || '시간 미지정'}
                               </span>
                               <span>작업자: {schedule.workerName}</span>
+                              {schedule.workLocation && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-4 h-4" />
+                                  {schedule.workLocation}
+                                </span>
+                              )}
                               <Badge variant={schedule.status === 'scheduled' ? 'default' : 'secondary'}>
                                 {schedule.status === 'scheduled' ? '예정' : schedule.status}
                               </Badge>
@@ -299,7 +306,7 @@ export default function Briefing() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Thermometer className="w-5 h-5" />
-                      날씨 정보
+                      날씨 정보 - {briefingData.weatherInfo.location}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

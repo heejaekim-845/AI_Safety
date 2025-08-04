@@ -691,8 +691,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Services are imported at the top of the file
 
-      // Get weather information
-      const weatherInfo = await weatherService.getWeatherForLocation(equipment.location);
+      // Get weather information using work location if available, otherwise use equipment location
+      const weatherLocation = workSchedule.workLocation || equipment.location;
+      const weatherInfo = await weatherService.getWeatherForLocation(weatherLocation);
 
       // Get RAG data
       const regulations = await ragService.findRelevantRegulations(equipment.name, workType.name);

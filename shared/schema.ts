@@ -128,6 +128,7 @@ export const workSchedules = pgTable("work_schedules", {
   scheduledDate: timestamp("scheduled_date").notNull(),
   briefingTime: text("briefing_time"), // HH:MM format
   workerName: text("worker_name").notNull(),
+  workLocation: text("work_location"), // 작업 위치 (지역명)
   specialNotes: text("special_notes"), // 특이사항
   status: text("status").default("scheduled"), // scheduled, completed, cancelled
   createdAt: timestamp("created_at").defaultNow(),

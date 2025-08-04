@@ -30,7 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Clock } from "lucide-react";
+import { Calendar, Plus, Clock, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -41,6 +41,7 @@ const workScheduleSchema = z.object({
   scheduledDate: z.string().min(1, "작업 날짜를 입력해주세요"),
   briefingTime: z.string().optional(),
   workerName: z.string().min(1, "작업자명을 입력해주세요"),
+  workLocation: z.string().min(1, "작업 위치를 입력해주세요"),
   specialNotes: z.string().optional(),
 });
 
@@ -84,6 +85,7 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
         : format(new Date(), 'yyyy-MM-dd'),
       briefingTime: editData?.briefingTime || '08:00',
       workerName: editData?.workerName || '',
+      workLocation: editData?.workLocation || '',
       specialNotes: editData?.specialNotes || '',
     },
   });
@@ -274,6 +276,27 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
                   <FormControl>
                     <Input placeholder="작업자 이름을 입력하세요" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Work Location */}
+            <FormField
+              control={form.control}
+              name="workLocation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    작업 위치
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="작업이 수행될 지역명을 입력하세요 (예: 서울, 부산, 대구)" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    날씨 기반 안전 브리핑을 위한 지역명
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
