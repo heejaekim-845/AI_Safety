@@ -95,8 +95,8 @@ export const workSessions = pgTable("work_sessions", {
   equipmentId: integer("equipment_id").references(() => equipment.id),
   workTypeId: integer("work_type_id").references(() => workTypes.id),
   workerName: text("worker_name").notNull(),
-  startTime: timestamp("start_time").defaultNow(),
-  endTime: timestamp("end_time"),
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
   status: text("status").default("in_progress"),
   notes: text("notes"),
   safetyChecklistCompleted: boolean("safety_checklist_completed").default(false),
@@ -104,6 +104,7 @@ export const workSessions = pgTable("work_sessions", {
   completedSteps: integer("completed_steps").array(),
   specialNotes: jsonb("special_notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Risk reports table
@@ -185,6 +186,7 @@ export const insertIncidentSchema = createInsertSchema(incidents).omit({
 export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertRiskReportSchema = createInsertSchema(riskReports).omit({

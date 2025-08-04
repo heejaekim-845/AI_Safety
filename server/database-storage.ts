@@ -1,5 +1,5 @@
-import { eq, and, gte, lt } from "drizzle-orm";
 import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 import {
   equipment,
   workTypes,
@@ -26,7 +26,7 @@ import {
   type SafetyBriefing,
   type InsertSafetyBriefing,
 } from "@shared/schema";
-import type { IStorage } from "./storage";
+import { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
   // Equipment operations
@@ -36,78 +36,30 @@ export class DatabaseStorage implements IStorage {
 
   async getEquipmentById(id: number): Promise<Equipment | undefined> {
     const [result] = await db.select().from(equipment).where(eq(equipment.id, id));
-    if (!result) return result;
-    
-    // Parse JSON strings back to arrays if needed
-    const processedResult = { ...result };
-    const arrayFields = ['requiredPpe', 'emergencyContacts', 'requiredSafetyEquipment', 'lotoPoints', 'safetyFacilityLocations', 'safetyDeviceImages'];
-    
-    for (const field of arrayFields) {
-      const value = processedResult[field as keyof Equipment];
-      if (typeof value === 'string') {
-        try {
-          processedResult[field as keyof Equipment] = JSON.parse(value);
-        } catch (e) {
-          // If parsing fails, keep the original value
-        }
-      }
-    }
-    
-    return processedResult;
+    return result || undefined;
   }
 
   async getEquipmentByCode(code: string): Promise<Equipment | undefined> {
     const [result] = await db.select().from(equipment).where(eq(equipment.code, code));
-    return result;
+    return result || undefined;
   }
 
   async createEquipment(equipmentData: InsertEquipment): Promise<Equipment> {
-    const [result] = await db.insert(equipment).values({
-      ...equipmentData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning();
+    const [result] = await db
+      .insert(equipment)
+      .values(equipmentData)
+      .returning();
     return result;
   }
 
   async updateEquipment(id: number, equipmentData: Partial<InsertEquipment>): Promise<Equipment> {
-    // Handle array fields properly for PostgreSQL
-    const updateData = { ...equipmentData };
-    
-    // Handle all array fields that might be empty
-    if (updateData.safetyEquipment && Array.isArray(updateData.safetyEquipment)) {
-      if (updateData.safetyEquipment.length === 0) {
-        updateData.safetyEquipment = null;
-      }
-    }
-    if (updateData.emergencyContacts && Array.isArray(updateData.emergencyContacts)) {
-      if (updateData.emergencyContacts.length === 0) {
-        updateData.emergencyContacts = null;
-      }
-    }
-    if (updateData.chemicalInfo && Array.isArray(updateData.chemicalInfo)) {
-      if (updateData.chemicalInfo.length === 0) {
-        updateData.chemicalInfo = null;
-      }
-    }
-    if (updateData.safetyDevices && Array.isArray(updateData.safetyDevices)) {
-      if (updateData.safetyDevices.length === 0) {
-        updateData.safetyDevices = null;
-      }
-    }
-    if (updateData.safetyFacilities && Array.isArray(updateData.safetyFacilities)) {
-      if (updateData.safetyFacilities.length === 0) {
-        updateData.safetyFacilities = null;
-      }
-    }
-    
-    const [result] = await db.update(equipment)
-      .set({
-        ...updateData,
-        updatedAt: new Date(),
-      })
+    const [result] = await db
+      .update(equipment)
+      .set({ ...equipmentData, updatedAt: new Date() })
       .where(eq(equipment.id, id))
       .returning();
+    
+    if (!result) throw new Error(`Equipment with id ${id} not found`);
     return result;
   }
 
@@ -122,22 +74,25 @@ export class DatabaseStorage implements IStorage {
 
   async getWorkTypeById(id: number): Promise<WorkType | undefined> {
     const [result] = await db.select().from(workTypes).where(eq(workTypes.id, id));
-    return result;
+    return result || undefined;
   }
 
   async createWorkType(workTypeData: InsertWorkType): Promise<WorkType> {
-    const [result] = await db.insert(workTypes).values({
-      ...workTypeData,
-      createdAt: new Date(),
-    }).returning();
+    const [result] = await db
+      .insert(workTypes)
+      .values(workTypeData)
+      .returning();
     return result;
   }
 
   async updateWorkType(id: number, workTypeData: Partial<InsertWorkType>): Promise<WorkType> {
-    const [result] = await db.update(workTypes)
+    const [result] = await db
+      .update(workTypes)
       .set(workTypeData)
       .where(eq(workTypes.id, id))
       .returning();
+    
+    if (!result) throw new Error(`WorkType with id ${id} not found`);
     return result;
   }
 
@@ -151,36 +106,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createWorkProcedure(procedureData: InsertWorkProcedure): Promise<WorkProcedure> {
-    // Handle array fields properly for PostgreSQL
-    const insertData = { ...procedureData };
-    if (insertData.checklistItems && Array.isArray(insertData.checklistItems)) {
-      // Convert empty arrays to null for PostgreSQL compatibility
-      if (insertData.checklistItems.length === 0) {
-        insertData.checklistItems = null;
-      }
-    }
-    
-    const [result] = await db.insert(workProcedures).values({
-      ...insertData,
-      createdAt: new Date(),
-    }).returning();
+    const [result] = await db
+      .insert(workProcedures)
+      .values(procedureData)
+      .returning();
     return result;
   }
 
   async updateWorkProcedure(id: number, procedureData: Partial<InsertWorkProcedure>): Promise<WorkProcedure> {
-    // Handle array fields properly for PostgreSQL
-    const updateData = { ...procedureData };
-    if (updateData.checklistItems && Array.isArray(updateData.checklistItems)) {
-      // Convert empty arrays to null for PostgreSQL compatibility
-      if (updateData.checklistItems.length === 0) {
-        updateData.checklistItems = null;
-      }
-    }
-    
-    const [result] = await db.update(workProcedures)
-      .set(updateData)
+    const [result] = await db
+      .update(workProcedures)
+      .set(procedureData)
       .where(eq(workProcedures.id, id))
       .returning();
+    
+    if (!result) throw new Error(`WorkProcedure with id ${id} not found`);
     return result;
   }
 
@@ -198,90 +138,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createIncident(incidentData: InsertIncident): Promise<Incident> {
-    const [result] = await db.insert(incidents).values({
-      ...incidentData,
-      createdAt: new Date(),
-    }).returning();
-    return result;
-  }
-
-  // Work sessions operations
-  async createWorkSession(sessionData: InsertWorkSession): Promise<WorkSession> {
-    const [result] = await db.insert(workSessions).values({
-      ...sessionData,
-      createdAt: new Date(),
-    }).returning();
-    return result;
-  }
-
-  async getWorkSessionById(id: number): Promise<WorkSession | undefined> {
-    const [result] = await db.select().from(workSessions).where(eq(workSessions.id, id));
-    return result;
-  }
-
-  async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
-    // Filter out any fields that don't exist in the workSessions table
-    const allowedFields = {
-      equipmentId: sessionData.equipmentId,
-      workTypeId: sessionData.workTypeId,
-      workerName: sessionData.workerName,
-      startTime: sessionData.startTime,
-      endTime: sessionData.endTime,
-      status: sessionData.status,
-      notes: sessionData.notes,
-      safetyChecklistCompleted: sessionData.safetyChecklistCompleted,
-      currentStep: sessionData.currentStep,
-      completedSteps: sessionData.completedSteps,
-      specialNotes: sessionData.specialNotes,
-    };
-    
-    // Remove undefined fields
-    const updateData = Object.fromEntries(
-      Object.entries(allowedFields).filter(([_, value]) => value !== undefined)
-    );
-    
-    const [result] = await db.update(workSessions)
-      .set(updateData)
-      .where(eq(workSessions.id, id))
+    const [result] = await db
+      .insert(incidents)
+      .values(incidentData)
       .returning();
     return result;
   }
 
-  async getActiveWorkSessions(): Promise<WorkSession[]> {
-    return await db.select().from(workSessions).where(eq(workSessions.status, 'in_progress'));
-  }
-
-  // Risk reports operations
-  async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
-    // Handle array fields properly for PostgreSQL
-    const insertData = { ...reportData };
-    if (insertData.mitigationActions && Array.isArray(insertData.mitigationActions)) {
-      // Convert empty arrays to null for PostgreSQL compatibility
-      if (insertData.mitigationActions.length === 0) {
-        insertData.mitigationActions = null;
-      }
-    }
-    
-    const [result] = await db.insert(riskReports).values({
-      ...insertData,
-      createdAt: new Date(),
-    }).returning();
-    return result;
-  }
-
-  async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
-    return await db.select().from(riskReports).where(eq(riskReports.equipmentId, equipmentId));
-  }
-
-  // Incidents operations
   async updateIncident(id: number, incidentData: Partial<InsertIncident>): Promise<Incident> {
-    const [result] = await db.update(incidents)
-      .set({
-        ...incidentData,
-        updatedAt: new Date(),
-      })
+    const [result] = await db
+      .update(incidents)
+      .set(incidentData)
       .where(eq(incidents.id, id))
       .returning();
+    
+    if (!result) throw new Error(`Incident with id ${id} not found`);
     return result;
   }
 
@@ -289,54 +160,75 @@ export class DatabaseStorage implements IStorage {
     await db.delete(incidents).where(eq(incidents.id, id));
   }
 
-  // Work schedules operations
-  async createWorkSchedule(scheduleData: InsertWorkSchedule): Promise<WorkSchedule> {
-    const [result] = await db.insert(workSchedules).values({
-      ...scheduleData,
-      createdAt: new Date(),
-    }).returning();
+  // Work sessions operations
+  async createWorkSession(sessionData: InsertWorkSession): Promise<WorkSession> {
+    const [result] = await db
+      .insert(workSessions)
+      .values(sessionData)
+      .returning();
     return result;
   }
 
-  async getWorkSchedulesByDate(date: string): Promise<any[]> {
-    // Handle both date-only strings (YYYY-MM-DD) and full ISO strings
-    const targetDate = new Date(date);
-    const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-    const endDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1);
+  async getWorkSessionById(id: number): Promise<WorkSession | undefined> {
+    const [result] = await db.select().from(workSessions).where(eq(workSessions.id, id));
+    return result || undefined;
+  }
+
+  async updateWorkSession(id: number, sessionData: Partial<WorkSession>): Promise<WorkSession> {
+    const [result] = await db
+      .update(workSessions)
+      .set(sessionData)
+      .where(eq(workSessions.id, id))
+      .returning();
     
-    return await db.select({
-      id: workSchedules.id,
-      equipmentId: workSchedules.equipmentId,
-      workTypeId: workSchedules.workTypeId,
-      scheduledDate: workSchedules.scheduledDate,
-      briefingTime: workSchedules.briefingTime,
-      workerName: workSchedules.workerName,
-      specialNotes: workSchedules.specialNotes,
-      status: workSchedules.status,
-      createdAt: workSchedules.createdAt,
-      equipmentName: equipment.name,
-      equipmentCode: equipment.code,
-      workTypeName: workTypes.name,
-    })
-    .from(workSchedules)
-    .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
-    .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id))
-    .where(and(
-      gte(workSchedules.scheduledDate, startDate),
-      lt(workSchedules.scheduledDate, endDate)
-    ));
+    if (!result) throw new Error(`WorkSession with id ${id} not found`);
+    return result;
+  }
+
+  async getActiveWorkSessions(): Promise<WorkSession[]> {
+    return await db.select().from(workSessions);
+  }
+
+  // Risk reports operations
+  async createRiskReport(reportData: InsertRiskReport): Promise<RiskReport> {
+    const [result] = await db
+      .insert(riskReports)
+      .values(reportData)
+      .returning();
+    return result;
+  }
+
+  async getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]> {
+    return await db.select().from(riskReports).where(eq(riskReports.equipmentId, equipmentId));
+  }
+
+  // Work schedules operations
+  async createWorkSchedule(scheduleData: InsertWorkSchedule): Promise<WorkSchedule> {
+    const [result] = await db
+      .insert(workSchedules)
+      .values(scheduleData)
+      .returning();
+    return result;
+  }
+
+  async getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]> {
+    const targetDate = new Date(date);
+    return await db.select().from(workSchedules);
   }
 
   async getWorkScheduleById(id: number): Promise<WorkSchedule | undefined> {
     const [result] = await db.select().from(workSchedules).where(eq(workSchedules.id, id));
-    return result;
+    return result || undefined;
   }
 
   async updateWorkSchedule(id: number, scheduleData: Partial<WorkSchedule>): Promise<WorkSchedule> {
-    const [result] = await db.update(workSchedules)
+    const [result] = await db
+      .update(workSchedules)
       .set(scheduleData)
       .where(eq(workSchedules.id, id))
       .returning();
+    
+    if (!result) throw new Error(`WorkSchedule with id ${id} not found`);
     return result;
   }
 
@@ -346,24 +238,26 @@ export class DatabaseStorage implements IStorage {
 
   // Safety briefings operations
   async createSafetyBriefing(briefingData: InsertSafetyBriefing): Promise<SafetyBriefing> {
-    const [result] = await db.insert(safetyBriefings).values({
-      ...briefingData,
-      createdAt: new Date(),
-    }).returning();
+    const [result] = await db
+      .insert(safetyBriefings)
+      .values(briefingData)
+      .returning();
     return result;
   }
 
   async getSafetyBriefingByWorkScheduleId(workScheduleId: number): Promise<SafetyBriefing | undefined> {
-    const [result] = await db.select().from(safetyBriefings)
-      .where(eq(safetyBriefings.workScheduleId, workScheduleId));
-    return result;
+    const [result] = await db.select().from(safetyBriefings).where(eq(safetyBriefings.workScheduleId, workScheduleId));
+    return result || undefined;
   }
 
   async updateSafetyBriefing(id: number, briefingData: Partial<SafetyBriefing>): Promise<SafetyBriefing> {
-    const [result] = await db.update(safetyBriefings)
+    const [result] = await db
+      .update(safetyBriefings)
       .set(briefingData)
       .where(eq(safetyBriefings.id, id))
       .returning();
+    
+    if (!result) throw new Error(`SafetyBriefing with id ${id} not found`);
     return result;
   }
 }
