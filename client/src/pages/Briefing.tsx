@@ -314,8 +314,8 @@ export default function Briefing() {
                   <Shield className="w-6 h-6" />
                   AI 안전 브리핑
                 </DialogTitle>
-                <DialogDescription>
-                  {selectedWorkSchedule?.workTypeName} - {selectedWorkSchedule?.workerName}
+                <DialogDescription className="text-base font-medium">
+                  {selectedWorkSchedule?.equipmentName} - {selectedWorkSchedule?.workTypeName}
                 </DialogDescription>
               </DialogHeader>
 
