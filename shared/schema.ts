@@ -128,9 +128,7 @@ export const workSchedules = pgTable("work_schedules", {
   scheduledDate: timestamp("scheduled_date").notNull(),
   briefingTime: text("briefing_time"), // HH:MM format
   workerName: text("worker_name").notNull(),
-  workDescription: text("work_description"),
-  workVolume: text("work_volume"),
-  workScope: text("work_scope"),
+  specialNotes: text("special_notes"), // 특이사항
   status: text("status").default("scheduled"), // scheduled, completed, cancelled
   createdAt: timestamp("created_at").defaultNow(),
 });

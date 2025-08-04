@@ -41,9 +41,7 @@ const workScheduleSchema = z.object({
   scheduledDate: z.string().min(1, "작업 날짜를 입력해주세요"),
   briefingTime: z.string().optional(),
   workerName: z.string().min(1, "작업자명을 입력해주세요"),
-  workDescription: z.string().optional(),
-  workVolume: z.string().optional(),
-  workScope: z.string().optional(),
+  specialNotes: z.string().optional(),
 });
 
 type WorkScheduleFormData = z.infer<typeof workScheduleSchema>;
@@ -80,9 +78,7 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
       scheduledDate: format(new Date(), 'yyyy-MM-dd'),
       briefingTime: '08:00',
       workerName: '',
-      workDescription: '',
-      workVolume: '',
-      workScope: '',
+      specialNotes: '',
     },
   });
 
@@ -268,55 +264,26 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
               )}
             />
 
-            {/* Work Description */}
+            {/* Special Notes */}
             <FormField
               control={form.control}
-              name="workDescription"
+              name="specialNotes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>작업 내용</FormLabel>
+                  <FormLabel>특이사항</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="구체적인 작업 내용을 입력하세요"
+                      placeholder="안전상 주의사항이나 특별히 고려할 사항을 입력하세요"
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>
+                    작업 시 특별히 주의해야 할 사항이나 안전 고려사항
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Work Volume */}
-              <FormField
-                control={form.control}
-                name="workVolume"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>작업 물량</FormLabel>
-                    <FormControl>
-                      <Input placeholder="예: 5대, 10개소 등" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Work Scope */}
-              <FormField
-                control={form.control}
-                name="workScope"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>작업 범위</FormLabel>
-                    <FormControl>
-                      <Input placeholder="예: 전체, 일부, 특정 구역 등" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
