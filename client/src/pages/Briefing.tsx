@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2 } from "lucide-react";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -233,7 +233,10 @@ export default function Briefing() {
                                 <Clock className="w-4 h-4" />
                                 {schedule.briefingTime || '시간 미지정'}
                               </span>
-                              <span>작업자: {schedule.workerName}</span>
+                              <span className="flex items-center gap-1">
+                                <User className="w-4 h-4" />
+                                작업자: {schedule.workerName}
+                              </span>
                               {schedule.workLocation && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-4 h-4" />
