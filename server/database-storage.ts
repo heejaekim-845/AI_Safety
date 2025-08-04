@@ -298,19 +298,33 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]> {
+  async getWorkSchedulesByDate(date: string): Promise<any[]> {
     // Handle both date-only strings (YYYY-MM-DD) and full ISO strings
     const targetDate = new Date(date);
     const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
     const endDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1);
     
-
-    
-    return await db.select().from(workSchedules)
-      .where(and(
-        gte(workSchedules.scheduledDate, startDate),
-        lt(workSchedules.scheduledDate, endDate)
-      ));
+    return await db.select({
+      id: workSchedules.id,
+      equipmentId: workSchedules.equipmentId,
+      workTypeId: workSchedules.workTypeId,
+      scheduledDate: workSchedules.scheduledDate,
+      briefingTime: workSchedules.briefingTime,
+      workerName: workSchedules.workerName,
+      specialNotes: workSchedules.specialNotes,
+      status: workSchedules.status,
+      createdAt: workSchedules.createdAt,
+      equipmentName: equipment.name,
+      equipmentCode: equipment.code,
+      workTypeName: workTypes.name,
+    })
+    .from(workSchedules)
+    .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
+    .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id))
+    .where(and(
+      gte(workSchedules.scheduledDate, startDate),
+      lt(workSchedules.scheduledDate, endDate)
+    ));
   }
 
   async getWorkScheduleById(id: number): Promise<WorkSchedule | undefined> {

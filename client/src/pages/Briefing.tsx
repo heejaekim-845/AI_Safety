@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus } from "lucide-react";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -18,11 +18,12 @@ interface WorkSchedule {
   scheduledDate: string;
   briefingTime: string;
   workerName: string;
-  workDescription: string;
-  workVolume: string;
-  workScope: string;
+  specialNotes: string;
   status: string;
   createdAt: string;
+  equipmentName?: string;
+  equipmentCode?: string;
+  workTypeName?: string;
 }
 
 interface SafetyBriefingData {
@@ -84,10 +85,30 @@ export default function Briefing() {
     }
   });
 
+  // Delete work schedule mutation
+  const deleteScheduleMutation = useMutation({
+    mutationFn: async (scheduleId: number) => {
+      const response = await apiRequest('DELETE', `/api/work-schedules/${scheduleId}`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] });
+    },
+    onError: (error) => {
+      console.error('작업 일정 삭제 오류:', error);
+    }
+  });
+
   const handleGenerateBriefing = async (workSchedule: WorkSchedule) => {
     setSelectedWorkSchedule(workSchedule);
     setIsGenerating(true);
     generateBriefingMutation.mutate(workSchedule.id);
+  };
+
+  const handleDeleteSchedule = async (scheduleId: number) => {
+    if (confirm('이 작업 일정을 삭제하시겠습니까?')) {
+      deleteScheduleMutation.mutate(scheduleId);
+    }
   };
 
   const getRiskLevelColor = (level: string) => {
@@ -174,8 +195,13 @@ export default function Briefing() {
                     {workSchedules.map((schedule: WorkSchedule) => (
                       <div key={schedule.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h3 className="font-semibold text-lg">{schedule.workDescription || '작업 설명 없음'}</h3>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">
+                              {schedule.equipmentName && schedule.workTypeName 
+                                ? `${schedule.equipmentName} - ${schedule.workTypeName}`
+                                : '작업 설명 없음'
+                              }
+                            </h3>
                             <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" />
@@ -186,16 +212,41 @@ export default function Briefing() {
                                 {schedule.status === 'scheduled' ? '예정' : schedule.status}
                               </Badge>
                             </div>
+                            {schedule.specialNotes && (
+                              <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
+                                <span className="font-medium text-yellow-800">특이사항:</span> 
+                                <span className="text-yellow-700 ml-1">{schedule.specialNotes}</span>
+                              </div>
+                            )}
                           </div>
-                          <Button
-                            onClick={() => handleGenerateBriefing(schedule)}
-                            disabled={isGenerating}
-                            size="sm"
-                            className="bg-blue-600 hover:bg-blue-700"
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            AI 안전브리핑
-                          </Button>
+                          <div className="flex gap-2 ml-4">
+                            <WorkScheduleForm 
+                              trigger={
+                                <Button variant="outline" size="sm">
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              }
+                              editData={schedule}
+                              onSuccess={() => queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] })}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => handleGenerateBriefing(schedule)}
+                              disabled={isGenerating}
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700"
+                            >
+                              <Shield className="w-4 h-4 mr-2" />
+                              AI 안전브리핑
+                            </Button>
+                          </div>
                         </div>
                         
                         {schedule.workVolume && (

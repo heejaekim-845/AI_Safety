@@ -63,22 +63,28 @@ interface WorkType {
 interface WorkScheduleFormProps {
   trigger?: React.ReactNode;
   onSuccess?: () => void;
+  editData?: any; // Work schedule data for editing
 }
 
-export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) {
+export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleFormProps) {
   const [open, setOpen] = useState(false);
-  const [selectedEquipmentId, setSelectedEquipmentId] = useState<number | null>(null);
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState<number | null>(
+    editData?.equipmentId || null
+  );
   const queryClient = useQueryClient();
+  const isEditing = !!editData;
 
   const form = useForm<WorkScheduleFormData>({
     resolver: zodResolver(workScheduleSchema),
     defaultValues: {
-      equipmentId: 0,
-      workTypeId: 0,
-      scheduledDate: format(new Date(), 'yyyy-MM-dd'),
-      briefingTime: '08:00',
-      workerName: '',
-      specialNotes: '',
+      equipmentId: editData?.equipmentId || 0,
+      workTypeId: editData?.workTypeId || 0,
+      scheduledDate: editData?.scheduledDate 
+        ? format(new Date(editData.scheduledDate), 'yyyy-MM-dd')
+        : format(new Date(), 'yyyy-MM-dd'),
+      briefingTime: editData?.briefingTime || '08:00',
+      workerName: editData?.workerName || '',
+      specialNotes: editData?.specialNotes || '',
     },
   });
 
@@ -101,26 +107,32 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
     enabled: !!selectedEquipmentId,
   });
 
-  // Create work schedule mutation
-  const createScheduleMutation = useMutation({
+  // Create or update work schedule mutation
+  const saveScheduleMutation = useMutation({
     mutationFn: async (data: WorkScheduleFormData) => {
-      const response = await apiRequest('POST', '/api/work-schedules', {
+      const payload = {
         ...data,
         scheduledDate: new Date(data.scheduledDate).toISOString(),
-      });
+      };
+      
+      const response = isEditing
+        ? await apiRequest('PUT', `/api/work-schedules/${editData.id}`, payload)
+        : await apiRequest('POST', '/api/work-schedules', payload);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] });
       setOpen(false);
-      form.reset();
-      setSelectedEquipmentId(null);
+      if (!isEditing) {
+        form.reset();
+        setSelectedEquipmentId(null);
+      }
       onSuccess?.();
     },
   });
 
   const onSubmit = (data: WorkScheduleFormData) => {
-    createScheduleMutation.mutate(data);
+    saveScheduleMutation.mutate(data);
   };
 
   const handleEquipmentChange = (equipmentId: string) => {
@@ -144,10 +156,13 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
-            작업 일정 등록
+            {isEditing ? "작업 일정 수정" : "작업 일정 등록"}
           </DialogTitle>
           <DialogDescription>
-            새로운 작업 일정을 등록하고 안전 브리핑 시간을 설정합니다
+            {isEditing 
+              ? "작업 일정 정보를 수정하고 안전 브리핑 시간을 조정합니다"
+              : "새로운 작업 일정을 등록하고 안전 브리핑 시간을 설정합니다"
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -291,10 +306,13 @@ export function WorkScheduleForm({ trigger, onSuccess }: WorkScheduleFormProps) 
               </Button>
               <Button 
                 type="submit" 
-                disabled={createScheduleMutation.isPending}
+                disabled={saveScheduleMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                {createScheduleMutation.isPending ? "등록 중..." : "작업 일정 등록"}
+                {saveScheduleMutation.isPending 
+                  ? (isEditing ? "수정 중..." : "등록 중...") 
+                  : (isEditing ? "작업 일정 수정" : "작업 일정 등록")
+                }
               </Button>
             </div>
           </form>
