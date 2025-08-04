@@ -17,8 +17,7 @@ export class WeatherService {
   async getWeatherForLocation(location: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
-        console.warn('OpenWeather API key not found, using fallback data');
-        return this.getFallbackWeather(location);
+        throw new Error('OpenWeather API key not configured');
       }
 
       // Get real weather data from OpenWeatherMap API
@@ -47,8 +46,8 @@ export class WeatherService {
         console.warn(`Location "${location}" not found in OpenWeather API`);
       }
       
-      // Return fallback weather data if API fails
-      return this.getFallbackWeather(location);
+      // Throw error instead of returning fallback data
+      throw new Error(`날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
     }
   }
 
@@ -164,18 +163,7 @@ export class WeatherService {
     return desc;
   }
 
-  private getFallbackWeather(location: string): WeatherData {
-    console.log(`Using fallback weather data for location: ${location}`);
-    return {
-      location: location, // Use the actual location name provided
-      temperature: 18,
-      humidity: 60,
-      windSpeed: 5,
-      condition: '맑음',
-      description: '실시간 날씨 정보를 불러올 수 없어 기본값을 사용합니다. API 키 활성화를 확인해주세요.',
-      safetyWarnings: ['날씨 정보 확인 불가 - 현장 상황을 직접 확인하세요', 'API 연결 실패 - 수동으로 날씨 상황을 점검하세요']
-    };
-  }
+  // Remove fallback weather method - no mock data when API fails
 }
 
 export const weatherService = new WeatherService();

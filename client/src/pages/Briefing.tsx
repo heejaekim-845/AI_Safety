@@ -306,43 +306,56 @@ export default function Briefing() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Thermometer className="w-5 h-5" />
-                      날씨 정보 - {briefingData.weatherInfo.location}
+                      날씨 정보
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold">{briefingData.weatherInfo.temperature}°C</div>
-                        <div className="text-sm text-gray-600">기온</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold flex items-center justify-center">
-                          <Droplets className="w-5 h-5 mr-1" />
-                          {briefingData.weatherInfo.humidity}%
+                    {briefingData.weatherInfo ? (
+                      <>
+                        <div className="text-sm text-gray-600 mb-3">위치: {briefingData.weatherInfo.location}</div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">{briefingData.weatherInfo.temperature}°C</div>
+                            <div className="text-sm text-gray-600">기온</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold flex items-center justify-center">
+                              <Droplets className="w-5 h-5 mr-1" />
+                              {briefingData.weatherInfo.humidity}%
+                            </div>
+                            <div className="text-sm text-gray-600">습도</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold flex items-center justify-center">
+                              <Wind className="w-5 h-5 mr-1" />
+                              {briefingData.weatherInfo.windSpeed}m/s
+                            </div>
+                            <div className="text-sm text-gray-600">풍속</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">{briefingData.weatherInfo.condition}</div>
+                            <div className="text-sm text-gray-600">날씨</div>
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600">습도</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold flex items-center justify-center">
-                          <Wind className="w-5 h-5 mr-1" />
-                          {briefingData.weatherInfo.windSpeed}m/s
+                        
+                        {briefingData.weatherInfo.safetyWarnings && briefingData.weatherInfo.safetyWarnings.length > 0 && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <h4 className="font-semibold text-yellow-800 mb-2">날씨 안전 경고</h4>
+                            <ul className="space-y-1">
+                              {briefingData.weatherInfo.safetyWarnings.map((warning, index) => (
+                                <li key={index} className="text-yellow-700 text-sm">• {warning}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                        <div className="text-red-600 font-medium mb-2">실시간 날씨 정보 연결 실패</div>
+                        <div className="text-red-500 text-sm">
+                          날씨 API 연결에 실패했습니다. 현장에서 직접 날씨 상황을 확인하고 
+                          작업 전 안전 점검을 철저히 수행하세요.
                         </div>
-                        <div className="text-sm text-gray-600">풍속</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold">{briefingData.weatherInfo.condition}</div>
-                        <div className="text-sm text-gray-600">날씨</div>
-                      </div>
-                    </div>
-                    
-                    {briefingData.weatherInfo.safetyWarnings.length > 0 && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <h4 className="font-semibold text-yellow-800 mb-2">날씨 안전 경고</h4>
-                        <ul className="space-y-1">
-                          {briefingData.weatherInfo.safetyWarnings.map((warning, index) => (
-                            <li key={index} className="text-yellow-700 text-sm">• {warning}</li>
-                          ))}
-                        </ul>
                       </div>
                     )}
                   </CardContent>

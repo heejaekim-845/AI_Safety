@@ -693,7 +693,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get weather information using work location if available, otherwise use equipment location
       const weatherLocation = workSchedule.workLocation || equipment.location;
-      const weatherInfo = await weatherService.getWeatherForLocation(weatherLocation);
+      let weatherInfo = null;
+      
+      try {
+        weatherInfo = await weatherService.getWeatherForLocation(weatherLocation);
+      } catch (error) {
+        console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}): ${error.message}`);
+        // weatherInfo remains null - no mock data will be used
+      }
 
       // Get RAG data
       const regulations = await ragService.findRelevantRegulations(equipment.name, workType.name);

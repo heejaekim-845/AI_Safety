@@ -682,13 +682,13 @@ ${this.formatRisks(equipmentInfo)}
 - 예상 소요시간: ${workType.estimatedDuration || 60}분
 - 허가 필요: ${workType.requiresPermit ? '예' : '아니오'}
 
-날씨 정보:
+${weatherInfo ? `날씨 정보:
 - 위치: ${weatherInfo.location}
 - 기온: ${weatherInfo.temperature}°C
 - 습도: ${weatherInfo.humidity}%
 - 풍속: ${weatherInfo.windSpeed}m/s
 - 날씨: ${weatherInfo.condition}
-- 안전 경고: ${weatherInfo.safetyWarnings.join(', ')}
+- 안전 경고: ${weatherInfo.safetyWarnings.join(', ')}` : '날씨 정보: API 연결 실패로 실시간 날씨 정보를 가져올 수 없습니다. 현장에서 직접 날씨 상황을 확인하세요.'}
 
 관련 법규: ${ragData.regulations.map(r => r.title).join(', ')}
 관련 사고사례: ${ragData.incidents.length}건
