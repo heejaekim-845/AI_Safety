@@ -1,4 +1,5 @@
-import { ChromaApi, OpenAIEmbeddingFunction } from 'chromadb';
+// ChromaDB import commented out due to API inconsistencies
+// import { ChromaApi } from 'chromadb';
 import * as XLSX from 'xlsx';
 import { readFileSync } from 'fs';
 import path from 'path';
@@ -22,20 +23,17 @@ export interface AccidentCase {
 }
 
 class RAGService {
-  private chroma: ChromaApi;
-  private embeddingFunction: OpenAIEmbeddingFunction;
+  private chroma: any;
+  private embeddingFunction: any;
   private collectionName = 'accident_cases';
   private isInitialized = false;
 
   constructor() {
-    this.chroma = new ChromaApi({
-      path: "http://localhost:8000" // ChromaDB default URL
-    });
-    
-    this.embeddingFunction = new OpenAIEmbeddingFunction({
-      openai_api_key: process.env.OPENAI_API_KEY || '',
-      openai_model: 'text-embedding-3-small'
-    });
+    // ChromaDB initialization disabled due to API inconsistencies
+    // Will use fallback mode for accident case retrieval
+    console.warn('ChromaDB disabled, RAG service using fallback mode');
+    this.chroma = null;
+    this.embeddingFunction = null;
   }
 
   async initialize() {

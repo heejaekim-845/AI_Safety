@@ -131,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } catch (aiError) {
         console.error("AI 위험도 평가 실패:", aiError);
-        console.error("AI 오류 스택:", aiError.stack);
+        console.error("AI 오류 스택:", String(aiError));
         // AI 평가 실패 시 기존 값 유지
       }
       
@@ -140,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(equipment);
     } catch (error) {
       console.error("설비 업데이트 오류:", error);
-      console.error("오류 스택:", error.stack);
+      console.error("오류 스택:", String(error));
       if (error instanceof z.ZodError) {
         console.error("Zod 검증 오류:", error.errors);
         return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
@@ -387,8 +387,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // AI analysis
       const aiAnalysis = await aiService.analyzeRiskReport(
         equipment,
-        reportData.riskDescription,
-        reportData.reportedBy
+        reportData.description,
+        reportData.reporterName
       );
 
       const enrichedReport = {
@@ -544,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Work type not found" });
       }
 
-      const equipment = await storage.getEquipmentById(workType.equipmentId);
+      const equipment = await storage.getEquipmentById(workType.equipmentId!);
       if (!equipment) {
         return res.status(404).json({ message: "Equipment not found" });
       }
@@ -682,8 +682,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get related data
-      const equipment = await storage.getEquipmentById(workSchedule.equipmentId);
-      const workType = await storage.getWorkTypeById(workSchedule.workTypeId);
+      const equipment = await storage.getEquipmentById(workSchedule.equipmentId!);
+      const workType = await storage.getWorkTypeById(workSchedule.workTypeId!);
       
       if (!equipment || !workType) {
         return res.status(404).json({ message: "설비 또는 작업 유형을 찾을 수 없습니다." });
@@ -698,7 +698,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         weatherInfo = await weatherService.getWeatherForLocation(weatherLocation);
       } catch (error) {
-        console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}): ${error.message}`);
+        console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}): ${String(error)}`);
         // weatherInfo remains null - no mock data will be used
       }
 
@@ -707,7 +707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         equipment,
         workType,
         weatherInfo,
-        workSchedule.specialNotes
+        workSchedule.specialNotes || undefined
       );
 
       // Create complete briefing data

@@ -291,15 +291,9 @@ export default function Briefing() {
                           </div>
                         </div>
                         
-                        {schedule.workVolume && (
+                        {schedule.specialNotes && (
                           <div className="text-sm text-gray-600">
-                            <span className="font-medium">작업 물량:</span> {schedule.workVolume}
-                          </div>
-                        )}
-                        
-                        {schedule.workScope && (
-                          <div className="text-sm text-gray-600">
-                            <span className="font-medium">작업 범위:</span> {schedule.workScope}
+                            <span className="font-medium">특이사항:</span> {schedule.specialNotes}
                           </div>
                         )}
                       </div>
@@ -321,7 +315,7 @@ export default function Briefing() {
                   AI 안전 브리핑
                 </DialogTitle>
                 <DialogDescription>
-                  {selectedWorkSchedule?.workDescription} - {selectedWorkSchedule?.workerName}
+                  {selectedWorkSchedule?.workTypeName} - {selectedWorkSchedule?.workerName}
                 </DialogDescription>
               </DialogHeader>
 
@@ -558,7 +552,7 @@ export default function Briefing() {
                 </div>
 
                 {/* RAG-Based Related Accident Cases */}
-                {briefingData.relatedAccidentCases && briefingData.relatedAccidentCases.length > 0 && (
+                {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 && (
                   <Card className="border-orange-200">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-orange-700">
@@ -571,7 +565,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {briefingData.relatedAccidentCases.map((accident: any, index: number) => (
+                        {briefingData.relatedIncidents.map((accident: any, index: number) => (
                           <div key={index} className="border-l-4 border-orange-400 pl-4 py-3 bg-orange-50 rounded-r-lg">
                             <div className="flex items-start justify-between mb-2">
                               <h4 className="font-semibold text-orange-900">{accident.title}</h4>
