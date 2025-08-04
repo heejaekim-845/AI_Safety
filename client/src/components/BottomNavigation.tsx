@@ -6,7 +6,8 @@ import {
   LayoutDashboard, 
   ClipboardList, 
   Shield,
-  Settings 
+  Settings,
+  User
 } from "lucide-react";
 
 interface BottomNavigationProps {
@@ -37,13 +38,13 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
     {
       id: "work",
       label: "작업",
-      icon: ClipboardList,
+      icon: User,
       path: `/equipment/${currentEquipmentId}/work-types`
     },
     {
       id: "briefing",
       label: "브리핑",
-      icon: Shield,
+      icon: ClipboardList,
       path: "/briefing"
     },
     {
