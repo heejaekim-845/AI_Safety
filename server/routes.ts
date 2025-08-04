@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { aiService } from "./ai-service";
+import { weatherService } from "./weather-service";
+import { ragService } from "./rag-service";
 import { z } from "zod";
 import { 
   insertEquipmentSchema, 
@@ -9,7 +11,9 @@ import {
   insertWorkProcedureSchema,
   insertWorkSessionSchema,
   insertRiskReportSchema,
-  insertIncidentSchema
+  insertIncidentSchema,
+  insertWorkScheduleSchema,
+  insertSafetyBriefingSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -550,6 +554,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Work type risk assessment error:", error);
       res.status(500).json({ message: "Failed to perform risk assessment" });
+    }
+  });
+
+  // Work schedules routes
+  app.post("/api/work-schedules", async (req, res) => {
+    try {
+      const scheduleData = insertWorkScheduleSchema.parse(req.body);
+      const schedule = await storage.createWorkSchedule(scheduleData);
+      res.status(201).json(schedule);
+    } catch (error) {
+      console.error("작업 일정 생성 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "작업 일정을 생성할 수 없습니다." });
+    }
+  });
+
+  app.get("/api/work-schedules", async (req, res) => {
+    try {
+      const date = req.query.date as string;
+      if (!date) {
+        return res.status(400).json({ message: "날짜가 필요합니다." });
+      }
+      const schedules = await storage.getWorkSchedulesByDate(date);
+      res.json(schedules);
+    } catch (error) {
+      console.error("작업 일정 조회 오류:", error);
+      res.status(500).json({ message: "작업 일정을 불러올 수 없습니다." });
+    }
+  });
+
+  app.get("/api/work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const schedule = await storage.getWorkScheduleById(id);
+      if (!schedule) {
+        return res.status(404).json({ message: "작업 일정을 찾을 수 없습니다." });
+      }
+      res.json(schedule);
+    } catch (error) {
+      console.error("작업 일정 조회 오류:", error);
+      res.status(500).json({ message: "작업 일정을 불러올 수 없습니다." });
+    }
+  });
+
+  app.put("/api/work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const scheduleData = insertWorkScheduleSchema.partial().parse(req.body);
+      const schedule = await storage.updateWorkSchedule(id, scheduleData);
+      res.json(schedule);
+    } catch (error) {
+      console.error("작업 일정 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "작업 일정을 수정할 수 없습니다." });
+    }
+  });
+
+  app.delete("/api/work-schedules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteWorkSchedule(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("작업 일정 삭제 오류:", error);
+      res.status(500).json({ message: "작업 일정을 삭제할 수 없습니다." });
+    }
+  });
+
+  // Safety briefings routes  
+  app.post("/api/safety-briefings", async (req, res) => {
+    try {
+      const briefingData = insertSafetyBriefingSchema.parse(req.body);
+      const briefing = await storage.createSafetyBriefing(briefingData);
+      res.status(201).json(briefing);
+    } catch (error) {
+      console.error("안전 브리핑 생성 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "안전 브리핑을 생성할 수 없습니다." });
+    }
+  });
+
+  app.get("/api/safety-briefings/work-schedule/:workScheduleId", async (req, res) => {
+    try {
+      const workScheduleId = parseInt(req.params.workScheduleId);
+      const briefing = await storage.getSafetyBriefingByWorkScheduleId(workScheduleId);
+      if (!briefing) {
+        return res.status(404).json({ message: "안전 브리핑을 찾을 수 없습니다." });
+      }
+      res.json(briefing);
+    } catch (error) {
+      console.error("안전 브리핑 조회 오류:", error);
+      res.status(500).json({ message: "안전 브리핑을 불러올 수 없습니다." });
+    }
+  });
+
+  app.put("/api/safety-briefings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const briefingData = insertSafetyBriefingSchema.partial().parse(req.body);
+      const briefing = await storage.updateSafetyBriefing(id, briefingData);
+      res.json(briefing);
+    } catch (error) {
+      console.error("안전 브리핑 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "안전 브리핑을 수정할 수 없습니다." });
+    }
+  });
+
+  // Generate comprehensive safety briefing
+  app.post("/api/generate-safety-briefing/:workScheduleId", async (req, res) => {
+    try {
+      const workScheduleId = parseInt(req.params.workScheduleId);
+      
+      // Get work schedule
+      const workSchedule = await storage.getWorkScheduleById(workScheduleId);
+      if (!workSchedule) {
+        return res.status(404).json({ message: "작업 일정을 찾을 수 없습니다." });
+      }
+
+      // Get related data
+      const equipment = await storage.getEquipmentById(workSchedule.equipmentId);
+      const workType = await storage.getWorkTypeById(workSchedule.workTypeId);
+      
+      if (!equipment || !workType) {
+        return res.status(404).json({ message: "설비 또는 작업 유형을 찾을 수 없습니다." });
+      }
+
+      // Services are imported at the top of the file
+
+      // Get weather information
+      const weatherInfo = await weatherService.getWeatherForLocation(equipment.location);
+
+      // Get RAG data
+      const regulations = await ragService.findRelevantRegulations(equipment.name, workType.name);
+      const incidents = await ragService.findSimilarIncidents(equipment.name, workType.name);
+      const educationMaterials = await ragService.findEducationMaterials(equipment.name, workType.name);
+      const quizQuestions = await ragService.generateQuizQuestions(equipment.name, workType.name);
+      const safetySlogan = await ragService.getSafetySlogan(equipment.name, workType.name);
+
+      const ragData = {
+        regulations,
+        incidents,
+        educationMaterials,
+        quizQuestions,
+        safetySlogan
+      };
+
+      // Generate comprehensive AI briefing
+      const aiAnalysis = await aiService.generateSafetyBriefing(
+        workSchedule,
+        equipment,
+        workType,
+        weatherInfo,
+        ragData
+      );
+
+      // Create complete briefing data
+      const briefingData = {
+        workScheduleId,
+        weatherInfo,
+        workSummary: aiAnalysis.workSummary,
+        riskFactors: aiAnalysis.riskFactors,
+        riskAssessment: aiAnalysis.riskAssessment,
+        requiredTools: aiAnalysis.requiredTools,
+        requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
+        regulations,
+        relatedIncidents: incidents,
+        educationMaterials,
+        quizQuestions,
+        safetySlogan
+      };
+
+      // Save to database
+      const briefing = await storage.createSafetyBriefing(briefingData);
+
+      res.json({
+        briefing,
+        weatherInfo,
+        workSummary: aiAnalysis.workSummary,
+        riskFactors: aiAnalysis.riskFactors,
+        riskAssessment: aiAnalysis.riskAssessment,
+        requiredTools: aiAnalysis.requiredTools,
+        requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
+        weatherConsiderations: aiAnalysis.weatherConsiderations,
+        safetyRecommendations: aiAnalysis.safetyRecommendations,
+        regulations,
+        relatedIncidents: incidents,
+        educationMaterials,
+        quizQuestions,
+        safetySlogan
+      });
+    } catch (error) {
+      console.error("안전 브리핑 생성 오류:", error);
+      res.status(500).json({ message: "안전 브리핑을 생성할 수 없습니다." });
     }
   });
 

@@ -1,0 +1,515 @@
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus } from "lucide-react";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { apiRequest } from "@/lib/queryClient";
+import { WorkScheduleForm } from "@/components/WorkScheduleForm";
+
+interface WorkSchedule {
+  id: number;
+  equipmentId: number;
+  workTypeId: number;
+  scheduledDate: string;
+  briefingTime: string;
+  workerName: string;
+  workDescription: string;
+  workVolume: string;
+  workScope: string;
+  status: string;
+  createdAt: string;
+}
+
+interface SafetyBriefingData {
+  briefing: any;
+  weatherInfo: {
+    location: string;
+    temperature: number;
+    humidity: number;
+    windSpeed: number;
+    condition: string;
+    description: string;
+    safetyWarnings: string[];
+  };
+  workSummary: string;
+  riskFactors: string[];
+  riskAssessment: any;
+  requiredTools: string[];
+  requiredSafetyEquipment: string[];
+  weatherConsiderations: string[];
+  safetyRecommendations: string[];
+  regulations: any[];
+  relatedIncidents: any[];
+  educationMaterials: any[];
+  quizQuestions: any[];
+  safetySlogan: string;
+}
+
+export default function Briefing() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedWorkSchedule, setSelectedWorkSchedule] = useState<WorkSchedule | null>(null);
+  const [briefingData, setBriefingData] = useState<SafetyBriefingData | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const queryClient = useQueryClient();
+
+  const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+  // Fetch work schedules for selected date
+  const { data: workSchedules = [], isLoading: schedulesLoading } = useQuery({
+    queryKey: ['/api/work-schedules', dateString],
+    queryFn: () => apiRequest(`/api/work-schedules?date=${dateString}`),
+  });
+
+  // Generate safety briefing mutation
+  const generateBriefingMutation = useMutation({
+    mutationFn: (workScheduleId: number) => 
+      apiRequest(`/api/generate-safety-briefing/${workScheduleId}`, {
+        method: 'POST'
+      }),
+    onSuccess: (data) => {
+      setBriefingData(data);
+      setIsGenerating(false);
+    },
+    onError: (error) => {
+      console.error('브리핑 생성 오류:', error);
+      setIsGenerating(false);
+    }
+  });
+
+  const handleGenerateBriefing = async (workSchedule: WorkSchedule) => {
+    setSelectedWorkSchedule(workSchedule);
+    setIsGenerating(true);
+    generateBriefingMutation.mutate(workSchedule.id);
+  };
+
+  const getRiskLevelColor = (level: string) => {
+    switch (level?.toUpperCase()) {
+      case 'HIGH': return 'bg-red-100 text-red-800 border-red-200';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'LOW': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                AI 기반 안전 브리핑 시스템
+              </h1>
+              <p className="text-gray-600">
+                일일 작업 안전 브리핑을 AI 기술로 자동 생성하고 관리합니다
+              </p>
+            </div>
+            <WorkScheduleForm 
+              trigger={
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  작업 일정 등록
+                </Button>
+              }
+              onSuccess={() => queryClient.invalidateQueries({ queryKey: ['/api/work-schedules'] })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Date Selection Panel */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5" />
+                  날짜 선택
+                </CardTitle>
+                <CardDescription>
+                  브리핑을 확인할 작업 날짜를 선택하세요
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  locale={ko}
+                  className="rounded-md border"
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Work Schedules Panel */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {format(selectedDate, 'PPP', { locale: ko })} 작업 일정
+                </CardTitle>
+                <CardDescription>
+                  선택한 날짜의 작업 목록과 안전 브리핑
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {schedulesLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : workSchedules.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    선택한 날짜에 등록된 작업이 없습니다.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {workSchedules.map((schedule: WorkSchedule) => (
+                      <div key={schedule.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-semibold text-lg">{schedule.workDescription || '작업 설명 없음'}</h3>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                {schedule.briefingTime || '시간 미지정'}
+                              </span>
+                              <span>작업자: {schedule.workerName}</span>
+                              <Badge variant={schedule.status === 'scheduled' ? 'default' : 'secondary'}>
+                                {schedule.status === 'scheduled' ? '예정' : schedule.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => handleGenerateBriefing(schedule)}
+                            disabled={isGenerating}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            AI 안전브리핑
+                          </Button>
+                        </div>
+                        
+                        {schedule.workVolume && (
+                          <div className="text-sm text-gray-600">
+                            <span className="font-medium">작업 물량:</span> {schedule.workVolume}
+                          </div>
+                        )}
+                        
+                        {schedule.workScope && (
+                          <div className="text-sm text-gray-600">
+                            <span className="font-medium">작업 범위:</span> {schedule.workScope}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Safety Briefing Dialog */}
+        {briefingData && (
+          <Dialog open={!!briefingData} onOpenChange={() => setBriefingData(null)}>
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <Shield className="w-6 h-6" />
+                  AI 안전 브리핑
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedWorkSchedule?.workDescription} - {selectedWorkSchedule?.workerName}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6">
+                {/* Today's Safety Slogan */}
+                <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <h3 className="font-bold text-lg text-blue-800 mb-2">오늘의 안전구호</h3>
+                      <p className="text-blue-700 text-lg font-medium">{briefingData.safetySlogan}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Weather Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Thermometer className="w-5 h-5" />
+                      날씨 정보
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{briefingData.weatherInfo.temperature}°C</div>
+                        <div className="text-sm text-gray-600">기온</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold flex items-center justify-center">
+                          <Droplets className="w-5 h-5 mr-1" />
+                          {briefingData.weatherInfo.humidity}%
+                        </div>
+                        <div className="text-sm text-gray-600">습도</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold flex items-center justify-center">
+                          <Wind className="w-5 h-5 mr-1" />
+                          {briefingData.weatherInfo.windSpeed}m/s
+                        </div>
+                        <div className="text-sm text-gray-600">풍속</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{briefingData.weatherInfo.condition}</div>
+                        <div className="text-sm text-gray-600">날씨</div>
+                      </div>
+                    </div>
+                    
+                    {briefingData.weatherInfo.safetyWarnings.length > 0 && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <h4 className="font-semibold text-yellow-800 mb-2">날씨 안전 경고</h4>
+                        <ul className="space-y-1">
+                          {briefingData.weatherInfo.safetyWarnings.map((warning, index) => (
+                            <li key={index} className="text-yellow-700 text-sm">• {warning}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Work Summary and Risk Assessment */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>작업 내용 요약</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700">{briefingData.workSummary}</p>
+                      
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2">주요 위험 요인</h4>
+                        <ul className="space-y-1">
+                          {briefingData.riskFactors.map((factor, index) => (
+                            <li key={index} className="flex items-center gap-2">
+                              <AlertTriangle className="w-4 h-4 text-orange-500" />
+                              <span className="text-sm">{factor}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>위험성 평가 결과</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">종합 위험도</span>
+                          <Badge className={getRiskLevelColor(briefingData.riskAssessment.overallRiskLevel)}>
+                            {briefingData.riskAssessment.overallRiskLevel}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          총점: {briefingData.riskAssessment.totalScore}점
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {briefingData.riskAssessment.riskFactors?.slice(0, 3).map((risk: any, index: number) => (
+                          <div key={index} className="border-l-4 border-orange-400 pl-3 py-1">
+                            <div className="font-medium text-sm">{risk.factor}</div>
+                            <div className="text-xs text-gray-600">
+                              위험점수: {risk.score}점 (가능성:{risk.probability} × 심각도:{risk.severity})
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Required Tools and Safety Equipment */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>필요한 작업도구</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {briefingData.requiredTools.map((tool, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>{tool}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>필요한 안전장비</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {briefingData.requiredSafetyEquipment.map((equipment, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-green-500" />
+                            <span>{equipment}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Safety Recommendations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>안전 권고사항</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {briefingData.safetyRecommendations.map((recommendation, index) => (
+                        <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
+                          <div className="flex items-start gap-2">
+                            <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                              {index + 1}
+                            </div>
+                            <span className="text-green-800">{recommendation}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Related Information Tabs */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">관련 법령 및 규정</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {briefingData.regulations.map((reg: any, index) => (
+                          <div key={index} className="text-xs p-2 bg-gray-50 rounded">
+                            <div className="font-medium">{reg.title}</div>
+                            <div className="text-gray-600 mt-1">{reg.category}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">관련 사고이력</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {briefingData.relatedIncidents.map((incident: any, index) => (
+                          <div key={index} className="text-xs p-2 bg-red-50 rounded border border-red-200">
+                            <div className="font-medium text-red-800">{incident.title}</div>
+                            <div className="text-red-600 mt-1">위험도: {incident.severity}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">교육자료</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {briefingData.educationMaterials.map((material: any, index) => (
+                          <div key={index} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
+                            <div className="font-medium text-blue-800">{material.title}</div>
+                            <div className="text-blue-600 mt-1">{material.type}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Safety Quiz Section */}
+                {briefingData.quizQuestions.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        안전 이해도 확인 퀴즈
+                      </CardTitle>
+                      <CardDescription>
+                        작업 안전에 대한 이해도를 확인하는 객관식 문제입니다
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {briefingData.quizQuestions.slice(0, 3).map((quiz: any, index) => (
+                          <div key={index} className="border rounded-lg p-4">
+                            <h4 className="font-medium mb-3">Q{index + 1}. {quiz.question}</h4>
+                            <div className="space-y-2">
+                              {quiz.options.map((option: string, optIndex: number) => (
+                                <div key={optIndex} className="flex items-center gap-2">
+                                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm ${
+                                    optIndex === quiz.correctAnswer 
+                                      ? 'bg-green-100 border-green-500 text-green-700' 
+                                      : 'border-gray-300'
+                                  }`}>
+                                    {optIndex + 1}
+                                  </div>
+                                  <span className={optIndex === quiz.correctAnswer ? 'text-green-700 font-medium' : ''}>
+                                    {option}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-3 p-3 bg-green-50 rounded text-sm text-green-800">
+                              <strong>해설:</strong> {quiz.explanation}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Loading State */}
+        {isGenerating && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <h3 className="text-lg font-semibold mb-2">AI 안전 브리핑 생성 중...</h3>
+                <p className="text-gray-600">
+                  종합적인 안전 분석을 수행하고 있습니다. 잠시만 기다려주세요.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -637,6 +637,133 @@ ${this.formatRisks(equipmentInfo)}
       };
     }
   }
+
+  async generateSafetyBriefing(
+    workSchedule: any,
+    equipment: any,
+    workType: any,
+    weatherInfo: any,
+    ragData: {
+      regulations: any[];
+      incidents: any[];
+      educationMaterials: any[];
+      quizQuestions: any[];
+      safetySlogan: string;
+    }
+  ): Promise<{
+    workSummary: string;
+    riskFactors: string[];
+    riskAssessment: any;
+    requiredTools: string[];
+    requiredSafetyEquipment: string[];
+    weatherConsiderations: string[];
+    safetyRecommendations: string[];
+  }> {
+    try {
+      const prompt = `다음 정보를 바탕으로 종합적인 AI 안전 브리핑을 생성해주세요.
+
+작업 일정 정보:
+- 작업일: ${new Date(workSchedule.scheduledDate).toLocaleDateString('ko-KR')}
+- 작업자: ${workSchedule.workerName}
+- 작업 설명: ${workSchedule.workDescription || ''}
+- 작업 물량: ${workSchedule.workVolume || '표준'}
+- 작업 범위: ${workSchedule.workScope || '일반'}
+
+설비 정보:
+- 설비명: ${equipment.name}
+- 위치: ${equipment.location}
+- 제조사: ${equipment.manufacturer || '정보 없음'}
+- 설치연도: ${equipment.installYear || '정보 없음'}
+- 주요 위험요소: ${this.formatRisks(equipment)}
+
+작업 유형:
+- 작업명: ${workType.name}
+- 설명: ${workType.description || ''}
+- 예상 소요시간: ${workType.estimatedDuration || 60}분
+- 허가 필요: ${workType.requiresPermit ? '예' : '아니오'}
+
+날씨 정보:
+- 위치: ${weatherInfo.location}
+- 기온: ${weatherInfo.temperature}°C
+- 습도: ${weatherInfo.humidity}%
+- 풍속: ${weatherInfo.windSpeed}m/s
+- 날씨: ${weatherInfo.condition}
+- 안전 경고: ${weatherInfo.safetyWarnings.join(', ')}
+
+관련 법규: ${ragData.regulations.map(r => r.title).join(', ')}
+관련 사고사례: ${ragData.incidents.length}건
+교육자료: ${ragData.educationMaterials.length}건
+
+다음 형식으로 JSON 응답을 제공해주세요:
+{
+  "workSummary": "작업 내용 종합 요약 (물량, 범위 포함)",
+  "riskFactors": ["주요 위험요인1", "주요 위험요인2", ...],
+  "requiredTools": ["필요한 작업도구1", "필요한 작업도구2", ...],
+  "requiredSafetyEquipment": ["필요한 안전장비1", "필요한 안전장비2", ...],
+  "weatherConsiderations": ["날씨 고려사항1", "날씨 고려사항2", ...],
+  "safetyRecommendations": ["안전 권고사항1", "안전 권고사항2", ...]
+}`;
+
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업 안전 전문가입니다. 종합적이고 실용적인 안전 브리핑을 생성합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              workSummary: { type: "string" },
+              riskFactors: { type: "array", items: { type: "string" } },
+              requiredTools: { type: "array", items: { type: "string" } },
+              requiredSafetyEquipment: { type: "array", items: { type: "string" } },
+              weatherConsiderations: { type: "array", items: { type: "string" } },
+              safetyRecommendations: { type: "array", items: { type: "string" } }
+            },
+            required: ["workSummary", "riskFactors", "requiredTools", "requiredSafetyEquipment", "weatherConsiderations", "safetyRecommendations"]
+          }
+        },
+        contents: prompt
+      });
+
+      const result = JSON.parse(response.text || "{}");
+
+      // Generate risk assessment
+      const riskAssessment = await this.analyzeWorkTypeRisk(
+        workType.id,
+        workType.name,
+        equipment
+      );
+
+      return {
+        workSummary: result.workSummary || `${workType.name} 작업을 ${equipment.name}에서 수행합니다.`,
+        riskFactors: result.riskFactors || ["설비 특성상 위험 요소 확인 필요"],
+        riskAssessment,
+        requiredTools: result.requiredTools || ["기본 작업도구", "점검용 계측기"],
+        requiredSafetyEquipment: result.requiredSafetyEquipment || ["안전모", "안전화", "보호안경"],
+        weatherConsiderations: result.weatherConsiderations || [`${weatherInfo.condition} 날씨 고려`],
+        safetyRecommendations: result.safetyRecommendations || ["작업 전 안전점검 실시", "LOTO 절차 준수"]
+      };
+    } catch (error) {
+      console.error("AI 안전 브리핑 생성 오류:", error);
+      
+      // Fallback briefing
+      const riskAssessment = await this.analyzeWorkTypeRisk(
+        workType.id,
+        workType.name,
+        equipment
+      );
+
+      return {
+        workSummary: `${workType.name} 작업을 ${equipment.name}에서 안전하게 수행합니다.`,
+        riskFactors: ["설비 고유 위험성", "작업 환경 위험성"],
+        riskAssessment,
+        requiredTools: ["표준 작업도구", "안전 점검 도구"],
+        requiredSafetyEquipment: ["안전모", "안전화", "보호안경", "안전장갑"],
+        weatherConsiderations: [`현재 날씨: ${weatherInfo.condition}`],
+        safetyRecommendations: ["작업 전 안전점검", "표준 작업절차 준수", "비상연락망 확인"]
+      };
+    }
+  }
 }
 
 export const aiService = new AIService();

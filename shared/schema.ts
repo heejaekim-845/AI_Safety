@@ -120,6 +120,39 @@ export const riskReports = pgTable("risk_reports", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Work schedules table
+export const workSchedules = pgTable("work_schedules", {
+  id: serial("id").primaryKey(),
+  equipmentId: integer("equipment_id").references(() => equipment.id),
+  workTypeId: integer("work_type_id").references(() => workTypes.id),
+  scheduledDate: timestamp("scheduled_date").notNull(),
+  briefingTime: text("briefing_time"), // HH:MM format
+  workerName: text("worker_name").notNull(),
+  workDescription: text("work_description"),
+  workVolume: text("work_volume"),
+  workScope: text("work_scope"),
+  status: text("status").default("scheduled"), // scheduled, completed, cancelled
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Safety briefings table
+export const safetyBriefings = pgTable("safety_briefings", {
+  id: serial("id").primaryKey(),
+  workScheduleId: integer("work_schedule_id").references(() => workSchedules.id),
+  weatherInfo: jsonb("weather_info"),
+  workSummary: text("work_summary"),
+  riskFactors: jsonb("risk_factors"),
+  riskAssessment: jsonb("risk_assessment"),
+  requiredTools: text("required_tools").array(),
+  requiredSafetyEquipment: text("required_safety_equipment").array(),
+  regulations: jsonb("regulations"),
+  relatedIncidents: jsonb("related_incidents"),
+  educationMaterials: jsonb("education_materials"),
+  quizQuestions: jsonb("quiz_questions"),
+  safetySlogan: text("safety_slogan"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertEquipmentSchema = createInsertSchema(equipment).omit({
   id: true,
@@ -152,11 +185,27 @@ export const insertIncidentSchema = createInsertSchema(incidents).omit({
 
 export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
   id: true,
-  startedAt: true,
-  completedAt: true,
+  createdAt: true,
 });
 
 export const insertRiskReportSchema = createInsertSchema(riskReports).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWorkScheduleSchema = createInsertSchema(workSchedules).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  scheduledDate: z.union([z.string(), z.date()]).transform((val) => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }),
+});
+
+export const insertSafetyBriefingSchema = createInsertSchema(safetyBriefings).omit({
   id: true,
   createdAt: true,
 });
@@ -179,3 +228,9 @@ export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
 
 export type RiskReport = typeof riskReports.$inferSelect;
 export type InsertRiskReport = z.infer<typeof insertRiskReportSchema>;
+
+export type WorkSchedule = typeof workSchedules.$inferSelect;
+export type InsertWorkSchedule = z.infer<typeof insertWorkScheduleSchema>;
+
+export type SafetyBriefing = typeof safetyBriefings.$inferSelect;
+export type InsertSafetyBriefing = z.infer<typeof insertSafetyBriefingSchema>;

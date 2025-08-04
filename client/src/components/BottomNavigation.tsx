@@ -5,6 +5,7 @@ import {
   QrCode, 
   LayoutDashboard, 
   ClipboardList, 
+  Shield,
   Settings 
 } from "lucide-react";
 
@@ -40,6 +41,12 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
       path: `/equipment/${currentEquipmentId}/work-types`
     },
     {
+      id: "briefing",
+      label: "브리핑",
+      icon: Shield,
+      path: "/briefing"
+    },
+    {
       id: "admin",
       label: "관리",
       icon: Settings,
@@ -53,8 +60,8 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/50 max-w-md mx-auto z-40 h-20 shadow-2xl">
-      <div className="grid grid-cols-4 py-2 px-2">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/50 max-w-full mx-auto z-40 h-20 shadow-2xl">
+      <div className="grid grid-cols-5 py-2 px-2 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;

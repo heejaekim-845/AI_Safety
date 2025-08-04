@@ -8,6 +8,7 @@ import EquipmentDashboard from "@/pages/EquipmentDashboard";
 import WorkTypeSelection from "@/pages/WorkTypeSelection";
 import WorkProcedure from "@/pages/WorkProcedure";
 import WorkManagement from "@/pages/WorkManagement";
+import Briefing from "@/pages/Briefing";
 import AdminPanel from "@/pages/AdminPanel";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
@@ -24,6 +25,8 @@ function Router() {
       setActiveTab("work");
     } else if (location.startsWith("/equipment/")) {
       setActiveTab("dashboard");
+    } else if (location === "/briefing") {
+      setActiveTab("briefing");
     } else if (location === "/admin") {
       setActiveTab("admin");
     }
@@ -57,7 +60,7 @@ function Router() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto bg-white min-h-[calc(100vh-140px)] pb-20">
+      <div className="max-w-full mx-auto bg-white min-h-[calc(100vh-140px)] pb-20">
         <Switch>
           <Route path="/" component={QRScanner} />
           <Route path="/equipment/:id" component={EquipmentDashboard} />
@@ -65,6 +68,7 @@ function Router() {
           <Route path="/equipment/:equipmentId/work-management" component={WorkManagement} />
           <Route path="/work-management/:equipmentId" component={WorkManagement} />
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
+          <Route path="/briefing" component={Briefing} />
           <Route path="/admin" component={AdminPanel} />
         </Switch>
       </div>

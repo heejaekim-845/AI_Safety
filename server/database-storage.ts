@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, gte, lt } from "drizzle-orm";
 import { db } from "./db";
 import {
   equipment,
@@ -7,6 +7,8 @@ import {
   incidents,
   workSessions,
   riskReports,
+  workSchedules,
+  safetyBriefings,
   type Equipment,
   type InsertEquipment,
   type WorkType,
@@ -19,6 +21,10 @@ import {
   type InsertWorkSession,
   type RiskReport,
   type InsertRiskReport,
+  type WorkSchedule,
+  type InsertWorkSchedule,
+  type SafetyBriefing,
+  type InsertSafetyBriefing,
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 
@@ -281,5 +287,69 @@ export class DatabaseStorage implements IStorage {
 
   async deleteIncident(id: number): Promise<void> {
     await db.delete(incidents).where(eq(incidents.id, id));
+  }
+
+  // Work schedules operations
+  async createWorkSchedule(scheduleData: InsertWorkSchedule): Promise<WorkSchedule> {
+    const [result] = await db.insert(workSchedules).values({
+      ...scheduleData,
+      createdAt: new Date(),
+    }).returning();
+    return result;
+  }
+
+  async getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]> {
+    // Handle both date-only strings (YYYY-MM-DD) and full ISO strings
+    const targetDate = new Date(date);
+    const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const endDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1);
+    
+
+    
+    return await db.select().from(workSchedules)
+      .where(and(
+        gte(workSchedules.scheduledDate, startDate),
+        lt(workSchedules.scheduledDate, endDate)
+      ));
+  }
+
+  async getWorkScheduleById(id: number): Promise<WorkSchedule | undefined> {
+    const [result] = await db.select().from(workSchedules).where(eq(workSchedules.id, id));
+    return result;
+  }
+
+  async updateWorkSchedule(id: number, scheduleData: Partial<WorkSchedule>): Promise<WorkSchedule> {
+    const [result] = await db.update(workSchedules)
+      .set(scheduleData)
+      .where(eq(workSchedules.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteWorkSchedule(id: number): Promise<void> {
+    await db.delete(workSchedules).where(eq(workSchedules.id, id));
+  }
+
+  // Safety briefings operations
+  async createSafetyBriefing(briefingData: InsertSafetyBriefing): Promise<SafetyBriefing> {
+    const [result] = await db.insert(safetyBriefings).values({
+      ...briefingData,
+      createdAt: new Date(),
+    }).returning();
+    return result;
+  }
+
+  async getSafetyBriefingByWorkScheduleId(workScheduleId: number): Promise<SafetyBriefing | undefined> {
+    const [result] = await db.select().from(safetyBriefings)
+      .where(eq(safetyBriefings.workScheduleId, workScheduleId));
+    return result;
+  }
+
+  async updateSafetyBriefing(id: number, briefingData: Partial<SafetyBriefing>): Promise<SafetyBriefing> {
+    const [result] = await db.update(safetyBriefings)
+      .set(briefingData)
+      .where(eq(safetyBriefings.id, id))
+      .returning();
+    return result;
   }
 }

@@ -5,6 +5,8 @@ import {
   incidents,
   workSessions,
   riskReports,
+  workSchedules,
+  safetyBriefings,
   type Equipment,
   type InsertEquipment,
   type WorkType,
@@ -17,6 +19,10 @@ import {
   type InsertWorkSession,
   type RiskReport,
   type InsertRiskReport,
+  type WorkSchedule,
+  type InsertWorkSchedule,
+  type SafetyBriefing,
+  type InsertSafetyBriefing,
 } from "@shared/schema";
 
 // Interface for storage operations
@@ -58,6 +64,18 @@ export interface IStorage {
   // Risk reports operations
   createRiskReport(report: InsertRiskReport): Promise<RiskReport>;
   getRiskReportsByEquipmentId(equipmentId: number): Promise<RiskReport[]>;
+
+  // Work schedules operations
+  createWorkSchedule(schedule: InsertWorkSchedule): Promise<WorkSchedule>;
+  getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]>;
+  getWorkScheduleById(id: number): Promise<WorkSchedule | undefined>;
+  updateWorkSchedule(id: number, schedule: Partial<WorkSchedule>): Promise<WorkSchedule>;
+  deleteWorkSchedule(id: number): Promise<void>;
+
+  // Safety briefings operations
+  createSafetyBriefing(briefing: InsertSafetyBriefing): Promise<SafetyBriefing>;
+  getSafetyBriefingByWorkScheduleId(workScheduleId: number): Promise<SafetyBriefing | undefined>;
+  updateSafetyBriefing(id: number, briefing: Partial<SafetyBriefing>): Promise<SafetyBriefing>;
 }
 
 export class MemStorage implements IStorage {
@@ -67,6 +85,8 @@ export class MemStorage implements IStorage {
   private incidents: Map<number, Incident> = new Map();
   private workSessions: Map<number, WorkSession> = new Map();
   private riskReports: Map<number, RiskReport> = new Map();
+  private workSchedules: Map<number, WorkSchedule> = new Map();
+  private safetyBriefings: Map<number, SafetyBriefing> = new Map();
   private currentId = 3;
 
   constructor() {
@@ -476,6 +496,71 @@ export class MemStorage implements IStorage {
         const bTime = b.createdAt?.getTime() ?? 0;
         return bTime - aTime;
       });
+  }
+
+  // Work schedules operations
+  async createWorkSchedule(scheduleData: InsertWorkSchedule): Promise<WorkSchedule> {
+    const id = this.currentId++;
+    const newSchedule: WorkSchedule = {
+      id,
+      ...scheduleData,
+      createdAt: new Date()
+    };
+    this.workSchedules.set(id, newSchedule);
+    return newSchedule;
+  }
+
+  async getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]> {
+    const targetDate = new Date(date);
+    return Array.from(this.workSchedules.values())
+      .filter(ws => {
+        const scheduleDate = new Date(ws.scheduledDate);
+        return scheduleDate.toDateString() === targetDate.toDateString();
+      })
+      .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime());
+  }
+
+  async getWorkScheduleById(id: number): Promise<WorkSchedule | undefined> {
+    return this.workSchedules.get(id);
+  }
+
+  async updateWorkSchedule(id: number, scheduleData: Partial<WorkSchedule>): Promise<WorkSchedule> {
+    const existing = this.workSchedules.get(id);
+    if (!existing) throw new Error(`WorkSchedule with id ${id} not found`);
+    
+    const updated = { ...existing, ...scheduleData };
+    this.workSchedules.set(id, updated);
+    return updated;
+  }
+
+  async deleteWorkSchedule(id: number): Promise<void> {
+    this.workSchedules.delete(id);
+  }
+
+  // Safety briefings operations
+  async createSafetyBriefing(briefingData: InsertSafetyBriefing): Promise<SafetyBriefing> {
+    const id = this.currentId++;
+    const newBriefing: SafetyBriefing = {
+      id,
+      ...briefingData,
+      createdAt: new Date()
+    };
+    this.safetyBriefings.set(id, newBriefing);
+    return newBriefing;
+  }
+
+  async getSafetyBriefingByWorkScheduleId(workScheduleId: number): Promise<SafetyBriefing | undefined> {
+    return Array.from(this.safetyBriefings.values())
+      .find(sb => sb.workScheduleId === workScheduleId);
+  }
+
+  async updateSafetyBriefing(id: number, briefingData: Partial<SafetyBriefing>): Promise<SafetyBriefing> {
+    const existing = this.safetyBriefings.get(id);
+    if (!existing) throw new Error(`SafetyBriefing with id ${id} not found`);
+    
+    const updated = { ...existing, ...briefingData };
+    this.safetyBriefings.set(id, updated);
+    return updated;
   }
 }
 
