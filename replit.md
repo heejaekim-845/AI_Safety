@@ -33,8 +33,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Key Components & Features
 - **Equipment Management**: Comprehensive database with risk classification (HIGH/MEDIUM/LOW), safety requirements, and QR code integration.
-- **Work Management**: Categorized work types, dynamic step-by-step procedures, real-time session tracking, and safety checklists.
+- **Work Management**: Categorized work types, dynamic step-by-step procedures, real-time session tracking, and safety checklists with location-based work scheduling.
 - **AI Safety Analysis**: Real-time contextual risk assessment, dynamic procedure adjustments, and automated emergency response generation. AI voice guidance provides concise, safety-focused summaries.
+- **Weather Integration**: Real-time weather data integration using OpenWeatherMap API for location-specific safety recommendations. System properly handles API failures without displaying mock data.
 - **Mobile Interface**: QR scanner, mobile-optimized navigation, PWA design, and structured for future offline capability.
 - **Data Flow**: Guided workflow from equipment access (QR scan) through AI-powered safety assessment, work planning, session creation, guided execution, completion tracking, and incident reporting.
 - **Visuals**: Modern design system with gradient backgrounds, hover animations, safety-themed color schemes, and custom Korean fonts in headers.
@@ -44,6 +45,7 @@ Preferred communication style: Simple, everyday language.
 ### Runtime Dependencies
 - **Database**: Neon Database (PostgreSQL serverless)
 - **AI Service**: OpenAI API (GPT-4o) and Google Gemini (2.5 Flash model)
+- **Weather Service**: OpenWeatherMap API for real-time weather data integration
 - **UI Components**: Radix UI component library
 - **Form Handling**: React Hook Form with Zod validation
 - **Styling**: Tailwind CSS
