@@ -125,15 +125,13 @@ export default function Briefing() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                AI 기반 안전 브리핑 시스템
-              </h1>
-              <p className="text-gray-600">
-                일일 작업 안전 브리핑을 AI 기술로 자동 생성하고 관리합니다
-              </p>
-            </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              AI 기반 안전 브리핑 시스템
+            </h1>
+            <p className="text-gray-600 mb-6">
+              일일 작업 안전 브리핑을 AI 기술로 자동 생성하고 관리합니다
+            </p>
             <WorkScheduleForm 
               trigger={
                 <Button className="bg-blue-600 hover:bg-blue-700">
@@ -159,13 +157,13 @@ export default function Briefing() {
                   브리핑을 확인할 작업 날짜를 선택하세요
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex justify-center">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
                   onSelect={(date) => date && setSelectedDate(date)}
                   locale={ko}
-                  className="rounded-md border"
+                  className="rounded-md border w-full max-w-sm"
                 />
               </CardContent>
             </Card>
