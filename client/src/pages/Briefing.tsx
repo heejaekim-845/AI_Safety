@@ -290,12 +290,6 @@ export default function Briefing() {
                             </div>
                           </div>
                         </div>
-                        
-                        {schedule.specialNotes && (
-                          <div className="text-sm text-gray-600">
-                            <span className="font-medium">특이사항:</span> {schedule.specialNotes}
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
