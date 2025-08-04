@@ -14,21 +14,64 @@ export class WeatherService {
   private readonly API_KEY = process.env.OPENWEATHER_API_KEY;
   private readonly BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
+  // Korean city coordinates mapping for reliable weather data
+  private readonly KOREAN_CITIES: { [key: string]: { lat: number; lon: number } } = {
+    '서울': { lat: 37.5665, lon: 126.9780 },
+    '부산': { lat: 35.1796, lon: 129.0756 },
+    '대구': { lat: 35.8714, lon: 128.6014 },
+    '인천': { lat: 37.4563, lon: 126.7052 },
+    '광주': { lat: 35.1595, lon: 126.8526 },
+    '대전': { lat: 36.3504, lon: 127.3845 },
+    '울산': { lat: 35.5384, lon: 129.3114 },
+    '세종': { lat: 36.4800, lon: 127.2890 },
+    '경기': { lat: 37.4138, lon: 127.5183 },
+    '강원': { lat: 37.8228, lon: 128.1555 },
+    '충북': { lat: 36.6357, lon: 127.4917 },
+    '충남': { lat: 36.5184, lon: 126.8000 },
+    '전북': { lat: 35.7175, lon: 127.1530 },
+    '전남': { lat: 34.8161, lon: 126.4629 },
+    '경북': { lat: 36.4919, lon: 128.8889 },
+    '경남': { lat: 35.4606, lon: 128.2132 },
+    '제주': { lat: 33.4996, lon: 126.5312 }
+  };
+
   async getWeatherForLocation(location: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
         throw new Error('OpenWeather API key not configured');
       }
 
-      // Get real weather data from OpenWeatherMap API
-      const response = await axios.get(this.BASE_URL, {
-        params: {
-          q: `${location},KR`, // Assuming Korean locations
-          appid: this.API_KEY,
-          units: 'metric', // Celsius
-          lang: 'kr' // Korean language for descriptions
-        }
-      });
+      // Try to get coordinates for Korean cities first
+      const coords = this.getCoordinatesForLocation(location);
+      let response;
+
+      console.log(`Attempting to get weather for location: "${location}"`);
+      console.log('Coordinates found:', coords);
+
+      if (coords) {
+        // Use coordinate-based API call for reliability
+        console.log(`Using coordinates for ${location}: lat=${coords.lat}, lon=${coords.lon}`);
+        response = await axios.get(this.BASE_URL, {
+          params: {
+            lat: coords.lat,
+            lon: coords.lon,
+            appid: this.API_KEY,
+            units: 'metric', // Celsius
+            lang: 'ko' // Korean language for descriptions
+          }
+        });
+      } else {
+        // Fallback to city name search
+        console.log(`No coordinates found for "${location}", trying city name search`);
+        response = await axios.get(this.BASE_URL, {
+          params: {
+            q: `${location},KR`, // Assuming Korean locations
+            appid: this.API_KEY,
+            units: 'metric', // Celsius
+            lang: 'ko' // Korean language for descriptions
+          }
+        });
+      }
 
       const weatherData = response.data;
       const realWeatherData = this.parseOpenWeatherResponse(weatherData);
@@ -49,6 +92,22 @@ export class WeatherService {
       // Throw error instead of returning fallback data
       throw new Error(`날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
     }
+  }
+
+  private getCoordinatesForLocation(location: string): { lat: number; lon: number } | null {
+    // Check for exact match first
+    if (this.KOREAN_CITIES[location]) {
+      return this.KOREAN_CITIES[location];
+    }
+
+    // Check for partial matches (e.g., if location contains city name)
+    for (const [city, coords] of Object.entries(this.KOREAN_CITIES)) {
+      if (location.includes(city) || city.includes(location)) {
+        return coords;
+      }
+    }
+
+    return null;
   }
 
   private parseOpenWeatherResponse(data: any): WeatherData {
