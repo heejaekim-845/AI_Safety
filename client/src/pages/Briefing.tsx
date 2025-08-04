@@ -246,12 +246,6 @@ export default function Briefing() {
                                 <User className="w-4 h-4" />
                                 작업자: {schedule.workerName}
                               </span>
-                              {schedule.workLocation && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {schedule.workLocation}
-                                </span>
-                              )}
                             </div>
                             {schedule.specialNotes && (
                               <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
