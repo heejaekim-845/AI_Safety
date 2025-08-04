@@ -217,13 +217,18 @@ export default function Briefing() {
                       <div key={schedule.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-lg">
-                              {schedule.equipmentName && schedule.workTypeName 
-                                ? `${schedule.equipmentName} - ${schedule.workTypeName}`
-                                : '작업 설명 없음'
-                              }
-                            </h3>
-                            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-lg">
+                                {schedule.equipmentName && schedule.workTypeName 
+                                  ? `${schedule.equipmentName} - ${schedule.workTypeName}`
+                                  : '작업 설명 없음'
+                                }
+                              </h3>
+                              <Badge variant={schedule.status === 'scheduled' ? 'default' : 'secondary'}>
+                                {schedule.status === 'scheduled' ? '예정' : schedule.status}
+                              </Badge>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-sm text-gray-600 gap-1">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" />
                                 {schedule.briefingTime || '시간 미지정'}
@@ -235,9 +240,6 @@ export default function Briefing() {
                                   {schedule.workLocation}
                                 </span>
                               )}
-                              <Badge variant={schedule.status === 'scheduled' ? 'default' : 'secondary'}>
-                                {schedule.status === 'scheduled' ? '예정' : schedule.status}
-                              </Badge>
                             </div>
                             {schedule.specialNotes && (
                               <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">

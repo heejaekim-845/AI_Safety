@@ -312,7 +312,26 @@ export class DatabaseStorage implements IStorage {
 
   async getWorkSchedulesByDate(date: string) {
     try {
-      return await db.select().from(workSchedules);
+      const result = await db
+        .select({
+          id: workSchedules.id,
+          equipmentId: workSchedules.equipmentId,
+          workTypeId: workSchedules.workTypeId,
+          scheduledDate: workSchedules.scheduledDate,
+          briefingTime: workSchedules.briefingTime,
+          workerName: workSchedules.workerName,
+          workLocation: workSchedules.workLocation,
+          specialNotes: workSchedules.specialNotes,
+          status: workSchedules.status,
+          createdAt: workSchedules.createdAt,
+          equipmentName: equipment.name,
+          workTypeName: workTypes.name,
+        })
+        .from(workSchedules)
+        .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
+        .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id));
+      
+      return result;
     } catch (error) {
       console.error('Database error in getWorkSchedulesByDate:', error);
       return [];
@@ -321,7 +340,26 @@ export class DatabaseStorage implements IStorage {
 
   async getWorkScheduleById(id: number) {
     try {
-      const [result] = await db.select().from(workSchedules).where(eq(workSchedules.id, id));
+      const [result] = await db
+        .select({
+          id: workSchedules.id,
+          equipmentId: workSchedules.equipmentId,
+          workTypeId: workSchedules.workTypeId,
+          scheduledDate: workSchedules.scheduledDate,
+          briefingTime: workSchedules.briefingTime,
+          workerName: workSchedules.workerName,
+          workLocation: workSchedules.workLocation,
+          specialNotes: workSchedules.specialNotes,
+          status: workSchedules.status,
+          createdAt: workSchedules.createdAt,
+          equipmentName: equipment.name,
+          workTypeName: workTypes.name,
+        })
+        .from(workSchedules)
+        .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
+        .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id))
+        .where(eq(workSchedules.id, id));
+      
       return result || undefined;
     } catch (error) {
       console.error('Database error in getWorkScheduleById:', error);
@@ -347,7 +385,13 @@ export class DatabaseStorage implements IStorage {
 
   async deleteWorkSchedule(id: number) {
     try {
-      await db.delete(workSchedules).where(eq(workSchedules.id, id));
+      // First delete related safety briefings
+      const deletedBriefings = await db.delete(safetyBriefings).where(eq(safetyBriefings.workScheduleId, id));
+      console.log(`Deleted ${deletedBriefings} safety briefings for work schedule ${id}`);
+      
+      // Then delete the work schedule
+      const deletedSchedule = await db.delete(workSchedules).where(eq(workSchedules.id, id));
+      console.log(`Deleted work schedule ${id}`);
     } catch (error) {
       console.error('Database error in deleteWorkSchedule:', error);
       throw error;
