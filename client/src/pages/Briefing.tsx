@@ -309,14 +309,16 @@ export default function Briefing() {
         {briefingData && (
           <Dialog open={!!briefingData} onOpenChange={() => setBriefingData(null)}>
             <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl">
-                  <Shield className="w-6 h-6" />
+              <DialogHeader className="pb-4 border-b">
+                <DialogTitle className="flex items-center gap-2 text-2xl mb-3">
+                  <Shield className="w-7 h-7 text-blue-600" />
                   AI 안전 브리핑
                 </DialogTitle>
-                <DialogDescription className="text-base font-medium">
-                  {selectedWorkSchedule?.equipmentName} - {selectedWorkSchedule?.workTypeName}
-                </DialogDescription>
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg">
+                  <h2 className="text-xl font-bold text-center">
+                    {selectedWorkSchedule?.equipmentName} - {selectedWorkSchedule?.workTypeName}
+                  </h2>
+                </div>
               </DialogHeader>
 
               <div className="space-y-6">
