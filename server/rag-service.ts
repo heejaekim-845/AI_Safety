@@ -1,5 +1,9 @@
 // RAG Service for Safety Briefings
 // This service will handle vector storage and retrieval of regulations, incidents, and education materials
+import OpenAI from "openai";
+import { excelProcessor, type AccidentCase } from "./excel-processor";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface RegulationDocument {
   id: string;
@@ -50,6 +54,16 @@ export class RAGService {
 
   constructor() {
     this.initializeSampleData();
+    this.loadAccidentData();
+  }
+
+  private async loadAccidentData() {
+    try {
+      await excelProcessor.loadAccidentData();
+      console.log('Accident data loaded successfully for RAG service');
+    } catch (error) {
+      console.error('Failed to load accident data:', error);
+    }
   }
 
   private initializeSampleData() {
@@ -244,6 +258,30 @@ export class RAGService {
   }
 
   async findSimilarIncidents(equipmentType: string, workType: string): Promise<IncidentRecord[]> {
+    // First, try to get real accident cases from Excel data
+    await excelProcessor.loadAccidentData();
+    const excelAccidents = excelProcessor.findRelevantAccidents(equipmentType, workType, 3);
+    
+    // Convert Excel accident cases to IncidentRecord format
+    const realIncidents: IncidentRecord[] = excelAccidents.map(acc => ({
+      id: acc.id,
+      title: `${acc.equipment} - ${acc.accidentType}`,
+      description: acc.description,
+      equipmentType: acc.equipment,
+      workType: acc.workType,
+      severity: acc.severity,
+      rootCause: acc.cause,
+      preventiveMeasures: acc.preventionMeasures.split('\n').filter(m => m.trim()),
+      date: acc.date ? new Date(acc.date) : new Date()
+    }));
+
+    // If we have real accidents, prioritize them
+    if (realIncidents.length > 0) {
+      console.log(`Using ${realIncidents.length} real accident cases from Excel data`);
+      return realIncidents;
+    }
+
+    // Fallback to sample data if no real accidents found
     const similar = this.incidents.filter(inc => 
       inc.equipmentType.toLowerCase().includes(equipmentType.toLowerCase()) ||
       inc.workType.toLowerCase().includes(workType.toLowerCase()) ||
@@ -251,7 +289,6 @@ export class RAGService {
       workType.toLowerCase().includes(inc.workType.toLowerCase())
     );
     
-    // Sort by relevance and return top 3
     return similar.slice(0, 3);
   }
 
@@ -307,6 +344,68 @@ export class RAGService {
     ];
     
     return slogans[Math.floor(Math.random() * slogans.length)];
+  }
+
+  // Enhanced method to generate accident-based safety recommendations using OpenAI
+  async generateAccidentBasedRecommendations(equipment: string, workType: string): Promise<{
+    accidentCases: AccidentCase[];
+    recommendations: string[];
+    riskFactors: string[];
+  }> {
+    try {
+      await excelProcessor.loadAccidentData();
+      const relevantAccidents = excelProcessor.findRelevantAccidents(equipment, workType, 5);
+      
+      if (relevantAccidents.length === 0) {
+        return {
+          accidentCases: [],
+          recommendations: ["해당 작업에 대한 구체적인 사고사례가 없으나, 일반적인 안전수칙을 준수하세요."],
+          riskFactors: ["일반적인 작업 위험요소"]
+        };
+      }
+
+      // Extract key insights from accident cases
+      const accidentDescriptions = relevantAccidents.map(acc => 
+        `사고유형: ${acc.accidentType}, 원인: ${acc.cause}, 예방대책: ${acc.preventionMeasures}`
+      ).join('\n');
+
+      const prompt = `
+다음은 ${equipment} 설비에서 ${workType} 작업 중 발생한 실제 사고사례들입니다:
+
+${accidentDescriptions}
+
+이 사고사례들을 분석하여 다음을 JSON 형태로 제공해주세요:
+{
+  "recommendations": ["구체적인 예방 권고사항 5개"],
+  "riskFactors": ["주요 위험요소 3개"]
+}
+
+실제 사고사례를 기반으로 한 구체적이고 실용적인 내용으로 작성해주세요.
+`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        max_tokens: 800,
+        temperature: 0.3
+      });
+
+      const analysis = JSON.parse(response.choices[0].message.content || '{}');
+
+      return {
+        accidentCases: relevantAccidents.slice(0, 3), // Return top 3 for display
+        recommendations: analysis.recommendations || [],
+        riskFactors: analysis.riskFactors || []
+      };
+    } catch (error) {
+      console.error('Error generating accident-based recommendations:', error);
+      return {
+        accidentCases: [],
+        recommendations: ["사고사례 분석 중 오류가 발생했습니다. 일반적인 안전수칙을 준수하세요."],
+        riskFactors: ["분석 불가"]
+      };
+    }
   }
 }
 

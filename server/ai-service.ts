@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { ragService } from "./rag-service";
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -693,6 +694,9 @@ ${weatherInfo ? `날씨 정보:
 관련 법규: ${ragData.regulations.map(r => r.title).join(', ')}
 관련 사고사례: ${ragData.incidents.length}건
 교육자료: ${ragData.educationMaterials.length}건
+
+실제 사고사례 분석:
+${ragData.incidents.map(incident => `- ${incident.title}: ${incident.description || incident.rootCause}`).join('\n')}
 
 다음 형식으로 JSON 응답을 제공해주세요:
 {
