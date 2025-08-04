@@ -57,6 +57,7 @@ export default function Briefing() {
   const [selectedWorkSchedule, setSelectedWorkSchedule] = useState<WorkSchedule | null>(null);
   const [briefingData, setBriefingData] = useState<SafetyBriefingData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<{[key: number]: number}>({});
   const queryClient = useQueryClient();
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
@@ -78,6 +79,7 @@ export default function Briefing() {
     },
     onSuccess: (data) => {
       setBriefingData(data);
+      setQuizAnswers({}); // Reset quiz answers for new briefing
       setIsGenerating(false);
     },
     onError: (error) => {
@@ -110,6 +112,13 @@ export default function Briefing() {
     if (confirm('이 작업 일정을 삭제하시겠습니까?')) {
       deleteScheduleMutation.mutate(scheduleId);
     }
+  };
+
+  const handleQuizAnswer = (quizIndex: number, selectedOption: number) => {
+    setQuizAnswers(prev => ({
+      ...prev,
+      [quizIndex]: selectedOption
+    }));
   };
 
   const getRiskLevelColor = (level: string) => {
@@ -557,35 +566,93 @@ export default function Briefing() {
                         안전 이해도 확인 퀴즈
                       </CardTitle>
                       <CardDescription>
-                        작업 안전에 대한 이해도를 확인하는 객관식 문제입니다
+                        선택지를 클릭하여 정답을 확인하고 해설을 읽어보세요
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
-                        {briefingData.quizQuestions.slice(0, 3).map((quiz: any, index) => (
-                          <div key={index} className="border rounded-lg p-4">
-                            <h4 className="font-medium mb-3">Q{index + 1}. {quiz.question}</h4>
-                            <div className="space-y-2">
-                              {quiz.options.map((option: string, optIndex: number) => (
-                                <div key={optIndex} className="flex items-center gap-2">
-                                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm ${
-                                    optIndex === quiz.correctAnswer 
-                                      ? 'bg-green-100 border-green-500 text-green-700' 
-                                      : 'border-gray-300'
-                                  }`}>
-                                    {optIndex + 1}
+                      <div className="space-y-6">
+                        {briefingData.quizQuestions.slice(0, 3).map((quiz: any, quizIndex) => {
+                          const userAnswer = quizAnswers[quizIndex];
+                          const hasAnswered = userAnswer !== undefined;
+                          
+                          return (
+                            <div key={quizIndex} className="border rounded-lg p-4">
+                              <h4 className="font-medium mb-4">Q{quizIndex + 1}. {quiz.question}</h4>
+                              <div className="space-y-2 mb-4">
+                                {quiz.options.map((option: string, optIndex: number) => {
+                                  const isCorrect = optIndex === quiz.correctAnswer;
+                                  const isSelected = userAnswer === optIndex;
+                                  
+                                  let buttonClass = "w-full text-left p-3 rounded-lg border-2 transition-all duration-200 ";
+                                  
+                                  if (!hasAnswered) {
+                                    buttonClass += "border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer";
+                                  } else if (isCorrect) {
+                                    buttonClass += "border-green-500 bg-green-50 text-green-800";
+                                  } else if (isSelected && !isCorrect) {
+                                    buttonClass += "border-red-500 bg-red-50 text-red-800";
+                                  } else {
+                                    buttonClass += "border-gray-200 text-gray-600";
+                                  }
+                                  
+                                  return (
+                                    <button
+                                      key={optIndex}
+                                      onClick={() => !hasAnswered && handleQuizAnswer(quizIndex, optIndex)}
+                                      disabled={hasAnswered}
+                                      className={buttonClass}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
+                                          hasAnswered && isCorrect
+                                            ? 'bg-green-100 border-green-500 text-green-700'
+                                            : hasAnswered && isSelected && !isCorrect
+                                            ? 'bg-red-100 border-red-500 text-red-700'
+                                            : 'border-gray-400 text-gray-600'
+                                        }`}>
+                                          {optIndex + 1}
+                                        </div>
+                                        <span className="flex-1">{option}</span>
+                                        {hasAnswered && isCorrect && (
+                                          <div className="text-green-600 font-bold">✓</div>
+                                        )}
+                                        {hasAnswered && isSelected && !isCorrect && (
+                                          <div className="text-red-600 font-bold">✗</div>
+                                        )}
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              
+                              {hasAnswered && (
+                                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <div className="flex items-start gap-2 mb-2">
+                                    <div className={`font-medium ${
+                                      userAnswer === quiz.correctAnswer ? 'text-green-700' : 'text-red-700'
+                                    }`}>
+                                      {userAnswer === quiz.correctAnswer ? '정답입니다!' : '틀렸습니다.'}
+                                    </div>
+                                    {userAnswer !== quiz.correctAnswer && (
+                                      <div className="text-sm text-gray-600">
+                                        (정답: {quiz.correctAnswer + 1}번)
+                                      </div>
+                                    )}
                                   </div>
-                                  <span className={optIndex === quiz.correctAnswer ? 'text-green-700 font-medium' : ''}>
-                                    {option}
-                                  </span>
+                                  <div className="text-sm text-blue-800">
+                                    <strong>해설:</strong> {quiz.explanation}
+                                  </div>
                                 </div>
-                              ))}
+                              )}
+                              
+                              {!hasAnswered && (
+                                <div className="text-sm text-gray-500 italic">
+                                  선택지를 클릭하여 답안을 확인하세요
+                                </div>
+                              )}
                             </div>
-                            <div className="mt-3 p-3 bg-green-50 rounded text-sm text-green-800">
-                              <strong>해설:</strong> {quiz.explanation}
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </CardContent>
                   </Card>
