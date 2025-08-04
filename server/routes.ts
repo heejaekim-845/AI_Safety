@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { aiService } from "./ai-service";
 import { weatherService } from "./weather-service";
-import { ragService } from "./rag-service";
+import { simpleRagService as ragService } from "./simple-rag-service";
 import { z } from "zod";
 import { 
   insertEquipmentSchema, 
@@ -702,28 +702,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // weatherInfo remains null - no mock data will be used
       }
 
-      // Get RAG data
-      const regulations = await ragService.findRelevantRegulations(equipment.name, workType.name);
-      const incidents = await ragService.findSimilarIncidents(equipment.name, workType.name);
-      const educationMaterials = await ragService.findEducationMaterials(equipment.name, workType.name);
-      const quizQuestions = await ragService.generateQuizQuestions(equipment.name, workType.name);
-      const safetySlogan = await ragService.getSafetySlogan(equipment.name, workType.name);
-
-      const ragData = {
-        regulations,
-        incidents,
-        educationMaterials,
-        quizQuestions,
-        safetySlogan
-      };
-
-      // Generate comprehensive AI briefing
-      const aiAnalysis = await aiService.generateSafetyBriefing(
-        workSchedule,
+      // Generate comprehensive AI briefing with RAG integration
+      const aiAnalysis = await aiService.generateEnhancedSafetyBriefing(
         equipment,
         workType,
         weatherInfo,
-        ragData
+        workSchedule.specialNotes
       );
 
       // Create complete briefing data
@@ -735,11 +719,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         riskAssessment: aiAnalysis.riskAssessment,
         requiredTools: aiAnalysis.requiredTools,
         requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
-        regulations,
-        relatedIncidents: incidents,
-        educationMaterials,
-        quizQuestions,
-        safetySlogan
+        regulations: aiAnalysis.regulations || [],
+        relatedIncidents: aiAnalysis.relatedIncidents || [],
+        educationMaterials: aiAnalysis.educationMaterials || [],
+        quizQuestions: aiAnalysis.quizQuestions || [],
+        safetySlogan: aiAnalysis.safetySlogan || "안전이 최우선입니다"
       };
 
       // Save to database
@@ -753,13 +737,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         riskAssessment: aiAnalysis.riskAssessment,
         requiredTools: aiAnalysis.requiredTools,
         requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
-        weatherConsiderations: aiAnalysis.weatherConsiderations,
-        safetyRecommendations: aiAnalysis.safetyRecommendations,
-        regulations,
-        relatedIncidents: incidents,
-        educationMaterials,
-        quizQuestions,
-        safetySlogan
+        weatherConsiderations: aiAnalysis.weatherConsiderations || [],
+        safetyRecommendations: aiAnalysis.safetyRecommendations || [],
+        regulations: aiAnalysis.regulations || [],
+        relatedIncidents: aiAnalysis.relatedIncidents || [],
+        educationMaterials: aiAnalysis.educationMaterials || [],
+        quizQuestions: aiAnalysis.quizQuestions || [],
+        safetySlogan: aiAnalysis.safetySlogan || "안전이 최우선입니다",
+        relatedAccidentCases: aiAnalysis.relatedAccidentCases || []
       });
     } catch (error) {
       console.error("안전 브리핑 생성 오류:", error);

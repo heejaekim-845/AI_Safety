@@ -557,6 +557,53 @@ export default function Briefing() {
                   </Card>
                 </div>
 
+                {/* RAG-Based Related Accident Cases */}
+                {briefingData.relatedAccidentCases && briefingData.relatedAccidentCases.length > 0 && (
+                  <Card className="border-orange-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-orange-700">
+                        <AlertTriangle className="w-5 h-5" />
+                        AI 분석 - 유사 사고사례
+                      </CardTitle>
+                      <CardDescription>
+                        AI가 분석한 현재 작업과 유사한 실제 사고사례입니다
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {briefingData.relatedAccidentCases.map((accident: any, index: number) => (
+                          <div key={index} className="border-l-4 border-orange-400 pl-4 py-3 bg-orange-50 rounded-r-lg">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-orange-900">{accident.title}</h4>
+                              <span className="text-xs px-2 py-1 bg-orange-200 text-orange-800 rounded-full">
+                                {accident.severity}
+                              </span>
+                            </div>
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700">작업유형:</span>
+                                <span className="ml-2 text-gray-600">{accident.workType}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">사고형태:</span>
+                                <span className="ml-2 text-gray-600">{accident.accidentType}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">사고개요:</span>
+                                <p className="mt-1 text-gray-600 text-xs leading-relaxed">{accident.summary}</p>
+                              </div>
+                              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                                <span className="font-medium text-blue-800">예방대책:</span>
+                                <p className="mt-1 text-blue-700 text-xs leading-relaxed">{accident.prevention}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Safety Quiz Section */}
                 {briefingData.quizQuestions.length > 0 && (
                   <Card>

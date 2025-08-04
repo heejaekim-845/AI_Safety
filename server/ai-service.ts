@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-service";
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -390,6 +391,159 @@ JSON 형식으로 응답:
         preventiveMeasures: preventiveMeasures.slice(0, 3)
       };
     }
+  }
+
+  async generateEnhancedSafetyBriefing(
+    equipmentInfo: any,
+    workType: any,
+    weatherData: any,
+    specialNotes?: string
+  ): Promise<any> {
+    try {
+      // Get relevant accident cases using RAG
+      const relevantAccidents = await ragService.searchRelevantAccidents(
+        workType.name,
+        equipmentInfo.name,
+        this.extractRiskFactors(equipmentInfo),
+        3
+      );
+
+      // Also get accidents by work type for broader context
+      const workTypeAccidents = await ragService.getAccidentsByWorkType(workType.name, 2);
+
+      const accidentContext = this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
+
+      const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
+
+【설비 정보】
+- 설비명: ${equipmentInfo.name}
+- 위치: ${equipmentInfo.location}
+- 위험도: ${equipmentInfo.riskLevel}
+- 주요 위험 요소: ${this.formatRisks(equipmentInfo)}
+- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
+
+【작업 정보】
+- 작업 유형: ${workType.name}
+- 작업 설명: ${workType.description}
+- 예상 소요 시간: ${workType.estimatedDuration}분
+
+【날씨 정보】
+- 현재 날씨: ${weatherData.condition}
+- 온도: ${weatherData.temperature}°C
+- 습도: ${weatherData.humidity}%
+- 풍속: ${weatherData.windSpeed}m/s
+- 안전 주의사항: ${weatherData.safetyWarnings?.join(", ") || "없음"}
+
+【관련 사고사례】
+${accidentContext}
+
+【특이사항】
+${specialNotes || "없음"}
+
+다음 형식으로 JSON 응답을 제공해주세요:
+{
+  "workSummary": "작업 개요 설명",
+  "riskFactors": ["위험요인1", "위험요인2", ...],
+  "riskAssessment": {
+    "totalScore": 숫자,
+    "riskFactors": [
+      {"factor": "위험요인명", "probability": 숫자, "severity": 숫자, "score": 숫자}
+    ]
+  },
+  "requiredTools": ["필요도구1", "필요도구2", ...],
+  "requiredSafetyEquipment": ["안전장비1", "안전장비2", ...],
+  "weatherConsiderations": ["날씨고려사항1", "날씨고려사항2", ...],
+  "safetyRecommendations": ["안전권고1", "안전권고2", ...],
+  "regulations": [
+    {"title": "관련규정명", "category": "분류"}
+  ],
+  "relatedIncidents": [
+    {"title": "사고사례제목", "severity": "심각도"}
+  ],
+  "educationMaterials": [
+    {"title": "교육자료명", "type": "유형"}
+  ],
+  "quizQuestions": [
+    {
+      "question": "퀴즈문제",
+      "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
+      "correctAnswer": 정답번호(0-3),
+      "explanation": "해설"
+    }
+  ],
+  "safetySlogan": "오늘의 안전 슬로건"
+}`;
+
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
+          responseMimeType: "application/json"
+        },
+        contents: prompt
+      });
+
+      const result = JSON.parse(response.text || "{}");
+      
+      // Add the actual accident cases to the response
+      if (relevantAccidents.length > 0) {
+        result.relatedAccidentCases = relevantAccidents.map(acc => ({
+          title: acc.title,
+          workType: acc.workType,
+          accidentType: acc.accidentType,
+          summary: acc.summary,
+          prevention: acc.prevention,
+          severity: acc.severity
+        }));
+      }
+
+      return result;
+
+    } catch (error) {
+      console.error("Enhanced safety briefing generation error:", error);
+      
+      // Fallback to basic briefing without RAG
+      return {
+        workSummary: `${equipmentInfo.name}에서 ${workType.name} 작업을 수행합니다.`,
+        riskFactors: ["기본 안전수칙 준수"],
+        riskAssessment: { totalScore: 5, riskFactors: [] },
+        requiredTools: ["기본 작업도구"],
+        requiredSafetyEquipment: ["안전모", "안전화", "보안경"],
+        weatherConsiderations: ["현재 날씨 조건 확인"],
+        safetyRecommendations: ["안전수칙을 준수하며 작업하세요"],
+        regulations: [],
+        relatedIncidents: [],
+        educationMaterials: [],
+        quizQuestions: [],
+        safetySlogan: "안전이 최우선입니다",
+        relatedAccidentCases: []
+      };
+    }
+  }
+
+  private extractRiskFactors(equipmentInfo: any): string[] {
+    const factors = [];
+    if (equipmentInfo.highTemperature) factors.push("고온");
+    if (equipmentInfo.highPressure) factors.push("고압");
+    if (equipmentInfo.highVoltage) factors.push("전기");
+    if (equipmentInfo.height) factors.push("추락");
+    if (equipmentInfo.mechanical) factors.push("기계");
+    if (equipmentInfo.chemical) factors.push("화학물질");
+    return factors;
+  }
+
+  private formatAccidentCases(accidents: AccidentCase[]): string {
+    if (accidents.length === 0) return "관련 사고사례 없음";
+    
+    return accidents.map((acc, index) => 
+      `사고사례 ${index + 1}:
+      - 제목: ${acc.title}
+      - 작업유형: ${acc.workType}
+      - 사고형태: ${acc.accidentType}
+      - 사고개요: ${acc.summary}
+      - 직접원인: ${acc.directCause}
+      - 예방대책: ${acc.prevention}`
+    ).join('\n\n');
   }
 
   private formatRisks(equipmentInfo: any): string {
