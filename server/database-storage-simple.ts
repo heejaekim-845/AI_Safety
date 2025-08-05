@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, gte, lt } from "drizzle-orm";
 import {
   equipment,
   workTypes,
@@ -312,6 +312,11 @@ export class DatabaseStorage implements IStorage {
 
   async getWorkSchedulesByDate(date: string) {
     try {
+      // Parse the date string to ensure we filter by the exact date
+      const targetDate = new Date(date);
+      const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+      const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1);
+      
       const result = await db
         .select({
           id: workSchedules.id,
@@ -329,7 +334,13 @@ export class DatabaseStorage implements IStorage {
         })
         .from(workSchedules)
         .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
-        .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id));
+        .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id))
+        .where(
+          and(
+            gte(workSchedules.scheduledDate, startOfDay),
+            lt(workSchedules.scheduledDate, endOfDay)
+          )
+        );
       
       return result;
     } catch (error) {
