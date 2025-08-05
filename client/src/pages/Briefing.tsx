@@ -535,12 +535,28 @@ export default function Briefing() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {briefingData.regulations && briefingData.regulations.length > 0 ? (
                           briefingData.regulations.map((reg: any, index) => (
-                            <div key={index} className="text-sm p-3 bg-gray-50 rounded border">
-                              <div className="font-medium text-gray-800">{reg.title}</div>
-                              <div className="text-gray-600 mt-1 text-xs">{reg.category}</div>
+                            <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                              <div className="mb-2">
+                                <div className="font-bold text-blue-900 text-sm mb-1">
+                                  산업안전보건기준에 관한 규칙
+                                </div>
+                                <div className="font-semibold text-blue-800 text-sm">
+                                  {reg.article_number} {reg.title.replace(/^제\d+조\s*/, '')}
+                                </div>
+                              </div>
+                              <div className="text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100">
+                                {reg.content}
+                              </div>
+                              {reg.category && (
+                                <div className="mt-2">
+                                  <span className="inline-block bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded">
+                                    {reg.category}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           ))
                         ) : (
