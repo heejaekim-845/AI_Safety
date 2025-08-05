@@ -32,6 +32,8 @@ export default function WorkManagement() {
 
   const [selectedWorkType, setSelectedWorkType] = useState<WorkType | null>(null);
   const [isAddingWorkType, setIsAddingWorkType] = useState(false);
+  const [isEditingWorkType, setIsEditingWorkType] = useState(false);
+  const [editingWorkType, setEditingWorkType] = useState<WorkType | null>(null);
   const [isAddingProcedure, setIsAddingProcedure] = useState(false);
   const [editingProcedure, setEditingProcedure] = useState<WorkProcedure | null>(null);
   const [isEditingChecklist, setIsEditingChecklist] = useState(false);
@@ -128,6 +130,19 @@ export default function WorkManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/work-types/${selectedWorkType?.id}/procedures`] });
       toast({ title: "작업 절차가 삭제되었습니다" });
+    },
+  });
+
+  const updateWorkTypeMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertWorkType> }) => {
+      return apiRequest("PATCH", `/api/work-types/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/equipment/${equipmentId}/work-types`] });
+      setIsEditingWorkType(false);
+      setEditingWorkType(null);
+      resetWorkTypeForm();
+      toast({ title: "작업 유형이 수정되었습니다" });
     },
   });
 
@@ -295,11 +310,46 @@ export default function WorkManagement() {
       estimatedDuration: estimatedDuration ? Number(estimatedDuration) : null,
       requiredQualifications: [],
       requiredEquipment: [],
+      requiredTools: [],
       environmentalRequirements: [],
       legalRequirements: [],
     };
 
     createWorkTypeMutation.mutate(workTypeData);
+  };
+
+  const handleEditWorkType = (workType: WorkType) => {
+    setEditingWorkType(workType);
+    setWorkTypeName(workType.name);
+    setWorkTypeDescription(workType.description || "");
+    setRequiresPermit(workType.requiresPermit || false);
+    setEstimatedDuration(workType.estimatedDuration ? String(workType.estimatedDuration) : "");
+    setIsEditingWorkType(true);
+  };
+
+  const handleUpdateWorkType = () => {
+    if (!editingWorkType || !workTypeName.trim()) {
+      toast({ title: "작업 유형명을 입력하세요", variant: "destructive" });
+      return;
+    }
+
+    const workTypeData: Partial<InsertWorkType> = {
+      name: workTypeName,
+      description: workTypeDescription || null,
+      requiresPermit: requiresPermit,
+      estimatedDuration: estimatedDuration ? Number(estimatedDuration) : null,
+    };
+
+    updateWorkTypeMutation.mutate({
+      id: editingWorkType.id,
+      data: workTypeData,
+    });
+  };
+
+  const handleCancelEditWorkType = () => {
+    setIsEditingWorkType(false);
+    setEditingWorkType(null);
+    resetWorkTypeForm();
   };
 
   const handleCreateProcedure = () => {
@@ -470,6 +520,14 @@ export default function WorkManagement() {
                           title="작업 전 점검사항 편집"
                         >
                           <CheckCircle className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleEditWorkType(workType)}
+                          title="작업 유형 편집"
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
                           size="sm" 
@@ -888,6 +946,70 @@ export default function WorkManagement() {
                   disabled={updateChecklistMutation.isPending}
                 >
                   {updateChecklistMutation.isPending ? "저장 중..." : "저장"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Work Type Dialog */}
+        <Dialog open={isEditingWorkType} onOpenChange={setIsEditingWorkType}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>작업 유형 수정</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="editWorkTypeName">작업 유형명</Label>
+                <Input
+                  id="editWorkTypeName"
+                  value={workTypeName}
+                  onChange={(e) => setWorkTypeName(e.target.value)}
+                  placeholder="예: 정기점검, 예방보전"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editWorkTypeDescription">설명</Label>
+                <Textarea
+                  id="editWorkTypeDescription"
+                  value={workTypeDescription}
+                  onChange={(e) => setWorkTypeDescription(e.target.value)}
+                  placeholder="작업 유형에 대한 설명"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editRequiresPermit">작업허가서 필요</Label>
+                  <Select 
+                    value={requiresPermit ? "true" : "false"} 
+                    onValueChange={(value) => setRequiresPermit(value === "true")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="false">불필요</SelectItem>
+                      <SelectItem value="true">필요</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editEstimatedDuration">예상 소요시간 (분)</Label>
+                  <Input
+                    id="editEstimatedDuration"
+                    type="number"
+                    value={estimatedDuration}
+                    onChange={(e) => setEstimatedDuration(e.target.value)}
+                    placeholder="60"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleUpdateWorkType} disabled={updateWorkTypeMutation.isPending}>
+                  {updateWorkTypeMutation.isPending ? "수정 중..." : "수정"}
+                </Button>
+                <Button variant="outline" onClick={handleCancelEditWorkType}>
+                  취소
                 </Button>
               </div>
             </div>
