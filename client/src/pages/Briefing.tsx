@@ -424,7 +424,7 @@ export default function Briefing() {
                       </div>
 
                       <div className="space-y-2">
-                        {briefingData.riskAssessment.riskFactors?.slice(0, 3).map((risk: any, index: number) => (
+                        {briefingData.riskAssessment.riskFactors?.map((risk: any, index: number) => (
                           <div key={index} className="border-l-4 border-orange-400 pl-3 py-1">
                             <div className="font-medium text-sm">{risk.factor}</div>
                             <div className="text-xs text-gray-600">
@@ -621,7 +621,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-6">
-                        {briefingData.quizQuestions.slice(0, 3).map((quiz: any, quizIndex) => {
+                        {briefingData.quizQuestions.map((quiz: any, quizIndex) => {
                           const userAnswer = quizAnswers[quizIndex];
                           const hasAnswered = userAnswer !== undefined;
                           
