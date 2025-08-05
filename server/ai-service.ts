@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-service";
-import { chromaRAGService } from "./chroma-rag-service";
+import { vectorDBService } from "./vector-db-service";
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -409,31 +409,20 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // Try ChromaDB first for enhanced RAG search
-        chromaAccidents = await chromaRAGService.searchRelevantAccidents(
-          workType.name,
-          equipmentInfo.name,
-          this.extractRiskFactors(equipmentInfo),
-          3
-        );
-
-        // Get education materials related to work type
-        educationMaterials = await chromaRAGService.searchEducationMaterials(
-          `${workType.name} ${equipmentInfo.name} 안전교육`,
-          2
-        );
-
-        // Get relevant safety regulations
-        safetyRegulations = await chromaRAGService.searchSafetyRegulations(
+        // Try Vectra vector database first for enhanced RAG search
+        const vectorResults = await vectorDBService.searchRelevantData(
           equipmentInfo.name,
           workType.name,
-          this.extractRiskFactors(equipmentInfo),
-          3
+          this.extractRiskFactors(equipmentInfo)
         );
 
-        console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        chromaAccidents = vectorResults.incidents;
+        educationMaterials = vectorResults.education;
+        safetyRegulations = vectorResults.regulations;
+
+        console.log(`Vectra 벡터 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
       } catch (error) {
-        console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
+        console.log('Vectra 벡터 검색 실패, 기본 RAG 사용:', error);
       }
 
       // Fallback to simple RAG if ChromaDB fails
