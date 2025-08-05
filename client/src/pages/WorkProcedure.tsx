@@ -348,7 +348,7 @@ export default function WorkProcedureComponent() {
       {upcomingProcedures.length > 0 && (
         <div className="space-y-3 mb-4">
           <h3 className="font-medium text-gray-900">다음 단계</h3>
-          {upcomingProcedures.slice(0, 3).map((procedure) => {
+          {upcomingProcedures.map((procedure) => {
             const categoryStyle = getCategoryStyle(procedure.category);
             return (
               <Card key={procedure.id} className={`bg-gray-50 border-gray-200 ${categoryStyle.cardClass}`}>
