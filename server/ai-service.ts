@@ -551,30 +551,37 @@ ${specialNotes || "없음"}
       result.requiredTools = processedTools;
       result.requiredSafetyEquipment = processedSafetyEquipment;
       
-      // Override the AI-generated regulations, incidents, and education materials with actual RAG results
-      result.regulations = safetyRegulations.map(reg => ({
+      // Force override with actual RAG search results regardless of AI response
+      result.regulations = safetyRegulations.length > 0 ? safetyRegulations.map(reg => ({
         title: reg.title,
         category: reg.category,
         content: reg.content,
         article_number: reg.article_number
-      }));
+      })) : [];
       
-      result.relatedIncidents = relevantAccidents.map(acc => ({
+      result.relatedIncidents = chromaAccidents.length > 0 ? chromaAccidents.map(acc => ({
         title: acc.title,
         severity: this.mapAccidentTypeToSeverity(acc.accident_type),
         workType: acc.work_type,
         accidentType: acc.accident_type,
         summary: acc.summary,
         prevention: acc.prevention
-      }));
+      })) : [];
       
-      result.educationMaterials = educationMaterials.map(edu => ({
+      result.educationMaterials = educationMaterials.length > 0 ? educationMaterials.map(edu => ({
         title: edu.title,
         type: edu.type,
         keywords: edu.keywords,
         content: edu.content,
         url: edu.url
-      }));
+      })) : [];
+
+      // Add debug info
+      console.log('RAG 검색 결과 적용:', {
+        regulations: result.regulations.length,
+        incidents: result.relatedIncidents.length, 
+        education: result.educationMaterials.length
+      });
 
       return result;
 

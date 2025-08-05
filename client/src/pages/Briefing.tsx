@@ -517,12 +517,19 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {briefingData.regulations.map((reg: any, index) => (
-                          <div key={index} className="text-xs p-2 bg-gray-50 rounded">
-                            <div className="font-medium">{reg.title}</div>
-                            <div className="text-gray-600 mt-1">{reg.category}</div>
+                        {briefingData.regulations && briefingData.regulations.length > 0 ? (
+                          briefingData.regulations.map((reg: any, index) => (
+                            <div key={index} className="text-xs p-2 bg-gray-50 rounded">
+                              <div className="font-medium">{reg.title}</div>
+                              <div className="text-gray-600 mt-1">{reg.category}</div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                            현재 작업에 해당하는 특별 규정이 검색되지 않았습니다.<br/>
+                            기본 산업안전보건법을 준수하세요.
                           </div>
-                        ))}
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -533,12 +540,27 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {briefingData.relatedIncidents.map((incident: any, index) => (
-                          <div key={index} className="text-xs p-2 bg-red-50 rounded border border-red-200">
-                            <div className="font-medium text-red-800">{incident.title}</div>
-                            <div className="text-red-600 mt-1">위험도: {incident.severity}</div>
+                        {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 ? (
+                          briefingData.relatedIncidents.map((incident: any, index) => (
+                            <div key={index} className="text-xs p-2 bg-red-50 rounded border border-red-200">
+                              <div className="font-medium text-red-800">{incident.title}</div>
+                              <div className="text-red-600 mt-1">위험도: {incident.severity}</div>
+                              {incident.summary && (
+                                <div className="text-gray-600 mt-1 text-xs">{incident.summary}</div>
+                              )}
+                              {incident.prevention && (
+                                <div className="text-blue-700 mt-2 text-xs font-medium">
+                                  예방대책: {incident.prevention}
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                            AI가 분석한 결과, 현재 작업과 유사한<br/>
+                            사고사례가 검색되지 않았습니다.
                           </div>
-                        ))}
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -549,12 +571,22 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {briefingData.educationMaterials.map((material: any, index) => (
-                          <div key={index} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
-                            <div className="font-medium text-blue-800">{material.title}</div>
-                            <div className="text-blue-600 mt-1">{material.type}</div>
+                        {briefingData.educationMaterials && briefingData.educationMaterials.length > 0 ? (
+                          briefingData.educationMaterials.map((material: any, index) => (
+                            <div key={index} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
+                              <div className="font-medium text-blue-800">{material.title}</div>
+                              <div className="text-blue-600 mt-1">{material.type}</div>
+                              {material.keywords && (
+                                <div className="text-gray-600 mt-1 text-xs">키워드: {material.keywords}</div>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                            현재 작업과 관련된 특별 교육자료가<br/>
+                            검색되지 않았습니다.
                           </div>
-                        ))}
+                        )}
                       </div>
                     </CardContent>
                   </Card>

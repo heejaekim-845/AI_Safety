@@ -135,12 +135,24 @@ export class ChromaRAGService {
         workType.toLowerCase(),
         equipmentName.toLowerCase(),
         ...riskFactors.map(rf => rf.toLowerCase())
-      ];
+      ].filter(term => term && term.trim().length > 0);
+
+      // 추가 키워드 확장
+      const expandedTerms = [...searchTerms];
+      if (equipmentName.toLowerCase().includes('gis')) {
+        expandedTerms.push('변전소', '전기', '고전압', '감전', '절연');
+      }
+      if (workType.toLowerCase().includes('정비') || workType.toLowerCase().includes('점검')) {
+        expandedTerms.push('정비', '점검', '수리', '보수');
+      }
+      if (workType.toLowerCase().includes('컨베이어')) {
+        expandedTerms.push('벨트', '끼임', '회전');
+      }
 
       const relevantAccidents = this.accidentData.filter(accident => {
         const searchText = `${accident.title} ${accident.work_type} ${accident.accident_type} ${accident.summary} ${accident.risk_keywords}`.toLowerCase();
         
-        return searchTerms.some(term => 
+        return expandedTerms.some(term => 
           term && searchText.includes(term)
         );
       });
@@ -173,10 +185,21 @@ export class ChromaRAGService {
     try {
       const queryLower = query.toLowerCase();
       
+      // 키워드 확장
+      const expandedTerms = queryLower.split(' ').filter(term => term.trim().length > 0);
+      if (queryLower.includes('gis') || queryLower.includes('전기') || queryLower.includes('고전압')) {
+        expandedTerms.push('감전', '절연', '전기', '정전');
+      }
+      if (queryLower.includes('추락') || queryLower.includes('고소')) {
+        expandedTerms.push('난간', '추락', '안전대');
+      }
+      if (queryLower.includes('컨베이어') || queryLower.includes('기계')) {
+        expandedTerms.push('끼임', '방호', '전원');
+      }
+      
       const relevantRegulations = this.regulationData.filter(regulation => {
         const searchText = `${regulation.title} ${regulation.content} ${regulation.category}`.toLowerCase();
-        return searchText.includes(queryLower) || 
-               queryLower.split(' ').some(term => term && searchText.includes(term));
+        return expandedTerms.some(term => searchText.includes(term));
       });
 
       return relevantRegulations.slice(0, limit);
@@ -193,10 +216,18 @@ export class ChromaRAGService {
     try {
       const queryLower = query.toLowerCase();
       
+      // 키워드 확장
+      const expandedTerms = queryLower.split(' ').filter(term => term.trim().length > 0);
+      if (queryLower.includes('gis') || queryLower.includes('전기')) {
+        expandedTerms.push('전기안전', '감전방지', '절연');
+      }
+      if (queryLower.includes('안전교육') || queryLower.includes('교육')) {
+        expandedTerms.push('교육', '훈련', '안전', '예방');
+      }
+      
       const relevantEducation = this.educationData.filter(edu => {
         const searchText = `${edu.title} ${edu.keywords} ${edu.content} ${edu.type}`.toLowerCase();
-        return searchText.includes(queryLower) || 
-               queryLower.split(' ').some(term => term && searchText.includes(term));
+        return expandedTerms.some(term => searchText.includes(term));
       });
 
       return relevantEducation.slice(0, limit);
