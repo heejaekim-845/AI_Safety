@@ -175,17 +175,6 @@ export default function WorkTypeSelection() {
     return <Badge variant="secondary" className="bg-success text-white">허가 불필요</Badge>;
   };
 
-  const getRequiredLevelIcon = (workType: WorkType) => {
-    const hasAdvancedReqs = workType.requiredQualifications?.some(q => 
-      q.includes('전문') || q.includes('고급')
-    );
-    
-    if (hasAdvancedReqs) {
-      return <span className="material-icons text-sm mr-1 text-danger">engineering</span>;
-    }
-    return <span className="material-icons text-sm mr-1 text-success">check_circle</span>;
-  };
-
   if (isLoading) {
     return (
       <div className="p-6 flex items-center justify-center min-h-96">
@@ -229,15 +218,9 @@ export default function WorkTypeSelection() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 text-xs mb-4">
-                <div className="flex items-center">
-                  {getRequiredLevelIcon(workType)}
-                  <span>자격: {workType.requiredQualifications?.[0] || '기본'}</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="text-sm mr-1 text-warning h-4 w-4" />
-                  <span>소요시간: {workType.estimatedDuration || 30}분</span>
-                </div>
+              <div className="flex items-center text-xs mb-4">
+                <Clock className="text-sm mr-1 text-warning h-4 w-4" />
+                <span>소요시간: {workType.estimatedDuration || 30}분</span>
               </div>
               
               <div className="flex gap-2">
