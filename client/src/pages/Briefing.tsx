@@ -388,8 +388,8 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <Wrench className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Wrench className="w-5 h-5" />
                         작업 내용 요약
                       </CardTitle>
                     </CardHeader>
@@ -412,8 +412,8 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <Shield className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Shield className="w-5 h-5" />
                         위험성 평가 결과
                       </CardTitle>
                     </CardHeader>
@@ -448,8 +448,8 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <Wrench className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Wrench className="w-5 h-5" />
                         필요한 작업도구
                       </CardTitle>
                     </CardHeader>
@@ -475,8 +475,8 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <HardHat className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <HardHat className="w-5 h-5" />
                         필요한 안전장비
                       </CardTitle>
                     </CardHeader>
@@ -504,8 +504,8 @@ export default function Briefing() {
                 {/* Safety Recommendations */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <CheckCircle className="w-4 h-4" />
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <CheckCircle className="w-5 h-5" />
                       안전 권고사항
                     </CardTitle>
                   </CardHeader>
@@ -514,7 +514,7 @@ export default function Briefing() {
                       {briefingData.safetyRecommendations.map((recommendation, index) => (
                         <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
                           <div className="flex items-start gap-2">
-                            <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                               {index + 1}
                             </div>
                             <span className="text-green-800 text-sm leading-relaxed">{recommendation}</span>
@@ -529,8 +529,8 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <ScrollText className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <ScrollText className="w-5 h-5" />
                         관련 법령 및 규정
                       </CardTitle>
                     </CardHeader>
@@ -555,8 +555,8 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <History className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <History className="w-5 h-5" />
                         관련 사고이력
                       </CardTitle>
                     </CardHeader>
@@ -588,8 +588,8 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <GraduationCap className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <GraduationCap className="w-5 h-5" />
                         교육자료
                       </CardTitle>
                     </CardHeader>
@@ -634,10 +634,10 @@ export default function Briefing() {
 
                 {/* RAG-Based Related Accident Cases */}
                 {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 && (
-                  <Card className="border-orange-200">
+                  <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base text-orange-700">
-                        <Zap className="w-4 h-4" />
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Zap className="w-5 h-5" />
                         AI 분석 - 유사 사고사례
                       </CardTitle>
                       <CardDescription>
@@ -704,7 +704,7 @@ export default function Briefing() {
                 {briefingData.quizQuestions.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
                         <BookOpen className="w-5 h-5" />
                         안전 이해도 확인 퀴즈
                       </CardTitle>
