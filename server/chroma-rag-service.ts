@@ -55,9 +55,9 @@ export class ChromaRAGService {
       apiKey: process.env.OPENAI_API_KEY,
     });
     
-    // ChromaDB 클라이언트 초기화 (인메모리 모드)
+    // ChromaDB 클라이언트 초기화 (영구 저장소)
     this.chromaClient = new ChromaClient({
-      path: "http://localhost:8000" // 로컬 ChromaDB 서버 또는 인메모리
+      path: "./data/chromadb" // 로컬 파일 시스템에 영구 저장
     });
   }
 
