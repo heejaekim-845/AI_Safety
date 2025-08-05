@@ -86,7 +86,7 @@ export default function WorkManagement() {
       return apiRequest("POST", `/api/work-types`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/equipment", equipmentId, "work-types"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/equipment/${equipmentId}/work-types`] });
       setIsAddingWorkType(false);
       resetWorkTypeForm();
       toast({ title: "작업 유형이 생성되었습니다" });
@@ -134,7 +134,7 @@ export default function WorkManagement() {
       return apiRequest("DELETE", `/api/work-types/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/equipment", equipmentId, "work-types"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/equipment/${equipmentId}/work-types`] });
       setSelectedWorkType(null);
       toast({ title: "작업 유형이 삭제되었습니다" });
     },
