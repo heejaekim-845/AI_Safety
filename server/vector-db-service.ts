@@ -58,11 +58,25 @@ export class VectorDBService {
       // JSON 파일들에서 데이터 로드
       await this.loadInitialData();
       
-      // OpenAI API 키 확인
+      // OpenAI API 키 확인 및 간단한 테스트
       if (!process.env.OPENAI_API_KEY) {
         console.log('OpenAI API 키가 없어 키워드 기반 검색만 사용');
         this.isInitialized = true;
         return;
+      }
+
+      // OpenAI API 할당량 테스트
+      try {
+        console.log('OpenAI API 할당량 테스트 중...');
+        await this.generateEmbedding('test');
+        console.log('OpenAI API 테스트 성공, 벡터 임베딩 진행');
+      } catch (error: any) {
+        if (error.code === 'insufficient_quota') {
+          console.log('OpenAI API 할당량 부족, 키워드 기반 검색만 사용');
+          this.isInitialized = true;
+          return;
+        }
+        throw error;
       }
       
       // Vectra 벡터 인덱스에 데이터 추가
