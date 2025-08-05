@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-service";
+import { chromaRAGService } from "./chroma-rag-service";
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -400,18 +401,54 @@ JSON 형식으로 응답:
     specialNotes?: string
   ): Promise<any> {
     try {
-      // Get relevant accident cases using RAG
-      const relevantAccidents = await ragService.searchRelevantAccidents(
-        workType.name,
-        equipmentInfo.name,
-        this.extractRiskFactors(equipmentInfo),
-        3
-      );
+      // Get relevant accident cases using both ChromaDB RAG and simple RAG
+      let relevantAccidents: AccidentCase[] = [];
+      let workTypeAccidents: AccidentCase[] = [];
+      let chromaAccidents: any[] = [];
+      let educationMaterials: any[] = [];
+      let safetyRegulations: any[] = [];
 
-      // Also get accidents by work type for broader context
-      const workTypeAccidents = await ragService.getAccidentsByWorkType(workType.name, 2);
+      try {
+        // Try ChromaDB first for enhanced RAG search
+        chromaAccidents = await chromaRAGService.searchRelevantAccidents(
+          workType.name,
+          equipmentInfo.name,
+          this.extractRiskFactors(equipmentInfo),
+          3
+        );
 
-      const accidentContext = this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
+        // Get education materials related to work type
+        educationMaterials = await chromaRAGService.searchEducationMaterials(
+          `${workType.name} ${equipmentInfo.name} 안전교육`,
+          2
+        );
+
+        // Get relevant safety regulations
+        safetyRegulations = await chromaRAGService.searchSafetyRegulations(
+          `${workType.name} ${this.formatRisks(equipmentInfo)} 안전규칙`,
+          3
+        );
+
+        console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+      } catch (error) {
+        console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
+      }
+
+      // Fallback to simple RAG if ChromaDB fails
+      if (chromaAccidents.length === 0) {
+        relevantAccidents = await ragService.searchRelevantAccidents(
+          workType.name,
+          equipmentInfo.name,
+          this.extractRiskFactors(equipmentInfo),
+          3
+        );
+        workTypeAccidents = await ragService.getAccidentsByWorkType(workType.name, 2);
+      }
+
+      // Format accident context for AI prompt
+      const accidentContext = chromaAccidents.length > 0 
+        ? this.formatChromaAccidentCases(chromaAccidents)
+        : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
 
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
@@ -438,6 +475,12 @@ JSON 형식으로 응답:
 
 【관련 사고사례】
 ${accidentContext}
+
+${educationMaterials.length > 0 ? `【관련 교육자료】
+${this.formatEducationMaterials(educationMaterials)}` : ''}
+
+${safetyRegulations.length > 0 ? `【관련 안전규칙】
+${this.formatSafetyRegulations(safetyRegulations)}` : ''}
 
 【특이사항】
 ${specialNotes || "없음"}
@@ -607,6 +650,52 @@ ${specialNotes || "없음"}
     }
     
     return result;
+  }
+
+  private formatChromaAccidentCases(chromaAccidents: any[]): string {
+    if (!chromaAccidents || chromaAccidents.length === 0) {
+      return "관련 사고사례가 없습니다.";
+    }
+
+    return chromaAccidents.map((accident, index) => `
+【사고사례 ${index + 1}】
+- 제목: ${accident.title}
+- 작업유형: ${accident.work_type}
+- 재해형태: ${accident.accident_type}  
+- 사고개요: ${accident.summary}
+- 직접원인: ${accident.direct_cause}
+- 근본원인: ${accident.root_cause}
+- 위험키워드: ${accident.risk_keywords}
+- 예방대책: ${accident.prevention}
+    `).join('\n');
+  }
+
+  private formatEducationMaterials(materials: any[]): string {
+    if (!materials || materials.length === 0) {
+      return "관련 교육자료가 없습니다.";
+    }
+
+    return materials.map((material, index) => `
+【교육자료 ${index + 1}】
+- 제목: ${material.title}
+- 유형: ${material.type}
+- 키워드: ${material.keywords}
+- 내용: ${material.content}
+    `).join('\n');
+  }
+
+  private formatSafetyRegulations(regulations: any[]): string {
+    if (!regulations || regulations.length === 0) {
+      return "관련 안전규칙이 없습니다.";
+    }
+
+    return regulations.map((regulation, index) => `
+【안전규칙 ${index + 1}】
+- 조문: ${regulation.article_number}
+- 제목: ${regulation.title}
+- 내용: ${regulation.content}
+- 분류: ${regulation.category}
+    `).join('\n');
   }
 
   private formatRisks(equipmentInfo: any): string {

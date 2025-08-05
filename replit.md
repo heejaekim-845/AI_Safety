@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Equipment Management**: Comprehensive database with risk classification (HIGH/MEDIUM/LOW), safety requirements, and QR code integration.
 - **Work Management**: Categorized work types, dynamic step-by-step procedures, real-time session tracking, and safety checklists with location-based work scheduling.
 - **AI Safety Analysis**: Real-time contextual risk assessment, dynamic procedure adjustments, and automated emergency response generation. AI voice guidance provides concise, safety-focused summaries.
-- **RAG-based Accident Case Analysis**: Integrated ChromaDB-powered retrieval system that analyzes 1,783 real accident cases from Excel data, providing contextual safety recommendations based on work type and equipment similarity matching.
+- **Enhanced RAG-based Safety Analysis**: Implemented comprehensive retrieval-augmented generation system using real accident case data, safety education materials, and regulatory documents. The system performs keyword-based semantic search across accident cases, education resources, and safety regulations to provide contextual recommendations for AI safety briefings. Includes fallback to simplified RAG when advanced vector database is unavailable.
 - **Weather Integration**: Real-time weather data integration using OpenWeatherMap API for location-specific safety recommendations. System properly handles API failures without displaying mock data.
 - **Mobile Interface**: QR scanner, mobile-optimized navigation, PWA design, and structured for future offline capability.
 - **Data Flow**: Guided workflow from equipment access (QR scan) through AI-powered safety assessment, work planning, session creation, guided execution, completion tracking, and incident reporting.
@@ -51,7 +51,7 @@ Preferred communication style: Simple, everyday language.
 - **Form Handling**: React Hook Form with Zod validation
 - **Styling**: Tailwind CSS
 - **QR Scanning**: ZXing library
-- **RAG System**: ChromaDB for vector embeddings, XLSX for Excel data processing, simple keyword-based fallback search
+- **RAG System**: Enhanced retrieval system with ChromaDB preparation for vector embeddings, keyword-based semantic search, real accident case database, safety education materials integration, and regulatory document analysis
 
 ### Production Infrastructure
 - **Deployment**: Replit autoscale deployment
