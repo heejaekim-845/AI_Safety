@@ -565,7 +565,10 @@ ${specialNotes || "없음"}
         workType: acc.work_type,
         accidentType: acc.accident_type,
         summary: acc.summary,
-        prevention: acc.prevention
+        prevention: acc.prevention,
+        date: acc.date,
+        location: acc.location,
+        damage: acc.damage
       })) : [];
       
       result.educationMaterials = educationMaterials.length > 0 ? educationMaterials.map(edu => ({
@@ -573,7 +576,8 @@ ${specialNotes || "없음"}
         type: edu.type,
         keywords: edu.keywords,
         content: edu.content,
-        url: edu.url
+        url: edu.url,
+        date: edu.date
       })) : [];
 
       // Add debug info

@@ -46,7 +46,8 @@ interface SafetyBriefingData {
   weatherConsiderations: string[];
   safetyRecommendations: string[];
   regulations: any[];
-  relatedIncidents: any[];
+  relatedIncidents: any[]; // RAG 검색된 유사 사고사례
+  registeredIncidents: any[]; // 설비별 등록된 사고이력
   educationMaterials: any[];
   quizQuestions: any[];
   safetySlogan: string;
@@ -540,25 +541,24 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 ? (
-                          briefingData.relatedIncidents.map((incident: any, index) => (
+                        {briefingData.registeredIncidents && briefingData.registeredIncidents.length > 0 ? (
+                          briefingData.registeredIncidents.map((incident: any, index: number) => (
                             <div key={index} className="text-xs p-2 bg-red-50 rounded border border-red-200">
                               <div className="font-medium text-red-800">{incident.title}</div>
                               <div className="text-red-600 mt-1">위험도: {incident.severity}</div>
-                              {incident.summary && (
-                                <div className="text-gray-600 mt-1 text-xs">{incident.summary}</div>
+                              {incident.description && (
+                                <div className="text-gray-600 mt-1 text-xs">{incident.description}</div>
                               )}
-                              {incident.prevention && (
+                              {incident.correctiveActions && (
                                 <div className="text-blue-700 mt-2 text-xs font-medium">
-                                  예방대책: {incident.prevention}
+                                  조치사항: {incident.correctiveActions}
                                 </div>
                               )}
                             </div>
                           ))
                         ) : (
                           <div className="text-xs text-gray-500 italic p-2 text-center">
-                            AI가 분석한 결과, 현재 작업과 유사한<br/>
-                            사고사례가 검색되지 않았습니다.
+                            해당 설비에 등록된 사고이력이 없습니다.
                           </div>
                         )}
                       </div>
@@ -574,10 +574,26 @@ export default function Briefing() {
                         {briefingData.educationMaterials && briefingData.educationMaterials.length > 0 ? (
                           briefingData.educationMaterials.map((material: any, index) => (
                             <div key={index} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
-                              <div className="font-medium text-blue-800">{material.title}</div>
+                              <div className="font-medium text-blue-800">
+                                {material.url ? (
+                                  <a 
+                                    href={material.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="hover:underline text-blue-800 hover:text-blue-900"
+                                  >
+                                    {material.title} ↗
+                                  </a>
+                                ) : (
+                                  material.title
+                                )}
+                              </div>
                               <div className="text-blue-600 mt-1">{material.type}</div>
                               {material.keywords && (
                                 <div className="text-gray-600 mt-1 text-xs">키워드: {material.keywords}</div>
+                              )}
+                              {material.date && (
+                                <div className="text-gray-500 mt-1 text-xs">발행일: {material.date}</div>
                               )}
                             </div>
                           ))
@@ -615,6 +631,27 @@ export default function Briefing() {
                               </span>
                             </div>
                             <div className="space-y-2 text-sm">
+                              {/* 날짜, 장소, 사고규모 정보 추가 */}
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 p-2 bg-gray-50 rounded text-xs">
+                                {accident.date && (
+                                  <div>
+                                    <span className="font-medium text-gray-700">날짜:</span>
+                                    <span className="ml-1 text-gray-600">{accident.date}</span>
+                                  </div>
+                                )}
+                                {accident.location && (
+                                  <div>
+                                    <span className="font-medium text-gray-700">장소:</span>
+                                    <span className="ml-1 text-gray-600">{accident.location}</span>
+                                  </div>
+                                )}
+                                {accident.damage && (
+                                  <div>
+                                    <span className="font-medium text-gray-700">사고규모:</span>
+                                    <span className="ml-1 text-red-600 font-medium">{accident.damage}</span>
+                                  </div>
+                                )}
+                              </div>
                               <div>
                                 <span className="font-medium text-gray-700">작업유형:</span>
                                 <span className="ml-2 text-gray-600">{accident.workType}</span>

@@ -694,6 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get related data
       const equipment = await storage.getEquipmentById(workSchedule.equipmentId!);
       const workType = await storage.getWorkTypeById(workSchedule.workTypeId!);
+      const registeredIncidents = await storage.getIncidentsByEquipmentId(workSchedule.equipmentId!);
       
       if (!equipment || !workType) {
         return res.status(404).json({ message: "설비 또는 작업 유형을 찾을 수 없습니다." });
@@ -750,7 +751,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         weatherConsiderations: aiAnalysis.weatherConsiderations || [],
         safetyRecommendations: aiAnalysis.safetyRecommendations || [],
         regulations: aiAnalysis.regulations || [],
-        relatedIncidents: aiAnalysis.relatedIncidents || [],
+        relatedIncidents: aiAnalysis.relatedIncidents || [], // RAG 검색 결과 (유사 사고사례)
+        registeredIncidents: registeredIncidents || [], // 설비별 등록된 사고이력
         educationMaterials: aiAnalysis.educationMaterials || [],
         quizQuestions: aiAnalysis.quizQuestions || [],
         safetySlogan: aiAnalysis.safetySlogan || "안전이 최우선입니다",
