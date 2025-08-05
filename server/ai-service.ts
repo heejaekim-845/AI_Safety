@@ -551,17 +551,30 @@ ${specialNotes || "없음"}
       result.requiredTools = processedTools;
       result.requiredSafetyEquipment = processedSafetyEquipment;
       
-      // Add the actual accident cases to the response
-      if (relevantAccidents.length > 0) {
-        result.relatedAccidentCases = relevantAccidents.map(acc => ({
-          title: acc.title,
-          workType: acc.workType,
-          accidentType: acc.accidentType,
-          summary: acc.summary,
-          prevention: acc.prevention,
-          severity: acc.severity
-        }));
-      }
+      // Override the AI-generated regulations, incidents, and education materials with actual RAG results
+      result.regulations = safetyRegulations.map(reg => ({
+        title: reg.title,
+        category: reg.category,
+        content: reg.content,
+        article_number: reg.article_number
+      }));
+      
+      result.relatedIncidents = relevantAccidents.map(acc => ({
+        title: acc.title,
+        severity: this.mapAccidentTypeToSeverity(acc.accident_type),
+        workType: acc.work_type,
+        accidentType: acc.accident_type,
+        summary: acc.summary,
+        prevention: acc.prevention
+      }));
+      
+      result.educationMaterials = educationMaterials.map(edu => ({
+        title: edu.title,
+        type: edu.type,
+        keywords: edu.keywords,
+        content: edu.content,
+        url: edu.url
+      }));
 
       return result;
 
@@ -623,7 +636,7 @@ ${specialNotes || "없음"}
   }
 
   private mergeRegisteredAndAIItems(registeredItems: string[], aiItems: any[]): Array<{name: string; source: string}> {
-    const result = [];
+    const result: Array<{name: string; source: string}> = [];
     
     // Add registered items first
     if (registeredItems && registeredItems.length > 0) {
@@ -696,6 +709,22 @@ ${specialNotes || "없음"}
 - 내용: ${regulation.content}
 - 분류: ${regulation.category}
     `).join('\n');
+  }
+
+  private mapAccidentTypeToSeverity(accidentType: string): string {
+    // 사고 유형에 따른 심각도 매핑
+    const highSeverityTypes = ['매몰', '감전', '사망', '화상', '추락'];
+    const mediumSeverityTypes = ['끼임', '부딪힘', '절단', '화재'];
+    
+    const accidentTypeLower = accidentType.toLowerCase();
+    
+    if (highSeverityTypes.some(type => accidentTypeLower.includes(type.toLowerCase()))) {
+      return 'HIGH';
+    } else if (mediumSeverityTypes.some(type => accidentTypeLower.includes(type.toLowerCase()))) {
+      return 'MEDIUM';
+    } else {
+      return 'LOW';
+    }
   }
 
   private formatRisks(equipmentInfo: any): string {
