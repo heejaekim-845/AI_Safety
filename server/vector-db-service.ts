@@ -58,6 +58,13 @@ export class VectorDBService {
       // JSON 파일들에서 데이터 로드
       await this.loadInitialData();
       
+      // OpenAI API 키 확인
+      if (!process.env.OPENAI_API_KEY) {
+        console.log('OpenAI API 키가 없어 키워드 기반 검색만 사용');
+        this.isInitialized = true;
+        return;
+      }
+      
       // Vectra 벡터 인덱스에 데이터 추가
       await this.populateVectorDB();
       

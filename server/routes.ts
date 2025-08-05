@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { aiService } from "./ai-service";
 import { weatherService } from "./weather-service";
 import { simpleRagService as ragService } from "./simple-rag-service";
+import { vectorDBService } from "./vector-db-service";
 import { z } from "zod";
 import { 
   insertEquipmentSchema, 
@@ -761,6 +762,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("안전 브리핑 생성 오류:", error);
       res.status(500).json({ message: "안전 브리핑을 생성할 수 없습니다." });
+    }
+  });
+
+  // 벡터 데이터베이스 테스트 엔드포인트
+  app.get("/api/test-vector-db", async (req, res) => {
+    try {
+      console.log('벡터 데이터베이스 초기화 테스트 시작...');
+      
+      // 벡터 데이터베이스 강제 초기화
+      await vectorDBService.initialize();
+      
+      // 테스트 검색 수행
+      const results = await vectorDBService.searchRelevantData(
+        "170kV GIS",
+        "정기점검", 
+        "HIGH"
+      );
+      
+      res.json({
+        message: "벡터 데이터베이스 테스트 완료",
+        results: {
+          incidents: results.incidents.length,
+          education: results.education.length,
+          regulations: results.regulations.length
+        },
+        data: results
+      });
+    } catch (error) {
+      console.error('벡터 데이터베이스 테스트 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "벡터 데이터베이스 테스트 실패" 
+      });
     }
   });
 
