@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User } from "lucide-react";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User, CheckCircle, Wrench, HardHat, ScrollText, History, GraduationCap, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -388,10 +388,13 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>작업 내용 요약</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Wrench className="w-4 h-4" />
+                        작업 내용 요약
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-700">{briefingData.workSummary}</p>
+                      <p className="text-sm leading-relaxed text-gray-700">{briefingData.workSummary}</p>
                       
                       <div className="mt-4">
                         <h4 className="font-semibold mb-2">주요 위험 요인</h4>
@@ -409,7 +412,10 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>위험성 평가 결과</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Shield className="w-4 h-4" />
+                        위험성 평가 결과
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="mb-4">
@@ -442,7 +448,10 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>필요한 작업도구</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Wrench className="w-4 h-4" />
+                        필요한 작업도구
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
@@ -466,7 +475,10 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>필요한 안전장비</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <HardHat className="w-4 h-4" />
+                        필요한 안전장비
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
@@ -492,7 +504,10 @@ export default function Briefing() {
                 {/* Safety Recommendations */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>안전 권고사항</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <CheckCircle className="w-4 h-4" />
+                      안전 권고사항
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -502,7 +517,7 @@ export default function Briefing() {
                             <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                               {index + 1}
                             </div>
-                            <span className="text-green-800">{recommendation}</span>
+                            <span className="text-green-800 text-sm leading-relaxed">{recommendation}</span>
                           </div>
                         </div>
                       ))}
@@ -514,19 +529,22 @@ export default function Briefing() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm">관련 법령 및 규정</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <ScrollText className="w-4 h-4" />
+                        관련 법령 및 규정
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         {briefingData.regulations && briefingData.regulations.length > 0 ? (
                           briefingData.regulations.map((reg: any, index) => (
-                            <div key={index} className="text-xs p-2 bg-gray-50 rounded">
-                              <div className="font-medium">{reg.title}</div>
-                              <div className="text-gray-600 mt-1">{reg.category}</div>
+                            <div key={index} className="text-sm p-3 bg-gray-50 rounded border">
+                              <div className="font-medium text-gray-800">{reg.title}</div>
+                              <div className="text-gray-600 mt-1 text-xs">{reg.category}</div>
                             </div>
                           ))
                         ) : (
-                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                          <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
                             현재 작업에 해당하는 특별 규정이 검색되지 않았습니다.<br/>
                             기본 산업안전보건법을 준수하세요.
                           </div>
@@ -537,17 +555,20 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm">관련 사고이력</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <History className="w-4 h-4" />
+                        관련 사고이력
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         {briefingData.registeredIncidents && briefingData.registeredIncidents.length > 0 ? (
                           briefingData.registeredIncidents.map((incident: any, index: number) => (
-                            <div key={index} className="text-xs p-2 bg-red-50 rounded border border-red-200">
+                            <div key={index} className="text-sm p-3 bg-red-50 rounded border border-red-200">
                               <div className="font-medium text-red-800">{incident.title}</div>
-                              <div className="text-red-600 mt-1">위험도: {incident.severity}</div>
+                              <div className="text-red-600 mt-1 text-xs">위험도: {incident.severity}</div>
                               {incident.description && (
-                                <div className="text-gray-600 mt-1 text-xs">{incident.description}</div>
+                                <div className="text-gray-600 mt-2 text-xs leading-relaxed">{incident.description}</div>
                               )}
                               {incident.correctiveActions && (
                                 <div className="text-blue-700 mt-2 text-xs font-medium">
@@ -557,7 +578,7 @@ export default function Briefing() {
                             </div>
                           ))
                         ) : (
-                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                          <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
                             해당 설비에 등록된 사고이력이 없습니다.
                           </div>
                         )}
@@ -567,13 +588,16 @@ export default function Briefing() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-sm">교육자료</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <GraduationCap className="w-4 h-4" />
+                        교육자료
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         {briefingData.educationMaterials && briefingData.educationMaterials.length > 0 ? (
                           briefingData.educationMaterials.map((material: any, index) => (
-                            <div key={index} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
+                            <div key={index} className="text-sm p-3 bg-blue-50 rounded border border-blue-200">
                               <div className="font-medium text-blue-800">
                                 {material.url ? (
                                   <a 
@@ -588,9 +612,9 @@ export default function Briefing() {
                                   material.title
                                 )}
                               </div>
-                              <div className="text-blue-600 mt-1">{material.type}</div>
+                              <div className="text-blue-600 mt-1 text-xs">{material.type}</div>
                               {material.keywords && (
-                                <div className="text-gray-600 mt-1 text-xs">키워드: {material.keywords}</div>
+                                <div className="text-gray-600 mt-2 text-xs">키워드: {material.keywords}</div>
                               )}
                               {material.date && (
                                 <div className="text-gray-500 mt-1 text-xs">발행일: {material.date}</div>
@@ -598,7 +622,7 @@ export default function Briefing() {
                             </div>
                           ))
                         ) : (
-                          <div className="text-xs text-gray-500 italic p-2 text-center">
+                          <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
                             현재 작업과 관련된 특별 교육자료가<br/>
                             검색되지 않았습니다.
                           </div>
@@ -612,8 +636,8 @@ export default function Briefing() {
                 {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 && (
                   <Card className="border-orange-200">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-orange-700">
-                        <AlertTriangle className="w-5 h-5" />
+                      <CardTitle className="flex items-center gap-2 text-base text-orange-700">
+                        <Zap className="w-4 h-4" />
                         AI 분석 - 유사 사고사례
                       </CardTitle>
                       <CardDescription>
