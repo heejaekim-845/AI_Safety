@@ -493,6 +493,21 @@ ${specialNotes || "없음"}
 
       const result = JSON.parse(response.text || "{}");
       
+      // Process and merge registered checklist items with AI recommendations
+      const processedTools = this.mergeRegisteredAndAIItems(
+        workType.requiredTools || [],
+        result.requiredTools || []
+      );
+      
+      const processedSafetyEquipment = this.mergeRegisteredAndAIItems(
+        workType.requiredEquipment || [],
+        result.requiredSafetyEquipment || []
+      );
+      
+      // Update result with processed items
+      result.requiredTools = processedTools;
+      result.requiredSafetyEquipment = processedSafetyEquipment;
+      
       // Add the actual accident cases to the response
       if (relevantAccidents.length > 0) {
         result.relatedAccidentCases = relevantAccidents.map(acc => ({
@@ -510,13 +525,23 @@ ${specialNotes || "없음"}
     } catch (error) {
       console.error("Enhanced safety briefing generation error:", error);
       
-      // Fallback to basic briefing without RAG
+      // Fallback to basic briefing without RAG, but include registered checklist items
+      const fallbackTools = this.mergeRegisteredAndAIItems(
+        workType.requiredTools || [],
+        ["기본 작업도구"]
+      );
+      
+      const fallbackSafetyEquipment = this.mergeRegisteredAndAIItems(
+        workType.requiredEquipment || [],
+        ["안전모", "안전화", "보안경"]
+      );
+      
       return {
         workSummary: `${equipmentInfo.name}에서 ${workType.name} 작업을 수행합니다.`,
         riskFactors: ["기본 안전수칙 준수"],
         riskAssessment: { totalScore: 5, riskFactors: [] },
-        requiredTools: ["기본 작업도구"],
-        requiredSafetyEquipment: ["안전모", "안전화", "보안경"],
+        requiredTools: fallbackTools,
+        requiredSafetyEquipment: fallbackSafetyEquipment,
         weatherConsiderations: ["현재 날씨 조건 확인"],
         safetyRecommendations: ["안전수칙을 준수하며 작업하세요"],
         regulations: [],
@@ -552,6 +577,36 @@ ${specialNotes || "없음"}
       - 직접원인: ${acc.directCause}
       - 예방대책: ${acc.prevention}`
     ).join('\n\n');
+  }
+
+  private mergeRegisteredAndAIItems(registeredItems: string[], aiItems: any[]): Array<{name: string; source: string}> {
+    const result = [];
+    
+    // Add registered items first
+    if (registeredItems && registeredItems.length > 0) {
+      registeredItems.forEach(item => {
+        if (item && item.trim()) {
+          result.push({ name: item.trim(), source: 'registered' });
+        }
+      });
+    }
+    
+    // Add AI recommended items that are not already registered
+    if (aiItems && aiItems.length > 0) {
+      aiItems.forEach(aiItem => {
+        const itemName = typeof aiItem === 'string' ? aiItem : aiItem.name;
+        if (itemName && itemName.trim()) {
+          const exists = result.some(existing => 
+            existing.name.toLowerCase() === itemName.trim().toLowerCase()
+          );
+          if (!exists) {
+            result.push({ name: itemName.trim(), source: 'ai_recommended' });
+          }
+        }
+      });
+    }
+    
+    return result;
   }
 
   private formatRisks(equipmentInfo: any): string {
