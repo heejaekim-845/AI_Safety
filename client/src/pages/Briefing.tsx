@@ -41,8 +41,8 @@ interface SafetyBriefingData {
   workSummary: string;
   riskFactors: string[];
   riskAssessment: any;
-  requiredTools: string[];
-  requiredSafetyEquipment: string[];
+  requiredTools: Array<{name: string; source: string}> | string[];
+  requiredSafetyEquipment: Array<{name: string; source: string}> | string[];
   weatherConsiderations: string[];
   safetyRecommendations: string[];
   regulations: any[];
@@ -445,12 +445,20 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {briefingData.requiredTools.map((tool, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span>{tool}</span>
-                          </li>
-                        ))}
+                        {briefingData.requiredTools.map((tool, index) => {
+                          const toolItem = typeof tool === 'string' ? { name: tool, source: 'registered' } : tool;
+                          return (
+                            <li key={index} className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <span>{toolItem.name}</span>
+                              {toolItem.source === 'ai_recommended' && (
+                                <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700">
+                                  AI추천
+                                </Badge>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </CardContent>
                   </Card>
@@ -461,12 +469,20 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {briefingData.requiredSafetyEquipment.map((equipment, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-green-500" />
-                            <span>{equipment}</span>
-                          </li>
-                        ))}
+                        {briefingData.requiredSafetyEquipment.map((equipment, index) => {
+                          const equipmentItem = typeof equipment === 'string' ? { name: equipment, source: 'registered' } : equipment;
+                          return (
+                            <li key={index} className="flex items-center gap-2">
+                              <Shield className="w-4 h-4 text-green-500" />
+                              <span>{equipmentItem.name}</span>
+                              {equipmentItem.source === 'ai_recommended' && (
+                                <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700">
+                                  AI추천
+                                </Badge>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </CardContent>
                   </Card>

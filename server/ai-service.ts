@@ -426,6 +426,8 @@ JSON 형식으로 응답:
 - 작업 유형: ${workType.name}
 - 작업 설명: ${workType.description}
 - 예상 소요 시간: ${workType.estimatedDuration}분
+- 등록된 필수 안전장비: ${workType.requiredEquipment?.join(", ") || "없음"}
+- 등록된 필수 작업도구: ${workType.requiredTools?.join(", ") || "없음"}
 
 【날씨 정보】
 - 현재 날씨: ${weatherData.condition}
@@ -440,6 +442,8 @@ ${accidentContext}
 【특이사항】
 ${specialNotes || "없음"}
 
+등록된 필수 안전장비와 작업도구를 우선적으로 포함하되, 추가로 필요하다고 판단되는 항목들을 AI 추천으로 포함해주세요.
+
 다음 형식으로 JSON 응답을 제공해주세요:
 {
   "workSummary": "작업 개요 설명",
@@ -450,8 +454,12 @@ ${specialNotes || "없음"}
       {"factor": "위험요인명", "probability": 숫자, "severity": 숫자, "score": 숫자}
     ]
   },
-  "requiredTools": ["필요도구1", "필요도구2", ...],
-  "requiredSafetyEquipment": ["안전장비1", "안전장비2", ...],
+  "requiredTools": [
+    {"name": "도구명", "source": "registered|ai_recommended"}
+  ],
+  "requiredSafetyEquipment": [
+    {"name": "장비명", "source": "registered|ai_recommended"}
+  ],
   "weatherConsiderations": ["날씨고려사항1", "날씨고려사항2", ...],
   "safetyRecommendations": ["안전권고1", "안전권고2", ...],
   "regulations": [
