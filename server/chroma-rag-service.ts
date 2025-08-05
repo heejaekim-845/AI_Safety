@@ -55,10 +55,8 @@ export class ChromaRAGService {
       apiKey: process.env.OPENAI_API_KEY,
     });
     
-    // ChromaDB 클라이언트 초기화 (영구 저장소)
-    this.chromaClient = new ChromaClient({
-      path: "./data/chromadb" // 로컬 파일 시스템에 영구 저장
-    });
+    // ChromaDB 클라이언트 초기화 (인메모리 모드)
+    this.chromaClient = new ChromaClient();
   }
 
   async initialize(): Promise<void> {
@@ -91,7 +89,7 @@ export class ChromaRAGService {
 
       // 교육자료 컬렉션 생성 및 임베딩
       this.vectorCollections.education = await this.chromaClient.getOrCreateCollection({
-        name: "safety_education", 
+        name: "safety_education",
         metadata: { "hnsw:space": "cosine" }
       });
 
@@ -121,11 +119,8 @@ export class ChromaRAGService {
             `${item.title} ${item.work_type} ${item.accident_type} ${item.summary} ${item.direct_cause} ${item.risk_keywords}`
           );
           
-          const accidentEmbeddings = await this.generateEmbeddings(accidentTexts);
-          
           await this.vectorCollections.accidents.add({
             ids: this.accidentData.map((_, index) => `accident_${index}`),
-            embeddings: accidentEmbeddings,
             documents: accidentTexts,
             metadatas: this.accidentData.map(item => ({
               type: 'accident',
@@ -147,11 +142,8 @@ export class ChromaRAGService {
             `${item.title} ${item.type} ${item.keywords} ${item.content}`
           );
           
-          const educationEmbeddings = await this.generateEmbeddings(educationTexts);
-          
           await this.vectorCollections.education.add({
             ids: this.educationData.map((_, index) => `education_${index}`),
-            embeddings: educationEmbeddings,
             documents: educationTexts,
             metadatas: this.educationData.map(item => ({
               type: 'education',
@@ -172,11 +164,8 @@ export class ChromaRAGService {
             `${item.title} ${item.content} ${item.category}`
           );
           
-          const regulationEmbeddings = await this.generateEmbeddings(regulationTexts);
-          
           await this.vectorCollections.regulations.add({
             ids: this.regulationData.map((_, index) => `regulation_${index}`),
-            embeddings: regulationEmbeddings,
             documents: regulationTexts,
             metadatas: this.regulationData.map(item => ({
               type: 'regulation',
@@ -587,21 +576,18 @@ export class ChromaRAGService {
     education: EducationData[];
   }> {
     try {
-      // 검색 쿼리 임베딩 생성
-      const queryEmbedding = await this.generateEmbeddings([searchQuery]);
-      
-      // 각 컬렉션에서 유사한 문서 검색
+      // 각 컬렉션에서 유사한 문서 검색 (임베딩은 자동 생성됨)
       const [regulationResults, incidentResults, educationResults] = await Promise.all([
         this.vectorCollections.regulations!.query({
-          queryEmbeddings: queryEmbedding,
+          queryTexts: [searchQuery],
           nResults: 3
         }),
         this.vectorCollections.accidents!.query({
-          queryEmbeddings: queryEmbedding,
+          queryTexts: [searchQuery],
           nResults: 3
         }),
         this.vectorCollections.education!.query({
-          queryEmbeddings: queryEmbedding,
+          queryTexts: [searchQuery],
           nResults: 2
         })
       ]);
