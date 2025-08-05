@@ -638,7 +638,7 @@ export default function Briefing() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <Zap className="w-5 h-5" />
-                        AI 분석 - 유사 사고사례
+                        유사 사고사례
                       </CardTitle>
                       <CardDescription>
                         AI가 분석한 현재 작업과 유사한 실제 사고사례입니다
