@@ -1,7 +1,8 @@
-// ChromaDB를 사용한 고급 RAG 시스템 (ChromaDB 서버가 실행 중일 때만 활성화)
+// ChromaDB를 사용한 고급 RAG 시스템 (벡터 데이터베이스 기반)
 import * as fs from 'fs';
 import * as path from 'path';
 import OpenAI from 'openai';
+import { ChromaClient } from 'chromadb';
 
 interface AccidentCase {
   title: string;
@@ -38,14 +39,25 @@ interface SafetyRegulation {
 
 export class ChromaRAGService {
   private openai: OpenAI;
+  private chromaClient: ChromaClient;
   private accidentData: AccidentCase[] = [];
   private educationData: EducationData[] = [];
   private regulationData: SafetyRegulation[] = [];
   private isInitialized = false;
+  private vectorCollections: {
+    accidents?: any;
+    education?: any;
+    regulations?: any;
+  } = {};
 
   constructor() {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
+    });
+    
+    // ChromaDB 클라이언트 초기화 (인메모리 모드)
+    this.chromaClient = new ChromaClient({
+      path: "http://localhost:8000" // 로컬 ChromaDB 서버 또는 인메모리
     });
   }
 
@@ -53,16 +65,145 @@ export class ChromaRAGService {
     if (this.isInitialized) return;
 
     try {
-      console.log('Enhanced RAG Service 초기화 시작...');
+      console.log('ChromaDB RAG Service 초기화 시작...');
       
       // JSON 파일들에서 데이터 로드
       await this.loadInitialData();
       
+      // ChromaDB 벡터 컬렉션 초기화
+      await this.initializeVectorCollections();
+      
       this.isInitialized = true;
-      console.log('Enhanced RAG Service 초기화 완료');
+      console.log('ChromaDB RAG Service 초기화 완료');
     } catch (error) {
-      console.error('Enhanced RAG Service 초기화 실패:', error);
-      this.isInitialized = true;
+      console.error('ChromaDB RAG Service 초기화 실패, 키워드 기반으로 폴백:', error);
+      this.isInitialized = true; // 키워드 기반 검색으로 폴백
+    }
+  }
+
+  private async initializeVectorCollections(): Promise<void> {
+    try {
+      // 사고사례 컬렉션 생성 및 임베딩
+      this.vectorCollections.accidents = await this.chromaClient.getOrCreateCollection({
+        name: "safety_accidents",
+        metadata: { "hnsw:space": "cosine" }
+      });
+
+      // 교육자료 컬렉션 생성 및 임베딩
+      this.vectorCollections.education = await this.chromaClient.getOrCreateCollection({
+        name: "safety_education", 
+        metadata: { "hnsw:space": "cosine" }
+      });
+
+      // 법규 컬렉션 생성 및 임베딩
+      this.vectorCollections.regulations = await this.chromaClient.getOrCreateCollection({
+        name: "safety_regulations",
+        metadata: { "hnsw:space": "cosine" }
+      });
+
+      // 기존 데이터 확인 및 임베딩 생성
+      await this.populateVectorCollections();
+      
+      console.log('ChromaDB 벡터 컬렉션 초기화 완료');
+    } catch (error) {
+      console.error('ChromaDB 벡터 컬렉션 초기화 실패:', error);
+      throw error;
+    }
+  }
+
+  private async populateVectorCollections(): Promise<void> {
+    try {
+      // 사고사례 벡터화
+      if (this.accidentData.length > 0 && this.vectorCollections.accidents) {
+        const accidentCount = await this.vectorCollections.accidents.count();
+        if (accidentCount === 0) {
+          const accidentTexts = this.accidentData.map(item => 
+            `${item.title} ${item.work_type} ${item.accident_type} ${item.summary} ${item.direct_cause} ${item.risk_keywords}`
+          );
+          
+          const accidentEmbeddings = await this.generateEmbeddings(accidentTexts);
+          
+          await this.vectorCollections.accidents.add({
+            ids: this.accidentData.map((_, index) => `accident_${index}`),
+            embeddings: accidentEmbeddings,
+            documents: accidentTexts,
+            metadatas: this.accidentData.map(item => ({
+              type: 'accident',
+              work_type: item.work_type,
+              accident_type: item.accident_type,
+              date: item.date,
+              location: item.location
+            }))
+          });
+          console.log(`사고사례 ${this.accidentData.length}건 벡터화 완료`);
+        }
+      }
+
+      // 교육자료 벡터화
+      if (this.educationData.length > 0 && this.vectorCollections.education) {
+        const educationCount = await this.vectorCollections.education.count();
+        if (educationCount === 0) {
+          const educationTexts = this.educationData.map(item => 
+            `${item.title} ${item.type} ${item.keywords} ${item.content}`
+          );
+          
+          const educationEmbeddings = await this.generateEmbeddings(educationTexts);
+          
+          await this.vectorCollections.education.add({
+            ids: this.educationData.map((_, index) => `education_${index}`),
+            embeddings: educationEmbeddings,
+            documents: educationTexts,
+            metadatas: this.educationData.map(item => ({
+              type: 'education',
+              doc_type: item.type,
+              date: item.date,
+              doc_number: item.doc_number
+            }))
+          });
+          console.log(`교육자료 ${this.educationData.length}건 벡터화 완료`);
+        }
+      }
+
+      // 법규 벡터화
+      if (this.regulationData.length > 0 && this.vectorCollections.regulations) {
+        const regulationCount = await this.vectorCollections.regulations.count();
+        if (regulationCount === 0) {
+          const regulationTexts = this.regulationData.map(item => 
+            `${item.title} ${item.content} ${item.category}`
+          );
+          
+          const regulationEmbeddings = await this.generateEmbeddings(regulationTexts);
+          
+          await this.vectorCollections.regulations.add({
+            ids: this.regulationData.map((_, index) => `regulation_${index}`),
+            embeddings: regulationEmbeddings,
+            documents: regulationTexts,
+            metadatas: this.regulationData.map(item => ({
+              type: 'regulation',
+              article_number: item.article_number,
+              category: item.category
+            }))
+          });
+          console.log(`법규 ${this.regulationData.length}건 벡터화 완료`);
+        }
+      }
+    } catch (error) {
+      console.error('벡터 컬렉션 데이터 입력 실패:', error);
+      throw error;
+    }
+  }
+
+  private async generateEmbeddings(texts: string[]): Promise<number[][]> {
+    try {
+      const response = await this.openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: texts,
+      });
+      
+      return response.data.map(item => item.embedding);
+    } catch (error) {
+      console.error('임베딩 생성 실패:', error);
+      throw error;
     }
   }
 
@@ -407,6 +548,144 @@ export class ChromaRAGService {
       console.error('작업유형별 사고사례 검색 실패:', error);
       return [];
     }
+  }
+
+  // ChromaDB 벡터 검색 메서드 (새로 추가)
+  async searchRelevantDataVector(equipment: string, workType: string, riskLevel: string): Promise<{
+    regulations: SafetyRegulation[];
+    incidents: AccidentCase[];
+    education: EducationData[];
+  }> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+
+    try {
+      console.log('ChromaDB 벡터 검색 시작...');
+      
+      // 검색 쿼리 생성
+      const searchQuery = `${equipment} ${workType} ${riskLevel} 전기 안전 GIS 고압 특고압 170kV`;
+      
+      // ChromaDB 벡터 검색 시도
+      if (this.vectorCollections.accidents && this.vectorCollections.education && this.vectorCollections.regulations) {
+        return await this.performVectorSearch(searchQuery);
+      } else {
+        // 폴백: 키워드 기반 검색
+        console.log('ChromaDB 미초기화, 키워드 기반 검색으로 폴백');
+        return await this.performKeywordSearch(equipment, workType, riskLevel);
+      }
+      
+    } catch (error) {
+      console.error('ChromaDB 벡터 검색 실패, 키워드 기반으로 폴백:', error);
+      return await this.performKeywordSearch(equipment, workType, riskLevel);
+    }
+  }
+
+  private async performVectorSearch(searchQuery: string): Promise<{
+    regulations: SafetyRegulation[];
+    incidents: AccidentCase[];
+    education: EducationData[];
+  }> {
+    try {
+      // 검색 쿼리 임베딩 생성
+      const queryEmbedding = await this.generateEmbeddings([searchQuery]);
+      
+      // 각 컬렉션에서 유사한 문서 검색
+      const [regulationResults, incidentResults, educationResults] = await Promise.all([
+        this.vectorCollections.regulations!.query({
+          queryEmbeddings: queryEmbedding,
+          nResults: 3
+        }),
+        this.vectorCollections.accidents!.query({
+          queryEmbeddings: queryEmbedding,
+          nResults: 3
+        }),
+        this.vectorCollections.education!.query({
+          queryEmbeddings: queryEmbedding,
+          nResults: 2
+        })
+      ]);
+
+      // 결과를 원본 데이터와 매핑
+      const regulations = this.mapRegulationResults(regulationResults);
+      const incidents = this.mapIncidentResults(incidentResults);
+      const education = this.mapEducationResults(educationResults);
+
+      console.log(`ChromaDB 벡터 검색 결과: 사고사례 ${incidents.length}건, 교육자료 ${education.length}건, 법규 ${regulations.length}건`);
+
+      return { regulations, incidents, education };
+      
+    } catch (error) {
+      console.error('벡터 검색 실행 실패:', error);
+      throw error;
+    }
+  }
+
+  private async performKeywordSearch(equipment: string, workType: string, riskLevel: string): Promise<{
+    regulations: SafetyRegulation[];
+    incidents: AccidentCase[];
+    education: EducationData[];
+  }> {
+    const searchKeywords = [
+      equipment.toLowerCase(),
+      workType.toLowerCase(),
+      riskLevel.toLowerCase(),
+      '전기', 'gis', '고압', '특고압', '170kv'
+    ];
+
+    // 법규 검색 - 전기 관련 키워드 우선
+    const relevantRegulations = this.regulationData.filter(reg => {
+      const searchText = `${reg.title} ${reg.content} ${reg.category}`.toLowerCase();
+      return searchKeywords.some(keyword => searchText.includes(keyword)) ||
+             searchText.includes('전기') || searchText.includes('고압') || searchText.includes('특고압');
+    }).slice(0, 3);
+
+    // 사고사례 검색
+    const relevantIncidents = this.accidentData.filter(incident => {
+      const searchText = `${incident.title} ${incident.work_type} ${incident.accident_type} ${incident.risk_keywords}`.toLowerCase();
+      return searchKeywords.some(keyword => searchText.includes(keyword));
+    }).slice(0, 3);
+
+    // 교육자료 검색
+    const relevantEducation = this.educationData.filter(edu => {
+      const searchText = `${edu.title} ${edu.keywords} ${edu.content}`.toLowerCase();
+      return searchKeywords.some(keyword => searchText.includes(keyword));
+    }).slice(0, 2);
+
+    console.log(`키워드 기반 검색 결과: 사고사례 ${relevantIncidents.length}건, 교육자료 ${relevantEducation.length}건, 법규 ${relevantRegulations.length}건`);
+
+    return {
+      regulations: relevantRegulations,
+      incidents: relevantIncidents,
+      education: relevantEducation
+    };
+  }
+
+  private mapRegulationResults(results: any): SafetyRegulation[] {
+    if (!results.ids || !results.ids[0]) return [];
+    
+    return results.ids[0].map((id: string) => {
+      const index = parseInt(id.replace('regulation_', ''));
+      return this.regulationData[index];
+    }).filter(Boolean);
+  }
+
+  private mapIncidentResults(results: any): AccidentCase[] {
+    if (!results.ids || !results.ids[0]) return [];
+    
+    return results.ids[0].map((id: string) => {
+      const index = parseInt(id.replace('accident_', ''));
+      return this.accidentData[index];
+    }).filter(Boolean);
+  }
+
+  private mapEducationResults(results: any): EducationData[] {
+    if (!results.ids || !results.ids[0]) return [];
+    
+    return results.ids[0].map((id: string) => {
+      const index = parseInt(id.replace('education_', ''));
+      return this.educationData[index];
+    }).filter(Boolean);
   }
 }
 
