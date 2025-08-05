@@ -55,8 +55,9 @@ export class ChromaRAGService {
       apiKey: process.env.OPENAI_API_KEY,
     });
     
-    // ChromaDB 클라이언트 초기화 (인메모리 모드)
-    this.chromaClient = new ChromaClient();
+    // ChromaDB 클라이언트 초기화 (완전 비활성화 모드)
+    // ChromaDB 연결 오류 방지를 위해 null로 설정
+    this.chromaClient = null as any;
   }
 
   async initialize(): Promise<void> {
@@ -80,33 +81,9 @@ export class ChromaRAGService {
   }
 
   private async initializeVectorCollections(): Promise<void> {
-    try {
-      // 사고사례 컬렉션 생성 및 임베딩
-      this.vectorCollections.accidents = await this.chromaClient.getOrCreateCollection({
-        name: "safety_accidents",
-        metadata: { "hnsw:space": "cosine" }
-      });
-
-      // 교육자료 컬렉션 생성 및 임베딩
-      this.vectorCollections.education = await this.chromaClient.getOrCreateCollection({
-        name: "safety_education",
-        metadata: { "hnsw:space": "cosine" }
-      });
-
-      // 법규 컬렉션 생성 및 임베딩
-      this.vectorCollections.regulations = await this.chromaClient.getOrCreateCollection({
-        name: "safety_regulations",
-        metadata: { "hnsw:space": "cosine" }
-      });
-
-      // 기존 데이터 확인 및 임베딩 생성
-      await this.populateVectorCollections();
-      
-      console.log('ChromaDB 벡터 컬렉션 초기화 완료');
-    } catch (error) {
-      console.error('ChromaDB 벡터 컬렉션 초기화 실패:', error);
-      throw error;
-    }
+    // ChromaDB 비활성화 - 키워드 기반 검색만 사용
+    console.log('ChromaDB 비활성화됨, 키워드 기반 검색 사용');
+    return;
   }
 
   private async populateVectorCollections(): Promise<void> {
@@ -549,25 +526,9 @@ export class ChromaRAGService {
       await this.initialize();
     }
 
-    try {
-      console.log('ChromaDB 벡터 검색 시작...');
-      
-      // 검색 쿼리 생성
-      const searchQuery = `${equipment} ${workType} ${riskLevel} 전기 안전 GIS 고압 특고압 170kV`;
-      
-      // ChromaDB 벡터 검색 시도
-      if (this.vectorCollections.accidents && this.vectorCollections.education && this.vectorCollections.regulations) {
-        return await this.performVectorSearch(searchQuery);
-      } else {
-        // 폴백: 키워드 기반 검색
-        console.log('ChromaDB 미초기화, 키워드 기반 검색으로 폴백');
-        return await this.performKeywordSearch(equipment, workType, riskLevel);
-      }
-      
-    } catch (error) {
-      console.error('ChromaDB 벡터 검색 실패, 키워드 기반으로 폴백:', error);
-      return await this.performKeywordSearch(equipment, workType, riskLevel);
-    }
+    // ChromaDB 비활성화 - 직접 키워드 기반 검색 사용
+    console.log('키워드 기반 검색 시작 (ChromaDB 비활성화)...');
+    return await this.performKeywordSearch(equipment, workType, riskLevel);
   }
 
   private async performVectorSearch(searchQuery: string): Promise<{
