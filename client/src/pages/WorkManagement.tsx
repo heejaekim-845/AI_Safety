@@ -53,10 +53,12 @@ export default function WorkManagement() {
   // Checklist Form States
   const [requiredQualifications, setRequiredQualifications] = useState<string[]>([]);
   const [safetyEquipmentRequirements, setSafetyEquipmentRequirements] = useState<string[]>([]);
+  const [requiredTools, setRequiredTools] = useState<string[]>([]);
   const [environmentalRequirements, setEnvironmentalRequirements] = useState<string[]>([]);
   const [legalRequirements, setLegalRequirements] = useState<string[]>([]);
   const [newQualification, setNewQualification] = useState("");
   const [newSafetyEquipment, setNewSafetyEquipment] = useState("");
+  const [newTool, setNewTool] = useState("");
   const [newEnvironmentalReq, setNewEnvironmentalReq] = useState("");
   const [newLegalReq, setNewLegalReq] = useState("");
 
@@ -146,6 +148,7 @@ export default function WorkManagement() {
       data: {
         requiredQualifications?: string[];
         requiredEquipment?: string[];
+        requiredTools?: string[];
         environmentalRequirements?: string[];
         legalRequirements?: string[];
       } 
@@ -179,10 +182,12 @@ export default function WorkManagement() {
   const resetChecklistForm = () => {
     setRequiredQualifications([]);
     setSafetyEquipmentRequirements([]);
+    setRequiredTools([]);
     setEnvironmentalRequirements([]);
     setLegalRequirements([]);
     setNewQualification("");
     setNewSafetyEquipment("");
+    setNewTool("");
     setNewEnvironmentalReq("");
     setNewLegalReq("");
   };
@@ -192,6 +197,7 @@ export default function WorkManagement() {
     setEditingWorkTypeId(workType.id);
     setRequiredQualifications(workType.requiredQualifications || []);
     setSafetyEquipmentRequirements(workType.requiredEquipment || []);
+    setRequiredTools(workType.requiredTools || []);
     setEnvironmentalRequirements(workType.environmentalRequirements || []);
     setLegalRequirements(workType.legalRequirements || []);
     setIsEditingChecklist(true);
@@ -205,6 +211,7 @@ export default function WorkManagement() {
       data: {
         requiredQualifications,
         requiredEquipment: safetyEquipmentRequirements,
+        requiredTools,
         environmentalRequirements,
         legalRequirements,
       },
@@ -238,6 +245,17 @@ export default function WorkManagement() {
 
   const removeSafetyEquipment = (index: number) => {
     setSafetyEquipmentRequirements(safetyEquipmentRequirements.filter((_, i) => i !== index));
+  };
+
+  const addTool = () => {
+    if (newTool.trim()) {
+      setRequiredTools([...requiredTools, newTool.trim()]);
+      setNewTool("");
+    }
+  };
+
+  const removeTool = (index: number) => {
+    setRequiredTools(requiredTools.filter((_, i) => i !== index));
   };
 
   const addEnvironmentalReq = () => {
@@ -732,6 +750,47 @@ export default function WorkManagement() {
                       onKeyPress={(e) => e.key === 'Enter' && addSafetyEquipment()}
                     />
                     <Button onClick={addSafetyEquipment} disabled={!newSafetyEquipment.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Required Tools */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <Wrench className="h-4 w-4" />
+                  필수 작업도구
+                </Label>
+                <div className="space-y-2">
+                  {requiredTools.map((tool, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        value={tool} 
+                        onChange={(e) => {
+                          const updated = [...requiredTools];
+                          updated[index] = e.target.value;
+                          setRequiredTools(updated);
+                        }}
+                        className="flex-1" 
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeTool(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 작업도구 추가"
+                      value={newTool}
+                      onChange={(e) => setNewTool(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addTool()}
+                    />
+                    <Button onClick={addTool} disabled={!newTool.trim()}>
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>

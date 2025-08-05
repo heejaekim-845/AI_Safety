@@ -58,6 +58,7 @@ export const workTypes = pgTable("work_types", {
   estimatedDuration: integer("estimated_duration"), // in minutes
   requiredQualifications: text("required_qualifications").array(),
   requiredEquipment: text("required_equipment").array(),
+  requiredTools: text("required_tools").array(),
   environmentalRequirements: text("environmental_requirements").array(),
   legalRequirements: text("legal_requirements").array(),
   createdAt: timestamp("created_at").defaultNow(),
