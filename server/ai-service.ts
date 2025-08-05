@@ -425,7 +425,9 @@ JSON 형식으로 응답:
 
         // Get relevant safety regulations
         safetyRegulations = await chromaRAGService.searchSafetyRegulations(
-          `${workType.name} ${this.formatRisks(equipmentInfo)} 안전규칙`,
+          equipmentInfo.name,
+          workType.name,
+          this.extractRiskFactors(equipmentInfo),
           3
         );
 

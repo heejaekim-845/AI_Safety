@@ -82,8 +82,82 @@ export class ChromaRAGService {
         console.log(`교육자료 ${this.educationData.length}건 로드 완료`);
       }
 
-      // 안전보건 법규 데이터 추가
+      // 안전보건 법규 데이터 추가 - 전기설비 중심으로 확장
       this.regulationData = [
+        // 전기설비 안전 관련 조항들 (170kV GIS 등 고압 전기설비)
+        {
+          title: "제301조(전기기계·기구의 방호)",
+          article_number: "제301조",
+          content: "사업주는 근로자가 전기에 의하여 위험을 입을 우려가 있는 장소에 전기기계·기구를 설치하는 경우에는 충전부가 노출되지 아니하도록 폐쇄형 구조로 하거나 절연덮개 등 적절한 방호장치를 설치하여야 한다.",
+          category: "전기안전"
+        },
+        {
+          title: "제302조(접지)",
+          article_number: "제302조",
+          content: "사업주는 전기기계·기구의 충전될 우려가 있는 금속제 외함에 대하여는 접지선을 연결하는 등의 조치를 하여야 한다.",
+          category: "전기안전"
+        },
+        {
+          title: "제303조(누전차단기)",
+          article_number: "제303조",
+          content: "사업주는 전기기계·기구를 습기가 많은 장소에서 사용하거나 근로자가 전기에 의한 위험에 노출될 우려가 있는 장소에서는 누전차단기를 설치하여야 한다.",
+          category: "전기안전"
+        },
+        {
+          title: "제304조(과전류차단장치)",
+          article_number: "제304조",
+          content: "사업주는 전기설비에 과전류가 흘러 화재의 위험이 있는 경우에는 과전류차단장치를 설치하여야 한다.",
+          category: "전기안전"
+        },
+        {
+          title: "제305조(전기기계의 조작)",
+          article_number: "제305조",
+          content: "사업주는 전기기계를 조작하는 경우에는 해당 전기기계에 전력을 공급하는 개폐기에 잠금장치를 하고 그 개폐기에 작업 중임을 표시하는 꼬리표를 붙이는 등의 조치를 하여야 한다.",
+          category: "전기안전"
+        },
+        {
+          title: "제306조 ~ 제310조(전기설비 안전조치)",
+          article_number: "제306조~제310조",
+          content: "전기기계·기구의 방호, 접지, 누전차단기, 과전류 차단장치, 전기기계의 조작 안전조치 등에 관한 세부 규정",
+          category: "전기안전"
+        },
+        {
+          title: "제318조(전기작업자의 자격)",
+          article_number: "제318조",
+          content: "사업주는 고압 또는 특고압 전기설비의 설치·정비·점검 등의 업무를 하는 근로자에 대하여는 전기 관련 자격을 취득한 자 또는 해당 업무에 관한 안전보건교육을 받은 자로 하여금 작업하게 하여야 한다. GIS 설치·정비·점검은 자격 또는 경험을 갖춘 자만 수행 가능하다.",
+          category: "전기작업자격"
+        },
+        {
+          title: "제319조(정전작업)",
+          article_number: "제319조",
+          content: "사업주는 충전된 전로에서 작업을 하는 경우 전원을 차단하고, 그 개폐기에 잠금장치를 하며, 작업 중임을 표시하는 꼬리표를 붙이는 등의 조치를 하여야 한다.",
+          category: "전기작업절차"
+        },
+        {
+          title: "제320조(충전전로 작업)",
+          article_number: "제320조",
+          content: "사업주는 충전된 전로에서 작업을 하는 경우에는 절연용 보호구나 절연용 방호구를 착용하게 하거나 활선작업용 장치 및 기구를 사용하게 하여야 한다.",
+          category: "전기작업절차"
+        },
+        {
+          title: "제321조(접지)",
+          article_number: "제321조",
+          content: "사업주는 전로의 개폐기를 열어 전원을 차단한 후 작업을 하는 경우에는 작업개시 전에 검전기를 사용하여 무전압을 확인하고, 해당 전로에 접지를 하여야 한다.",
+          category: "전기작업절차"
+        },
+        {
+          title: "제322조(충전전로 인근작업)",
+          article_number: "제322조",
+          content: "사업주는 충전된 전로 인근에서 작업을 하는 경우 방호울타리 설치, 감시인 배치 등 위험방지를 위한 조치를 하여야 한다.",
+          category: "전기작업절차"
+        },
+        {
+          title: "제323조(절연용 보호구 등)",
+          article_number: "제323조",
+          content: "사업주는 절연용 보호구, 절연 방호구, 활선작업용 장치의 사용 및 정기 점검 의무를 가진다. 이들 장비는 정기적으로 절연성능을 점검하여야 한다.",
+          category: "전기보호구"
+        },
+        // 기존 일반 안전 조항들
         {
           title: "제3조(전도의 방지)",
           article_number: "제3조",
@@ -107,12 +181,6 @@ export class ChromaRAGService {
           article_number: "제8조",
           content: "사업주는 근로자가 상시 작업하는 장소의 작업면 조도를 정밀작업 300럭스 이상, 보통작업 150럭스 이상으로 하여야 한다.",
           category: "작업환경"
-        },
-        {
-          title: "제16조(위험물 등의 보관)",
-          article_number: "제16조",
-          content: "사업주는 규정된 위험물질을 작업장 외의 별도의 장소에 보관하여야 하며, 작업장 내부에는 작업에 필요한 양만 두어야 한다.",
-          category: "위험물 관리"
         }
       ];
 
@@ -179,30 +247,84 @@ export class ChromaRAGService {
     }
   }
 
-  async searchSafetyRegulations(query: string, limit: number = 5): Promise<SafetyRegulation[]> {
+  async searchSafetyRegulations(equipmentName: string, workType: string, riskFactors: string[] = [], limit: number = 5): Promise<SafetyRegulation[]> {
     await this.initialize();
 
     try {
-      const queryLower = query.toLowerCase();
+      // 복합 검색어 구성
+      const queryTerms = [
+        equipmentName.toLowerCase(),
+        workType.toLowerCase(),
+        ...riskFactors.map(rf => rf.toLowerCase())
+      ].filter(term => term && term.trim().length > 0);
       
-      // 키워드 확장
-      const expandedTerms = queryLower.split(' ').filter(term => term.trim().length > 0);
-      if (queryLower.includes('gis') || queryLower.includes('전기') || queryLower.includes('고전압')) {
-        expandedTerms.push('감전', '절연', '전기', '정전');
-      }
-      if (queryLower.includes('추락') || queryLower.includes('고소')) {
-        expandedTerms.push('난간', '추락', '안전대');
-      }
-      if (queryLower.includes('컨베이어') || queryLower.includes('기계')) {
-        expandedTerms.push('끼임', '방호', '전원');
+      // 장비별 특화 키워드 확장
+      const expandedTerms = [...queryTerms];
+      
+      // 170kV GIS, 변전설비, 전기설비 관련
+      if (equipmentName.toLowerCase().includes('gis') || 
+          equipmentName.toLowerCase().includes('변전') || 
+          equipmentName.toLowerCase().includes('전기') ||
+          equipmentName.toLowerCase().includes('kv') ||
+          riskFactors.some(rf => rf.toLowerCase().includes('전기') || rf.toLowerCase().includes('고전압'))) {
+        expandedTerms.push(
+          '전기', '감전', '절연', '정전', '충전', '전로', '접지', 
+          '누전', '과전류', '방호', '차단', '검전', '무전압',
+          '절연용', '보호구', '활선', '방호울타리', '감시인', '자격'
+        );
       }
       
-      const relevantRegulations = this.regulationData.filter(regulation => {
+      // 정비/점검 작업 관련
+      if (workType.toLowerCase().includes('정비') || 
+          workType.toLowerCase().includes('점검') || 
+          workType.toLowerCase().includes('수리')) {
+        expandedTerms.push('정비', '점검', '수리', '보수', '작업자', '자격', '교육');
+      }
+      
+      // 고소작업 관련
+      if (workType.toLowerCase().includes('고소') || 
+          riskFactors.some(rf => rf.toLowerCase().includes('추락'))) {
+        expandedTerms.push('추락', '난간', '안전대', '발판');
+      }
+      
+      // 컨베이어/기계 관련
+      if (equipmentName.toLowerCase().includes('컨베이어') || 
+          equipmentName.toLowerCase().includes('기계')) {
+        expandedTerms.push('끼임', '방호', '전원', '차단', '기계');
+      }
+      
+      // 관련도 점수 계산으로 검색 개선
+      const scoredRegulations = this.regulationData.map(regulation => {
         const searchText = `${regulation.title} ${regulation.content} ${regulation.category}`.toLowerCase();
-        return expandedTerms.some(term => searchText.includes(term));
+        
+        // 정확한 매칭에 높은 점수
+        let score = 0;
+        expandedTerms.forEach(term => {
+          if (term && searchText.includes(term)) {
+            // 제목에 포함된 경우 더 높은 점수
+            if (regulation.title.toLowerCase().includes(term)) {
+              score += 3;
+            }
+            // 카테고리에 포함된 경우 중간 점수
+            else if (regulation.category.toLowerCase().includes(term)) {
+              score += 2;
+            }
+            // 내용에 포함된 경우 기본 점수
+            else {
+              score += 1;
+            }
+          }
+        });
+        
+        return { regulation, score };
       });
-
-      return relevantRegulations.slice(0, limit);
+      
+      // 점수순으로 정렬하고 최소 점수 1 이상인 것들만 반환
+      return scoredRegulations
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(item => item.regulation);
 
     } catch (error) {
       console.error('법규 검색 실패:', error);
