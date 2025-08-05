@@ -516,18 +516,18 @@ export default function WorkManagement() {
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          onClick={() => handleEditChecklist(workType)}
-                          title="작업 전 점검사항 편집"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
                           onClick={() => handleEditWorkType(workType)}
                           title="작업 유형 편집"
                         >
                           <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleEditChecklist(workType)}
+                          title="작업 전 점검사항 편집"
+                        >
+                          <CheckCircle className="h-4 w-4" />
                         </Button>
                         <Button 
                           size="sm" 
