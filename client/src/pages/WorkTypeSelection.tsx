@@ -302,7 +302,7 @@ export default function WorkTypeSelection() {
                     <span className="material-icons mr-2 text-primary">verified_user</span>
                     자격 요건
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ml-8">
                     {selectedWorkType.requiredQualifications.map((qual, index) => (
                       <label key={index} className="flex items-center space-x-3">
                         <Checkbox
@@ -325,7 +325,7 @@ export default function WorkTypeSelection() {
                     <span className="material-icons mr-2 text-primary">build</span>
                     안전 장비
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ml-8">
                     {selectedWorkType.requiredEquipment.map((equip, index) => (
                       <label key={index} className="flex items-center space-x-3">
                         <Checkbox
@@ -348,7 +348,7 @@ export default function WorkTypeSelection() {
                     <span className="material-icons mr-2 text-primary">construction</span>
                     필수 작업도구
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ml-8">
                     {selectedWorkType.requiredTools.map((tool, index) => (
                       <label key={index} className="flex items-center space-x-3">
                         <Checkbox
@@ -371,7 +371,7 @@ export default function WorkTypeSelection() {
                     <span className="material-icons mr-2 text-primary">eco</span>
                     환경 조건
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ml-8">
                     {selectedWorkType.environmentalRequirements.map((env, index) => (
                       <label key={index} className="flex items-center space-x-3">
                         <Checkbox
@@ -394,7 +394,7 @@ export default function WorkTypeSelection() {
                     <span className="material-icons mr-2 text-primary">gavel</span>
                     법적 사항
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 ml-8">
                     {selectedWorkType.legalRequirements.map((legal, index) => (
                       <label key={index} className="flex items-center space-x-3">
                         <Checkbox
