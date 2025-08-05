@@ -202,7 +202,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const checklistData = checklistSchema.parse(req.body);
-      const workType = await storage.updateWorkType(id, checklistData);
+      
+      // Convert empty arrays to null for PostgreSQL compatibility
+      const processedData = Object.fromEntries(
+        Object.entries(checklistData).map(([key, value]) => [
+          key,
+          Array.isArray(value) && value.length === 0 ? null : value
+        ])
+      );
+      
+      const workType = await storage.updateWorkType(id, processedData);
       res.json(workType);
     } catch (error) {
       console.error("작업 전 점검사항 수정 오류:", error);
