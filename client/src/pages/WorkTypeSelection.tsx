@@ -117,6 +117,9 @@ export default function WorkTypeSelection() {
     workType.requiredEquipment?.forEach(eq => {
       items[`equip_${eq}`] = false;
     });
+    workType.requiredTools?.forEach(tool => {
+      items[`tool_${tool}`] = false;
+    });
     workType.environmentalRequirements?.forEach(env => {
       items[`env_${env}`] = false;
     });
@@ -320,7 +323,7 @@ export default function WorkTypeSelection() {
                 <div>
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                     <span className="material-icons mr-2 text-primary">build</span>
-                    장비 점검
+                    안전 장비
                   </h4>
                   <div className="space-y-2">
                     {selectedWorkType.requiredEquipment.map((equip, index) => (
@@ -331,7 +334,30 @@ export default function WorkTypeSelection() {
                             setChecklistItems(prev => ({ ...prev, [`equip_${equip}`]: !!checked }))
                           }
                         />
-                        <span className="text-sm">{equip} 정상 작동 확인</span>
+                        <span className="text-sm">{equip}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Required Tools Check */}
+              {selectedWorkType.requiredTools && selectedWorkType.requiredTools.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <span className="material-icons mr-2 text-primary">construction</span>
+                    필수 작업도구
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedWorkType.requiredTools.map((tool, index) => (
+                      <label key={index} className="flex items-center space-x-3">
+                        <Checkbox
+                          checked={checklistItems[`tool_${tool}`] || false}
+                          onCheckedChange={(checked) => 
+                            setChecklistItems(prev => ({ ...prev, [`tool_${tool}`]: !!checked }))
+                          }
+                        />
+                        <span className="text-sm">{tool}</span>
                       </label>
                     ))}
                   </div>
