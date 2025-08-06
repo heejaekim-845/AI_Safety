@@ -117,40 +117,76 @@ export class ChromaDBService {
       // 기존 데이터 확인
       const items = await this.index.listItems();
       if (items.length > 0) {
-        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다. 기존 데이터를 삭제하고 재생성합니다.`);
-        // 기존 인덱스 삭제하고 새로 생성
-        await this.index.deleteIndex();
-        await this.index.createIndex();
+        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다. API 할당량을 고려하여 기존 데이터 유지합니다.`);
+        return;
       }
 
       console.log('/embed_data 폴더에서 데이터 로드 및 임베딩 시작...');
 
-      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서)
+      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서) - API 할당량을 고려하여 샘플링
       const accidentCasesPath = path.join(process.cwd(), 'embed_data', 'accident_cases_for_rag.json');
       let accidentCases = [];
       try {
         const accidentData = await fs.readFile(accidentCasesPath, 'utf-8');
-        accidentCases = JSON.parse(accidentData);
-        console.log(`사고사례 ${accidentCases.length}건 로드`);
+        const allAccidents = JSON.parse(accidentData);
+        // API 할당량을 고려하여 처음 50건만 선택
+        accidentCases = allAccidents.slice(0, 50);
+        console.log(`사고사례 ${accidentCases.length}건 로드 (전체 ${allAccidents.length}건 중 샘플링)`);
       } catch (error) {
         console.log('embed_data 폴더에서 사고사례 데이터 파일을 찾을 수 없습니다.');
       }
 
-      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서)
+      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서) - API 할당량을 고려하여 샘플링
       const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
       let educationData = [];
       try {
         const eduData = await fs.readFile(educationDataPath, 'utf-8');
-        educationData = JSON.parse(eduData);
-        console.log(`교육자료 ${educationData.length}건 로드`);
+        const allEducation = JSON.parse(eduData);
+        // API 할당량을 고려하여 처음 20건만 선택
+        educationData = allEducation.slice(0, 20);
+        console.log(`교육자료 ${educationData.length}건 로드 (전체 ${allEducation.length}건 중 샘플링)`);
       } catch (error) {
         console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.');
       }
 
-      // 3. 안전법규 JSON 데이터 로드 (향후 PDF 처리 대신 JSON으로 변환된 데이터 사용)
-      // TODO: PDF를 JSON으로 변환한 safety_regulations.json 파일 생성 필요
-      let pdfChunks: string[] = [];
-      console.log('PDF 처리는 현재 비활성화됨 - JSON 변환 데이터 대기 중');
+      // 3. PDF를 LangChain으로 청킹한 JSON 데이터 로드
+      const pdfJsonPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
+      let pdfRegulations: any[] = [];
+      try {
+        const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
+        pdfRegulations = JSON.parse(pdfData);
+        console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드`);
+      } catch (error) {
+        console.log('PDF 청킹 JSON 파일을 찾을 수 없습니다. Python 스크립트로 생성 중...');
+        // Python 스크립트 실행
+        try {
+          const { spawn } = require('child_process');
+          const pythonProcess = spawn('python', [
+            './scripts/pdf_chunking.py',
+            './embed_data/산업안전보건기준에 관한 규칙(고용노동부령)(제00448호)(20250717)_1754373490895.pdf',
+            './embed_data/pdf_regulations_chunks.json'
+          ]);
+          
+          await new Promise((resolve, reject) => {
+            pythonProcess.on('close', (code) => {
+              if (code === 0) {
+                console.log('PDF 청킹 완료');
+                resolve(code);
+              } else {
+                console.log('PDF 청킹 실패');
+                reject(new Error(`Python script exit code: ${code}`));
+              }
+            });
+          });
+          
+          // 생성된 파일 다시 로드
+          const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
+          pdfRegulations = JSON.parse(pdfData);
+          console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드 완료`);
+        } catch (pythonError) {
+          console.log('Python PDF 청킹 실패:', pythonError);
+        }
+      }
 
       // 4. 데이터 임베딩 및 저장
       let totalItems = 0;
@@ -203,11 +239,12 @@ export class ChromaDBService {
         console.log(`교육자료 ${i + 1}/${educationData.length} 임베딩 완료`);
       }
 
-      // PDF 안전법규 청크 처리
-      for (let i = 0; i < pdfChunks.length; i++) {
-        const chunk = pdfChunks[i];
-        const chunkTitle = `산업안전보건기준에 관한 규칙 - 청크 ${i + 1}`;
-        const content = `${chunkTitle}\n${chunk}`;
+      // PDF 안전법규 청크 처리 (LangChain으로 생성된 청크들) - API 할당량을 고려하여 샘플링
+      const samplePdfRegulations = pdfRegulations.slice(0, 30); // 처음 30개 청크만 선택
+      console.log(`PDF 법규 청크 ${samplePdfRegulations.length}개 선택 (전체 ${pdfRegulations.length}개 중)`);
+      for (let i = 0; i < samplePdfRegulations.length; i++) {
+        const chunk = samplePdfRegulations[i];
+        const content = `${chunk.title}\n${chunk.content}\n분류: ${chunk.category}`;
         
         const embedding = await this.generateEmbedding(content);
         
@@ -216,17 +253,17 @@ export class ChromaDBService {
           vector: embedding,
           metadata: {
             type: 'regulation',
-            title: chunkTitle,
-            source: 'pdf',
-            chunk_index: i,
-            total_chunks: pdfChunks.length,
-            category: '산업안전보건법규',
+            title: chunk.title,
+            source: 'pdf_langchain',
+            chunk_id: chunk.chunk_id,
+            page_number: chunk.page_number,
+            category: chunk.category,
             content: content
           }
         });
 
         totalItems++;
-        console.log(`PDF 안전법규 청크 ${i + 1}/${pdfChunks.length} 임베딩 완료`);
+        console.log(`PDF 안전법규 청크 ${i + 1}/${samplePdfRegulations.length} 임베딩 완료`);
       }
 
       console.log(`총 ${totalItems}개 문서를 Vectra에 저장 완료`);
