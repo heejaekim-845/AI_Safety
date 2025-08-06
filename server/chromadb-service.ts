@@ -2,6 +2,7 @@ import { LocalIndex } from 'vectra';
 import { GoogleGenAI } from '@google/genai';
 import fs from 'fs/promises';
 import path from 'path';
+// PDF 파싱을 위한 dynamic import 사용
 
 export interface SearchResult {
   document: string;
@@ -84,49 +85,72 @@ export class ChromaDBService {
     }
   }
 
+  // PDF 텍스트를 적절한 크기로 청킹하는 함수
+  private chunkText(text: string, maxChunkSize: number = 1000, overlap: number = 100): string[] {
+    const chunks: string[] = [];
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    let currentChunk = '';
+    
+    for (const sentence of sentences) {
+      const trimmedSentence = sentence.trim();
+      if (currentChunk.length + trimmedSentence.length > maxChunkSize && currentChunk.length > 0) {
+        chunks.push(currentChunk.trim());
+        // 오버랩을 위해 마지막 몇 문장을 유지
+        const words = currentChunk.split(' ');
+        const overlapWords = words.slice(-overlap);
+        currentChunk = overlapWords.join(' ') + ' ' + trimmedSentence;
+      } else {
+        currentChunk += (currentChunk ? ' ' : '') + trimmedSentence;
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+    
+    return chunks.filter(chunk => chunk.length > 50); // 너무 짧은 청크 제거
+  }
+
   private async loadAndEmbedData(): Promise<void> {
     try {
       // 기존 데이터 확인
       const items = await this.index.listItems();
       if (items.length > 0) {
-        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다.`);
-        return;
+        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다. 기존 데이터를 삭제하고 재생성합니다.`);
+        // 기존 인덱스 삭제하고 새로 생성
+        await this.index.deleteIndex();
+        await this.index.createIndex();
       }
 
-      console.log('데이터 로드 및 임베딩 시작...');
+      console.log('/embed_data 폴더에서 데이터 로드 및 임베딩 시작...');
 
-      // 1. 사고사례 데이터 로드
-      const accidentCasesPath = path.join(process.cwd(), 'data', 'accident_cases_for_rag.json');
+      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서)
+      const accidentCasesPath = path.join(process.cwd(), 'embed_data', 'accident_cases_for_rag.json');
       let accidentCases = [];
       try {
         const accidentData = await fs.readFile(accidentCasesPath, 'utf-8');
         accidentCases = JSON.parse(accidentData);
         console.log(`사고사례 ${accidentCases.length}건 로드`);
       } catch (error) {
-        console.log('사고사례 데이터 파일을 찾을 수 없습니다.');
+        console.log('embed_data 폴더에서 사고사례 데이터 파일을 찾을 수 없습니다.');
       }
 
-      // 2. 교육자료 데이터 로드
-      const educationDataPath = path.join(process.cwd(), 'data', 'education_data.json');
+      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서)
+      const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
       let educationData = [];
       try {
         const eduData = await fs.readFile(educationDataPath, 'utf-8');
         educationData = JSON.parse(eduData);
         console.log(`교육자료 ${educationData.length}건 로드`);
       } catch (error) {
-        console.log('교육자료 데이터 파일을 찾을 수 없습니다.');
+        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.');
       }
 
-      // 3. 안전법규 데이터 로드
-      const regulationsPath = path.join(process.cwd(), 'data', 'safety_regulations.json');
-      let regulations = [];
-      try {
-        const regData = await fs.readFile(regulationsPath, 'utf-8');
-        regulations = JSON.parse(regData);
-        console.log(`안전법규 ${regulations.length}건 로드`);
-      } catch (error) {
-        console.log('안전법규 데이터 파일을 찾을 수 없습니다.');
-      }
+      // 3. 안전법규 JSON 데이터 로드 (향후 PDF 처리 대신 JSON으로 변환된 데이터 사용)
+      // TODO: PDF를 JSON으로 변환한 safety_regulations.json 파일 생성 필요
+      let pdfChunks: string[] = [];
+      console.log('PDF 처리는 현재 비활성화됨 - JSON 변환 데이터 대기 중');
 
       // 4. 데이터 임베딩 및 저장
       let totalItems = 0;
@@ -179,27 +203,30 @@ export class ChromaDBService {
         console.log(`교육자료 ${i + 1}/${educationData.length} 임베딩 완료`);
       }
 
-      // 안전법규 처리
-      for (let i = 0; i < regulations.length; i++) {
-        const reg = regulations[i];
-        const content = `${reg.title} (${reg.article_number})\n${reg.content}\n분류: ${reg.category}`;
+      // PDF 안전법규 청크 처리
+      for (let i = 0; i < pdfChunks.length; i++) {
+        const chunk = pdfChunks[i];
+        const chunkTitle = `산업안전보건기준에 관한 규칙 - 청크 ${i + 1}`;
+        const content = `${chunkTitle}\n${chunk}`;
         
         const embedding = await this.generateEmbedding(content);
         
         await this.index.upsertItem({
-          id: `regulation_${i}`,
+          id: `pdf_regulation_${i}`,
           vector: embedding,
           metadata: {
             type: 'regulation',
-            title: reg.title,
-            article_number: reg.article_number,
-            category: reg.category,
+            title: chunkTitle,
+            source: 'pdf',
+            chunk_index: i,
+            total_chunks: pdfChunks.length,
+            category: '산업안전보건법규',
             content: content
           }
         });
 
         totalItems++;
-        console.log(`안전법규 ${i + 1}/${regulations.length} 임베딩 완료`);
+        console.log(`PDF 안전법규 청크 ${i + 1}/${pdfChunks.length} 임베딩 완료`);
       }
 
       console.log(`총 ${totalItems}개 문서를 Vectra에 저장 완료`);

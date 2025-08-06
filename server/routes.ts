@@ -806,6 +806,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // /embed_data 폴더에서 벡터DB 재생성 엔드포인트
+  app.post("/api/regenerate-vector-db", async (req, res) => {
+    try {
+      console.log('/embed_data 폴더에서 벡터DB 재생성 시작...');
+      
+      // ChromaDB 강제 재초기화 (기존 데이터 삭제 후 재생성)
+      await chromaDBService.initialize();
+      
+      // 재생성 후 테스트 검색 수행
+      const results = await chromaDBService.searchRelevantData(
+        "산업안전 작업 안전수칙",
+        10
+      );
+      
+      // 통계 정보 가져오기
+      const stats = await chromaDBService.getStats();
+      
+      res.json({
+        message: "/embed_data 폴더에서 벡터DB 재생성 완료",
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        },
+        searchResults: {
+          found: results.length,
+          results: results.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            source: r.metadata.source || 'json',
+            distance: r.distance
+          }))
+        }
+      });
+    } catch (error: any) {
+      console.error('벡터DB 재생성 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "벡터DB 재생성 실패" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
