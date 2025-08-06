@@ -68,7 +68,7 @@ export class ChromaDBService {
     }
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(text: string, retryCount = 0): Promise<number[]> {
     try {
       const response = await this.genai.models.embedContent({
         model: "gemini-embedding-001",
@@ -82,6 +82,13 @@ export class ChromaDBService {
       const embedding = response.embeddings?.[0]?.values;
       return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
     } catch (error: any) {
+      if (error.status === 429 && retryCount < 3) {
+        // 할당량 초과 시 대기 후 재시도
+        const waitTime = Math.pow(2, retryCount) * 60 * 1000; // 1분, 2분, 4분 대기
+        console.log(`API 할당량 초과, ${waitTime/60000}분 대기 후 재시도... (${retryCount + 1}/3)`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        return this.generateEmbedding(text, retryCount + 1);
+      }
       console.error('Gemini 임베딩 생성 실패:', error);
       throw error;
     }
@@ -125,28 +132,24 @@ export class ChromaDBService {
 
       console.log('/embed_data 폴더에서 데이터 로드 및 임베딩 시작...');
 
-      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서) - API 할당량을 고려하여 샘플링
+      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서) - 전체 데이터 사용
       const accidentCasesPath = path.join(process.cwd(), 'embed_data', 'accident_cases_for_rag.json');
       let accidentCases = [];
       try {
         const accidentData = await fs.readFile(accidentCasesPath, 'utf-8');
-        const allAccidents = JSON.parse(accidentData);
-        // API 할당량을 고려하여 처음 50건만 선택
-        accidentCases = allAccidents.slice(0, 50);
-        console.log(`사고사례 ${accidentCases.length}건 로드 (전체 ${allAccidents.length}건 중 샘플링)`);
+        accidentCases = JSON.parse(accidentData);
+        console.log(`사고사례 ${accidentCases.length}건 로드 (전체)`);
       } catch (error) {
         console.log('embed_data 폴더에서 사고사례 데이터 파일을 찾을 수 없습니다.');
       }
 
-      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서) - API 할당량을 고려하여 샘플링
+      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서) - 전체 데이터 사용
       const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
       let educationData = [];
       try {
         const eduData = await fs.readFile(educationDataPath, 'utf-8');
-        const allEducation = JSON.parse(eduData);
-        // API 할당량을 고려하여 처음 20건만 선택
-        educationData = allEducation.slice(0, 20);
-        console.log(`교육자료 ${educationData.length}건 로드 (전체 ${allEducation.length}건 중 샘플링)`);
+        educationData = JSON.parse(eduData);
+        console.log(`교육자료 ${educationData.length}건 로드 (전체)`);
       } catch (error) {
         console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.');
       }
@@ -241,11 +244,10 @@ export class ChromaDBService {
         console.log(`교육자료 ${i + 1}/${educationData.length} 임베딩 완료`);
       }
 
-      // PDF 안전법규 청크 처리 (LangChain으로 생성된 청크들) - API 할당량을 고려하여 샘플링
-      const samplePdfRegulations = pdfRegulations.slice(0, 30); // 처음 30개 청크만 선택
-      console.log(`PDF 법규 청크 ${samplePdfRegulations.length}개 선택 (전체 ${pdfRegulations.length}개 중)`);
-      for (let i = 0; i < samplePdfRegulations.length; i++) {
-        const chunk = samplePdfRegulations[i];
+      // PDF 안전법규 청크 처리 (LangChain으로 생성된 청크들) - 전체 데이터 사용
+      console.log(`PDF 법규 청크 ${pdfRegulations.length}개 전체 임베딩 시작`);
+      for (let i = 0; i < pdfRegulations.length; i++) {
+        const chunk = pdfRegulations[i];
         const content = `${chunk.title}\n${chunk.content}\n분류: ${chunk.category}`;
         
         const embedding = await this.generateEmbedding(content);
@@ -265,7 +267,7 @@ export class ChromaDBService {
         });
 
         totalItems++;
-        console.log(`PDF 안전법규 청크 ${i + 1}/${samplePdfRegulations.length} 임베딩 완료`);
+        console.log(`PDF 안전법규 청크 ${i + 1}/${pdfRegulations.length} 임베딩 완료`);
       }
 
       console.log(`총 ${totalItems}개 문서를 Vectra에 저장 완료`);
