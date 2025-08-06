@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { aiService } from "./ai-service";
 import { weatherService } from "./weather-service";
 import { simpleRagService as ragService } from "./simple-rag-service";
-import { vectorDBService } from "./vector-db-service";
+import { chromaDBService } from "./chromadb-service";
 import { z } from "zod";
 import { 
   insertEquipmentSchema, 
@@ -765,35 +765,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 벡터 데이터베이스 테스트 엔드포인트
+  // ChromaDB 임베디드 모드 테스트 엔드포인트
   app.get("/api/test-vector-db", async (req, res) => {
     try {
-      console.log('벡터 데이터베이스 초기화 테스트 시작...');
+      console.log('ChromaDB 초기화 테스트 시작...');
       
-      // 벡터 데이터베이스 강제 초기화
-      await vectorDBService.initialize();
+      // ChromaDB 초기화
+      await chromaDBService.initialize();
       
       // 테스트 검색 수행
-      const results = await vectorDBService.searchRelevantData(
-        "170kV GIS",
-        "정기점검", 
-        "HIGH"
+      const results = await chromaDBService.searchRelevantData(
+        "170kV GIS 정기점검",
+        5
       );
       
+      // 통계 정보 가져오기
+      const stats = await chromaDBService.getStats();
+      
       res.json({
-        message: "벡터 데이터베이스 테스트 완료",
-        results: {
-          incidents: results.incidents.length,
-          education: results.education.length,
-          regulations: results.regulations.length
+        message: "ChromaDB 임베디드 모드 테스트 완료",
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
         },
-        data: results
+        searchResults: {
+          found: results.length,
+          results: results.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            distance: r.distance
+          }))
+        }
       });
-    } catch (error) {
-      console.error('벡터 데이터베이스 테스트 실패:', error);
+    } catch (error: any) {
+      console.error('ChromaDB 테스트 실패:', error);
       res.status(500).json({ 
         error: error.message,
-        message: "벡터 데이터베이스 테스트 실패" 
+        message: "ChromaDB 테스트 실패" 
       });
     }
   });

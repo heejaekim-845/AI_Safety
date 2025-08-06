@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-service";
-import { vectorDBService } from "./vector-db-service";
+import { chromaDBService } from "./chromadb-service";
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -410,19 +410,35 @@ JSON 형식으로 응답:
 
       try {
         // Try Vectra vector database first for enhanced RAG search
-        const vectorResults = await vectorDBService.searchRelevantData(
-          equipmentInfo.name,
-          workType.name,
-          this.extractRiskFactors(equipmentInfo)
+        const chromaResults = await chromaDBService.searchRelevantData(
+          `${equipmentInfo.name} ${workType.name} ${this.extractRiskFactors(equipmentInfo)}`,
+          10
         );
 
-        chromaAccidents = vectorResults.incidents;
-        educationMaterials = vectorResults.education;
-        safetyRegulations = vectorResults.regulations;
+        // ChromaDB 결과를 타입별로 분류
+        chromaAccidents = chromaResults.filter(r => r.metadata.type === 'incident').map(r => ({
+          title: r.metadata.title,
+          summary: r.document.split('\n')[1] || '',
+          risk_keywords: r.metadata.risk_keywords || '',
+          prevention: r.document.split('예방대책: ')[1] || ''
+        }));
+        
+        educationMaterials = chromaResults.filter(r => r.metadata.type === 'education').map(r => ({
+          title: r.metadata.title,
+          content: r.document.split('\n')[1] || '',
+          category: r.metadata.category
+        }));
+        
+        safetyRegulations = chromaResults.filter(r => r.metadata.type === 'regulation').map(r => ({
+          title: r.metadata.title,
+          content: r.document.split('\n')[1] || '',
+          article_number: r.metadata.article_number,
+          category: r.metadata.category
+        }));
 
-        console.log(`Vectra 벡터 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
       } catch (error) {
-        console.log('Vectra 벡터 검색 실패, 기본 RAG 사용:', error);
+        console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
       }
 
       // Fallback to simple RAG if ChromaDB fails

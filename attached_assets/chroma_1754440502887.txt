@@ -1,0 +1,47 @@
+import chromadb
+from openai import OpenAI
+
+# OpenAI API 키 설정
+client_openai = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+
+# 1. ChromaDB 클라이언트 생성 (임베디드 모드)
+chroma_client = chromadb.Client()
+
+# 2. 컬렉션 생성
+collection = chroma_client.get_or_create_collection("docs")
+
+# 3. 문서 추가
+documents = [
+    "수력발전소의 Governor Free 운전은 주파수 제어를 위해 필요하다.",
+    "Pinecone은 대규모 벡터 검색에 적합한 클라우드 서비스다.",
+    "ChromaDB는 로컬 환경에서 빠르게 RAG를 구축할 수 있다."
+]
+
+# OpenAI Embedding 생성
+embeddings = [
+    client_openai.embeddings.create(input=doc, model="text-embedding-ada-002").data[0].embedding
+    for doc in documents
+]
+
+# 문서 저장
+for i, (doc, emb) in enumerate(zip(documents, embeddings)):
+    collection.add(
+        ids=[f"doc_{i}"],
+        documents=[doc],
+        embeddings=[emb]
+    )
+
+print("문서 저장 완료!")
+
+# 4. 쿼리 수행
+query = "수력발전소에서 governor free 운전이 필요한 이유"
+query_embedding = client_openai.embeddings.create(
+    input=query,
+    model="text-embedding-ada-002"
+).data[0].embedding
+
+results = collection.query(query_embeddings=[query_embedding], n_results=2)
+
+print("\n검색 결과:")
+for doc in results["documents"][0]:
+    print("-", doc)
