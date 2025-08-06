@@ -429,8 +429,9 @@ JSON 형식으로 응답:
         // 모든 사고사례를 일단 포함 (필터링 임계값 제거)
         const allAccidents = rawAccidents;
         
-        // 상위 5건만 선택하고 관련성 기반 재정렬
+        // 관련성 필터링 적용 후 상위 5건 선택
         chromaAccidents = allAccidents
+          .filter(r => this.isRelevantAccident(r, equipmentInfo, workType)) // 관련성 필터링 재활성화
           .sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬 (가까운 것부터)
           .slice(0, 5) // 최대 5건만 선택
           .map(r => ({
@@ -459,7 +460,8 @@ JSON 형식으로 응답:
         console.log(`검색 쿼리: "${searchQuery}"`);
         console.log(`원본 검색 결과:`, chromaResults.length, '건');
         console.log(`사고사례 필터링 전:`, rawAccidents.length, '건');
-        console.log(`관련성 필터링 후:`, relevantAccidents.length, '건');
+        console.log(`관련성 필터링 후:`, chromaAccidents.length, '건');
+        console.log(`선택된 사고사례:`, chromaAccidents.map(acc => acc.title));
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
       }
@@ -756,34 +758,41 @@ ${specialNotes || "없음"}
     const title = (result.metadata.title || '').toLowerCase();
     const workTypeInData = (result.metadata.work_type || '').toLowerCase();
     const riskKeywords = (result.metadata.risk_keywords || '').toLowerCase();
+    const content = (result.document || '').toLowerCase();
     
     const equipmentName = equipmentInfo.name.toLowerCase();
     const workTypeName = workType.name.toLowerCase();
     
-    // 설비명 직접 매칭
-    if (title.includes(equipmentName) || riskKeywords.includes(equipmentName)) {
-      return true;
+    // 170kV GIS 관련 필수 키워드
+    const gisKeywords = ['gis', '170kv', '고전압', '감전', '전기', '변전소', 'sf6', '가스절연'];
+    const hasGisKeyword = gisKeywords.some(keyword => 
+      title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
+    );
+    
+    // 명확히 관련없는 키워드들 (블랙리스트)
+    const irrelevantKeywords = ['양망기', '롤러', '끼임', '스크랩', '상차', '매몰', '비산재', '크레인', '지게차', '컨베이어'];
+    const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
+      title.includes(keyword) || content.includes(keyword)
+    );
+    
+    // 관련없는 키워드가 있으면 제외
+    if (hasIrrelevantKeyword) {
+      return false;
     }
     
-    // 작업 유형 매칭
-    if (workTypeInData.includes(workTypeName) || title.includes(workTypeName)) {
-      return true;
-    }
+    // GIS/전기 관련이거나 순시점검 관련이면 포함
+    const inspectionKeywords = ['순시', '점검', '정기', '일상', '육안'];
+    const hasInspectionKeyword = inspectionKeywords.some(keyword => 
+      title.includes(keyword) || content.includes(keyword)
+    );
     
-    // 위험 요소 매칭
-    const equipmentRisks = this.extractRiskFactors(equipmentInfo);
-    if (equipmentRisks && riskKeywords.includes(equipmentRisks.toLowerCase())) {
-      return true;
-    }
+    const electricalKeywords = ['전기', '전력', '변전', '송전', '배전', '개폐기', '차단기'];
+    const hasElectricalKeyword = electricalKeywords.some(keyword => 
+      title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
+    );
     
-    // 고전압 설비 특별 처리
-    if (equipmentName.includes('gis') || equipmentName.includes('170kv')) {
-      if (title.includes('감전') || title.includes('고전압') || riskKeywords.includes('전기')) {
-        return true;
-      }
-    }
-    
-    return false;
+    // GIS/전기 관련이거나 점검 관련이면 포함
+    return hasGisKeyword || hasElectricalKeyword || hasInspectionKeyword;
   }
 
   private mapAccidentTypeToSeverity(accidentType: string | undefined): string {
