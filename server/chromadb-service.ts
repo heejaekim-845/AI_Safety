@@ -357,8 +357,22 @@ export class ChromaDBService {
       this.isInitialized = false;
       this.forceRebuildFlag = true; // 강제 재구축 플래그 설정
       
-      // 새로운 인덱스로 재생성
+      // 파일 시스템에서 인덱스 폴더 완전 삭제
+      try {
+        const fs = await import('fs/promises');
+        await fs.rm(this.indexPath, { recursive: true, force: true });
+        console.log('인덱스 폴더 완전 삭제 완료');
+        
+        // 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (fsError) {
+        console.log('인덱스 폴더 삭제 중 오류 (무시):', fsError);
+      }
+      
+      // 완전히 새로운 인덱스 인스턴스 생성
       this.index = new LocalIndex(this.indexPath);
+      
+      // 새로운 인덱스 생성
       await this.index.createIndex();
       console.log('새 인덱스 생성 완료');
       
