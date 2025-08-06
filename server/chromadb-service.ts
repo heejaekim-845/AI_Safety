@@ -1,5 +1,5 @@
 import { LocalIndex } from 'vectra';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -11,15 +11,16 @@ export interface SearchResult {
 
 export class ChromaDBService {
   private index: LocalIndex;
-  private openai: OpenAI;
+  private genai: GoogleGenAI;
   private isInitialized = false;
 
   constructor() {
     // Vectra LocalIndex (파일 기반 임베디드 모드)
     this.index = new LocalIndex('./data/vectra-index');
     
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || "",
+    // Google Gemini AI for embeddings
+    this.genai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY || "",
     });
   }
 
@@ -35,28 +36,25 @@ export class ChromaDBService {
         await this.index.createIndex();
       }
 
-      // OpenAI API 할당량 테스트
-      if (!process.env.OPENAI_API_KEY) {
-        console.log('OpenAI API 키가 없어 Vectra 초기화 중단');
+      // Gemini API 테스트
+      if (!process.env.GEMINI_API_KEY) {
+        console.log('Gemini API 키가 없어 Vectra 초기화 중단');
         this.isInitialized = true;
         return;
       }
 
       try {
-        console.log('OpenAI API 할당량 테스트 중...');
+        console.log('Gemini API 임베딩 테스트 중...');
         await this.generateEmbedding('test');
-        console.log('OpenAI API 테스트 성공, 데이터 임베딩 진행');
+        console.log('Gemini API 테스트 성공, 데이터 임베딩 진행');
         
         // 데이터 로드 및 임베딩
         await this.loadAndEmbedData();
         
       } catch (error: any) {
-        if (error.code === 'insufficient_quota') {
-          console.log('OpenAI API 할당량 부족, Vectra 임베딩 건너뜀');
-          this.isInitialized = true;
-          return;
-        }
-        throw error;
+        console.log('Gemini API 오류, Vectra 임베딩 건너뜀:', error.message);
+        this.isInitialized = true;
+        return;
       }
 
       this.isInitialized = true;
@@ -69,11 +67,21 @@ export class ChromaDBService {
   }
 
   private async generateEmbedding(text: string): Promise<number[]> {
-    const response = await this.openai.embeddings.create({
-      model: "text-embedding-ada-002",
-      input: text,
-    });
-    return response.data[0].embedding;
+    try {
+      const response = await this.genai.models.embedContent({
+        model: "gemini-embedding-001",
+        contents: text,
+        config: {
+          task_type: "RETRIEVAL_DOCUMENT", // 문서 임베딩용
+          output_dimensionality: 768 // 저장 공간 효율을 위해 768 차원 사용
+        }
+      });
+      
+      return response.embeddings || [];
+    } catch (error: any) {
+      console.error('Gemini 임베딩 생성 실패:', error);
+      throw error;
+    }
   }
 
   private async loadAndEmbedData(): Promise<void> {
@@ -202,19 +210,38 @@ export class ChromaDBService {
     }
   }
 
+  // 검색용 쿼리 임베딩 생성 (별도 메서드)
+  private async generateQueryEmbedding(query: string): Promise<number[]> {
+    try {
+      const response = await this.genai.models.embedContent({
+        model: "gemini-embedding-001",
+        contents: query,
+        config: {
+          task_type: "RETRIEVAL_QUERY", // 검색 쿼리용
+          output_dimensionality: 768
+        }
+      });
+      
+      return response.embeddings || [];
+    } catch (error: any) {
+      console.error('Gemini 쿼리 임베딩 생성 실패:', error);
+      throw error;
+    }
+  }
+
   async searchRelevantData(query: string, limit: number = 5): Promise<SearchResult[]> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
 
-      // OpenAI API 할당량 문제가 있으면 빈 결과 반환
-      if (!process.env.OPENAI_API_KEY) {
+      // Gemini API 할당량 문제가 있으면 빈 결과 반환
+      if (!process.env.GEMINI_API_KEY) {
         return [];
       }
 
-      // 쿼리 임베딩 생성
-      const queryEmbedding = await this.generateEmbedding(query);
+      // 쿼리 임베딩 생성 (검색용)
+      const queryEmbedding = await this.generateQueryEmbedding(query);
 
       // Vectra에서 검색
       const results = await this.index.queryItems(queryEmbedding, limit);
@@ -230,11 +257,7 @@ export class ChromaDBService {
       return searchResults;
 
     } catch (error: any) {
-      if (error.code === 'insufficient_quota') {
-        console.log('OpenAI API 할당량 부족으로 Vectra 검색 실패');
-        return [];
-      }
-      console.error('Vectra 검색 실패:', error);
+      console.log('Gemini API 오류로 Vectra 검색 실패:', error.message);
       return [];
     }
   }
