@@ -729,11 +729,12 @@ ${specialNotes || "없음"}
     `).join('\n');
   }
 
-  private mapAccidentTypeToSeverity(accidentType: string): string {
+  private mapAccidentTypeToSeverity(accidentType: string | undefined): string {
     // 사고 유형에 따른 심각도 매핑
     const highSeverityTypes = ['매몰', '감전', '사망', '화상', '추락'];
     const mediumSeverityTypes = ['끼임', '부딪힘', '절단', '화재'];
     
+    if (!accidentType) return 'LOW';
     const accidentTypeLower = accidentType.toLowerCase();
     
     if (highSeverityTypes.some(type => accidentTypeLower.includes(type.toLowerCase()))) {
