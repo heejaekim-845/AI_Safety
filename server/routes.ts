@@ -811,8 +811,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('/embed_data 폴더에서 벡터DB 재생성 시작...');
       
-      // ChromaDB 강제 재초기화 (기존 데이터 삭제 후 재생성)
-      await chromaDBService.initialize();
+      // ChromaDB 강제 재구축 (기존 데이터 삭제 후 새로 임베딩 생성)
+      await chromaDBService.forceRebuildIndex();
       
       // 재생성 후 테스트 검색 수행
       const results = await chromaDBService.searchRelevantData(

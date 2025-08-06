@@ -14,6 +14,7 @@ export class ChromaDBService {
   private index: LocalIndex;
   private genai: GoogleGenAI;
   private isInitialized = false;
+  private forceRebuildFlag = false;
 
   constructor() {
     // Vectra LocalIndex (파일 기반 임베디드 모드)
@@ -115,9 +116,9 @@ export class ChromaDBService {
 
   private async loadAndEmbedData(): Promise<void> {
     try {
-      // 기존 데이터 확인
+      // 기존 데이터 확인 (forceRebuild 플래그가 있으면 무시)
       const items = await this.index.listItems();
-      if (items.length > 0) {
+      if (items.length > 0 && !this.forceRebuildFlag) {
         console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다. API 할당량을 고려하여 기존 데이터 유지합니다.`);
         return;
       }
@@ -343,6 +344,37 @@ export class ChromaDBService {
     } catch (error) {
       console.error('Vectra 통계 조회 실패:', error);
       return { count: 0, collections: [] };
+    }
+  }
+
+  async forceRebuildIndex(): Promise<void> {
+    try {
+      console.log('벡터 DB 강제 재구축 시작...');
+      
+      // Delete existing index directory
+      if (this.index && await this.index.isIndexCreated()) {
+        await this.index.deleteIndex();
+        console.log('기존 인덱스 삭제 완료');
+      }
+      
+      this.isInitialized = false;
+      this.forceRebuildFlag = true; // 강제 재구축 플래그 설정
+      
+      // Recreate index
+      this.index = new LocalIndex(this.indexPath);
+      await this.index.createIndex();
+      console.log('새 인덱스 생성 완료');
+      
+      // Repopulate with fresh data
+      await this.loadAndEmbedData();
+      this.isInitialized = true;
+      this.forceRebuildFlag = false; // 플래그 리셋
+      console.log('벡터 DB 재구축 완료');
+      
+    } catch (error: any) {
+      console.error('벡터 DB 재구축 실패:', error);
+      this.forceRebuildFlag = false; // 오류 시에도 플래그 리셋
+      throw error;
     }
   }
 }
