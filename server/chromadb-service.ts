@@ -152,7 +152,7 @@ export class ChromaDBService {
         educationData = JSON.parse(eduData);
         console.log(`교육자료 ${educationData.length}건 로드 (전체)`);
       } catch (error) {
-        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.');
+        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.', error.message);
       }
 
       // 3. PDF를 LangChain으로 청킹한 JSON 데이터 로드
