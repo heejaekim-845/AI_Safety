@@ -3,6 +3,13 @@
 ## Overview
 This is a comprehensive, mobile-first web application designed as an industrial equipment safety management system. Its primary purpose is to enhance workplace safety by guiding workers through safe equipment maintenance and operations. Key capabilities include QR code scanning for equipment identification, real-time AI-powered safety analysis, dynamic work procedure guidance, and comprehensive risk management. The system aims to minimize industrial accidents, streamline safety protocols, and provide contextual safety recommendations, ultimately fostering a safer working environment.
 
+## Recent Updates (August 2025)
+- **Vector Database Enhancement**: Implemented complete RAG system with Gemini API integration for embedding 8,661+ safety documents
+- **Data Processing**: Fixed JSON parsing issues in education_data.json (6,501 education materials now loading properly)
+- **API Management**: Added retry logic with quota management for Gemini API calls
+- **Monitoring System**: Created VectorDBStatus page for real-time database monitoring and search testing
+- **Data Coverage**: Complete dataset processing (1,793 accident cases + 6,501 education materials + 367 PDF regulation chunks)
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
