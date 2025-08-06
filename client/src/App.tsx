@@ -10,6 +10,7 @@ import WorkProcedure from "@/pages/WorkProcedure";
 import WorkManagement from "@/pages/WorkManagement";
 import Briefing from "@/pages/Briefing";
 import AdminPanel from "@/pages/AdminPanel";
+import VectorDBStatus from "@/pages/VectorDBStatus";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
 
@@ -70,6 +71,7 @@ function Router() {
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
           <Route path="/briefing" component={Briefing} />
           <Route path="/admin" component={AdminPanel} />
+          <Route path="/vector-db" component={VectorDBStatus} />
         </Switch>
       </div>
 
