@@ -73,12 +73,13 @@ export class ChromaDBService {
         model: "gemini-embedding-001",
         contents: text,
         config: {
-          task_type: "RETRIEVAL_DOCUMENT", // 문서 임베딩용
-          output_dimensionality: 768 // 저장 공간 효율을 위해 768 차원 사용
+          taskType: "RETRIEVAL_DOCUMENT", // 문서 임베딩용
+          outputDimensionality: 768 // 저장 공간 효율을 위해 768 차원 사용
         }
       });
       
-      return response.embeddings || [];
+      const embedding = response.embeddings?.[0]?.values;
+      return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
     } catch (error: any) {
       console.error('Gemini 임베딩 생성 실패:', error);
       throw error;
@@ -168,7 +169,7 @@ export class ChromaDBService {
           ]);
           
           await new Promise((resolve, reject) => {
-            pythonProcess.on('close', (code) => {
+            pythonProcess.on('close', (code: number) => {
               if (code === 0) {
                 console.log('PDF 청킹 완료');
                 resolve(code);
@@ -281,12 +282,13 @@ export class ChromaDBService {
         model: "gemini-embedding-001",
         contents: query,
         config: {
-          task_type: "RETRIEVAL_QUERY", // 검색 쿼리용
-          output_dimensionality: 768
+          taskType: "RETRIEVAL_QUERY", // 검색 쿼리용
+          outputDimensionality: 768
         }
       });
       
-      return response.embeddings || [];
+      const embedding = response.embeddings?.[0]?.values;
+      return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
     } catch (error: any) {
       console.error('Gemini 쿼리 임베딩 생성 실패:', error);
       throw error;
@@ -307,12 +309,12 @@ export class ChromaDBService {
       // 쿼리 임베딩 생성 (검색용)
       const queryEmbedding = await this.generateQueryEmbedding(query);
 
-      // Vectra에서 검색
+      // Vectra에서 검색  
       const results = await this.index.queryItems(queryEmbedding, limit);
 
       // 결과 포맷팅
       const searchResults: SearchResult[] = results.map(result => ({
-        document: result.item.metadata.content,
+        document: (result.item.metadata.content as string) || '',
         metadata: result.item.metadata,
         distance: result.score
       }));

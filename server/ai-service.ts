@@ -410,18 +410,37 @@ JSON 형식으로 응답:
 
       try {
         // Try Vectra vector database first for enhanced RAG search
-        const chromaResults = await chromaDBService.searchRelevantData(
-          `${equipmentInfo.name} ${workType.name} ${this.extractRiskFactors(equipmentInfo)}`,
-          10
-        );
+        const searchQuery = `${equipmentInfo.name} ${workType.name} ${this.extractRiskFactors(equipmentInfo)}`;
+        console.log(`검색 시작 - 쿼리: "${searchQuery}"`);
+        
+        // 먼저 간단한 키워드로 검색 시도
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 15);
+        
+        // 결과가 없으면 더 간단한 쿼리로 재시도
+        if (chromaResults.length === 0) {
+          console.log('첫 번째 검색 실패, 간단한 키워드로 재시도');
+          const simpleQuery = equipmentInfo.name.includes('GIS') ? 'GIS 감전' : '감전 사고';
+          chromaResults = await chromaDBService.searchRelevantData(simpleQuery, 10);
+        }
 
-        // ChromaDB 결과를 타입별로 분류
-        chromaAccidents = chromaResults.filter(r => r.metadata.type === 'incident').map(r => ({
-          title: r.metadata.title,
-          summary: r.document.split('\n')[1] || '',
-          risk_keywords: r.metadata.risk_keywords || '',
-          prevention: r.document.split('예방대책: ')[1] || ''
-        }));
+        // ChromaDB 결과를 타입별로 분류하고 관련성 필터링 적용
+        const rawAccidents = chromaResults.filter(r => r.metadata.type === 'incident');
+        
+        // 모든 사고사례를 일단 포함 (필터링 임계값 제거)
+        const allAccidents = rawAccidents;
+        
+        // 상위 5건만 선택하고 관련성 기반 재정렬
+        chromaAccidents = allAccidents
+          .sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬 (가까운 것부터)
+          .slice(0, 5) // 최대 5건만 선택
+          .map(r => ({
+            title: r.metadata.title,
+            summary: r.document.split('\n')[1] || '',
+            risk_keywords: r.metadata.risk_keywords || '',
+            prevention: r.document.split('예방대책: ')[1] || '',
+            work_type: r.metadata.work_type || '',
+            relevanceScore: r.distance || 0
+          }));
         
         educationMaterials = chromaResults.filter(r => r.metadata.type === 'education').map(r => ({
           title: r.metadata.title,
@@ -437,6 +456,10 @@ JSON 형식으로 응답:
         }));
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log(`검색 쿼리: "${searchQuery}"`);
+        console.log(`원본 검색 결과:`, chromaResults.length, '건');
+        console.log(`사고사례 필터링 전:`, rawAccidents.length, '건');
+        console.log(`관련성 필터링 후:`, relevantAccidents.length, '건');
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
       }
@@ -727,6 +750,40 @@ ${specialNotes || "없음"}
 - 내용: ${regulation.content}
 - 분류: ${regulation.category}
     `).join('\n');
+  }
+
+  private isRelevantAccident(result: any, equipmentInfo: any, workType: any): boolean {
+    const title = (result.metadata.title || '').toLowerCase();
+    const workTypeInData = (result.metadata.work_type || '').toLowerCase();
+    const riskKeywords = (result.metadata.risk_keywords || '').toLowerCase();
+    
+    const equipmentName = equipmentInfo.name.toLowerCase();
+    const workTypeName = workType.name.toLowerCase();
+    
+    // 설비명 직접 매칭
+    if (title.includes(equipmentName) || riskKeywords.includes(equipmentName)) {
+      return true;
+    }
+    
+    // 작업 유형 매칭
+    if (workTypeInData.includes(workTypeName) || title.includes(workTypeName)) {
+      return true;
+    }
+    
+    // 위험 요소 매칭
+    const equipmentRisks = this.extractRiskFactors(equipmentInfo);
+    if (equipmentRisks && riskKeywords.includes(equipmentRisks.toLowerCase())) {
+      return true;
+    }
+    
+    // 고전압 설비 특별 처리
+    if (equipmentName.includes('gis') || equipmentName.includes('170kv')) {
+      if (title.includes('감전') || title.includes('고전압') || riskKeywords.includes('전기')) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   private mapAccidentTypeToSeverity(accidentType: string | undefined): string {
