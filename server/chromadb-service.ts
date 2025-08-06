@@ -15,10 +15,11 @@ export class ChromaDBService {
   private genai: GoogleGenAI;
   private isInitialized = false;
   private forceRebuildFlag = false;
+  private readonly indexPath = './data/vectra-index';
 
   constructor() {
     // Vectra LocalIndex (파일 기반 임베디드 모드)
-    this.index = new LocalIndex('./data/vectra-index');
+    this.index = new LocalIndex(this.indexPath);
     
     // Google Gemini AI for embeddings
     this.genai = new GoogleGenAI({
@@ -353,21 +354,15 @@ export class ChromaDBService {
     try {
       console.log('벡터 DB 강제 재구축 시작...');
       
-      // Delete existing index directory
-      if (this.index && await this.index.isIndexCreated()) {
-        await this.index.deleteIndex();
-        console.log('기존 인덱스 삭제 완료');
-      }
-      
       this.isInitialized = false;
       this.forceRebuildFlag = true; // 강제 재구축 플래그 설정
       
-      // Recreate index
+      // 새로운 인덱스로 재생성
       this.index = new LocalIndex(this.indexPath);
       await this.index.createIndex();
       console.log('새 인덱스 생성 완료');
       
-      // Repopulate with fresh data
+      // 전체 데이터 임베딩
       await this.loadAndEmbedData();
       this.isInitialized = true;
       this.forceRebuildFlag = false; // 플래그 리셋
