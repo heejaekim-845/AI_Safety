@@ -313,10 +313,24 @@ export class ChromaDBService {
       // 쿼리 임베딩 생성 (검색용)
       const queryEmbedding = await this.generateQueryEmbedding(query);
 
+      // 저장된 아이템 확인
+      const items = await this.index.listItems();
+      console.log(`저장된 아이템 수: ${items.length}`);
+      
+      if (items.length > 0) {
+        try {
+          const firstItem = await this.index.getItem(items[0].id);
+          console.log(`첫번째 아이템 전체:`, JSON.stringify(firstItem, null, 2).substring(0, 500));
+        } catch (itemError) {
+          console.error('아이템 조회 오류:', itemError);
+        }
+      }
+
       // Vectra에서 검색  
-      const results = await this.index.queryItems(queryEmbedding, limit, {
-        includeMetadata: true
-      });
+      console.log(`검색 쿼리: "${query}", 임베딩 차원: ${queryEmbedding.length}`);
+      const results = await this.index.queryItems(queryEmbedding, limit);
+
+      console.log(`원시 검색 결과:`, results.map(r => ({ score: r.score, title: r.item.metadata.title })));
 
       // 결과 포맷팅
       const searchResults: SearchResult[] = results.map(result => ({
@@ -341,6 +355,13 @@ export class ChromaDBService {
       }
 
       const items = await this.index.listItems();
+      console.log(`벡터DB 실제 아이템 수: ${items.length}`);
+      
+      // 샘플 아이템 확인
+      if (items.length > 0) {
+        const sampleItem = await this.index.getItem(items[0].id);
+        console.log(`샘플 아이템 메타데이터:`, sampleItem?.metadata);
+      }
       
       return {
         count: items.length,

@@ -806,6 +806,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ChromaDB 사용자 정의 검색 테스트 엔드포인트 (POST)
+  app.post("/api/test-vector-db", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ 
+          message: "검색어를 입력해주세요",
+          stats: { totalDocuments: 0, collections: [] },
+          searchResults: { found: 0, results: [] }
+        });
+      }
+
+      console.log(`사용자 정의 검색 테스트: "${query}"`);
+      
+      // ChromaDB 초기화
+      await chromaDBService.initialize();
+      
+      // 사용자 정의 쿼리로 검색 수행
+      const results = await chromaDBService.searchRelevantData(query.trim(), 10);
+      
+      // 통계 정보 가져오기
+      const stats = await chromaDBService.getStats();
+      
+      res.json({
+        message: `"${query}" 검색 완료`,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        },
+        searchResults: {
+          found: results.length,
+          results: results.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            distance: r.distance
+          }))
+        }
+      });
+    } catch (error: any) {
+      console.error('사용자 정의 벡터 검색 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "벡터 검색 실패",
+        stats: { totalDocuments: 0, collections: [] },
+        searchResults: { found: 0, results: [] }
+      });
+    }
+  });
+
   // 특정 파일만 추가로 임베딩하는 엔드포인트
   app.post("/api/add-documents", async (req, res) => {
     try {
