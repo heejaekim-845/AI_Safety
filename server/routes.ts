@@ -825,7 +825,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await chromaDBService.initialize();
       
       // 사용자 정의 쿼리로 검색 수행
-      const results = await chromaDBService.searchRelevantData(query.trim(), 10);
+      const results = await chromaDBService.searchRelevantData(query.trim(), 5);
       
       // 통계 정보 가져오기
       const stats = await chromaDBService.getStats();

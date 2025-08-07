@@ -331,20 +331,26 @@ export class ChromaDBService {
         }
       }
 
-      // Vectra에서 검색  
+      // Vectra에서 검색
       console.log(`검색 쿼리: "${query}", 임베딩 차원: ${queryEmbedding.length}`);
-      const results = await this.index.queryItems(queryEmbedding, limit);
+      const results = await this.index.queryItems(queryEmbedding, 10000); // 큰 수를 지정
+      
+      // 유사도 점수로 정렬하고 상위 limit개만 선택
+      const topResults = results
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit);
 
-      console.log(`원시 검색 결과:`, results.map(r => ({ score: r.score, title: r.item.metadata.title })));
+      console.log(`원시 검색 결과 (상위 ${topResults.length}개):`, 
+        topResults.map(r => ({ score: r.score, title: r.item.metadata?.title || 'No title' })));
 
       // 결과 포맷팅
-      const searchResults: SearchResult[] = results.map(result => ({
-        document: (result.item.metadata.content as string) || '',
-        metadata: result.item.metadata,
+      const searchResults: SearchResult[] = topResults.map(result => ({
+        document: (result.item.metadata?.content as string) || '',
+        metadata: result.item.metadata || {},
         distance: result.score
       }));
 
-      console.log(`Vectra 검색 완료: ${searchResults.length}개 결과`);
+      console.log(`Vectra 검색 완료: ${searchResults.length}개 결과 (전체 ${results.length}개 중)`);
       return searchResults;
 
     } catch (error: any) {
