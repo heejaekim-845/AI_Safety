@@ -28,7 +28,8 @@ import {
   Trash2,
   Factory,
   Shield,
-  AlertTriangle
+  AlertTriangle,
+  Database
 } from "lucide-react";
 
 export default function AdminPanel() {
@@ -358,15 +359,26 @@ export default function AdminPanel() {
             <p className="text-body text-blue-50">산업 설비의 안전 정보를 관리합니다</p>
           </div>
           
-          {/* Add Equipment Dialog */}
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button className="bg-white text-primary hover:bg-blue-50 border-0">
-                <Plus className="mr-2 h-4 w-4" />
-                설비 추가
-              </Button>
-            </DialogTrigger>
-          </Dialog>
+          <div className="flex items-center gap-3">
+            {/* Vector DB Status Button */}
+            <Button 
+              onClick={() => setLocation('/vector-db-status')}
+              className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+            >
+              <Database className="mr-2 h-4 w-4" />
+              벡터DB상태확인
+            </Button>
+            
+            {/* Add Equipment Dialog */}
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-white text-primary hover:bg-blue-50 border-0">
+                  <Plus className="mr-2 h-4 w-4" />
+                  설비 추가
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </div>
         </div>
       </div>
 
