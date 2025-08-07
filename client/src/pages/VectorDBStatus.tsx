@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Database, Search, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
+import { Database, Search, RefreshCw, AlertCircle, CheckCircle, Plus, Upload } from 'lucide-react';
 
 interface VectorDBStats {
   message: string;
@@ -25,7 +25,9 @@ export default function VectorDBStatus() {
   const [stats, setStats] = useState<VectorDBStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [addingDocs, setAddingDocs] = useState(false);
   const [searchQuery, setSearchQuery] = useState('전기');
+  const [newFilePaths, setNewFilePaths] = useState(['']);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -58,6 +60,53 @@ export default function VectorDBStatus() {
       alert('벡터 DB 재생성에 실패했습니다.');
     }
     setRegenerating(false);
+  };
+
+  const addNewDocuments = async () => {
+    const validPaths = newFilePaths.filter(path => path.trim() !== '');
+    if (validPaths.length === 0) {
+      alert('추가할 파일 경로를 입력해주세요.');
+      return;
+    }
+
+    setAddingDocs(true);
+    try {
+      const response = await fetch('/api/add-documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePaths: validPaths })
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`성공: ${result.message}`);
+        setNewFilePaths(['']); // 입력 필드 초기화
+        fetchStats(); // 상태 새로고침
+      } else {
+        alert(`실패: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('문서 추가 실패:', error);
+      alert('문서 추가에 실패했습니다.');
+    }
+    setAddingDocs(false);
+  };
+
+  const addFilePathField = () => {
+    setNewFilePaths([...newFilePaths, '']);
+  };
+
+  const updateFilePath = (index: number, value: string) => {
+    const updated = [...newFilePaths];
+    updated[index] = value;
+    setNewFilePaths(updated);
+  };
+
+  const removeFilePath = (index: number) => {
+    if (newFilePaths.length > 1) {
+      const updated = newFilePaths.filter((_, i) => i !== index);
+      setNewFilePaths(updated);
+    }
   };
 
   const performSearch = async () => {
@@ -208,6 +257,69 @@ export default function VectorDBStatus() {
           </Card>
         </div>
       )}
+
+      {/* 새 문서 추가 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-green-600" />
+            새 문서 추가 (전체 재생성 없이)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-sm text-gray-600 mb-4">
+            embed_data 폴더에 있는 새로운 파일만 추가로 임베딩합니다. 기존 데이터는 유지됩니다.
+          </div>
+          
+          <div className="space-y-3">
+            {newFilePaths.map((filePath, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="예: new_accidents.json, additional_education.json"
+                  value={filePath}
+                  onChange={(e) => updateFilePath(index, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {newFilePaths.length > 1 && (
+                  <Button 
+                    onClick={() => removeFilePath(index)}
+                    variant="outline" 
+                    size="sm"
+                    className="px-2"
+                  >
+                    ×
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <Button onClick={addFilePathField} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-1" />
+              파일 경로 추가
+            </Button>
+            <Button 
+              onClick={addNewDocuments} 
+              disabled={addingDocs || newFilePaths.every(path => path.trim() === '')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Upload className={`h-4 w-4 mr-2 ${addingDocs ? 'animate-spin' : ''}`} />
+              {addingDocs ? '임베딩 중...' : '문서 추가'}
+            </Button>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 rounded-md">
+            <div className="text-sm font-medium text-blue-800 mb-2">사용 예시:</div>
+            <div className="text-sm text-blue-700 space-y-1">
+              <div>• JSON 파일: <code>new_accidents_2025.json</code></div>
+              <div>• 텍스트 파일: <code>safety_manual.txt</code></div>
+              <div>• 여러 파일: 위의 "+" 버튼으로 추가 입력창 생성</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* 데이터 구성 설명 */}
       <Card>

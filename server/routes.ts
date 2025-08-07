@@ -806,6 +806,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 특정 파일만 추가로 임베딩하는 엔드포인트
+  app.post("/api/add-documents", async (req, res) => {
+    try {
+      const { filePaths } = req.body;
+      
+      if (!Array.isArray(filePaths) || filePaths.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "임베딩할 파일 경로를 제공해주세요. 예: ['new_accidents.json', 'new_education.json']"
+        });
+      }
+
+      console.log(`추가 문서 임베딩 시작: ${filePaths.join(', ')}`);
+      
+      // 새로운 문서들을 기존 벡터DB에 추가
+      const result = await chromaDBService.addNewDocuments(filePaths);
+      
+      // 추가 후 통계 정보 가져오기
+      const stats = await chromaDBService.getStats();
+      
+      res.json({
+        ...result,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('문서 추가 실패:', error);
+      res.status(500).json({ 
+        success: false,
+        message: `문서 추가 실패: ${error.message}`,
+        addedCount: 0
+      });
+    }
+  });
+
   // /embed_data 폴더에서 벡터DB 재생성 엔드포인트
   app.post("/api/regenerate-vector-db", async (req, res) => {
     try {

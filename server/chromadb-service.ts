@@ -152,7 +152,7 @@ export class ChromaDBService {
         educationData = JSON.parse(eduData);
         console.log(`교육자료 ${educationData.length}건 로드 (전체)`);
       } catch (error) {
-        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.', error.message);
+        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.', (error as Error).message);
       }
 
       // 3. PDF를 LangChain으로 청킹한 JSON 데이터 로드
@@ -314,7 +314,9 @@ export class ChromaDBService {
       const queryEmbedding = await this.generateQueryEmbedding(query);
 
       // Vectra에서 검색  
-      const results = await this.index.queryItems(queryEmbedding, limit);
+      const results = await this.index.queryItems(queryEmbedding, limit, {
+        includeMetadata: true
+      });
 
       // 결과 포맷팅
       const searchResults: SearchResult[] = results.map(result => ({
@@ -386,6 +388,116 @@ export class ChromaDBService {
       console.error('벡터 DB 재구축 실패:', error);
       this.forceRebuildFlag = false; // 오류 시에도 플래그 리셋
       throw error;
+    }
+  }
+
+  // 특정 파일만 추가로 임베딩하는 메소드
+  async addNewDocuments(filePaths: string[]): Promise<{success: boolean, message: string, addedCount: number}> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      let addedCount = 0;
+      console.log(`새로운 문서 ${filePaths.length}개 파일 임베딩 시작...`);
+
+      for (const filePath of filePaths) {
+        try {
+          const fullPath = path.join('./embed_data', filePath);
+          const fileContent = await fs.readFile(fullPath, 'utf-8');
+          
+          let data: any[] = [];
+          if (filePath.endsWith('.json')) {
+            data = JSON.parse(fileContent);
+          } else if (filePath.endsWith('.txt')) {
+            // 텍스트 파일을 문단 단위로 분할
+            const paragraphs = fileContent.split('\n\n').filter(p => p.trim().length > 0);
+            data = paragraphs.map((paragraph, index) => ({
+              title: `${filePath} - 문단 ${index + 1}`,
+              content: paragraph.trim(),
+              source: filePath
+            }));
+          }
+
+          // 각 문서를 임베딩하여 추가
+          for (let i = 0; i < data.length; i++) {
+            const doc = data[i];
+            try {
+              const textToEmbed = this.prepareTextForEmbedding(doc);
+              const embedding = await this.generateEmbedding(textToEmbed);
+              
+              const docId = `${filePath}_${i}_${Date.now()}`;
+              await this.index.upsertItem({
+                id: docId,
+                vector: embedding,
+                metadata: {
+                  type: this.getDocumentType(filePath),
+                  title: doc.title || doc.사고명칭 || doc.교육과정명 || `문서 ${i + 1}`,
+                  source: filePath,
+                  index: i,
+                  content: textToEmbed
+                }
+              });
+              
+              addedCount++;
+              console.log(`${filePath}의 문서 ${i + 1}/${data.length} 임베딩 완료`);
+              
+              // API 제한 방지를 위한 딜레이
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
+            } catch (embeddingError: any) {
+              console.log(`임베딩 실패 (건너뜀): ${filePath} 문서 ${i + 1} - ${embeddingError.message}`);
+            }
+          }
+          
+        } catch (fileError: any) {
+          console.error(`파일 처리 실패: ${filePath} - ${fileError.message}`);
+        }
+      }
+
+      return {
+        success: true,
+        message: `성공적으로 ${addedCount}개 문서를 추가했습니다.`,
+        addedCount
+      };
+      
+    } catch (error: any) {
+      console.error('새 문서 추가 실패:', error);
+      return {
+        success: false,
+        message: `문서 추가 실패: ${error.message}`,
+        addedCount: 0
+      };
+    }
+  }
+
+  // 문서 타입 결정 헬퍼 메소드
+  private getDocumentType(filePath: string): string {
+    if (filePath.includes('accident') || filePath.includes('사고')) {
+      return 'accident_case';
+    } else if (filePath.includes('education') || filePath.includes('교육')) {
+      return 'education_material';
+    } else if (filePath.includes('regulation') || filePath.includes('법규')) {
+      return 'regulation';
+    } else {
+      return 'general';
+    }
+  }
+
+  // 텍스트 임베딩 준비 헬퍼 메소드
+  private prepareTextForEmbedding(doc: any): string {
+    if (doc.사고명칭) {
+      // 사고사례 문서
+      return `사고명: ${doc.사고명칭}\n발생장소: ${doc.발생장소 || ''}\n사고유형: ${doc.사고유형 || ''}\n사고개요: ${doc.사고개요 || ''}\n사고원인: ${doc.사고원인 || ''}\n재발방지대책: ${doc.재발방지대책 || ''}`;
+    } else if (doc.교육과정명) {
+      // 교육자료 문서
+      return `교육과정: ${doc.교육과정명}\n교육기관: ${doc.교육기관명 || ''}\n교육내용: ${doc.교육내용 || ''}\n교육대상: ${doc.교육대상 || ''}`;
+    } else if (doc.title && doc.content) {
+      // 일반 문서
+      return `제목: ${doc.title}\n내용: ${doc.content}`;
+    } else {
+      // 기타
+      return JSON.stringify(doc);
     }
   }
 }
