@@ -320,7 +320,12 @@ export class ChromaDBService {
       if (items.length > 0) {
         try {
           const firstItem = await this.index.getItem(items[0].id);
-          console.log(`첫번째 아이템 전체:`, JSON.stringify(firstItem, null, 2).substring(0, 500));
+          console.log(`첫번째 아이템:`, {
+            id: firstItem?.id,
+            vector_length: firstItem?.vector?.length,
+            metadata: firstItem?.metadata ? Object.keys(firstItem.metadata) : 'no metadata',
+            metadata_title: firstItem?.metadata?.title
+          });
         } catch (itemError) {
           console.error('아이템 조회 오류:', itemError);
         }
