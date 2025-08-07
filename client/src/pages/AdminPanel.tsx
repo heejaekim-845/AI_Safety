@@ -362,7 +362,7 @@ export default function AdminPanel() {
           <div className="flex items-center gap-3">
             {/* Vector DB Status Button */}
             <Button 
-              onClick={() => setLocation('/vector-db-status')}
+              onClick={() => setLocation('/vector-db')}
               className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
             >
               <Database className="mr-2 h-4 w-4" />
