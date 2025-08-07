@@ -856,6 +856,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ChromaDB 카테고리별 검색 엔드포인트 (POST)
+  app.post("/api/search-by-category", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ 
+          message: "검색어를 입력해주세요",
+          results: {
+            education: [],
+            incident: [],
+            regulation: [],
+            totalFound: { education: 0, incident: 0, regulation: 0 }
+          }
+        });
+      }
+
+      console.log(`카테고리별 검색: "${query}"`);
+      
+      // ChromaDB 초기화
+      await chromaDBService.initialize();
+      
+      // 카테고리별 검색 수행
+      const results = await chromaDBService.searchByCategory(query.trim(), 5);
+      
+      res.json({
+        message: `"${query}" 카테고리별 검색 완료`,
+        results: {
+          education: results.education.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            content: r.metadata.content || r.document,
+            distance: r.distance,
+            metadata: r.metadata
+          })),
+          incident: results.incident.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            content: r.metadata.content || r.document,
+            distance: r.distance,
+            metadata: r.metadata
+          })),
+          regulation: results.regulation.map(r => ({
+            type: r.metadata.type,
+            title: r.metadata.title,
+            content: r.metadata.content || r.document,
+            distance: r.distance,
+            metadata: r.metadata
+          })),
+          totalFound: results.totalFound
+        }
+      });
+    } catch (error: any) {
+      console.error('카테고리별 벡터 검색 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "카테고리별 벡터 검색 실패",
+        results: {
+          education: [],
+          incident: [],
+          regulation: [],
+          totalFound: { education: 0, incident: 0, regulation: 0 }
+        }
+      });
+    }
+  });
+
   // 특정 파일만 추가로 임베딩하는 엔드포인트
   app.post("/api/add-documents", async (req, res) => {
     try {

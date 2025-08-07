@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Database, Search, RefreshCw, AlertCircle, CheckCircle, Plus, Upload } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Database, Search, RefreshCw, AlertCircle, CheckCircle, Plus, Upload, BookOpen, AlertTriangle, FileText } from 'lucide-react';
 
 interface VectorDBStats {
   message: string;
@@ -21,13 +22,47 @@ interface VectorDBStats {
   };
 }
 
+interface CategorySearchResult {
+  message: string;
+  results: {
+    education: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    incident: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    regulation: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    totalFound: {
+      education: number;
+      incident: number;
+      regulation: number;
+    };
+  };
+}
+
 export default function VectorDBStatus() {
   const [stats, setStats] = useState<VectorDBStats | null>(null);
+  const [categoryResults, setCategoryResults] = useState<CategorySearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [addingDocs, setAddingDocs] = useState(false);
   const [searchQuery, setSearchQuery] = useState('전기');
   const [newFilePaths, setNewFilePaths] = useState(['']);
+  const [activeTab, setActiveTab] = useState('education');
 
   const fetchStats = async () => {
     setLoading(true);
@@ -127,6 +162,24 @@ export default function VectorDBStatus() {
     setLoading(false);
   };
 
+  const performCategorySearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/search-by-category', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery })
+      });
+      const data = await response.json();
+      setCategoryResults(data);
+    } catch (error) {
+      console.error('카테고리별 검색 실패:', error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     fetchStats();
   }, []);
@@ -198,12 +251,12 @@ export default function VectorDBStatus() {
             </CardContent>
           </Card>
 
-          {/* 검색 테스트 */}
+          {/* 카테고리별 검색 테스트 */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
-                벡터 검색 테스트
+                카테고리별 벡터 검색
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -214,45 +267,133 @@ export default function VectorDBStatus() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="검색어 입력 (예: 전기, GIS, 감전)"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                  onKeyPress={(e) => e.key === 'Enter' && performSearch()}
+                  onKeyPress={(e) => e.key === 'Enter' && performCategorySearch()}
                 />
-                <Button onClick={performSearch} disabled={loading}>
+                <Button onClick={performCategorySearch} disabled={loading}>
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">검색 결과</span>
-                  <Badge variant="outline">
-                    {stats.searchResults.found}개 발견
-                  </Badge>
-                </div>
+              {categoryResults && (
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="education" className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      교육자료 ({categoryResults.results.totalFound.education})
+                    </TabsTrigger>
+                    <TabsTrigger value="incident" className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      사고사례 ({categoryResults.results.totalFound.incident})
+                    </TabsTrigger>
+                    <TabsTrigger value="regulation" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      관련규정 ({categoryResults.results.totalFound.regulation})
+                    </TabsTrigger>
+                  </TabsList>
 
-                <div className="max-h-64 overflow-y-auto space-y-2">
-                  {stats.searchResults.results.length > 0 ? (
-                    stats.searchResults.results.map((result, index) => (
-                      <div key={index} className="p-3 border border-gray-200 rounded-lg">
-                        <div className="flex items-center justify-between mb-1">
-                          <Badge variant="secondary" className="text-xs">
-                            {result.type}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            유사도: {(1 - result.distance).toFixed(3)}
-                          </span>
+                  <TabsContent value="education" className="space-y-3">
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {categoryResults.results.education.length > 0 ? (
+                        categoryResults.results.education.map((result, index) => (
+                          <div key={index} className="p-3 border border-green-200 bg-green-50 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                교육자료
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                유사도: {result.distance.toFixed(3)}
+                              </span>
+                            </div>
+                            <div className="text-sm font-medium text-gray-800 mb-1">
+                              {result.title}
+                            </div>
+                            <div className="text-xs text-gray-600 line-clamp-2">
+                              {result.content?.substring(0, 150)}...
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center text-gray-500 py-8">
+                          교육자료 검색 결과가 없습니다.
                         </div>
-                        <div className="text-sm font-medium text-gray-800">
-                          {result.title}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center text-gray-500 py-8">
-                      검색 결과가 없습니다.
+                      )}
                     </div>
-                  )}
+                  </TabsContent>
+
+                  <TabsContent value="incident" className="space-y-3">
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {categoryResults.results.incident.length > 0 ? (
+                        categoryResults.results.incident.map((result, index) => (
+                          <div key={index} className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge variant="destructive" className="bg-red-100 text-red-800">
+                                사고사례
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                유사도: {result.distance.toFixed(3)}
+                              </span>
+                            </div>
+                            <div className="text-sm font-medium text-gray-800 mb-1">
+                              {result.title}
+                            </div>
+                            <div className="text-xs text-gray-600 line-clamp-2">
+                              {result.content?.substring(0, 150)}...
+                            </div>
+                            {result.metadata?.risk_keywords && (
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                {result.metadata.risk_keywords.split(', ').slice(0, 3).map((keyword: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs bg-red-100 text-red-700">
+                                    {keyword}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center text-gray-500 py-8">
+                          사고사례 검색 결과가 없습니다.
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="regulation" className="space-y-3">
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {categoryResults.results.regulation.length > 0 ? (
+                        categoryResults.results.regulation.map((result, index) => (
+                          <div key={index} className="p-3 border border-blue-200 bg-blue-50 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge variant="default" className="bg-blue-100 text-blue-800">
+                                관련규정
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                유사도: {result.distance.toFixed(3)}
+                              </span>
+                            </div>
+                            <div className="text-sm font-medium text-gray-800 mb-1">
+                              {result.title}
+                            </div>
+                            <div className="text-xs text-gray-600 line-clamp-2">
+                              {result.content?.substring(0, 150)}...
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center text-gray-500 py-8">
+                          관련규정 검색 결과가 없습니다.
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              )}
+
+              {!categoryResults && (
+                <div className="text-center text-gray-500 py-8">
+                  검색어를 입력하고 검색 버튼을 클릭하세요.
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -10,6 +10,17 @@ export interface SearchResult {
   distance: number;
 }
 
+export interface CategorizedSearchResult {
+  education: SearchResult[];
+  incident: SearchResult[];
+  regulation: SearchResult[];
+  totalFound: {
+    education: number;
+    incident: number;
+    regulation: number;
+  };
+}
+
 export class ChromaDBService {
   private index: LocalIndex;
   private genai: GoogleGenAI;
@@ -356,6 +367,87 @@ export class ChromaDBService {
     } catch (error: any) {
       console.log('Gemini API 오류로 Vectra 검색 실패:', error.message);
       return [];
+    }
+  }
+
+  async searchByCategory(query: string, limitPerCategory: number = 5): Promise<CategorizedSearchResult> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      // Gemini API 할당량 문제가 있으면 빈 결과 반환
+      if (!process.env.GEMINI_API_KEY) {
+        return {
+          education: [],
+          incident: [],
+          regulation: [],
+          totalFound: { education: 0, incident: 0, regulation: 0 }
+        };
+      }
+
+      // 쿼리 임베딩 생성
+      const queryEmbedding = await this.generateQueryEmbedding(query);
+
+      // 모든 결과 가져오기
+      const results = await this.index.queryItems(queryEmbedding, 10000);
+      const sortedResults = results.sort((a, b) => b.score - a.score);
+
+      // 카테고리별로 분류
+      const educationResults: SearchResult[] = [];
+      const incidentResults: SearchResult[] = [];
+      const regulationResults: SearchResult[] = [];
+
+      for (const result of sortedResults) {
+        const type = result.item.metadata?.type;
+        const searchResult: SearchResult = {
+          document: (result.item.metadata?.content as string) || '',
+          metadata: result.item.metadata || {},
+          distance: result.score
+        };
+
+        if (type === 'education' && educationResults.length < limitPerCategory) {
+          educationResults.push(searchResult);
+        } else if (type === 'incident' && incidentResults.length < limitPerCategory) {
+          incidentResults.push(searchResult);
+        } else if (type === 'regulation' && regulationResults.length < limitPerCategory) {
+          regulationResults.push(searchResult);
+        }
+
+        // 모든 카테고리가 채워지면 중단
+        if (educationResults.length >= limitPerCategory && 
+            incidentResults.length >= limitPerCategory && 
+            regulationResults.length >= limitPerCategory) {
+          break;
+        }
+      }
+
+      // 전체 카테고리별 개수 계산
+      const totalCounts = sortedResults.reduce((acc, result) => {
+        const type = result.item.metadata?.type;
+        if (type === 'education') acc.education++;
+        else if (type === 'incident') acc.incident++;
+        else if (type === 'regulation') acc.regulation++;
+        return acc;
+      }, { education: 0, incident: 0, regulation: 0 });
+
+      console.log(`카테고리별 검색 완료 - 교육자료: ${educationResults.length}개, 사고사례: ${incidentResults.length}개, 관련규정: ${regulationResults.length}개`);
+
+      return {
+        education: educationResults,
+        incident: incidentResults,
+        regulation: regulationResults,
+        totalFound: totalCounts
+      };
+
+    } catch (error: any) {
+      console.log('카테고리별 벡터 검색 실패:', error.message);
+      return {
+        education: [],
+        incident: [],
+        regulation: [],
+        totalFound: { education: 0, incident: 0, regulation: 0 }
+      };
     }
   }
 
