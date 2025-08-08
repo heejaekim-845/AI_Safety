@@ -420,7 +420,22 @@ JSON 형식으로 응답:
         if (chromaResults.length === 0) {
           console.log('첫 번째 검색 실패, 간단한 키워드로 재시도');
           const simpleQuery = equipmentInfo.name.includes('GIS') ? 'GIS 감전' : '감전 사고';
-          chromaResults = await chromaDBService.searchRelevantData(simpleQuery, 10);
+          chromaResults = await chromaDBService.searchRelevantData(simpleQuery, 25);
+        }
+
+        // GIS/전기 관련이면 특별히 전기 안전 규정 검색 추가
+        if (equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
+          console.log('전기 설비 관련 규정 추가 검색 수행');
+          const electricalQuery = '전기 안전 작업 방법 절연 검전 정전';
+          const electricalResults = await chromaDBService.searchRelevantData(electricalQuery, 15);
+          
+          // 기존 결과와 합치기 (중복 제거)
+          const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+          const newResults = electricalResults.filter(r => 
+            !existingIds.has(r.metadata?.id || r.document)
+          );
+          chromaResults = [...chromaResults, ...newResults];
+          console.log(`전기 안전 규정 추가 검색으로 ${newResults.length}건 추가, 총 ${chromaResults.length}건`);
         }
 
         // ChromaDB 결과를 타입별로 분류하고 관련성 필터링 적용
@@ -449,15 +464,44 @@ JSON 형식으로 응답:
           category: r.metadata.category
         }));
         
-        safetyRegulations = chromaResults
-          .filter(r => r.metadata.type === 'regulation')
-          .slice(0, 5) // 최대 5개 규정만 선택
-          .map(r => ({
-            title: r.metadata.title,
-            content: r.document.substring(0, 300) || '', // 더 많은 내용 포함
-            article_number: r.metadata.article_number,
-            category: r.metadata.category
-          }));
+        const regulationResults = chromaResults.filter(r => r.metadata.type === 'regulation');
+        
+        // 청크 번호가 포함된 제목을 실제 조문으로 변환하고 중복 제거
+        const processedRegulations = new Map();
+        
+        regulationResults.forEach(r => {
+          // 실제 조문 제목을 추출 (청크 번호 제거)
+          let actualTitle = r.metadata.title;
+          if (actualTitle && actualTitle.includes('청크')) {
+            // 문서 내용에서 실제 조문 번호와 제목 추출
+            const content = r.document;
+            const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+            if (articleMatch) {
+              actualTitle = `제${articleMatch[1]}조(${articleMatch[2]})`;
+            } else {
+              // 조문이 없으면 주요 내용에서 제목 추출
+              const lines = content.split('\n').filter(line => line.trim().length > 0);
+              actualTitle = lines[0]?.substring(0, 50) + '...';
+            }
+          }
+          
+          // 중복 제거 - 같은 조문이면 더 긴 내용으로 업데이트
+          const key = actualTitle;
+          if (!processedRegulations.has(key) || processedRegulations.get(key).content.length < r.document.length) {
+            processedRegulations.set(key, {
+              title: actualTitle,
+              content: r.document.substring(0, 500), // 조문 전체 내용 포함
+              article_number: r.metadata.article_number,
+              category: r.metadata.category || '산업안전보건기준',
+              distance: r.distance
+            });
+          }
+        });
+        
+        // 관련성 순으로 정렬하여 상위 3개만 선택
+        safetyRegulations = Array.from(processedRegulations.values())
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 3);
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQuery}"`);
@@ -748,13 +792,23 @@ ${specialNotes || "없음"}
       return "관련 안전규칙이 없습니다.";
     }
 
-    return regulations.map((regulation, index) => `
-【안전규칙 ${index + 1}】
-- 조문: ${regulation.article_number}
-- 제목: ${regulation.title}
-- 내용: ${regulation.content}
-- 분류: ${regulation.category}
-    `).join('\n');
+    return regulations.map((regulation, index) => {
+      // 내용에서 실제 조문 내용 추출
+      let content = regulation.content || '';
+      
+      // 조문 번호와 제목이 포함된 내용 정리
+      const lines = content.split('\n').filter(line => line.trim().length > 0);
+      const mainContent = lines.slice(0, 5).join('\n'); // 주요 내용 5줄
+      
+      return `
+【관련법령 ${index + 1}】
+${regulation.title}
+
+${mainContent}
+
+(출처: ${regulation.category || '산업안전보건기준에 관한 규칙'})
+    `;
+    }).join('\n');
   }
 
   private isRelevantAccident(result: any, equipmentInfo: any, workType: any): boolean {
