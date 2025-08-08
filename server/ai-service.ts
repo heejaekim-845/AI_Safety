@@ -864,14 +864,12 @@ ${specialNotes || "없음"}
 - 50자 이내로 작성
 - 전문 용어보다는 이해하기 쉬운 표현 사용`;
 
-      const response = await this.openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 100,
-        temperature: 0.3
+      const response = await this.gemini.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
       });
 
-      const summary = response.choices[0].message.content?.trim();
+      const summary = response.text?.trim();
       return summary || "조문 요약을 생성할 수 없습니다.";
 
     } catch (error) {
