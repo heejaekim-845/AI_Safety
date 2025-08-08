@@ -51,7 +51,7 @@ export default function AdminPanel() {
     reportedBy: string;
     actions: string;
   }[]>([]);
-  
+
   const { data: equipment, isLoading } = useEquipment();
 
   const form = useForm<InsertEquipment>({
@@ -200,7 +200,7 @@ export default function AdminPanel() {
   const onEditSubmit = async (data: InsertEquipment) => {
     console.log("편집 폼 제출 데이터:", data);
     console.log("riskFactors:", data.riskFactors);
-    
+
     // First update the equipment
     updateEquipmentMutation.mutate(data, {
       onSuccess: async () => {
@@ -234,7 +234,7 @@ export default function AdminPanel() {
             setNewIncidents([]);
             // Invalidate incidents query to refresh the dashboard
             queryClient.invalidateQueries({ queryKey: [`/api/equipment/${editingEquipment.id}/incidents`] });
-            
+
             toast({
               title: "저장 완료",
               description: `설비 정보와 ${newIncidents.length}건의 사고이력이 저장되었습니다.`,
@@ -295,14 +295,14 @@ export default function AdminPanel() {
         : [],
       imageUrl: equipment.imageUrl || ""
     });
-    
+
     // Load existing incidents for this equipment
     try {
       const response = await fetch(`/api/equipment/${equipment.id}/incidents`);
       if (response.ok) {
         const incidents = await response.json();
         console.log("Loaded incidents:", incidents);
-        
+
         // Convert existing incidents to the format expected by newIncidents state
         const existingIncidents = incidents.map((incident: any) => ({
           id: incident.id, // Keep track of existing incident IDs
@@ -312,7 +312,7 @@ export default function AdminPanel() {
           reportedBy: incident.reporterName || "",
           actions: incident.actionsTaken || ""
         }));
-        
+
         console.log("Converted incidents:", existingIncidents);
         setNewIncidents(existingIncidents);
       } else {
@@ -323,7 +323,7 @@ export default function AdminPanel() {
       console.error("Failed to load incidents:", error);
       setNewIncidents([]);
     }
-    
+
     setShowEditDialog(true);
   };
 
@@ -360,7 +360,7 @@ export default function AdminPanel() {
             <h1 className="text-heading-1 text-white mb-2">설비 관리</h1>
             <p className="text-body text-blue-50">산업 설비의 안전 정보를 관리합니다</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {/* Vector DB Status Button */}
             <Button 
@@ -370,9 +370,9 @@ export default function AdminPanel() {
               <Database className="mr-2 h-4 w-4" />
               벡터DB상태확인
             </Button>
-            
 
-            
+
+
             {/* Add Equipment Dialog */}
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
@@ -525,7 +525,7 @@ export default function AdminPanel() {
                 {/* Risk Factors */}
                 <div className="space-y-4 border-t pt-4">
                   <Label className="text-base font-medium">위험요소</Label>
-                  
+
                   <div className="space-y-4">
                     <FormField
                       control={form.control}
@@ -739,7 +739,7 @@ export default function AdminPanel() {
                       장비 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="requiredSafetyEquipment"
@@ -788,7 +788,7 @@ export default function AdminPanel() {
                 {/* Hazardous Chemicals Management */}
                 <div className="space-y-4 border-t pt-4">
                   <Label className="text-base font-medium">유해화학물질 정보</Label>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -853,7 +853,7 @@ export default function AdminPanel() {
                       시설 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="safetyFacilityLocations"
@@ -878,7 +878,7 @@ export default function AdminPanel() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설명</Label>
@@ -975,7 +975,7 @@ export default function AdminPanel() {
                       장치 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="safetyDeviceImages"
@@ -1000,7 +1000,7 @@ export default function AdminPanel() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              
+
                               <div className="grid grid-cols-3 gap-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">장치명</Label>
@@ -1073,7 +1073,7 @@ export default function AdminPanel() {
                       연락처 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="emergencyContacts"
@@ -1098,7 +1098,7 @@ export default function AdminPanel() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">역할/직책</Label>
@@ -1161,7 +1161,7 @@ export default function AdminPanel() {
                       사고 추가
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {newIncidents.map((incident, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-gray-50">
@@ -1181,7 +1181,7 @@ export default function AdminPanel() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-3 mb-3">
                           <div>
                             <Label className="text-xs text-muted-foreground">심각도</Label>
@@ -1216,7 +1216,7 @@ export default function AdminPanel() {
                             />
                           </div>
                         </div>
-                        
+
                         <div className="space-y-3">
                           <div>
                             <Label className="text-xs text-muted-foreground">사고 설명</Label>
@@ -1259,7 +1259,7 @@ export default function AdminPanel() {
                         </div>
                       </div>
                     ))}
-                    
+
                     {newIncidents.length === 0 && (
                       <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
                         사고이력을 추가하려면 "사고 추가" 버튼을 클릭하세요
@@ -1426,7 +1426,7 @@ export default function AdminPanel() {
                 {/* Risk Factors */}
                 <div className="space-y-4 border-t pt-4">
                   <Label className="text-base font-medium">위험요소</Label>
-                  
+
                   <div className="space-y-4">
                     <FormField
                       control={editForm.control}
@@ -1640,7 +1640,7 @@ export default function AdminPanel() {
                       장비 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={editForm.control}
                     name="requiredSafetyEquipment"
@@ -1689,7 +1689,7 @@ export default function AdminPanel() {
                 {/* Hazardous Chemicals Management */}
                 <div className="space-y-4 border-t pt-4">
                   <Label className="text-base font-medium">유해화학물질 정보</Label>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={editForm.control}
@@ -1754,7 +1754,7 @@ export default function AdminPanel() {
                       장치 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={editForm.control}
                     name="safetyDeviceImages"
@@ -1779,7 +1779,7 @@ export default function AdminPanel() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설명</Label>
@@ -1876,7 +1876,7 @@ export default function AdminPanel() {
                       연락처 추가
                     </Button>
                   </div>
-                  
+
                   <FormField
                     control={editForm.control}
                     name="emergencyContacts"
@@ -1901,7 +1901,7 @@ export default function AdminPanel() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">역할/직책</Label>
@@ -1964,7 +1964,7 @@ export default function AdminPanel() {
                       사고 추가
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {newIncidents.map((incident, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-gray-50">
@@ -1984,7 +1984,7 @@ export default function AdminPanel() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-3 mb-3">
                           <div>
                             <Label className="text-xs text-muted-foreground">심각도</Label>
@@ -2019,7 +2019,7 @@ export default function AdminPanel() {
                             />
                           </div>
                         </div>
-                        
+
                         <div className="space-y-3">
                           <div>
                             <Label className="text-xs text-muted-foreground">사고 설명</Label>
@@ -2062,7 +2062,7 @@ export default function AdminPanel() {
                         </div>
                       </div>
                     ))}
-                    
+
                     {newIncidents.length === 0 && (
                       <div className="text-center py-4 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
                         사고이력을 추가하려면 "사고 추가" 버튼을 클릭하세요
@@ -2162,7 +2162,7 @@ export default function AdminPanel() {
                     <RiskLevelBadge level={eq.riskLevel} />
                   </div>
                 </div>
-                
+
                 {/* 두 번째 줄: 버튼들 */}
                 <div className="flex items-center space-x-3">
                   <Button
