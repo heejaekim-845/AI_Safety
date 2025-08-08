@@ -626,6 +626,73 @@ export class ChromaDBService {
       return JSON.stringify(doc);
     }
   }
+
+  // 특정 타입의 데이터만 재구성하는 메서드
+  async rebuildPartialData(dataTypes: ('incident' | 'education' | 'regulation')[]): Promise<void> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      console.log(`부분 재구성 시작: ${dataTypes.join(', ')}`);
+
+      // 기존 데이터 삭제 (해당 타입만)
+      const existingItems = await this.index.listItems();
+      for (const item of existingItems) {
+        const itemDetail = await this.index.getItem(item.id);
+        if (itemDetail?.metadata?.type && dataTypes.includes(itemDetail.metadata.type as any)) {
+          await this.index.deleteItem(item.id);
+          console.log(`기존 ${itemDetail.metadata.type} 데이터 삭제: ${item.id}`);
+        }
+      }
+
+      let totalItems = 0;
+
+      // 교육자료만 재구성
+      if (dataTypes.includes('education')) {
+        const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
+        try {
+          const eduData = await fs.readFile(educationDataPath, 'utf-8');
+          const educationData = JSON.parse(eduData);
+          console.log(`교육자료 ${educationData.length}건 재구성 시작`);
+
+          for (let i = 0; i < educationData.length; i++) {
+            const edu = educationData[i];
+            const content = `${edu.title}\n${edu.content}\n카테고리: ${edu.type || edu.category}`;
+            
+            const embedding = await this.generateEmbedding(content);
+            
+            await this.index.upsertItem({
+              id: `education_${i}`,
+              vector: embedding,
+              metadata: {
+                type: 'education',
+                title: edu.title,
+                category: edu.type || edu.category,
+                keywords: edu.keywords,
+                date: edu.date,
+                url: edu.url,
+                content: content
+              }
+            });
+
+            totalItems++;
+            if (i % 100 === 0) {
+              console.log(`교육자료 ${i + 1}/${educationData.length} 재구성 완료`);
+            }
+          }
+        } catch (error) {
+          console.log('교육자료 재구성 실패:', error);
+        }
+      }
+
+      console.log(`부분 재구성 완료: ${totalItems}개 문서 처리`);
+
+    } catch (error) {
+      console.error('부분 재구성 실패:', error);
+      throw error;
+    }
+  }
 }
 
 // 싱글톤 인스턴스 생성 (Vectra 기반)

@@ -961,6 +961,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ChromaDB 부분 재구성 엔드포인트  
+  app.post("/api/rebuild-partial-vector-db", async (req, res) => {
+    try {
+      const { dataTypes } = req.body;
+      
+      if (!dataTypes || !Array.isArray(dataTypes)) {
+        return res.status(400).json({ 
+          message: "재구성할 데이터 타입을 지정해주세요 (incident, education, regulation)" 
+        });
+      }
+
+      const validTypes = ['incident', 'education', 'regulation'];
+      const filteredTypes = dataTypes.filter(type => validTypes.includes(type));
+      
+      if (filteredTypes.length === 0) {
+        return res.status(400).json({ 
+          message: "유효한 데이터 타입이 없습니다. (incident, education, regulation 중 선택)" 
+        });
+      }
+
+      console.log(`부분 재구성 요청: ${filteredTypes.join(', ')}`);
+      
+      // 부분 재구성 실행
+      await chromaDBService.rebuildPartialData(filteredTypes);
+      
+      // 재구성 후 통계 확인
+      const stats = await chromaDBService.getStats();
+      
+      res.json({
+        message: `${filteredTypes.join(', ')} 데이터 부분 재구성 완료`,
+        rebuiltTypes: filteredTypes,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        }
+      });
+    } catch (error: any) {
+      console.error('부분 재구성 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "부분 재구성 실패" 
+      });
+    }
+  });
+
   // /embed_data 폴더에서 벡터DB 재생성 엔드포인트
   app.post("/api/regenerate-vector-db", async (req, res) => {
     try {
