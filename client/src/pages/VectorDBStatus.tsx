@@ -180,6 +180,28 @@ export default function VectorDBStatus() {
     setLoading(false);
   };
 
+  const partialReconstruct = async (category: 'education' | 'incident' | 'regulation') => {
+    setRegenerating(true);
+    try {
+      const response = await fetch('/api/partial-reconstruct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category })
+      });
+      const result = await response.json();
+      alert(result.message);
+      
+      // 재구성 후 상태 새로고침
+      setTimeout(() => {
+        fetchStats();
+      }, 2000);
+    } catch (error) {
+      console.error(`${category} 부분 재구성 실패:`, error);
+      alert(`${category} 부분 재구성에 실패했습니다.`);
+    }
+    setRegenerating(false);
+  };
+
   useEffect(() => {
     fetchStats();
   }, []);
@@ -470,10 +492,21 @@ export default function VectorDBStatus() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 border border-blue-200 rounded-lg">
-              <h3 className="font-semibold text-blue-800 mb-2">사고사례 데이터</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-blue-800">사고사례 데이터</h3>
+                <Button 
+                  onClick={() => partialReconstruct('incident')}
+                  disabled={regenerating}
+                  size="sm"
+                  className="bg-blue-600/10 text-blue-800 hover:bg-blue-600/20 border border-blue-600/20"
+                >
+                  <RefreshCw className={`mr-1 h-3 w-3 ${regenerating ? 'animate-spin' : ''}`} />
+                  재구성
+                </Button>
+              </div>
               <p className="text-sm text-gray-600">
                 실제 산업현장 사고사례 1,793건<br/>
-                (현재 임베딩: 일부)
+                (accident_cases_for_rag.json)
               </p>
             </div>
             <div className="p-4 border border-green-200 rounded-lg">
@@ -520,7 +553,18 @@ export default function VectorDBStatus() {
               </p>
             </div>
             <div className="p-4 border border-purple-200 rounded-lg">
-              <h3 className="font-semibold text-purple-800 mb-2">안전법규</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-purple-800">안전법규</h3>
+                <Button 
+                  onClick={() => partialReconstruct('regulation')}
+                  disabled={regenerating}
+                  size="sm"
+                  className="bg-purple-600/10 text-purple-800 hover:bg-purple-600/20 border border-purple-600/20"
+                >
+                  <RefreshCw className={`mr-1 h-3 w-3 ${regenerating ? 'animate-spin' : ''}`} />
+                  재구성
+                </Button>
+              </div>
               <p className="text-sm text-gray-600">
                 산업안전보건 관련 법규 PDF<br/>
                 청크 단위로 분할 (367개)

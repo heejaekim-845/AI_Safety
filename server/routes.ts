@@ -1006,6 +1006,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 단일 카테고리 부분 재구성 엔드포인트
+  app.post("/api/partial-reconstruct", async (req, res) => {
+    try {
+      const { category } = req.body;
+      
+      if (!category || typeof category !== 'string') {
+        return res.status(400).json({ 
+          message: "재구성할 카테고리를 지정해주세요 (incident, education, regulation)" 
+        });
+      }
+
+      const validCategories = ['incident', 'education', 'regulation'];
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ 
+          message: "유효한 카테고리가 아닙니다. (incident, education, regulation 중 선택)" 
+        });
+      }
+
+      console.log(`부분 재구성 요청: ${category}`);
+      
+      // 부분 재구성 실행
+      await chromaDBService.rebuildPartialData([category]);
+      
+      // 재구성 후 통계 확인
+      const stats = await chromaDBService.getStats();
+      
+      const categoryNames = {
+        incident: '사고사례',
+        education: '교육자료',
+        regulation: '안전법규'
+      };
+      
+      res.json({
+        message: `${categoryNames[category as keyof typeof categoryNames]} 부분 재구성 완료`,
+        category,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        }
+      });
+    } catch (error: any) {
+      console.error(`${category} 부분 재구성 실패:`, error);
+      res.status(500).json({ 
+        error: error.message,
+        message: `${category} 부분 재구성 실패` 
+      });
+    }
+  });
+
   // /embed_data 폴더에서 벡터DB 재생성 엔드포인트
   app.post("/api/regenerate-vector-db", async (req, res) => {
     try {
