@@ -474,55 +474,78 @@ JSON 형식으로 응답:
           let lawName = '산업안전보건기준에 관한 규칙';
           let articleNumber = '';
           let articleTitle = '';
-          let actualTitle = r.metadata.title;
 
-          if (actualTitle && actualTitle.includes('청크')) {
-            // 문서 내용에서 조문 정보 추출
-            const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
-            if (articleMatch) {
-              articleNumber = `제${articleMatch[1]}조`;
-              articleTitle = articleMatch[2];
-              actualTitle = `${lawName} - ${articleNumber}(${articleTitle})`;
-            } else {
-              // 조문 패턴이 없으면 다른 패턴 시도
-              const altMatch = content.match(/제(\d+)조([가-힣\s]+)/);
-              if (altMatch) {
-                articleNumber = `제${altMatch[1]}조`;
-                articleTitle = altMatch[2].trim().substring(0, 20);
-                actualTitle = `${lawName} - ${articleNumber}(${articleTitle})`;
-              } else {
-                // 조문을 찾을 수 없으면 첫 번째 유의미한 문장 사용
-                const sentences = content.split(/[.。]/).filter(s => s.trim().length > 10);
-                if (sentences.length > 0) {
-                  actualTitle = `${lawName} - ${sentences[0].trim().substring(0, 30)}...`;
-                }
+          // 문서 내용에서 조문 정보 추출
+          const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+          if (articleMatch) {
+            articleNumber = `제${articleMatch[1]}조`;
+            articleTitle = articleMatch[2];
+          } else {
+            // 조문 패턴이 없으면 다른 패턴 시도
+            const altMatch = content.match(/제(\d+)조([^①②③④⑤⑥⑦⑧⑨⑩\n]*)/);
+            if (altMatch) {
+              articleNumber = `제${altMatch[1]}조`;
+              articleTitle = altMatch[2].trim().replace(/^\s*\([^)]*\)\s*/, ''); // 괄호 제거
+              if (articleTitle.length > 20) {
+                articleTitle = articleTitle.substring(0, 20) + '...';
               }
             }
           }
 
-          // 내용 요약 생성 (주요 부분만)
-          let summary = content;
+          // 조문을 찾지 못한 경우 건너뛰기
+          if (!articleNumber) {
+            return;
+          }
+
+          // 조문의 실제 내용 추출 (①, ②와 같은 항목들 포함)
+          let summary = '';
           const lines = content.split('\n').filter(line => line.trim().length > 0);
-          if (lines.length > 0) {
-            // 법제 정보나 불필요한 줄 제거하고 실제 내용만
+          
+          // 조문 시작 위치 찾기
+          let startIndex = -1;
+          for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes(articleNumber)) {
+              startIndex = i;
+              break;
+            }
+          }
+
+          if (startIndex >= 0) {
+            // 조문 내용만 추출 (다음 조문이나 불필요한 정보까지)
+            let contentLines = [];
+            for (let i = startIndex; i < lines.length && i < startIndex + 5; i++) {
+              const line = lines[i].trim();
+              if (line && 
+                  !line.includes('법제처') && 
+                  !line.includes('국가법령정보센터') &&
+                  !line.includes('고용노동부') &&
+                  !line.match(/제\d+조/) || i === startIndex) {
+                contentLines.push(line);
+              }
+            }
+            summary = contentLines.join(' ').substring(0, 150);
+            
+            // 조문 제목 부분 제거하고 실제 내용만
+            summary = summary.replace(new RegExp(`${articleNumber}[^①②③④⑤⑥⑦⑧⑨⑩]*`), '').trim();
+          } else {
+            // 조문을 찾을 수 없으면 전체 내용에서 요약
             const meaningfulLines = lines.filter(line => 
               !line.includes('법제처') && 
               !line.includes('국가법령정보센터') &&
               !line.includes('고용노동부') &&
-              line.trim().length > 5
-            ).slice(0, 3); // 상위 3줄만
-            summary = meaningfulLines.join(' ').substring(0, 200);
+              line.trim().length > 10
+            ).slice(0, 2);
+            summary = meaningfulLines.join(' ').substring(0, 150);
           }
           
           // 중복 제거
-          const key = articleNumber || actualTitle;
+          const key = articleNumber;
           if (!processedRegulations.has(key) || processedRegulations.get(key).summary.length < summary.length) {
             processedRegulations.set(key, {
-              title: actualTitle,
-              summary: summary,
+              lawName: lawName,
               articleNumber: articleNumber,
               articleTitle: articleTitle,
-              lawName: lawName,
+              summary: summary,
               distance: r.distance
             });
           }
@@ -662,11 +685,10 @@ ${specialNotes || "없음"}
       
       // Force override with actual RAG search results regardless of AI response
       result.regulations = safetyRegulations.length > 0 ? safetyRegulations.map(reg => ({
-        title: reg.title,
-        summary: reg.summary,
+        lawName: reg.lawName,
         articleNumber: reg.articleNumber,
         articleTitle: reg.articleTitle,
-        lawName: reg.lawName,
+        summary: reg.summary,
         relevanceScore: reg.distance
       })) : [];
       
@@ -825,12 +847,14 @@ ${specialNotes || "없음"}
     }
 
     return regulations.map((regulation, index) => {
+      const articleTitle = regulation.articleTitle ? `(${regulation.articleTitle})` : '';
+      
       return `
 【관련법령 ${index + 1}】
-${regulation.title}
+${regulation.lawName}
+${regulation.articleNumber}${articleTitle}
 
-▣ 상세내용 요약:
-${regulation.summary}
+▣ ${regulation.summary}
     `;
     }).join('\n\n');
   }
