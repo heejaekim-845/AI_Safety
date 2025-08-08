@@ -622,6 +622,11 @@ export default function Briefing() {
                                 )}
                               </div>
                               <div className="text-blue-600 mt-1 text-xs">{material.type}</div>
+                              {material.content && (
+                                <div className="text-gray-700 mt-2 text-xs leading-relaxed bg-white p-2 rounded border">
+                                  {material.content.length > 200 ? `${material.content.substring(0, 200)}...` : material.content}
+                                </div>
+                              )}
                               {material.keywords && (
                                 <div className="text-gray-600 mt-2 text-xs">키워드: {material.keywords}</div>
                               )}

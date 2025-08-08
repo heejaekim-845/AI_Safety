@@ -845,6 +845,7 @@ ${specialNotes || "없음"}
 - 유형: ${material.type}
 - 키워드: ${material.keywords}
 - 내용: ${material.content}
+${material.url ? `- 링크: ${material.url}` : ''}
     `).join('\n');
   }
 
