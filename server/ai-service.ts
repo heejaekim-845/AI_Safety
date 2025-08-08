@@ -883,7 +883,7 @@ ${specialNotes || "없음"}
         }
       }
 
-      return summary || "전기작업 시 안전수칙을 준수하여야 합니다.";
+      return summary || "해당 조문의 안전규정을 준수하여 작업자의 안전을 확보해야 합니다.";
 
     } catch (error) {
       console.error('조문 요약 생성 실패:', error);
@@ -913,22 +913,34 @@ ${specialNotes || "없음"}
       if (title.includes('점검')) {
         return "작업 전에는 사용할 기계·기구와 작업환경에 대한 안전점검을 실시해야 합니다. 점검항목에는 기계의 이상 유무, 안전장치 작동상태, 작업환경의 위험요소 등이 포함되며, 이상 발견 시에는 즉시 조치를 취한 후 작업을 진행해야 합니다.";
       }
+      if (title.includes('재해') || title.includes('전기작업자')) {
+        return "전기작업을 하는 근로자에게 발생할 수 있는 감전, 화상 등의 재해를 예방하기 위하여 적절한 안전조치를 취해야 합니다. 작업 전 안전교육을 실시하고, 개인보호구 착용을 의무화하며, 안전작업절차를 준수하도록 지도·감독해야 합니다.";
+      }
+      if (title.includes('충전부') || title.includes('활선')) {
+        return "충전부 근처에서 작업할 때는 안전거리를 유지하고, 절연보호구를 착용해야 합니다. 부득이하게 충전부에 접근해야 하는 경우에는 충분한 안전조치를 취하고 숙련된 작업자가 작업을 수행해야 합니다.";
+      }
     }
 
     // 내용 기반 상세 요약
-    if (content.includes('정전')) {
+    if (content.includes('정전') && (content.includes('전로') || content.includes('차단'))) {
       return "전원을 차단하고 개폐기에 표시를 한 후, 검전기로 무전압 상태를 확인하여야 합니다. 임시접지를 설치하여 예상치 못한 전압 인가를 방지하고 안전한 작업환경을 조성해야 합니다.";
     }
-    if (content.includes('절연장갑') || content.includes('절연용')) {
+    if (content.includes('절연장갑') || content.includes('절연용') || content.includes('절연보호구')) {
       return "절연보호구를 착용하여 감전사고를 방지해야 합니다. 절연장갑, 절연화 등은 사용 전 점검하여 이상이 없는 것을 사용하고, 정격전압에 적합한 절연성능을 가진 보호구를 선택해야 합니다.";
     }
-    if (content.includes('검전') || content.includes('전압')) {
+    if (content.includes('검전') && content.includes('전압')) {
       return "검전기를 사용하여 충전부에 전압이 없음을 확인한 후 작업해야 합니다. 검전기는 사용 전 정상 작동 여부를 점검하고, 안전한 거리에서 검전을 실시해야 합니다.";
     }
-    if (content.includes('접지')) {
+    if (content.includes('접지') && (content.includes('임시') || content.includes('설치'))) {
       return "작업구간에 임시접지를 설치하여 안전을 확보해야 합니다. 접지도체는 충분한 용량을 가진 것을 사용하고, 작업 완료 후에는 접지를 해체해야 합니다.";
     }
-    if (content.includes('금지')) {
+    if (content.includes('재해') && content.includes('전기')) {
+      return "전기작업으로 인한 감전, 화상 등의 재해를 예방하기 위해 적절한 안전조치를 취해야 합니다. 작업 전 위험성평가를 실시하고, 안전작업절차를 수립하여 준수하도록 해야 합니다.";
+    }
+    if (content.includes('충전부') || content.includes('활선')) {
+      return "충전부 근처 작업 시 안전거리를 유지하고 절연보호구를 착용해야 합니다. 부득이한 경우 충분한 안전조치를 취하고 숙련된 작업자가 수행해야 합니다.";
+    }
+    if (content.includes('금지') || content.includes('하여서는 아니 된다')) {
       return "해당 행위는 안전상 위험하므로 금지됩니다. 작업자의 안전을 위해 정해진 안전수칙을 반드시 준수하고, 위험한 행동을 하지 않도록 주의해야 합니다.";
     }
 
