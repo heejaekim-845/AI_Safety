@@ -858,22 +858,28 @@ ${specialNotes || "없음"}
       let summary = this.extractRegulationSummary(content, articleTitle);
       
       if (!summary || summary.trim().length === 0) {
-        // 기본 패턴 매칭으로 핵심 내용 추출
-        const patterns = [
-          /작업자는\s*([^.。]+)/,
-          /하여야\s*한다\s*([^.。]+)/,
-          /금지한다\s*([^.。]+)/,
-          /설치하여야\s*한다\s*([^.。]+)/,
-          /착용하여야\s*한다\s*([^.。]+)/,
-          /점검하여야\s*한다\s*([^.。]+)/
-        ];
+        // 원본 내용에서 핵심 문장들 추출 (250자 이내)
+        const sentences = content.split(/[.。]/).filter(s => s.trim().length > 10);
+        const meaningfulSentences = sentences.filter(s => 
+          s.includes('하여야') || 
+          s.includes('해야') || 
+          s.includes('해야 한다') ||
+          s.includes('금지') ||
+          s.includes('작업자') ||
+          s.includes('사업주')
+        ).slice(0, 3); // 최대 3개 문장
 
-        for (const pattern of patterns) {
-          const match = content.match(pattern);
-          if (match) {
-            summary = match[0].substring(0, 50);
-            break;
+        if (meaningfulSentences.length > 0) {
+          summary = meaningfulSentences.join('. ').trim();
+          if (summary.length > 250) {
+            summary = summary.substring(0, 247) + '...';
           }
+        } else {
+          // 첫 번째 유의미한 문장들 사용
+          const firstSentences = sentences.slice(0, 2).join('. ');
+          summary = firstSentences.length > 250 ? 
+            firstSentences.substring(0, 247) + '...' : 
+            firstSentences;
         }
       }
 
@@ -886,47 +892,47 @@ ${specialNotes || "없음"}
   }
 
   private extractRegulationSummary(content: string, articleTitle?: string): string {
-    // 조문 제목에 따른 요약
+    // 조문 제목에 따른 상세 요약 (250자 이내)
     if (articleTitle) {
       const title = articleTitle.toLowerCase();
       if (title.includes('정전')) {
-        return "정전 상태 확인 후 전기작업을 수행해야 합니다.";
+        return "① 사업주는 근로자가 전기기계·기구나 전로에 대한 작업을 할 때에는 해당 전로의 전원을 차단하고 그 개폐기에 표시를 하는 등의 방법으로 다른 사람이 전원을 투입하지 못하도록 한 후 검전기를 사용하여 해당 전로에 전압이 없음을 확인하여야 한다. ② 임시접지를 하여야 한다.";
       }
       if (title.includes('절연')) {
-        return "절연장갑 착용 및 절연상태를 확인해야 합니다.";
+        return "절연보호구 착용이 필수이며, 절연효과가 있는 보호구를 작업 전에 점검하고 이상이 없는 것을 사용해야 합니다. 절연장갑, 절연화, 절연봉 등 적합한 절연보호구를 선택하여 감전사고를 방지하고 작업자의 안전을 확보해야 합니다.";
       }
       if (title.includes('검전')) {
-        return "검전기로 전압 유무를 확인한 후 작업해야 합니다.";
+        return "전기작업 전에는 반드시 검전기를 사용하여 전로에 전압이 없음을 확인해야 합니다. 검전기는 사용 전에 정상 작동 여부를 점검하고, 충전부에 접근하기 전 안전한 거리에서 무전압 상태를 확인한 후 작업을 진행해야 합니다.";
       }
       if (title.includes('접지')) {
-        return "임시접지를 설치하여 안전을 확보해야 합니다.";
+        return "전기작업 시에는 해당 전로에 임시접지를 설치하여 예상치 못한 전압이 가해지는 것을 방지해야 합니다. 임시접지는 작업구간 양단에 설치하고, 접지도체는 충분한 용량을 가진 것을 사용하여 작업자의 안전을 확보해야 합니다.";
       }
       if (title.includes('보호구')) {
-        return "해당 보호구를 착용하고 작업해야 합니다.";
+        return "작업 특성에 맞는 적절한 개인보호구를 착용해야 합니다. 보호구는 사용 전 점검하여 이상이 없는 것을 사용하고, 안전모, 안전화, 보호안경, 절연장갑 등 작업환경에 따라 필요한 보호구를 모두 착용하여 안전사고를 예방해야 합니다.";
       }
       if (title.includes('점검')) {
-        return "작업 전 설비 상태를 점검해야 합니다.";
+        return "작업 전에는 사용할 기계·기구와 작업환경에 대한 안전점검을 실시해야 합니다. 점검항목에는 기계의 이상 유무, 안전장치 작동상태, 작업환경의 위험요소 등이 포함되며, 이상 발견 시에는 즉시 조치를 취한 후 작업을 진행해야 합니다.";
       }
     }
 
-    // 내용 기반 요약
+    // 내용 기반 상세 요약
     if (content.includes('정전')) {
-      return "정전 확인 후 안전한 상태에서 작업 수행";
+      return "전원을 차단하고 개폐기에 표시를 한 후, 검전기로 무전압 상태를 확인하여야 합니다. 임시접지를 설치하여 예상치 못한 전압 인가를 방지하고 안전한 작업환경을 조성해야 합니다.";
     }
     if (content.includes('절연장갑') || content.includes('절연용')) {
-      return "절연보호구 착용하여 감전사고 방지";
+      return "절연보호구를 착용하여 감전사고를 방지해야 합니다. 절연장갑, 절연화 등은 사용 전 점검하여 이상이 없는 것을 사용하고, 정격전압에 적합한 절연성능을 가진 보호구를 선택해야 합니다.";
     }
     if (content.includes('검전') || content.includes('전압')) {
-      return "검전기로 무전압 상태 확인 필수";
+      return "검전기를 사용하여 충전부에 전압이 없음을 확인한 후 작업해야 합니다. 검전기는 사용 전 정상 작동 여부를 점검하고, 안전한 거리에서 검전을 실시해야 합니다.";
     }
     if (content.includes('접지')) {
-      return "임시접지 설치로 안전장치 확보";
+      return "작업구간에 임시접지를 설치하여 안전을 확보해야 합니다. 접지도체는 충분한 용량을 가진 것을 사용하고, 작업 완료 후에는 접지를 해체해야 합니다.";
     }
     if (content.includes('금지')) {
-      return "해당 행위는 안전상 금지됨";
+      return "해당 행위는 안전상 위험하므로 금지됩니다. 작업자의 안전을 위해 정해진 안전수칙을 반드시 준수하고, 위험한 행동을 하지 않도록 주의해야 합니다.";
     }
 
-    return "안전규정을 준수하여 작업 수행";
+    return "산업안전보건기준에 따라 안전규정을 준수하여 작업을 수행해야 합니다.";
   }
 
   private formatSafetyRegulations(regulations: any[]): string {
