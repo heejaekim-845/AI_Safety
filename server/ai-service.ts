@@ -854,98 +854,72 @@ ${specialNotes || "없음"}
         return "해당 조문의 내용을 확인할 수 없습니다.";
       }
 
-      // 규칙 기반 요약 (AI 대체)
-      let summary = this.extractRegulationSummary(content, articleTitle);
-      
-      if (!summary || summary.trim().length === 0) {
-        // 원본 내용에서 핵심 문장들 추출 (250자 이내)
-        const sentences = content.split(/[.。]/).filter(s => s.trim().length > 10);
-        const meaningfulSentences = sentences.filter(s => 
-          s.includes('하여야') || 
-          s.includes('해야') || 
-          s.includes('해야 한다') ||
-          s.includes('금지') ||
-          s.includes('작업자') ||
-          s.includes('사업주')
-        ).slice(0, 3); // 최대 3개 문장
+      console.log(`AI 조문 요약 시작: ${articleTitle || '제목없음'}`);
 
-        if (meaningfulSentences.length > 0) {
-          summary = meaningfulSentences.join('. ').trim();
-          if (summary.length > 250) {
-            summary = summary.substring(0, 247) + '...';
-          }
-        } else {
-          // 첫 번째 유의미한 문장들 사용
-          const firstSentences = sentences.slice(0, 2).join('. ');
-          summary = firstSentences.length > 250 ? 
-            firstSentences.substring(0, 247) + '...' : 
-            firstSentences;
+      // AI를 사용한 실제 조문 내용 요약
+      try {
+        const prompt = `다음은 산업안전보건 관련 법령 조문입니다. 이 조문의 핵심 내용을 250자 이내로 정확하게 요약해주세요. 
+
+중요: 
+- 원문의 내용을 변경하거나 추가하지 말고, 원문의 의미를 그대로 유지하면서 간단히 요약만 해주세요
+- 실제 조문에 명시된 안전수칙과 절차만 포함해주세요
+- 일반적인 표현이 아닌 구체적인 조문 내용을 요약해주세요
+
+조문 제목: ${articleTitle || ''}
+
+조문 내용:
+${content}
+
+250자 이내로 핵심 내용만 요약해주세요.`;
+
+        const response = await genai.models.generateContent({
+          model: "gemini-2.5-flash",
+          config: {
+            systemInstruction: "당신은 법령 전문가입니다. 주어진 조문의 내용을 정확하게 요약하되, 내용을 변경하거나 왜곡하지 않고 원문의 의미를 그대로 유지합니다.",
+          },
+          contents: prompt
+        });
+
+        const aiSummary = response.text?.trim();
+        if (aiSummary && aiSummary.length > 10) {
+          const finalSummary = aiSummary.length > 250 ? aiSummary.substring(0, 247) + '...' : aiSummary;
+          console.log(`AI 요약 성공: ${finalSummary.substring(0, 50)}...`);
+          return finalSummary;
         }
+      } catch (aiError) {
+        console.log('AI 요약 실패, 원문 추출로 대체:', aiError);
       }
 
-      return summary || "해당 조문의 안전규정을 준수하여 작업자의 안전을 확보해야 합니다.";
+      // AI 실패 시 원본 내용에서 핵심 문장들 추출 (250자 이내)
+      console.log('원문에서 핵심 문장 추출 시작');
+      const sentences = content.split(/[.。]/).filter(s => s.trim().length > 10);
+      const meaningfulSentences = sentences.filter(s => 
+        s.includes('하여야') || 
+        s.includes('해야') || 
+        s.includes('해야 한다') ||
+        s.includes('금지') ||
+        s.includes('작업자') ||
+        s.includes('사업주')
+      ).slice(0, 3); // 최대 3개 문장
+
+      if (meaningfulSentences.length > 0) {
+        const summary = meaningfulSentences.join('. ').trim();
+        return summary.length > 250 ? summary.substring(0, 247) + '...' : summary;
+      } else {
+        // 첫 번째 유의미한 문장들 사용
+        const firstSentences = sentences.slice(0, 2).join('. ');
+        return firstSentences.length > 250 ? 
+          firstSentences.substring(0, 247) + '...' : 
+          firstSentences;
+      }
 
     } catch (error) {
       console.error('조문 요약 생성 실패:', error);
-      return "전기작업 시 안전수칙을 준수하여야 합니다.";
+      return "관련 안전규정을 준수하여 작업을 수행해야 합니다.";
     }
   }
 
-  private extractRegulationSummary(content: string, articleTitle?: string): string {
-    // 조문 제목에 따른 상세 요약 (250자 이내)
-    if (articleTitle) {
-      const title = articleTitle.toLowerCase();
-      if (title.includes('정전')) {
-        return "① 사업주는 근로자가 전기기계·기구나 전로에 대한 작업을 할 때에는 해당 전로의 전원을 차단하고 그 개폐기에 표시를 하는 등의 방법으로 다른 사람이 전원을 투입하지 못하도록 한 후 검전기를 사용하여 해당 전로에 전압이 없음을 확인하여야 한다. ② 임시접지를 하여야 한다.";
-      }
-      if (title.includes('절연')) {
-        return "절연보호구 착용이 필수이며, 절연효과가 있는 보호구를 작업 전에 점검하고 이상이 없는 것을 사용해야 합니다. 절연장갑, 절연화, 절연봉 등 적합한 절연보호구를 선택하여 감전사고를 방지하고 작업자의 안전을 확보해야 합니다.";
-      }
-      if (title.includes('검전')) {
-        return "전기작업 전에는 반드시 검전기를 사용하여 전로에 전압이 없음을 확인해야 합니다. 검전기는 사용 전에 정상 작동 여부를 점검하고, 충전부에 접근하기 전 안전한 거리에서 무전압 상태를 확인한 후 작업을 진행해야 합니다.";
-      }
-      if (title.includes('접지')) {
-        return "전기작업 시에는 해당 전로에 임시접지를 설치하여 예상치 못한 전압이 가해지는 것을 방지해야 합니다. 임시접지는 작업구간 양단에 설치하고, 접지도체는 충분한 용량을 가진 것을 사용하여 작업자의 안전을 확보해야 합니다.";
-      }
-      if (title.includes('보호구')) {
-        return "작업 특성에 맞는 적절한 개인보호구를 착용해야 합니다. 보호구는 사용 전 점검하여 이상이 없는 것을 사용하고, 안전모, 안전화, 보호안경, 절연장갑 등 작업환경에 따라 필요한 보호구를 모두 착용하여 안전사고를 예방해야 합니다.";
-      }
-      if (title.includes('점검')) {
-        return "작업 전에는 사용할 기계·기구와 작업환경에 대한 안전점검을 실시해야 합니다. 점검항목에는 기계의 이상 유무, 안전장치 작동상태, 작업환경의 위험요소 등이 포함되며, 이상 발견 시에는 즉시 조치를 취한 후 작업을 진행해야 합니다.";
-      }
-      if (title.includes('재해') || title.includes('전기작업자')) {
-        return "전기작업을 하는 근로자에게 발생할 수 있는 감전, 화상 등의 재해를 예방하기 위하여 적절한 안전조치를 취해야 합니다. 작업 전 안전교육을 실시하고, 개인보호구 착용을 의무화하며, 안전작업절차를 준수하도록 지도·감독해야 합니다.";
-      }
-      if (title.includes('충전부') || title.includes('활선')) {
-        return "충전부 근처에서 작업할 때는 안전거리를 유지하고, 절연보호구를 착용해야 합니다. 부득이하게 충전부에 접근해야 하는 경우에는 충분한 안전조치를 취하고 숙련된 작업자가 작업을 수행해야 합니다.";
-      }
-    }
 
-    // 내용 기반 상세 요약
-    if (content.includes('정전') && (content.includes('전로') || content.includes('차단'))) {
-      return "전원을 차단하고 개폐기에 표시를 한 후, 검전기로 무전압 상태를 확인하여야 합니다. 임시접지를 설치하여 예상치 못한 전압 인가를 방지하고 안전한 작업환경을 조성해야 합니다.";
-    }
-    if (content.includes('절연장갑') || content.includes('절연용') || content.includes('절연보호구')) {
-      return "절연보호구를 착용하여 감전사고를 방지해야 합니다. 절연장갑, 절연화 등은 사용 전 점검하여 이상이 없는 것을 사용하고, 정격전압에 적합한 절연성능을 가진 보호구를 선택해야 합니다.";
-    }
-    if (content.includes('검전') && content.includes('전압')) {
-      return "검전기를 사용하여 충전부에 전압이 없음을 확인한 후 작업해야 합니다. 검전기는 사용 전 정상 작동 여부를 점검하고, 안전한 거리에서 검전을 실시해야 합니다.";
-    }
-    if (content.includes('접지') && (content.includes('임시') || content.includes('설치'))) {
-      return "작업구간에 임시접지를 설치하여 안전을 확보해야 합니다. 접지도체는 충분한 용량을 가진 것을 사용하고, 작업 완료 후에는 접지를 해체해야 합니다.";
-    }
-    if (content.includes('재해') && content.includes('전기')) {
-      return "전기작업으로 인한 감전, 화상 등의 재해를 예방하기 위해 적절한 안전조치를 취해야 합니다. 작업 전 위험성평가를 실시하고, 안전작업절차를 수립하여 준수하도록 해야 합니다.";
-    }
-    if (content.includes('충전부') || content.includes('활선')) {
-      return "충전부 근처 작업 시 안전거리를 유지하고 절연보호구를 착용해야 합니다. 부득이한 경우 충분한 안전조치를 취하고 숙련된 작업자가 수행해야 합니다.";
-    }
-    if (content.includes('금지') || content.includes('하여서는 아니 된다')) {
-      return "해당 행위는 안전상 위험하므로 금지됩니다. 작업자의 안전을 위해 정해진 안전수칙을 반드시 준수하고, 위험한 행동을 하지 않도록 주의해야 합니다.";
-    }
-
-    return "산업안전보건기준에 따라 안전규정을 준수하여 작업을 수행해야 합니다.";
-  }
 
   private formatSafetyRegulations(regulations: any[]): string {
     if (!regulations || regulations.length === 0) {
