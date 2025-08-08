@@ -854,28 +854,79 @@ ${specialNotes || "없음"}
         return "해당 조문의 내용을 확인할 수 없습니다.";
       }
 
-      const prompt = `다음 산업안전보건법 조문의 핵심 내용을 50자 이내로 함축적으로 요약해주세요:
+      // 규칙 기반 요약 (AI 대체)
+      let summary = this.extractRegulationSummary(content, articleTitle);
+      
+      if (!summary || summary.trim().length === 0) {
+        // 기본 패턴 매칭으로 핵심 내용 추출
+        const patterns = [
+          /작업자는\s*([^.。]+)/,
+          /하여야\s*한다\s*([^.。]+)/,
+          /금지한다\s*([^.。]+)/,
+          /설치하여야\s*한다\s*([^.。]+)/,
+          /착용하여야\s*한다\s*([^.。]+)/,
+          /점검하여야\s*한다\s*([^.。]+)/
+        ];
 
-조문 내용: ${content}
+        for (const pattern of patterns) {
+          const match = content.match(pattern);
+          if (match) {
+            summary = match[0].substring(0, 50);
+            break;
+          }
+        }
+      }
 
-요약 지침:
-- 핵심 안전 규정만 간단명료하게 표현
-- 작업자가 알아야 할 핵심 내용 위주
-- 50자 이내로 작성
-- 전문 용어보다는 이해하기 쉬운 표현 사용`;
-
-      const response = await this.gemini.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-      });
-
-      const summary = response.text?.trim();
-      return summary || "조문 요약을 생성할 수 없습니다.";
+      return summary || "전기작업 시 안전수칙을 준수하여야 합니다.";
 
     } catch (error) {
       console.error('조문 요약 생성 실패:', error);
-      return "조문 요약 생성 중 오류가 발생했습니다.";
+      return "전기작업 시 안전수칙을 준수하여야 합니다.";
     }
+  }
+
+  private extractRegulationSummary(content: string, articleTitle?: string): string {
+    // 조문 제목에 따른 요약
+    if (articleTitle) {
+      const title = articleTitle.toLowerCase();
+      if (title.includes('정전')) {
+        return "정전 상태 확인 후 전기작업을 수행해야 합니다.";
+      }
+      if (title.includes('절연')) {
+        return "절연장갑 착용 및 절연상태를 확인해야 합니다.";
+      }
+      if (title.includes('검전')) {
+        return "검전기로 전압 유무를 확인한 후 작업해야 합니다.";
+      }
+      if (title.includes('접지')) {
+        return "임시접지를 설치하여 안전을 확보해야 합니다.";
+      }
+      if (title.includes('보호구')) {
+        return "해당 보호구를 착용하고 작업해야 합니다.";
+      }
+      if (title.includes('점검')) {
+        return "작업 전 설비 상태를 점검해야 합니다.";
+      }
+    }
+
+    // 내용 기반 요약
+    if (content.includes('정전')) {
+      return "정전 확인 후 안전한 상태에서 작업 수행";
+    }
+    if (content.includes('절연장갑') || content.includes('절연용')) {
+      return "절연보호구 착용하여 감전사고 방지";
+    }
+    if (content.includes('검전') || content.includes('전압')) {
+      return "검전기로 무전압 상태 확인 필수";
+    }
+    if (content.includes('접지')) {
+      return "임시접지 설치로 안전장치 확보";
+    }
+    if (content.includes('금지')) {
+      return "해당 행위는 안전상 금지됨";
+    }
+
+    return "안전규정을 준수하여 작업 수행";
   }
 
   private formatSafetyRegulations(regulations: any[]): string {
