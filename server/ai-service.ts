@@ -413,8 +413,8 @@ JSON 형식으로 응답:
         const searchQuery = `${equipmentInfo.name} ${workType.name} ${this.extractRiskFactors(equipmentInfo)}`;
         console.log(`검색 시작 - 쿼리: "${searchQuery}"`);
         
-        // 먼저 간단한 키워드로 검색 시도
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 15);
+        // 더 넓은 범위로 검색하여 규정도 포함하도록 수정
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 25);
         
         // 결과가 없으면 더 간단한 쿼리로 재시도
         if (chromaResults.length === 0) {
@@ -449,12 +449,15 @@ JSON 형식으로 응답:
           category: r.metadata.category
         }));
         
-        safetyRegulations = chromaResults.filter(r => r.metadata.type === 'regulation').map(r => ({
-          title: r.metadata.title,
-          content: r.document.split('\n')[1] || '',
-          article_number: r.metadata.article_number,
-          category: r.metadata.category
-        }));
+        safetyRegulations = chromaResults
+          .filter(r => r.metadata.type === 'regulation')
+          .slice(0, 5) // 최대 5개 규정만 선택
+          .map(r => ({
+            title: r.metadata.title,
+            content: r.document.substring(0, 300) || '', // 더 많은 내용 포함
+            article_number: r.metadata.article_number,
+            category: r.metadata.category
+          }));
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQuery}"`);
