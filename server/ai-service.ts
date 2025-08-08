@@ -497,8 +497,8 @@ JSON 형식으로 응답:
             return;
           }
 
-          // 조문의 실제 내용 추출 (①, ②와 같은 항목들 포함)
-          let summary = '';
+          // 조문의 실제 내용 추출 (전체 텍스트)
+          let fullContent = '';
           const lines = content.split('\n').filter(line => line.trim().length > 0);
           
           // 조문 시작 위치 찾기
@@ -511,50 +511,57 @@ JSON 형식으로 응답:
           }
 
           if (startIndex >= 0) {
-            // 조문 내용만 추출 (다음 조문이나 불필요한 정보까지)
+            // 조문 내용만 추출 (전체 내용)
             let contentLines = [];
-            for (let i = startIndex; i < lines.length && i < startIndex + 5; i++) {
+            for (let i = startIndex; i < lines.length && i < startIndex + 10; i++) {
               const line = lines[i].trim();
               if (line && 
                   !line.includes('법제처') && 
                   !line.includes('국가법령정보센터') &&
-                  !line.includes('고용노동부') &&
-                  !line.match(/제\d+조/) || i === startIndex) {
+                  !line.includes('고용노동부')) {
                 contentLines.push(line);
               }
             }
-            summary = contentLines.join(' ').substring(0, 150);
-            
-            // 조문 제목 부분 제거하고 실제 내용만
-            summary = summary.replace(new RegExp(`${articleNumber}[^①②③④⑤⑥⑦⑧⑨⑩]*`), '').trim();
+            fullContent = contentLines.join(' ');
           } else {
-            // 조문을 찾을 수 없으면 전체 내용에서 요약
+            // 조문을 찾을 수 없으면 전체 내용 사용
             const meaningfulLines = lines.filter(line => 
               !line.includes('법제처') && 
               !line.includes('국가법령정보센터') &&
               !line.includes('고용노동부') &&
               line.trim().length > 10
-            ).slice(0, 2);
-            summary = meaningfulLines.join(' ').substring(0, 150);
+            );
+            fullContent = meaningfulLines.join(' ');
           }
           
           // 중복 제거
           const key = articleNumber;
-          if (!processedRegulations.has(key) || processedRegulations.get(key).summary.length < summary.length) {
+          if (!processedRegulations.has(key) || processedRegulations.get(key).fullContent.length < fullContent.length) {
             processedRegulations.set(key, {
               lawName: lawName,
               articleNumber: articleNumber,
               articleTitle: articleTitle,
-              summary: summary,
+              fullContent: fullContent,
               distance: r.distance
             });
           }
         });
         
         // 관련성 순으로 정렬하여 상위 10개 선택
-        safetyRegulations = Array.from(processedRegulations.values())
+        const sortedRegulations = Array.from(processedRegulations.values())
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 10);
+
+        // AI를 사용하여 각 조문 요약
+        safetyRegulations = await Promise.all(
+          sortedRegulations.map(async (reg) => {
+            const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
+            return {
+              ...reg,
+              summary: summary
+            };
+          })
+        );
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQuery}"`);
@@ -839,6 +846,38 @@ ${specialNotes || "없음"}
 - 키워드: ${material.keywords}
 - 내용: ${material.content}
     `).join('\n');
+  }
+
+  private async summarizeRegulation(content: string, articleTitle?: string): Promise<string> {
+    try {
+      if (!content || content.trim().length === 0) {
+        return "해당 조문의 내용을 확인할 수 없습니다.";
+      }
+
+      const prompt = `다음 산업안전보건법 조문의 핵심 내용을 50자 이내로 함축적으로 요약해주세요:
+
+조문 내용: ${content}
+
+요약 지침:
+- 핵심 안전 규정만 간단명료하게 표현
+- 작업자가 알아야 할 핵심 내용 위주
+- 50자 이내로 작성
+- 전문 용어보다는 이해하기 쉬운 표현 사용`;
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 100,
+        temperature: 0.3
+      });
+
+      const summary = response.choices[0].message.content?.trim();
+      return summary || "조문 요약을 생성할 수 없습니다.";
+
+    } catch (error) {
+      console.error('조문 요약 생성 실패:', error);
+      return "조문 요약 생성 중 오류가 발생했습니다.";
+    }
   }
 
   private formatSafetyRegulations(regulations: any[]): string {
