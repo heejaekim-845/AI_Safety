@@ -477,7 +477,43 @@ export default function VectorDBStatus() {
               </p>
             </div>
             <div className="p-4 border border-green-200 rounded-lg">
-              <h3 className="font-semibold text-green-800 mb-2">교육자료</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-green-800">교육자료</h3>
+                <Button 
+                  onClick={async () => {
+                    setRegenerating(true);
+                    try {
+                      const response = await fetch('/api/rebuild-partial-vector-db', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dataTypes: ['education'] }),
+                      });
+                      
+                      if (response.ok) {
+                        const result = await response.json();
+                        alert(`교육자료 재구성 완료: ${result.message}. 총 문서: ${result.stats?.totalDocuments || 0}개`);
+                        
+                        // 재구성 후 상태 새로고침
+                        setTimeout(() => {
+                          fetchStats();
+                        }, 2000);
+                      } else {
+                        throw new Error('재구성 실패');
+                      }
+                    } catch (error) {
+                      console.error('교육자료 재구성 실패:', error);
+                      alert('교육자료 재구성 중 오류가 발생했습니다.');
+                    }
+                    setRegenerating(false);
+                  }}
+                  disabled={regenerating}
+                  size="sm"
+                  className="bg-green-600/10 text-green-800 hover:bg-green-600/20 border border-green-600/20"
+                >
+                  <RefreshCw className={`mr-1 h-3 w-3 ${regenerating ? 'animate-spin' : ''}`} />
+                  재구성
+                </Button>
+              </div>
               <p className="text-sm text-gray-600">
                 안전교육 자료 및 가이드라인<br/>
                 (education_data.json)

@@ -371,38 +371,7 @@ export default function AdminPanel() {
               벡터DB상태확인
             </Button>
             
-            {/* Partial Rebuild Button */}
-            <Button 
-              onClick={async () => {
-                try {
-                  const response = await fetch('/api/rebuild-partial-vector-db', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dataTypes: ['education'] }),
-                  });
-                  
-                  if (response.ok) {
-                    const result = await response.json();
-                    toast({
-                      title: "교육자료 재구성 완료",
-                      description: `${result.message}. 총 문서: ${result.stats?.totalDocuments || 0}개`,
-                    });
-                  } else {
-                    throw new Error('재구성 실패');
-                  }
-                } catch (error) {
-                  toast({
-                    title: "재구성 실패",
-                    description: "교육자료 재구성 중 오류가 발생했습니다.",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              className="bg-green-600/10 text-green-100 hover:bg-green-600/20 border border-green-600/20"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              교육자료 재구성
-            </Button>
+
             
             {/* Add Equipment Dialog */}
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
