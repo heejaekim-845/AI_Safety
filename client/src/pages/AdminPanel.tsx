@@ -327,21 +327,21 @@ export default function AdminPanel() {
     setShowEditDialog(true);
   };
 
-  const filteredEquipment = equipment?.filter((eq) => {
+  const filteredEquipment = equipment && Array.isArray(equipment) ? equipment.filter((eq) => {
     const matchesSearch = eq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          eq.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          eq.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRisk = filterRisk === "all" || eq.riskLevel === filterRisk;
     return matchesSearch && matchesRisk;
-  });
+  }) : [];
 
-  const riskCounts = equipment?.reduce((acc, eq) => {
+  const riskCounts = equipment && Array.isArray(equipment) ? equipment.reduce((acc, eq) => {
     acc.total++;
     if (eq.riskLevel === "HIGH") acc.high++;
     else if (eq.riskLevel === "MEDIUM") acc.medium++;
     else acc.low++;
     return acc;
-  }, { total: 0, high: 0, medium: 0, low: 0 }) || { total: 0, high: 0, medium: 0, low: 0 };
+  }, { total: 0, high: 0, medium: 0, low: 0 }) : { total: 0, high: 0, medium: 0, low: 0 };
 
   if (isLoading) {
     return (
@@ -495,7 +495,7 @@ export default function AdminPanel() {
                       <FormItem>
                         <FormLabel>제조사</FormLabel>
                         <FormControl>
-                          <Input placeholder="예: 한국산업" {...field} />
+                          <Input placeholder="예: 한국산업" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -508,7 +508,7 @@ export default function AdminPanel() {
                       <FormItem>
                         <FormLabel>모델명</FormLabel>
                         <FormControl>
-                          <Input placeholder="예: KIC-500" {...field} />
+                          <Input placeholder="예: KIC-500" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -523,7 +523,7 @@ export default function AdminPanel() {
                     <FormItem>
                       <FormLabel>설비 이미지 URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="예: /attached_assets/compressor.jpg" {...field} />
+                        <Input placeholder="예: /attached_assets/compressor.jpg" {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -566,7 +566,7 @@ export default function AdminPanel() {
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="highVoltage"
-                              checked={field.value}
+                              checked={!!field.value}
                               onCheckedChange={field.onChange}
                             />
                             <Label htmlFor="highVoltage" className="text-sm font-medium">
@@ -604,7 +604,7 @@ export default function AdminPanel() {
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="highPressure"
-                              checked={field.value}
+                              checked={!!field.value}
                               onCheckedChange={field.onChange}
                             />
                             <Label htmlFor="highPressure" className="text-sm font-medium">
@@ -828,7 +828,7 @@ export default function AdminPanel() {
                         <FormItem>
                           <FormLabel>화학물질 종류</FormLabel>
                           <FormControl>
-                            <Input placeholder="예: 질소, 산소, 아세틸렌" {...field} />
+                            <Input placeholder="예: 질소, 산소, 아세틸렌" {...field} value={field.value || ""} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -841,7 +841,7 @@ export default function AdminPanel() {
                         <FormItem>
                           <FormLabel>화학물질명</FormLabel>
                           <FormControl>
-                            <Input placeholder="예: 액체질소" {...field} />
+                            <Input placeholder="예: 액체질소" {...field} value={field.value || ""} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -856,7 +856,7 @@ export default function AdminPanel() {
                       <FormItem>
                         <FormLabel>MSDS 이미지 URL</FormLabel>
                         <FormControl>
-                          <Input placeholder="예: /attached_assets/nitrogen_msds.png" {...field} />
+                          <Input placeholder="예: /attached_assets/nitrogen_msds.png" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
