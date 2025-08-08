@@ -236,7 +236,7 @@ export class ChromaDBService {
       // 교육자료 처리
       for (let i = 0; i < educationData.length; i++) {
         const edu = educationData[i];
-        const content = `${edu.title}\n${edu.content}\n카테고리: ${edu.category}`;
+        const content = `${edu.title}\n${edu.content}\n카테고리: ${edu.type || edu.category}`;
         
         const embedding = await this.generateEmbedding(content);
         
@@ -246,8 +246,10 @@ export class ChromaDBService {
           metadata: {
             type: 'education',
             title: edu.title,
-            category: edu.category,
+            category: edu.type || edu.category,
             keywords: edu.keywords,
+            date: edu.date,
+            url: edu.url,
             content: content
           }
         });
