@@ -13,6 +13,7 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **File Upload Feature**: Successfully restored file upload functionality with JSON/TXT support and automatic embedding processing
 - **File Upload UI Fix**: Resolved persistent "파일 업로드 중" message issue with proper state management and auto-clearing
 - **Data Coverage**: Complete vector database with 8,661 documents (1,793 incidents + 6,503 education materials + 367 safety regulations)
+- **Regulation Retrieval Fix**: Successfully resolved issue where safety regulations weren't appearing in AI briefings by optimizing search keywords and implementing multi-query search strategy for electrical safety regulations
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

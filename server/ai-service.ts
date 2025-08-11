@@ -426,20 +426,38 @@ JSON 형식으로 응답:
         // GIS/전기 관련이면 특별히 전기 안전 규정 검색 추가
         if (equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
           console.log('전기 설비 관련 규정 추가 검색 수행');
-          const electricalQuery = '전기 안전 작업 방법 절연 검전 정전';
-          const electricalResults = await chromaDBService.searchRelevantData(electricalQuery, 15);
           
-          // 기존 결과와 합치기 (중복 제거)
-          const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
-          const newResults = electricalResults.filter(r => 
-            !existingIds.has(r.metadata?.id || r.document)
-          );
-          chromaResults = [...chromaResults, ...newResults];
-          console.log(`전기 안전 규정 추가 검색으로 ${newResults.length}건 추가, 총 ${chromaResults.length}건`);
+          // 전기 관련 규정을 더 넓은 범위로 검색
+          const electricalQueries = [
+            '전기 설비 보안등 충전부',
+            '전기기계기구 점검 안전작업',
+            '충전부 접촉 방지조치',
+            '전로의 점검 등',
+            '절연용 보호구'
+          ];
+          
+          for (const query of electricalQueries) {
+            const electricalResults = await chromaDBService.searchRelevantData(query, 10);
+            const regulationCount = electricalResults.filter(r => r.metadata.type === 'regulation').length;
+            console.log(`"${query}" 검색 결과: ${electricalResults.length}건 (regulation: ${regulationCount}건)`);
+            
+            // 기존 결과와 합치기 (중복 제거)
+            const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+            const newResults = electricalResults.filter(r => 
+              !existingIds.has(r.metadata?.id || r.document)
+            );
+            chromaResults = [...chromaResults, ...newResults];
+          }
+          
+          console.log(`전기 안전 규정 추가 검색으로 총 ${chromaResults.length}건`);
         }
 
         // ChromaDB 결과를 타입별로 분류하고 관련성 필터링 적용
         const rawAccidents = chromaResults.filter(r => r.metadata.type === 'incident');
+        const rawEducation = chromaResults.filter(r => r.metadata.type === 'education');
+        const rawRegulations = chromaResults.filter(r => r.metadata.type === 'regulation');
+        
+        console.log(`Raw 검색 결과 타입별 분포: incidents=${rawAccidents.length}, education=${rawEducation.length}, regulation=${rawRegulations.length}`);
         
         // 모든 사고사례를 일단 포함 (필터링 임계값 제거)
         const allAccidents = rawAccidents;
@@ -465,21 +483,25 @@ JSON 형식으로 응답:
         }));
         
         const regulationResults = chromaResults.filter(r => r.metadata.type === 'regulation');
+        console.log(`Regulation 타입 필터링 결과: ${regulationResults.length}건`);
         
         // 청크 번호가 포함된 제목을 실제 조문으로 변환하고 중복 제거
         const processedRegulations = new Map();
         
-        regulationResults.forEach(r => {
+        regulationResults.forEach((r, index) => {
           const content = r.document;
           let lawName = '산업안전보건기준에 관한 규칙';
           let articleNumber = '';
           let articleTitle = '';
+
+          console.log(`Processing regulation ${index + 1}: "${r.metadata.title}"`);
 
           // 문서 내용에서 조문 정보 추출
           const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
           if (articleMatch) {
             articleNumber = `제${articleMatch[1]}조`;
             articleTitle = articleMatch[2];
+            console.log(`Found article pattern 1: ${articleNumber} - ${articleTitle}`);
           } else {
             // 조문 패턴이 없으면 다른 패턴 시도
             const altMatch = content.match(/제(\d+)조([^①②③④⑤⑥⑦⑧⑨⑩\n]*)/);
@@ -489,13 +511,24 @@ JSON 형식으로 응답:
               if (articleTitle.length > 20) {
                 articleTitle = articleTitle.substring(0, 20) + '...';
               }
+              console.log(`Found article pattern 2: ${articleNumber} - ${articleTitle}`);
+            } else {
+              // 조문 번호만이라도 추출해보기
+              const simpleMatch = content.match(/제(\d+)조/);
+              if (simpleMatch) {
+                articleNumber = `제${simpleMatch[1]}조`;
+                articleTitle = r.metadata.title || '안전 규정';
+                console.log(`Found simple article pattern: ${articleNumber} - ${articleTitle}`);
+              } else {
+                // 조문을 찾지 못한 경우에도 일반 제목으로 처리
+                articleNumber = `규정-${index + 1}`;
+                articleTitle = r.metadata.title || '산업안전보건 규정';
+                console.log(`No article found, using fallback: ${articleNumber} - ${articleTitle}`);
+              }
             }
           }
 
-          // 조문을 찾지 못한 경우 건너뛰기
-          if (!articleNumber) {
-            return;
-          }
+          // 모든 경우에 처리하도록 수정 (조문을 찾지 못해도 포함)
 
           // 조문의 실제 내용 추출 (전체 텍스트)
           let fullContent = '';
