@@ -1,5 +1,5 @@
 import { LocalIndex } from 'vectra';
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
 // PDF 파싱을 위한 dynamic import 사용
@@ -23,7 +23,7 @@ export interface CategorizedSearchResult {
 
 export class ChromaDBService {
   private index: LocalIndex;
-  private genai: GoogleGenAI;
+  private openai: OpenAI;
   private isInitialized = false;
   private forceRebuildFlag = false;
   private readonly indexPath = './data/vectra-index';
@@ -32,9 +32,9 @@ export class ChromaDBService {
     // Vectra LocalIndex (파일 기반 임베디드 모드)
     this.index = new LocalIndex(this.indexPath);
     
-    // Google Gemini AI for embeddings
-    this.genai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY || "",
+    // OpenAI for embeddings
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || "",
     });
   }
 
@@ -50,23 +50,23 @@ export class ChromaDBService {
         await this.index.createIndex();
       }
 
-      // Gemini API 테스트
-      if (!process.env.GEMINI_API_KEY) {
-        console.log('Gemini API 키가 없어 Vectra 초기화 중단');
+      // OpenAI API 테스트
+      if (!process.env.OPENAI_API_KEY) {
+        console.log('OpenAI API 키가 없어 Vectra 초기화 중단');
         this.isInitialized = true;
         return;
       }
 
       try {
-        console.log('Gemini API 임베딩 테스트 중...');
+        console.log('OpenAI API 임베딩 테스트 중...');
         await this.generateEmbedding('test');
-        console.log('Gemini API 테스트 성공, 데이터 임베딩 진행');
+        console.log('OpenAI API 테스트 성공, 데이터 임베딩 진행');
         
         // 데이터 로드 및 임베딩
         await this.loadAndEmbedData();
         
       } catch (error: any) {
-        console.log('Gemini API 오류, Vectra 임베딩 건너뜀:', error.message);
+        console.log('OpenAI API 오류, Vectra 임베딩 건너뜀:', error.message);
         this.isInitialized = true;
         return;
       }
@@ -82,22 +82,22 @@ export class ChromaDBService {
 
   private async generateEmbedding(text: string, retryCount = 0): Promise<number[]> {
     try {
-      const response = await this.genai.models.embedContent({
-        model: "gemini-embedding-001",
-        contents: [text] // 기본 형태로 단순화
+      const response = await this.openai.embeddings.create({
+        model: "text-embedding-3-small", // 1536 차원, 저렴하고 빠름
+        input: text,
+        encoding_format: 'float'
       });
       
-      const embedding = response.embeddings?.[0]?.values;
-      return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
+      return response.data[0].embedding;
     } catch (error: any) {
       if ((error.status === 429 || error.status === 500) && retryCount < 3) {
         // 할당량 초과 또는 서버 오류 시 대기 후 재시도
-        const waitTime = error.status === 500 ? 30000 : Math.pow(2, retryCount) * 60 * 1000; // 500 오류는 30초, 429는 지수 대기
-        console.log(`API ${error.status === 500 ? '서버' : '할당량'} 오류, ${waitTime/1000}초 대기 후 재시도... (${retryCount + 1}/3)`);
+        const waitTime = error.status === 500 ? 5000 : Math.pow(2, retryCount) * 1000; // OpenAI는 더 짧은 대기
+        console.log(`OpenAI API ${error.status === 500 ? '서버' : '할당량'} 오류, ${waitTime/1000}초 대기 후 재시도... (${retryCount + 1}/3)`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
         return this.generateEmbedding(text, retryCount + 1);
       }
-      console.error('Gemini 임베딩 생성 실패:', error);
+      console.error('OpenAI 임베딩 생성 실패:', error);
       throw error;
     }
   }
@@ -291,15 +291,15 @@ export class ChromaDBService {
   // 검색용 쿼리 임베딩 생성 (별도 메서드)
   private async generateQueryEmbedding(query: string): Promise<number[]> {
     try {
-      const response = await this.genai.models.embedContent({
-        model: "gemini-embedding-001",
-        contents: [query] // 기본 형태로 단순화
+      const response = await this.openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: query,
+        encoding_format: 'float'
       });
       
-      const embedding = response.embeddings?.[0]?.values;
-      return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
+      return response.data[0].embedding;
     } catch (error: any) {
-      console.error('Gemini 쿼리 임베딩 생성 실패:', error);
+      console.error('OpenAI 쿼리 임베딩 생성 실패:', error);
       throw error;
     }
   }
@@ -359,7 +359,7 @@ export class ChromaDBService {
       return searchResults;
 
     } catch (error: any) {
-      console.log('Gemini API 오류로 Vectra 검색 실패:', error.message);
+      console.log('OpenAI API 오류로 Vectra 검색 실패:', error.message);
       return [];
     }
   }
@@ -370,8 +370,8 @@ export class ChromaDBService {
         await this.initialize();
       }
 
-      // Gemini API 할당량 문제가 있으면 빈 결과 반환
-      if (!process.env.GEMINI_API_KEY) {
+      // OpenAI API 할당량 문제가 있으면 빈 결과 반환
+      if (!process.env.OPENAI_API_KEY) {
         return {
           education: [],
           incident: [],
