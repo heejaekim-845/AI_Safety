@@ -565,10 +565,11 @@ JSON 형식으로 응답:
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQuery}"`);
-        console.log(`원본 검색 결과:`, chromaResults.length, '건');
-        console.log(`사고사례 필터링 전:`, rawAccidents.length, '건');
-        console.log(`관련성 필터링 후:`, chromaAccidents.length, '건');
-        console.log(`선택된 사고사례:`, chromaAccidents.map(acc => acc.title));
+        console.log(`원본 검색 결과: ${chromaResults.length} 건`);
+        console.log(`사고사례 필터링 전: ${rawAccidents.length} 건`);
+        console.log(`관련성 필터링 후: ${chromaAccidents.length} 건`);
+        console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
+        console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
       }
