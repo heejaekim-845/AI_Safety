@@ -523,6 +523,83 @@ export class ChromaDBService {
     }
   }
 
+  // 상세 분석 정보 제공
+  public async getDetailedAnalysis(): Promise<any> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      const items = await this.index.listItems();
+      console.log(`분석 대상 아이템 수: ${items.length}`);
+
+      const categoryBreakdown: Record<string, number> = {};
+      const industryBreakdown: Record<string, number> = {};
+      const workTypeBreakdown: Record<string, number> = {};
+      const sampleDocuments: any[] = [];
+
+      // 모든 아이템 분석
+      for (const item of items) {
+        const metadata = item.metadata;
+        
+        // 카테고리별 분류
+        const category = metadata.type || 'unknown';
+        categoryBreakdown[category] = (categoryBreakdown[category] || 0) + 1;
+
+        // 산업별 분류 (사고사례에만 해당)
+        if (metadata.industry) {
+          const industry = metadata.industry;
+          industryBreakdown[industry] = (industryBreakdown[industry] || 0) + 1;
+        }
+
+        // 작업유형별 분류
+        if (metadata.work_type) {
+          const workType = metadata.work_type;
+          workTypeBreakdown[workType] = (workTypeBreakdown[workType] || 0) + 1;
+        }
+
+        // 샘플 문서 수집 (각 카테고리별로 3개씩)
+        const categoryCount = sampleDocuments.filter(doc => doc.type === category).length;
+        if (categoryCount < 3) {
+          sampleDocuments.push({
+            type: category,
+            title: metadata.title || 'No Title',
+            industry: metadata.industry || '',
+            workType: metadata.work_type || '',
+            date: metadata.date || '',
+            content: metadata.content ? metadata.content.substring(0, 200) + '...' : ''
+          });
+        }
+      }
+
+      // 카테고리명 한글화
+      const categoryNames: Record<string, string> = {
+        'incident': '사고사례',
+        'education': '교육자료',
+        'regulation': '안전법규'
+      };
+
+      const formattedCategoryBreakdown: Record<string, number> = {};
+      Object.keys(categoryBreakdown).forEach(key => {
+        const koreanName = categoryNames[key] || key;
+        formattedCategoryBreakdown[koreanName] = categoryBreakdown[key];
+      });
+
+      return {
+        totalDocuments: items.length,
+        categoryBreakdown: formattedCategoryBreakdown,
+        industryBreakdown,
+        workTypeBreakdown,
+        sampleDocuments,
+        lastAnalyzed: new Date().toISOString()
+      };
+
+    } catch (error) {
+      console.error('상세 분석 실패:', error);
+      throw error;
+    }
+  }
+
   private async loadAndEmbedData(): Promise<void> {
     try {
       // 체크포인트 로드

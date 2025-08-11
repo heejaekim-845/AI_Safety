@@ -856,6 +856,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 벡터DB 상세 분석 엔드포인트
+  app.get("/api/vector-db-analysis", async (req, res) => {
+    try {
+      console.log('벡터DB 상세 분석 시작...');
+      
+      // ChromaDB 초기화
+      await chromaDBService.initialize();
+      
+      // 상세 분석 정보 가져오기
+      const analysis = await chromaDBService.getDetailedAnalysis();
+      
+      res.json({
+        message: "벡터DB 상세 분석 완료",
+        ...analysis
+      });
+    } catch (error: any) {
+      console.error('벡터DB 상세 분석 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: "벡터DB 상세 분석 실패",
+        totalDocuments: 0,
+        categoryBreakdown: {},
+        industryBreakdown: {},
+        workTypeBreakdown: {},
+        sampleDocuments: []
+      });
+    }
+  });
+
   // ChromaDB 카테고리별 검색 엔드포인트 (POST)
   app.post("/api/search-by-category", async (req, res) => {
     try {

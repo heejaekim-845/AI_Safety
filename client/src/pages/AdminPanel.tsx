@@ -31,7 +31,8 @@ import {
   AlertTriangle,
   Database,
   RefreshCw,
-  BookOpen
+  BookOpen,
+  BarChart3
 } from "lucide-react";
 
 export default function AdminPanel() {
@@ -363,22 +364,30 @@ export default function AdminPanel() {
 
           <div className="flex items-center gap-3">
             {/* Vector DB Status Button */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-1">
               <Button 
                 onClick={() => setLocation('/vector-db')}
                 className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
                 size="sm"
               >
-                <Database className="mr-2 h-4 w-4" />
-                DB상태
+                <Database className="mr-1 h-4 w-4" />
+                상태
               </Button>
               <Button 
                 onClick={() => setLocation('/vector-management')}
                 className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
                 size="sm"
               >
-                <Shield className="mr-2 h-4 w-4" />
-                DB관리
+                <Shield className="mr-1 h-4 w-4" />
+                관리
+              </Button>
+              <Button 
+                onClick={() => setLocation('/vector-analysis')}
+                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                size="sm"
+              >
+                <BarChart3 className="mr-1 h-4 w-4" />
+                분석
               </Button>
             </div>
 
