@@ -686,6 +686,47 @@ export class ChromaDBService {
         }
       }
 
+      // 안전법규 재구성
+      if (dataTypes.includes('regulation')) {
+        const regulationDataPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
+        try {
+          const regData = await fs.readFile(regulationDataPath, 'utf-8');
+          const regulationData = JSON.parse(regData);
+          console.log(`안전법규 ${regulationData.length}건 재구성 시작`);
+
+          for (let i = 0; i < regulationData.length; i++) {
+            const reg = regulationData[i];
+            const content = `${reg.title}\n${reg.content}\n카테고리: ${reg.category}`;
+            
+            const embedding = await this.generateEmbedding(content);
+            
+            await this.index.upsertItem({
+              id: `regulation_${i}`,
+              vector: embedding,
+              metadata: {
+                type: 'regulation',
+                title: reg.title,
+                category: reg.category,
+                chunk_id: reg.chunk_id,
+                page_number: reg.page_number,
+                source: reg.source,
+                content: content
+              }
+            });
+
+            totalItems++;
+            if (i % 50 === 0) {
+              console.log(`안전법규 ${i + 1}/${regulationData.length} 재구성 완료`);
+            }
+            
+            // API 제한 방지를 위한 딜레이
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          console.log('안전법규 재구성 실패:', error);
+        }
+      }
+
       console.log(`부분 재구성 완료: ${totalItems}개 문서 처리`);
 
     } catch (error) {
