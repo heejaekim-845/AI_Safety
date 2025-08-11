@@ -273,16 +273,26 @@ export class ChromaDBService {
       console.log('사고사례 데이터 파일을 찾을 수 없습니다.');
     }
 
-    // 2. 교육자료 데이터 로드
-    const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
+    // 2. 교육자료 데이터 로드 (여러 파일 시도)
+    const educationPaths = [
+      'education_data.json',
+      'education_data_filter.json',
+      'test_new_safety_data.json'
+    ];
+    
     let educationData = [];
-    try {
-      const eduData = await fs.readFile(educationDataPath, 'utf-8');
-      educationData = JSON.parse(eduData);
-      console.log(`교육자료 ${educationData.length}건 로드`);
-    } catch (error) {
-      console.log('교육자료 데이터 파일을 찾을 수 없습니다.');
+    for (const filename of educationPaths) {
+      const educationDataPath = path.join(process.cwd(), 'embed_data', filename);
+      try {
+        const eduData = await fs.readFile(educationDataPath, 'utf-8');
+        const data = JSON.parse(eduData);
+        educationData = educationData.concat(data);
+        console.log(`교육자료 ${filename}에서 ${data.length}건 로드`);
+      } catch (error) {
+        // 파일이 없으면 다음 파일 시도
+      }
     }
+    console.log(`교육자료 총 ${educationData.length}건 로드`);
 
     // 3. PDF 안전법규 데이터 로드
     const pdfJsonPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
