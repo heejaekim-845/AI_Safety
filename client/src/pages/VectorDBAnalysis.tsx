@@ -5,7 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCw, BarChart3, PieChart, Database, FileText, Book, Scale, Building2, Wrench, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RefreshCw, BarChart3, PieChart, Database, FileText, Book, Scale, Building2, Wrench, Clock, Search } from 'lucide-react';
 
 interface VectorDBAnalysis {
   totalDocuments: number;              // 원본 파일의 전체 문서수 (목표치)
@@ -26,10 +28,46 @@ interface VectorDBAnalysis {
   message: string;
 }
 
+interface CategorySearchResult {
+  message: string;
+  results: {
+    education: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    incident: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    regulation: Array<{
+      type: string;
+      title: string;
+      content: string;
+      distance: number;
+      metadata: any;
+    }>;
+    totalFound: {
+      education: number;
+      incident: number;
+      regulation: number;
+    };
+  };
+}
+
 export default function VectorDBAnalysis() {
   const [analysis, setAnalysis] = useState<VectorDBAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('전기');
+  const [searchResults, setSearchResults] = useState<CategorySearchResult | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('education');
 
   const loadAnalysis = async () => {
     try {
@@ -74,6 +112,24 @@ export default function VectorDBAnalysis() {
       .slice(0, limit);
   };
 
+  const performCategorySearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setSearchLoading(true);
+    try {
+      const response = await fetch('/api/search-by-category', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery })
+      });
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error('카테고리별 검색 실패:', error);
+    }
+    setSearchLoading(false);
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -86,6 +142,154 @@ export default function VectorDBAnalysis() {
           새로고침
         </Button>
       </div>
+
+      {/* 검색 기능 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="h-5 w-5" />
+            카테고리별 벡터 검색
+          </CardTitle>
+          <CardDescription>
+            안전 관련 키워드를 검색하여 관련 문서를 카테고리별로 확인할 수 있습니다.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="검색어 입력 (예: 전기, GIS, 감전)"
+              onKeyDown={(e) => e.key === 'Enter' && performCategorySearch()}
+            />
+            <Button onClick={performCategorySearch} disabled={searchLoading}>
+              <Search className="h-4 w-4 mr-2" />
+              {searchLoading ? '검색 중...' : '검색'}
+            </Button>
+          </div>
+
+          {searchResults && (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="education" className="flex items-center gap-2">
+                  <Book className="h-4 w-4" />
+                  교육자료 ({searchResults.results.totalFound.education})
+                </TabsTrigger>
+                <TabsTrigger value="incident" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  사고사례 ({searchResults.results.totalFound.incident})
+                </TabsTrigger>
+                <TabsTrigger value="regulation" className="flex items-center gap-2">
+                  <Scale className="h-4 w-4" />
+                  관련규정 ({searchResults.results.totalFound.regulation})
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="education" className="space-y-3">
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {searchResults.results.education.length > 0 ? (
+                    searchResults.results.education.map((result, index) => (
+                      <div key={index} className="p-3 border border-green-200 bg-green-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            교육자료
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            유사도: {result.distance.toFixed(3)}
+                          </span>
+                        </div>
+                        <div className="text-sm font-medium text-gray-800 mb-1">
+                          {result.title}
+                        </div>
+                        <div className="text-xs text-gray-600 line-clamp-2">
+                          {result.content?.substring(0, 150)}...
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-gray-500 py-8">
+                      교육자료 검색 결과가 없습니다.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="incident" className="space-y-3">
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {searchResults.results.incident.length > 0 ? (
+                    searchResults.results.incident.map((result, index) => (
+                      <div key={index} className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="destructive" className="bg-red-100 text-red-800">
+                            사고사례
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            유사도: {result.distance.toFixed(3)}
+                          </span>
+                        </div>
+                        <div className="text-sm font-medium text-gray-800 mb-1">
+                          {result.title}
+                        </div>
+                        <div className="text-xs text-gray-600 line-clamp-2">
+                          {result.content?.substring(0, 150)}...
+                        </div>
+                        {result.metadata?.risk_keywords && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {result.metadata.risk_keywords.split(', ').slice(0, 3).map((keyword: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs bg-red-100 text-red-700">
+                                {keyword}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-gray-500 py-8">
+                      사고사례 검색 결과가 없습니다.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="regulation" className="space-y-3">
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {searchResults.results.regulation.length > 0 ? (
+                    searchResults.results.regulation.map((result, index) => (
+                      <div key={index} className="p-3 border border-blue-200 bg-blue-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="default" className="bg-blue-100 text-blue-800">
+                            관련규정
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            유사도: {result.distance.toFixed(3)}
+                          </span>
+                        </div>
+                        <div className="text-sm font-medium text-gray-800 mb-1">
+                          {result.title}
+                        </div>
+                        <div className="text-xs text-gray-600 line-clamp-2">
+                          {result.content?.substring(0, 150)}...
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-gray-500 py-8">
+                      관련규정 검색 결과가 없습니다.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          )}
+
+          {!searchResults && (
+            <div className="text-center text-gray-500 py-8">
+              검색어를 입력하고 검색 버튼을 클릭하세요.
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {error && (
         <Alert variant="destructive">

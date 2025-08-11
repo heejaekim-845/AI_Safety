@@ -10,7 +10,6 @@ import WorkProcedure from "@/pages/WorkProcedure";
 import WorkManagement from "@/pages/WorkManagement";
 import Briefing from "@/pages/Briefing";
 import AdminPanel from "@/pages/AdminPanel";
-import VectorDBStatus from "@/pages/VectorDBStatus";
 import VectorDBManagement from "@/pages/VectorDBManagement";
 import VectorDBAnalysis from "@/pages/VectorDBAnalysis";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -73,7 +72,6 @@ function Router() {
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
           <Route path="/briefing" component={Briefing} />
           <Route path="/admin" component={AdminPanel} />
-          <Route path="/vector-db" component={VectorDBStatus} />
           <Route path="/vector-management" component={VectorDBManagement} />
           <Route path="/vector-analysis" component={VectorDBAnalysis} />
         </Switch>
