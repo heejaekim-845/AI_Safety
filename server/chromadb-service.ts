@@ -90,10 +90,16 @@ export class ChromaDBService {
       try {
         console.log('OpenAI API 임베딩 테스트 중...');
         await this.generateEmbedding('test');
-        console.log('OpenAI API 테스트 성공, 데이터 임베딩 진행');
+        console.log('OpenAI API 테스트 성공');
         
-        // 데이터 로드 및 임베딩
-        await this.loadAndEmbedData();
+        // 기존 데이터 확인 후 임베딩 여부 결정
+        const existingItems = await this.index.listItems();
+        if (existingItems.length > 0) {
+          console.log(`Vectra에 이미 ${existingItems.length}개의 문서가 있어 임베딩을 건너뜁니다.`);
+        } else {
+          console.log('새로운 데이터 임베딩 시작...');
+          await this.loadAndEmbedData();
+        }
         
       } catch (error: any) {
         console.log('OpenAI API 오류, Vectra 임베딩 건너뜀:', error.message);
