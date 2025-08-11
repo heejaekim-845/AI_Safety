@@ -523,6 +523,64 @@ export class ChromaDBService {
     }
   }
 
+  // 부분 재구축 메서드 (누락된 데이터만 추가)
+  public async resumeIncompleteEmbedding(): Promise<void> {
+    try {
+      console.log('누락된 데이터 확인 및 이어서 임베딩 시작...');
+      
+      // 현재 인덱스 상태 확인
+      const items = await this.index.listItems();
+      console.log(`현재 벡터DB 아이템 수: ${items.length}`);
+      
+      // 각 카테고리별 현재 개수 계산
+      const categoryCount = { incident: 0, education: 0, regulation: 0 };
+      for (const item of items) {
+        const type = item.metadata?.type;
+        if (type && categoryCount[type] !== undefined) {
+          categoryCount[type]++;
+        }
+      }
+      
+      console.log('현재 카테고리별 개수:', categoryCount);
+      
+      // 원본 데이터 로드
+      const { accidentCases, educationData, pdfRegulations } = await this.loadAllData();
+      console.log(`원본 데이터: 사고사례 ${accidentCases.length}, 교육자료 ${educationData.length}, 안전법규 ${pdfRegulations.length}`);
+      
+      // 백업 생성
+      await this.createBackup();
+      
+      // 누락된 데이터만 처리
+      if (categoryCount.incident < accidentCases.length) {
+        console.log(`사고사례 ${categoryCount.incident}/${accidentCases.length}에서 재개`);
+        await this.processIncidents(accidentCases, categoryCount.incident);
+      }
+      
+      if (categoryCount.education < educationData.length) {
+        console.log(`교육자료 ${categoryCount.education}/${educationData.length}에서 재개`);
+        await this.processEducation(educationData, categoryCount.education);
+      }
+      
+      if (categoryCount.regulation < pdfRegulations.length) {
+        console.log(`안전법규 ${categoryCount.regulation}/${pdfRegulations.length}에서 재개`);
+        await this.processRegulations(pdfRegulations, categoryCount.regulation);
+      }
+      
+      console.log('부분 재구축 완료');
+      
+    } catch (error) {
+      console.error('부분 재구축 실패:', error);
+      
+      // 백업에서 복구 시도
+      const restored = await this.restoreFromBackup();
+      if (restored) {
+        console.log('백업에서 복구 완료');
+      }
+      
+      throw error;
+    }
+  }
+
   // 안전한 재구축 메서드
   public async rebuildVectorDB(forceRebuild: boolean = false): Promise<void> {
     try {

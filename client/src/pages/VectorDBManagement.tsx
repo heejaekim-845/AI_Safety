@@ -234,7 +234,15 @@ export default function VectorDBManagement() {
             </AlertDescription>
           </Alert>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Button 
+              onClick={() => handleOperation('누락된 데이터 임베딩', '/api/resume-incomplete-embedding')}
+              disabled={loading || operation === '누락된 데이터 임베딩'}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              <PlayCircle className="h-4 w-4 mr-2" />
+              {operation === '누락된 데이터 임베딩' ? '임베딩 중...' : '누락된 데이터 이어서'}
+            </Button>
             <Button 
               onClick={() => handleOperation('안전한 재구축', '/api/rebuild-vector-db', { forceRebuild: true })}
               disabled={loading || operation === '안전한 재구축'}

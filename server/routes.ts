@@ -1167,6 +1167,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 누락된 데이터 이어서 임베딩
+  app.post('/api/resume-incomplete-embedding', async (req, res) => {
+    try {
+      console.log('누락된 데이터 이어서 임베딩 요청받음');
+      await (chromaDBService as any).resumeIncompleteEmbedding();
+      res.json({ message: '누락된 데이터 임베딩 완료' });
+    } catch (error: any) {
+      console.error('부분 임베딩 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // 안전한 벡터DB 재구축 (체크포인트 지원)
   app.post('/api/rebuild-vector-db', async (req, res) => {
     try {
