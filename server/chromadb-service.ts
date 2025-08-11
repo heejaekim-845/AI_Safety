@@ -84,7 +84,7 @@ export class ChromaDBService {
     try {
       const response = await this.genai.models.embedContent({
         model: "gemini-embedding-001",
-        contents: text,
+        content: text, // contents → content로 수정
         config: {
           taskType: "RETRIEVAL_DOCUMENT", // 문서 임베딩용
           outputDimensionality: 768 // 저장 공간 효율을 위해 768 차원 사용
@@ -297,7 +297,7 @@ export class ChromaDBService {
     try {
       const response = await this.genai.models.embedContent({
         model: "gemini-embedding-001",
-        contents: query,
+        content: query, // contents → content로 수정
         config: {
           taskType: "RETRIEVAL_QUERY", // 검색 쿼리용
           outputDimensionality: 768
