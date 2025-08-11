@@ -523,6 +523,57 @@ export class ChromaDBService {
     }
   }
 
+  // 안전한 재구축 메서드
+  public async rebuildVectorDB(forceRebuild: boolean = false): Promise<void> {
+    try {
+      console.log('안전한 벡터DB 재구축 시작, forceRebuild:', forceRebuild);
+      
+      if (forceRebuild) {
+        // 백업 생성
+        await this.createBackup();
+        
+        // 기존 인덱스 삭제
+        console.log('기존 벡터DB 인덱스 삭제 중...');
+        try {
+          await this.index.deleteIndex();
+        } catch (error) {
+          console.log('인덱스 삭제 오류 무시 (없을 수 있음):', error.message);
+        }
+        
+        // 새 인덱스 생성
+        console.log('새 벡터DB 인덱스 생성 중...');
+        await this.index.createIndex();
+        
+        // 체크포인트 정리
+        await this.clearCheckpoint();
+        
+        // 강제 재구축 플래그 설정
+        this.forceRebuildFlag = true;
+        
+        // 데이터 로드 및 임베딩
+        await this.loadAndEmbedData();
+        
+        console.log('안전한 벡터DB 재구축 완료');
+      } else {
+        // 일반 초기화 (기존 데이터 유지)
+        await this.initialize();
+      }
+    } catch (error) {
+      console.error('벡터DB 재구축 실패:', error);
+      
+      // 백업에서 복구 시도
+      const restored = await this.restoreFromBackup();
+      if (restored) {
+        console.log('백업에서 복구 완료');
+      }
+      
+      throw error;
+    } finally {
+      // 플래그 초기화
+      this.forceRebuildFlag = false;
+    }
+  }
+
   // 상세 분석 정보 제공
   public async getDetailedAnalysis(): Promise<any> {
     try {
@@ -717,6 +768,15 @@ export class ChromaDBService {
     } catch (error: any) {
       console.log('OpenAI API 오류로 Vectra 검색 실패:', error.message);
       return [];
+    }
+  }
+
+  private async clearCheckpoint(): Promise<void> {
+    try {
+      await fs.unlink(this.checkpointPath);
+      console.log('체크포인트 파일 삭제 완료');
+    } catch (error) {
+      // 파일이 없으면 무시
     }
   }
 

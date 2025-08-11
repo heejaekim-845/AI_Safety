@@ -1173,12 +1173,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { forceRebuild } = req.body;
       console.log('안전한 벡터DB 재구축 요청받음, forceRebuild:', forceRebuild);
       
-      // 강제 재구축 플래그 설정
-      if (forceRebuild) {
-        (chromaDBService as any).forceRebuildFlag = true;
-      }
-      
-      await chromaDBService.initialize();
+      // 새로운 rebuildVectorDB 메서드 호출
+      await (chromaDBService as any).rebuildVectorDB(forceRebuild);
       res.json({ message: '벡터DB 재구축 완료' });
     } catch (error: any) {
       console.error('벡터DB 재구축 실패:', error);
