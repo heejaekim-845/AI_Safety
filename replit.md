@@ -12,7 +12,7 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **UI Reorganization**: Separated Vector DB management into dedicated section with three access points (Status, Management, Analysis)
 - **File Upload Feature**: Successfully restored file upload functionality with JSON/TXT support and automatic embedding processing
 - **File Upload UI Fix**: Resolved persistent "파일 업로드 중" message issue with proper state management and auto-clearing
-- **Data Coverage**: Completing embedding of 1,793 accident cases + 562 education materials + regulatory chunks + uploaded files (targeting 2,355+ total documents)
+- **Data Coverage**: Successfully restored from backup (3,388 docs) and currently re-embedding 6,501 education materials (501/6,501 complete)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
