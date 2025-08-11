@@ -410,11 +410,11 @@ JSON 형식으로 응답:
 
       try {
         // Try Vectra vector database first for enhanced RAG search
-        const searchQuery = `${equipmentInfo.name} ${workType.name} ${this.extractRiskFactors(equipmentInfo)}`;
-        console.log(`검색 시작 - 쿼리: "${searchQuery}"`);
+        const searchQuery = this.buildTargetedSearchQuery(equipmentInfo, workType);
+        console.log(`정밀 검색 시작 - 쿼리: "${searchQuery}"`);
         
-        // 더 넓은 범위로 검색하여 규정도 포함하도록 수정
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 25);
+        // 설비별 맞춤형 검색 실행
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 30);
         
         // 결과가 없으면 더 간단한 쿼리로 재시도
         if (chromaResults.length === 0) {
@@ -462,10 +462,16 @@ JSON 형식으로 응답:
         // 모든 사고사례를 일단 포함 (필터링 임계값 제거)
         const allAccidents = rawAccidents;
         
-        // 관련성 필터링 적용 후 상위 5건 선택
-        chromaAccidents = allAccidents
-          .filter(r => this.isRelevantAccident(r, equipmentInfo, workType)) // 관련성 필터링 재활성화
-          .sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬 (가까운 것부터)
+        // 관련성 점수 계산 및 필터링 적용
+        const scoredAccidents = allAccidents.map(r => ({
+          ...r,
+          relevanceScore: this.calculateRelevanceScore(r, equipmentInfo, workType)
+        }));
+        
+        // 관련성 점수 0.3 이상만 선택하고 상위 5건 선택
+        chromaAccidents = scoredAccidents
+          .filter(r => r.relevanceScore >= 0.3) // 관련성 임계값 적용
+          .sort((a, b) => b.relevanceScore - a.relevanceScore) // 관련성 점수 내림차순 정렬
           .slice(0, 5) // 최대 5건만 선택
           .map(r => ({
             title: r.metadata.title,
@@ -473,14 +479,24 @@ JSON 형식으로 응답:
             risk_keywords: r.metadata.risk_keywords || '',
             prevention: r.document.split('예방대책: ')[1] || '',
             work_type: r.metadata.work_type || '',
-            relevanceScore: r.distance || 0
+            relevanceScore: r.relevanceScore
           }));
         
-        educationMaterials = chromaResults.filter(r => r.metadata.type === 'education').map(r => ({
-          title: r.metadata.title,
-          content: r.document.split('\n')[1] || '',
-          category: r.metadata.category
+        // 교육자료도 관련성 필터링 적용
+        const scoredEducation = rawEducation.map(r => ({
+          ...r,
+          relevanceScore: this.calculateEducationRelevance(r, equipmentInfo, workType)
         }));
+        
+        educationMaterials = scoredEducation
+          .filter(r => r.relevanceScore >= 0.2) // 교육자료는 더 낮은 임계값 적용
+          .sort((a, b) => b.relevanceScore - a.relevanceScore)
+          .slice(0, 10) // 최대 10건
+          .map(r => ({
+            title: r.metadata.title,
+            content: r.document.split('\n')[1] || '',
+            category: r.metadata.category
+          }));
         
         const regulationResults = chromaResults.filter(r => r.metadata.type === 'regulation');
         console.log(`Regulation 타입 필터링 결과: ${regulationResults.length}건`);
@@ -597,11 +613,12 @@ JSON 형식으로 응답:
         );
 
         console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
-        console.log(`검색 쿼리: "${searchQuery}"`);
+        console.log(`정밀 검색 쿼리: "${searchQuery}"`);
         console.log(`원본 검색 결과: ${chromaResults.length} 건`);
         console.log(`사고사례 필터링 전: ${rawAccidents.length} 건`);
-        console.log(`관련성 필터링 후: ${chromaAccidents.length} 건`);
-        console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
+        console.log(`관련성 점수 0.3 이상 필터링 후: ${chromaAccidents.length} 건`);
+        console.log(`선택된 사고사례 (관련성 점수순): [${chromaAccidents.map(acc => `'${acc.title}' (${acc.relevanceScore?.toFixed(2)})`).join(', ')}]`);
+        console.log(`교육자료 필터링: ${rawEducation.length} → ${educationMaterials.length} 건`);
         console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
@@ -795,6 +812,44 @@ ${specialNotes || "없음"}
     }
   }
 
+  private buildTargetedSearchQuery(equipmentInfo: any, workType: any): string {
+    // 설비 특성 분석
+    const equipmentName = equipmentInfo.name || '';
+    const workTypeName = workType.name || '';
+    
+    // 170kV GIS 설비용 특화 검색어
+    if (equipmentName.includes('GIS') || equipmentName.includes('170kV')) {
+      if (workTypeName.includes('순시점검') || workTypeName.includes('점검')) {
+        return '170kV GIS 변전소 점검 감전 전기 안전 고전압 활선';
+      }
+      return 'GIS 170kV 고전압 변전소 감전 전기 SF6 절연';
+    }
+    
+    // 전기 설비용 검색어
+    if (equipmentName.includes('전기') || equipmentName.includes('변전') || equipmentName.includes('배전')) {
+      return `${equipmentName} 전기 감전 충전부 절연 안전작업`;
+    }
+    
+    // 컨베이어 벨트용 검색어
+    if (equipmentName.includes('컨베이어')) {
+      return '컨베이어 벨트 끼임 회전 기계 안전장치';
+    }
+    
+    // 크레인용 검색어
+    if (equipmentName.includes('크레인')) {
+      return '크레인 추락 충돌 중량물 권상 와이어로프';
+    }
+    
+    // 압력용기용 검색어
+    if (equipmentName.includes('압력') || equipmentName.includes('보일러')) {
+      return `${equipmentName} 압력 폭발 고온 증기 안전밸브`;
+    }
+    
+    // 기본 검색어 (작업 유형 + 설비명 + 위험요소)
+    const riskFactors = this.extractRiskFactors(equipmentInfo);
+    return `${equipmentName} ${workTypeName} ${riskFactors.join(' ')}`;
+  }
+
   private extractRiskFactors(equipmentInfo: any): string[] {
     const factors = [];
     if (equipmentInfo.highTemperature) factors.push("고온");
@@ -974,7 +1029,7 @@ ${regulation.articleNumber}${articleTitle}
     }).join('\n\n');
   }
 
-  private isRelevantAccident(result: any, equipmentInfo: any, workType: any): boolean {
+  private calculateRelevanceScore(result: any, equipmentInfo: any, workType: any): number {
     const title = (result.metadata.title || '').toLowerCase();
     const workTypeInData = (result.metadata.work_type || '').toLowerCase();
     const riskKeywords = (result.metadata.risk_keywords || '').toLowerCase();
@@ -983,36 +1038,108 @@ ${regulation.articleNumber}${articleTitle}
     const equipmentName = equipmentInfo.name.toLowerCase();
     const workTypeName = workType.name.toLowerCase();
     
-    // 170kV GIS 관련 필수 키워드
-    const gisKeywords = ['gis', '170kv', '고전압', '감전', '전기', '변전소', 'sf6', '가스절연'];
-    const hasGisKeyword = gisKeywords.some(keyword => 
+    let score = 0;
+    
+    // 1. 설비 특화 점수 (0-40점)
+    if (equipmentName.includes('gis') || equipmentName.includes('170kv')) {
+      // GIS 설비 특화 키워드
+      const gisKeywords = ['gis', '170kv', '154kv', '345kv', 'kv', '고전압', '변전소', 'sf6', '가스절연', '개폐기'];
+      const matchingGisKeywords = gisKeywords.filter(keyword => 
+        title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingGisKeywords.length * 8; // 키워드당 8점
+    } else if (equipmentName.includes('컨베이어')) {
+      const conveyorKeywords = ['컨베이어', '벨트', '회전', '구동', '모터'];
+      const matchingKeywords = conveyorKeywords.filter(keyword => 
+        title.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingKeywords.length * 8;
+    } else if (equipmentName.includes('크레인')) {
+      const craneKeywords = ['크레인', '권상', '와이어로프', '중량물', '인양'];
+      const matchingKeywords = craneKeywords.filter(keyword => 
+        title.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingKeywords.length * 8;
+    }
+    
+    // 2. 위험요소 매칭 (0-30점)
+    const electricalKeywords = ['감전', '전기', '전력', '배전', '송전', '충전부', '절연', '누전'];
+    const matchingElectricalKeywords = electricalKeywords.filter(keyword => 
       title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
     );
+    score += matchingElectricalKeywords.length * 5; // 키워드당 5점
     
-    // 명확히 관련없는 키워드들 (블랙리스트)
-    const irrelevantKeywords = ['양망기', '롤러', '끼임', '스크랩', '상차', '매몰', '비산재', '크레인', '지게차', '컨베이어'];
+    // 3. 작업 유형 매칭 (0-20점)
+    if (workTypeName.includes('점검') || workTypeName.includes('순시')) {
+      const inspectionKeywords = ['점검', '순시', '정기', '일상', '육안', '확인'];
+      const matchingInspectionKeywords = inspectionKeywords.filter(keyword => 
+        title.includes(keyword) || workTypeInData.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingInspectionKeywords.length * 4; // 키워드당 4점
+    }
+    
+    // 4. 사고 심각도 보너스 (0-10점)
+    const severityKeywords = ['사망', '중상', '화상', '감전사'];
+    const hasSeverity = severityKeywords.some(keyword => 
+      title.includes(keyword) || content.includes(keyword)
+    );
+    if (hasSeverity) score += 10;
+    
+    // 5. 부정 점수 (관련없는 키워드들)
+    const irrelevantKeywords = ['양망기', '롤러', '스크랩', '상차', '매몰', '비산재', '굴삭기', '덤프트럭'];
     const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
       title.includes(keyword) || content.includes(keyword)
     );
+    if (hasIrrelevantKeyword) score -= 50; // 큰 감점
     
-    // 관련없는 키워드가 있으면 제외
-    if (hasIrrelevantKeyword) {
-      return false;
+    // 6. 벡터 거리 기반 점수 조정
+    const vectorScore = Math.max(0, (1 - (result.distance || 0.5)) * 10); // 0-10점
+    score += vectorScore;
+    
+    // 점수를 0-1 범위로 정규화
+    return Math.max(0, Math.min(1, score / 100));
+  }
+
+  private calculateEducationRelevance(result: any, equipmentInfo: any, workType: any): number {
+    const title = (result.metadata.title || '').toLowerCase();
+    const category = (result.metadata.category || '').toLowerCase();
+    const content = (result.document || '').toLowerCase();
+    
+    const equipmentName = equipmentInfo.name.toLowerCase();
+    const workTypeName = workType.name.toLowerCase();
+    
+    let score = 0;
+    
+    // 1. 설비 관련 점수
+    if (equipmentName.includes('gis') || equipmentName.includes('전기')) {
+      const electricalEducKeywords = ['전기', '절연', '보호구', '감전', '활선', '정전'];
+      const matchingKeywords = electricalEducKeywords.filter(keyword => 
+        title.includes(keyword) || category.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingKeywords.length * 10;
     }
     
-    // GIS/전기 관련이거나 순시점검 관련이면 포함
-    const inspectionKeywords = ['순시', '점검', '정기', '일상', '육안'];
-    const hasInspectionKeyword = inspectionKeywords.some(keyword => 
-      title.includes(keyword) || content.includes(keyword)
-    );
+    // 2. 작업 관련 점수  
+    if (workTypeName.includes('점검')) {
+      const inspectionEducKeywords = ['점검', '안전', '작업', '수칙', '절차'];
+      const matchingKeywords = inspectionEducKeywords.filter(keyword => 
+        title.includes(keyword) || content.includes(keyword)
+      );
+      score += matchingKeywords.length * 8;
+    }
     
-    const electricalKeywords = ['전기', '전력', '변전', '송전', '배전', '개폐기', '차단기'];
-    const hasElectricalKeyword = electricalKeywords.some(keyword => 
-      title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
+    // 3. 안전교육 키워드 보너스
+    const safetyEducKeywords = ['안전보건', '포스터', '스티커', '교육', '훈련'];
+    const hasSafetyKeyword = safetyEducKeywords.some(keyword => 
+      title.includes(keyword) || category.includes(keyword)
     );
+    if (hasSafetyKeyword) score += 15;
     
-    // GIS/전기 관련이거나 점검 관련이면 포함
-    return hasGisKeyword || hasElectricalKeyword || hasInspectionKeyword;
+    // 벡터 거리 기반 점수 조정
+    const vectorScore = Math.max(0, (1 - (result.distance || 0.5)) * 10);
+    score += vectorScore;
+    
+    return Math.max(0, Math.min(1, score / 60));
   }
 
   private mapAccidentTypeToSeverity(accidentType: string | undefined): string {
