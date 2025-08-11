@@ -1097,6 +1097,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 체크포인트 상태 조회
+  app.get('/api/embedding-status', async (req, res) => {
+    try {
+      const status = await (chromaDBService as any).getEmbeddingStatus();
+      res.json(status);
+    } catch (error: any) {
+      console.error('임베딩 상태 조회 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 백업에서 복구
+  app.post('/api/restore-from-backup', async (req, res) => {
+    try {
+      const restored = await (chromaDBService as any).restoreFromBackup();
+      if (restored) {
+        res.json({ message: '백업에서 성공적으로 복구되었습니다.' });
+      } else {
+        res.status(404).json({ error: '백업 파일을 찾을 수 없습니다.' });
+      }
+    } catch (error: any) {
+      console.error('백업 복구 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 체크포인트에서 재개
+  app.post('/api/resume-embedding', async (req, res) => {
+    try {
+      const resumed = await (chromaDBService as any).resumeFromCheckpoint();
+      if (resumed) {
+        res.json({ message: '체크포인트에서 임베딩을 재개합니다.' });
+      } else {
+        res.status(404).json({ error: '체크포인트를 찾을 수 없습니다.' });
+      }
+    } catch (error: any) {
+      console.error('체크포인트 재개 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 안전한 벡터DB 재구축 (체크포인트 지원)
+  app.post('/api/rebuild-vector-db', async (req, res) => {
+    try {
+      const { forceRebuild } = req.body;
+      console.log('안전한 벡터DB 재구축 요청받음, forceRebuild:', forceRebuild);
+      
+      // 강제 재구축 플래그 설정
+      if (forceRebuild) {
+        (chromaDBService as any).forceRebuildFlag = true;
+      }
+      
+      await chromaDBService.initialize();
+      res.json({ message: '벡터DB 재구축 완료' });
+    } catch (error: any) {
+      console.error('벡터DB 재구축 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

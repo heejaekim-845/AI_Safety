@@ -363,13 +363,24 @@ export default function AdminPanel() {
 
           <div className="flex items-center gap-3">
             {/* Vector DB Status Button */}
-            <Button 
-              onClick={() => setLocation('/vector-db')}
-              className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
-            >
-              <Database className="mr-2 h-4 w-4" />
-              벡터DB상태확인
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                onClick={() => setLocation('/vector-db')}
+                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                size="sm"
+              >
+                <Database className="mr-2 h-4 w-4" />
+                DB상태
+              </Button>
+              <Button 
+                onClick={() => setLocation('/vector-management')}
+                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                size="sm"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                DB관리
+              </Button>
+            </div>
 
 
 

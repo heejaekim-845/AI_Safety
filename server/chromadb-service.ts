@@ -4,6 +4,19 @@ import fs from 'fs/promises';
 import path from 'path';
 // PDF 파싱을 위한 dynamic import 사용
 
+export interface EmbeddingCheckpoint {
+  timestamp: string;
+  phase: 'incidents' | 'education' | 'regulations';
+  lastCompletedIndex: number;
+  totalCount: number;
+  totalItemsProcessed: number;
+  dataHashes: {
+    incidents: string;
+    education: string;
+    regulations: string;
+  };
+}
+
 export interface SearchResult {
   document: string;
   metadata: any;
@@ -27,6 +40,8 @@ export class ChromaDBService {
   private isInitialized = false;
   private forceRebuildFlag = false;
   private readonly indexPath = './data/vectra-index';
+  private readonly checkpointPath = './data/embedding-checkpoint.json';
+  private readonly backupPath = './data/vectra-backup';
 
   constructor() {
     // Vectra LocalIndex (파일 기반 임베디드 모드)
@@ -129,83 +144,142 @@ export class ChromaDBService {
     return chunks.filter(chunk => chunk.length > 50); // 너무 짧은 청크 제거
   }
 
-  private async loadAndEmbedData(): Promise<void> {
+  // 체크포인트 관리 메서드들
+  private async saveCheckpoint(checkpoint: EmbeddingCheckpoint): Promise<void> {
     try {
-      // 기존 데이터 확인 (forceRebuild 플래그가 있으면 무시)
-      const items = await this.index.listItems();
-      if (items.length > 0 && !this.forceRebuildFlag) {
-        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다. API 할당량을 고려하여 기존 데이터 유지합니다.`);
-        return;
+      await fs.mkdir(path.dirname(this.checkpointPath), { recursive: true });
+      await fs.writeFile(this.checkpointPath, JSON.stringify(checkpoint, null, 2));
+      console.log(`체크포인트 저장: ${checkpoint.phase} ${checkpoint.lastCompletedIndex}/${checkpoint.totalCount}`);
+    } catch (error) {
+      console.error('체크포인트 저장 실패:', error);
+    }
+  }
+
+  private async loadCheckpoint(): Promise<EmbeddingCheckpoint | null> {
+    try {
+      const data = await fs.readFile(this.checkpointPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      return null; // 체크포인트 파일이 없으면 null 반환
+    }
+  }
+
+  private async createBackup(): Promise<void> {
+    try {
+      console.log('벡터DB 백업 생성 중...');
+      await fs.mkdir(this.backupPath, { recursive: true });
+      
+      // 원본 인덱스 파일들을 백업 폴더로 복사
+      const sourceFiles = await fs.readdir(this.indexPath).catch(() => []);
+      for (const file of sourceFiles) {
+        const sourcePath = path.join(this.indexPath, file);
+        const backupPath = path.join(this.backupPath, file);
+        await fs.copyFile(sourcePath, backupPath);
+      }
+      
+      console.log('벡터DB 백업 완료');
+    } catch (error) {
+      console.error('백업 생성 실패:', error);
+    }
+  }
+
+  private async restoreFromBackup(): Promise<boolean> {
+    try {
+      console.log('백업에서 복구 중...');
+      const backupFiles = await fs.readdir(this.backupPath).catch(() => []);
+      
+      if (backupFiles.length === 0) {
+        console.log('백업 파일을 찾을 수 없습니다.');
+        return false;
       }
 
-      console.log('/embed_data 폴더에서 데이터 로드 및 임베딩 시작...');
+      await fs.mkdir(this.indexPath, { recursive: true });
+      for (const file of backupFiles) {
+        const backupFilePath = path.join(this.backupPath, file);
+        const targetPath = path.join(this.indexPath, file);
+        await fs.copyFile(backupFilePath, targetPath);
+      }
+      
+      console.log('백업에서 복구 완료');
+      return true;
+    } catch (error) {
+      console.error('백업 복구 실패:', error);
+      return false;
+    }
+  }
 
-      // 1. 사고사례 데이터 로드 (/embed_data 폴더에서) - 전체 데이터 사용
-      const accidentCasesPath = path.join(process.cwd(), 'embed_data', 'accident_cases_for_rag.json');
-      let accidentCases = [];
+  private shouldResumeFromCheckpoint(checkpoint: EmbeddingCheckpoint, currentItems: number): boolean {
+    // 현재 아이템 수가 체크포인트보다 적으면 복구 필요
+    const expectedItems = checkpoint.totalItemsProcessed;
+    const isIncomplete = currentItems < expectedItems * 0.9; // 10% 오차 허용
+    
+    console.log(`복구 판단: 현재 ${currentItems}개, 예상 ${expectedItems}개, 복구 필요: ${isIncomplete}`);
+    return isIncomplete;
+  }
+
+  private async resumeEmbeddingFromCheckpoint(checkpoint: EmbeddingCheckpoint): Promise<void> {
+    console.log(`${checkpoint.phase} 단계 ${checkpoint.lastCompletedIndex}번부터 재개합니다.`);
+    
+    // 체크포인트 정보를 사용하여 해당 단계부터 다시 시작
+    await this.continueEmbeddingFromPhase(checkpoint.phase, checkpoint.lastCompletedIndex + 1);
+  }
+
+  private async continueEmbeddingFromPhase(phase: string, startIndex: number): Promise<void> {
+    // 데이터 로드
+    const { accidentCases, educationData, pdfRegulations } = await this.loadAllData();
+    
+    if (phase === 'incidents') {
+      await this.processIncidents(accidentCases, startIndex);
+      await this.processEducation(educationData, 0);
+      await this.processRegulations(pdfRegulations, 0);
+    } else if (phase === 'education') {
+      await this.processEducation(educationData, startIndex);
+      await this.processRegulations(pdfRegulations, 0);
+    } else if (phase === 'regulations') {
+      await this.processRegulations(pdfRegulations, startIndex);
+    }
+  }
+
+  private async loadAllData(): Promise<{accidentCases: any[], educationData: any[], pdfRegulations: any[]}> {
+    // 1. 사고사례 데이터 로드
+    const accidentCasesPath = path.join(process.cwd(), 'embed_data', 'accident_cases_for_rag.json');
+    let accidentCases = [];
+    try {
+      const accidentData = await fs.readFile(accidentCasesPath, 'utf-8');
+      accidentCases = JSON.parse(accidentData);
+      console.log(`사고사례 ${accidentCases.length}건 로드`);
+    } catch (error) {
+      console.log('사고사례 데이터 파일을 찾을 수 없습니다.');
+    }
+
+    // 2. 교육자료 데이터 로드
+    const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
+    let educationData = [];
+    try {
+      const eduData = await fs.readFile(educationDataPath, 'utf-8');
+      educationData = JSON.parse(eduData);
+      console.log(`교육자료 ${educationData.length}건 로드`);
+    } catch (error) {
+      console.log('교육자료 데이터 파일을 찾을 수 없습니다.');
+    }
+
+    // 3. PDF 안전법규 데이터 로드
+    const pdfJsonPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
+    let pdfRegulations: any[] = [];
+    try {
+      const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
+      pdfRegulations = JSON.parse(pdfData);
+      console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드`);
+    } catch (error) {
+      console.log('PDF 법규 파일이 없어 건너뜁니다.');
+    }
+
+    return { accidentCases, educationData, pdfRegulations };
+  }
+
+  private async processIncidents(accidentCases: any[], startIndex: number): Promise<void> {
+    for (let i = startIndex; i < accidentCases.length; i++) {
       try {
-        const accidentData = await fs.readFile(accidentCasesPath, 'utf-8');
-        accidentCases = JSON.parse(accidentData);
-        console.log(`사고사례 ${accidentCases.length}건 로드 (전체)`);
-      } catch (error) {
-        console.log('embed_data 폴더에서 사고사례 데이터 파일을 찾을 수 없습니다.');
-      }
-
-      // 2. 교육자료 데이터 로드 (/embed_data 폴더에서) - 전체 데이터 사용
-      const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
-      let educationData = [];
-      try {
-        const eduData = await fs.readFile(educationDataPath, 'utf-8');
-        educationData = JSON.parse(eduData);
-        console.log(`교육자료 ${educationData.length}건 로드 (전체)`);
-      } catch (error) {
-        console.log('embed_data 폴더에서 교육자료 데이터 파일을 찾을 수 없습니다.', (error as Error).message);
-      }
-
-      // 3. PDF를 LangChain으로 청킹한 JSON 데이터 로드
-      const pdfJsonPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
-      let pdfRegulations: any[] = [];
-      try {
-        const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
-        pdfRegulations = JSON.parse(pdfData);
-        console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드`);
-      } catch (error) {
-        console.log('PDF 청킹 JSON 파일을 찾을 수 없습니다. Python 스크립트로 생성 중...');
-        // Python 스크립트 실행
-        try {
-          const { spawn } = require('child_process');
-          const pythonProcess = spawn('python', [
-            './scripts/pdf_chunking.py',
-            './embed_data/산업안전보건기준에 관한 규칙(고용노동부령)(제00448호)(20250717)_1754373490895.pdf',
-            './embed_data/pdf_regulations_chunks.json'
-          ]);
-          
-          await new Promise((resolve, reject) => {
-            pythonProcess.on('close', (code: number) => {
-              if (code === 0) {
-                console.log('PDF 청킹 완료');
-                resolve(code);
-              } else {
-                console.log('PDF 청킹 실패');
-                reject(new Error(`Python script exit code: ${code}`));
-              }
-            });
-          });
-          
-          // 생성된 파일 다시 로드
-          const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
-          pdfRegulations = JSON.parse(pdfData);
-          console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드 완료`);
-        } catch (pythonError) {
-          console.log('Python PDF 청킹 실패:', pythonError);
-        }
-      }
-
-      // 4. 데이터 임베딩 및 저장
-      let totalItems = 0;
-
-      // 사고사례 처리
-      for (let i = 0; i < accidentCases.length; i++) {
         const incident = accidentCases[i];
         const content = `${incident.title}\n${incident.summary}\n위험요소: ${incident.risk_keywords}\n예방대책: ${incident.prevention}`;
         
@@ -225,12 +299,34 @@ export class ChromaDBService {
           }
         });
 
-        totalItems++;
         console.log(`사고사례 ${i + 1}/${accidentCases.length} 임베딩 완료`);
-      }
 
-      // 교육자료 처리
-      for (let i = 0; i < educationData.length; i++) {
+        // 50개마다 체크포인트 저장
+        if ((i + 1) % 50 === 0) {
+          await this.saveCheckpoint({
+            timestamp: new Date().toISOString(),
+            phase: 'incidents',
+            lastCompletedIndex: i,
+            totalCount: accidentCases.length,
+            totalItemsProcessed: i + 1,
+            dataHashes: { incidents: 'hash', education: 'hash', regulations: 'hash' }
+          });
+        }
+      } catch (error) {
+        console.error(`사고사례 ${i} 처리 실패:`, error);
+        // 백업에서 복구 시도
+        const restored = await this.restoreFromBackup();
+        if (restored) {
+          throw new Error(`사고사례 임베딩 중 오류 발생, 백업에서 복구됨. 다시 시도해주세요.`);
+        }
+        throw error;
+      }
+    }
+  }
+
+  private async processEducation(educationData: any[], startIndex: number): Promise<void> {
+    for (let i = startIndex; i < educationData.length; i++) {
+      try {
         const edu = educationData[i];
         const content = `${edu.title}\n${edu.content}\n카테고리: ${edu.type || edu.category}`;
         
@@ -250,13 +346,33 @@ export class ChromaDBService {
           }
         });
 
-        totalItems++;
         console.log(`교육자료 ${i + 1}/${educationData.length} 임베딩 완료`);
-      }
 
-      // PDF 안전법규 청크 처리 (LangChain으로 생성된 청크들) - 전체 데이터 사용
-      console.log(`PDF 법규 청크 ${pdfRegulations.length}개 전체 임베딩 시작`);
-      for (let i = 0; i < pdfRegulations.length; i++) {
+        // 100개마다 체크포인트 저장
+        if ((i + 1) % 100 === 0) {
+          await this.saveCheckpoint({
+            timestamp: new Date().toISOString(),
+            phase: 'education',
+            lastCompletedIndex: i,
+            totalCount: educationData.length,
+            totalItemsProcessed: 1793 + i + 1, // 사고사례 + 현재 교육자료
+            dataHashes: { incidents: 'hash', education: 'hash', regulations: 'hash' }
+          });
+        }
+      } catch (error) {
+        console.error(`교육자료 ${i} 처리 실패:`, error);
+        const restored = await this.restoreFromBackup();
+        if (restored) {
+          throw new Error(`교육자료 임베딩 중 오류 발생, 백업에서 복구됨. 다시 시도해주세요.`);
+        }
+        throw error;
+      }
+    }
+  }
+
+  private async processRegulations(pdfRegulations: any[], startIndex: number): Promise<void> {
+    for (let i = startIndex; i < pdfRegulations.length; i++) {
+      try {
         const chunk = pdfRegulations[i];
         const content = `${chunk.title}\n${chunk.content}\n분류: ${chunk.category}`;
         
@@ -276,11 +392,174 @@ export class ChromaDBService {
           }
         });
 
-        totalItems++;
         console.log(`PDF 안전법규 청크 ${i + 1}/${pdfRegulations.length} 임베딩 완료`);
+
+        // 20개마다 체크포인트 저장
+        if ((i + 1) % 20 === 0) {
+          await this.saveCheckpoint({
+            timestamp: new Date().toISOString(),
+            phase: 'regulations',
+            lastCompletedIndex: i,
+            totalCount: pdfRegulations.length,
+            totalItemsProcessed: 1793 + 6501 + i + 1, // 사고사례 + 교육자료 + 현재 법규
+            dataHashes: { incidents: 'hash', education: 'hash', regulations: 'hash' }
+          });
+        }
+      } catch (error) {
+        console.error(`안전법규 ${i} 처리 실패:`, error);
+        const restored = await this.restoreFromBackup();
+        if (restored) {
+          throw new Error(`안전법규 임베딩 중 오류 발생, 백업에서 복구됨. 다시 시도해주세요.`);
+        }
+        throw error;
+      }
+    }
+  }
+
+  private async clearCheckpoint(): Promise<void> {
+    try {
+      await fs.unlink(this.checkpointPath);
+    } catch (error) {
+      // 파일이 없어도 문제없음
+    }
+  }
+
+  // 공개 메서드들 (API에서 호출)
+  public async getEmbeddingStatus(): Promise<any> {
+    try {
+      const checkpoint = await this.loadCheckpoint();
+      const items = await this.index.listItems();
+      
+      return {
+        hasCheckpoint: !!checkpoint,
+        checkpoint: checkpoint,
+        currentItems: items.length,
+        indexPath: this.indexPath,
+        backupExists: await this.hasBackup()
+      };
+    } catch (error) {
+      return {
+        hasCheckpoint: false,
+        checkpoint: null,
+        currentItems: 0,
+        error: error.message
+      };
+    }
+  }
+
+  public async resumeFromCheckpoint(): Promise<boolean> {
+    try {
+      const checkpoint = await this.loadCheckpoint();
+      if (!checkpoint) {
+        return false;
       }
 
-      console.log(`총 ${totalItems}개 문서를 Vectra에 저장 완료`);
+      console.log('체크포인트에서 재개:', checkpoint);
+      await this.resumeEmbeddingFromCheckpoint(checkpoint);
+      return true;
+    } catch (error) {
+      console.error('체크포인트 재개 실패:', error);
+      return false;
+    }
+  }
+
+  private async hasBackup(): Promise<boolean> {
+    try {
+      const files = await fs.readdir(this.backupPath);
+      return files.length > 0;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async restoreFromBackup(): Promise<boolean> {
+    try {
+      const backupFiles = await fs.readdir(this.backupPath);
+      if (backupFiles.length === 0) {
+        return false;
+      }
+
+      // 가장 최근 백업 파일 찾기
+      const latestBackup = backupFiles
+        .filter(file => file.endsWith('.json'))
+        .sort()
+        .pop();
+
+      if (!latestBackup) {
+        return false;
+      }
+
+      console.log('백업에서 복구 중:', latestBackup);
+      
+      // 기존 인덱스 삭제
+      await this.index.deleteCollection();
+      
+      // 새 인덱스 초기화
+      await this.index.initialize();
+      
+      // 백업 데이터 로드
+      const backupPath = path.join(this.backupPath, latestBackup);
+      const backupData = JSON.parse(await fs.readFile(backupPath, 'utf8'));
+      
+      // 백업에서 데이터 복원
+      let restoredCount = 0;
+      for (const item of backupData) {
+        try {
+          await this.index.addItem({
+            vector: item.vector,
+            metadata: item.metadata
+          });
+          restoredCount++;
+        } catch (error) {
+          console.error('아이템 복원 실패:', error);
+        }
+      }
+
+      console.log(`백업에서 ${restoredCount}개 아이템 복원 완료`);
+      return true;
+    } catch (error) {
+      console.error('백업 복구 실패:', error);
+      return false;
+    }
+  }
+
+  private async loadAndEmbedData(): Promise<void> {
+    try {
+      // 체크포인트 로드
+      const checkpoint = await this.loadCheckpoint();
+      
+      // 기존 데이터 확인 (forceRebuild 플래그가 있으면 무시)
+      const items = await this.index.listItems();
+      if (items.length > 0 && !this.forceRebuildFlag) {
+        console.log(`Vectra에 이미 ${items.length}개의 문서가 있습니다.`);
+        
+        // 중단점 복구 로직
+        if (checkpoint && this.shouldResumeFromCheckpoint(checkpoint, items.length)) {
+          console.log(`체크포인트에서 복구 시작: ${checkpoint.lastCompletedIndex}에서 재개`);
+          await this.resumeEmbeddingFromCheckpoint(checkpoint);
+          return;
+        } else {
+          console.log('기존 데이터 유지합니다.');
+          return;
+        }
+      }
+
+      console.log('/embed_data 폴더에서 데이터 로드 및 임베딩 시작...');
+
+      // 백업 생성
+      await this.createBackup();
+
+      // 데이터 로드
+      const { accidentCases, educationData, pdfRegulations } = await this.loadAllData();
+
+      // 단계별 처리 (체크포인트와 함께)
+      await this.processIncidents(accidentCases, 0);
+      await this.processEducation(educationData, 0);
+      await this.processRegulations(pdfRegulations, 0);
+
+      // 최종 체크포인트 제거
+      await this.clearCheckpoint();
+      console.log('모든 임베딩 완료, 체크포인트 정리됨');
 
     } catch (error) {
       console.error('데이터 로드 및 임베딩 실패:', error);
@@ -310,8 +589,8 @@ export class ChromaDBService {
         await this.initialize();
       }
 
-      // Gemini API 할당량 문제가 있으면 빈 결과 반환
-      if (!process.env.GEMINI_API_KEY) {
+      // OpenAI API 할당량 문제가 있으면 빈 결과 반환
+      if (!process.env.OPENAI_API_KEY) {
         return [];
       }
 

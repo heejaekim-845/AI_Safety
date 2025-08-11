@@ -11,6 +11,7 @@ import WorkManagement from "@/pages/WorkManagement";
 import Briefing from "@/pages/Briefing";
 import AdminPanel from "@/pages/AdminPanel";
 import VectorDBStatus from "@/pages/VectorDBStatus";
+import VectorDBManagement from "@/pages/VectorDBManagement";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
 
@@ -72,6 +73,7 @@ function Router() {
           <Route path="/briefing" component={Briefing} />
           <Route path="/admin" component={AdminPanel} />
           <Route path="/vector-db" component={VectorDBStatus} />
+          <Route path="/vector-management" component={VectorDBManagement} />
         </Switch>
       </div>
 
