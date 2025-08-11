@@ -83,8 +83,8 @@ export class ChromaDBService {
   private async generateEmbedding(text: string, retryCount = 0): Promise<number[]> {
     try {
       const response = await this.openai.embeddings.create({
-        model: "text-embedding-3-small", // 1536 차원, 저렴하고 빠름
-        input: text,
+        model: "text-embedding-ada-002", // 1536 차원, 가장 저렴한 모델
+        input: text.substring(0, 8000), // 토큰 제한 적용
         encoding_format: 'float'
       });
       
@@ -292,8 +292,8 @@ export class ChromaDBService {
   private async generateQueryEmbedding(query: string): Promise<number[]> {
     try {
       const response = await this.openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: query,
+        model: "text-embedding-ada-002",
+        input: query.substring(0, 8000),
         encoding_format: 'float'
       });
       
