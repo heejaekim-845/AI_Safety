@@ -694,8 +694,19 @@ export class ChromaDBService {
         formattedCategoryBreakdown[koreanName] = categoryBreakdown[key];
       });
 
+      // 원본 데이터 파일 개수 확인
+      const { accidentCases, educationData, pdfRegulations } = await this.loadAllData();
+      const originalDataCounts = {
+        '사고사례': accidentCases.length,
+        '교육자료': educationData.length, 
+        '안전법규': pdfRegulations.length
+      };
+      const totalOriginalDocuments = accidentCases.length + educationData.length + pdfRegulations.length;
+
       return {
-        totalDocuments: items.length,
+        totalDocuments: totalOriginalDocuments,      // 원본 파일의 전체 문서수 (목표치)
+        currentIndexedDocuments: items.length,       // 현재 인덱싱된 문서수 (실제값)
+        originalDataCounts,                          // 각 카테고리별 원본 데이터 개수
         categoryBreakdown: formattedCategoryBreakdown,
         industryBreakdown,
         workTypeBreakdown,

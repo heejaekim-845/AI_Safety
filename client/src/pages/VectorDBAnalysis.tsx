@@ -8,7 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { RefreshCw, BarChart3, PieChart, Database, FileText, Book, Scale, Building2, Wrench, Clock } from 'lucide-react';
 
 interface VectorDBAnalysis {
-  totalDocuments: number;
+  totalDocuments: number;              // 원본 파일의 전체 문서수 (목표치)
+  currentIndexedDocuments: number;     // 현재 인덱싱된 문서수 (실제값)
+  originalDataCounts: Record<string, number>; // 각 카테고리별 원본 데이터 개수
   categoryBreakdown: Record<string, number>;
   industryBreakdown: Record<string, number>;
   workTypeBreakdown: Record<string, number>;
@@ -105,12 +107,66 @@ export default function VectorDBAnalysis() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">
-                  {analysis.totalDocuments.toLocaleString()}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 원본 데이터 (목표치) */}
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600">
+                    {analysis.totalDocuments.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">원본 파일 총 문서수</div>
+                  <div className="text-xs text-muted-foreground">(목표치)</div>
                 </div>
-                <div className="text-lg text-muted-foreground">총 문서 수</div>
+                
+                {/* 현재 인덱싱된 데이터 */}
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">
+                    {analysis.currentIndexedDocuments.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">현재 인덱싱 완료</div>
+                  <div className="text-xs text-muted-foreground">(실제 벡터DB)</div>
+                </div>
+                
+                {/* 진행률 */}
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-600">
+                    {getPercentage(analysis.currentIndexedDocuments, analysis.totalDocuments)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">임베딩 진행률</div>
+                  <Progress 
+                    value={getPercentage(analysis.currentIndexedDocuments, analysis.totalDocuments)} 
+                    className="w-full mt-2" 
+                  />
+                </div>
               </div>
+              
+              {/* 카테고리별 원본 vs 현재 비교 */}
+              {analysis.originalDataCounts && (
+                <div className="mt-6 pt-4 border-t">
+                  <h4 className="font-medium mb-3">카테고리별 진행 현황</h4>
+                  <div className="space-y-2">
+                    {Object.entries(analysis.originalDataCounts).map(([category, originalCount]) => {
+                      const currentCount = analysis.categoryBreakdown[category] || 0;
+                      const progress = getPercentage(currentCount, originalCount);
+                      return (
+                        <div key={category} className="flex justify-between items-center text-sm">
+                          <div className="flex items-center gap-2">
+                            {getCategoryIcon(category)}
+                            <span>{category}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">
+                              {currentCount.toLocaleString()}/{originalCount.toLocaleString()}
+                            </span>
+                            <Badge variant={progress === 100 ? "default" : "secondary"}>
+                              {progress}%
+                            </Badge>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -136,10 +192,12 @@ export default function VectorDBAnalysis() {
                         <span className="text-sm text-muted-foreground">
                           {count.toLocaleString()}개
                         </span>
-                        <Badge variant="secondary">{percentage}%</Badge>
+                        <Badge variant="secondary">
+                          {getPercentage(count, analysis.currentIndexedDocuments)}%
+                        </Badge>
                       </div>
                     </div>
-                    <Progress value={percentage} className="w-full" />
+                    <Progress value={getPercentage(count, analysis.currentIndexedDocuments)} className="w-full" />
                   </div>
                 );
               })}
