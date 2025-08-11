@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-11T08:58:01.624Z",
+  "phase": "incidents",
+  "lastCompletedIndex": 749,
+  "totalCount": 1793,
+  "totalItemsProcessed": 750,
+  "dataHashes": {
+    "incidents": "hash",
+    "education": "hash",
+    "regulations": "hash"
+  }
+}
