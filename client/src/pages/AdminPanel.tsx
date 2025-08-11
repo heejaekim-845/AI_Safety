@@ -363,36 +363,6 @@ export default function AdminPanel() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Vector DB Status Button */}
-            <div className="grid grid-cols-3 gap-1">
-              <Button 
-                onClick={() => setLocation('/vector-db')}
-                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                size="sm"
-              >
-                <Database className="mr-1 h-4 w-4" />
-                상태
-              </Button>
-              <Button 
-                onClick={() => setLocation('/vector-management')}
-                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                size="sm"
-              >
-                <Shield className="mr-1 h-4 w-4" />
-                관리
-              </Button>
-              <Button 
-                onClick={() => setLocation('/vector-analysis')}
-                className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                size="sm"
-              >
-                <BarChart3 className="mr-1 h-4 w-4" />
-                분석
-              </Button>
-            </div>
-
-
-
             {/* Add Equipment Dialog */}
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
@@ -402,6 +372,43 @@ export default function AdminPanel() {
                 </Button>
               </DialogTrigger>
             </Dialog>
+          </div>
+        </div>
+      </div>
+
+      {/* Vector DB Management Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-heading-1 text-white mb-2">벡터DB 관리</h2>
+            <p className="text-body text-purple-50">안전 데이터베이스 상태 및 관리 시스템</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <Button 
+              onClick={() => setLocation('/vector-db')}
+              className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+              size="default"
+            >
+              <Database className="mr-2 h-4 w-4" />
+              상태 확인
+            </Button>
+            <Button 
+              onClick={() => setLocation('/vector-management')}
+              className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+              size="default"
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              데이터 관리
+            </Button>
+            <Button 
+              onClick={() => setLocation('/vector-analysis')}
+              className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+              size="default"
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              상세 분석
+            </Button>
           </div>
         </div>
       </div>
