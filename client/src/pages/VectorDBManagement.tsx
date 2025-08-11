@@ -40,16 +40,38 @@ export default function VectorDBManagement() {
       
       // 임베딩 상태 조회
       const statusResponse = await fetch('/api/embedding-status');
-      const statusData = await statusResponse.json();
-      setStatus(statusData);
+      if (statusResponse.ok && statusResponse.headers.get('content-type')?.includes('application/json')) {
+        try {
+          const statusData = await statusResponse.json();
+          setStatus(statusData);
+        } catch (parseError) {
+          console.error('상태 JSON 파싱 실패:', parseError);
+          setStatus(null);
+        }
+      } else {
+        console.error('상태 조회 실패:', statusResponse.status, statusResponse.statusText);
+        setStatus(null);
+      }
 
       // 벡터DB 통계 조회
       const statsResponse = await fetch('/api/test-vector-db');
-      const statsData = await statsResponse.json();
-      setStats(statsData.stats);
+      if (statsResponse.ok && statsResponse.headers.get('content-type')?.includes('application/json')) {
+        try {
+          const statsData = await statsResponse.json();
+          setStats(statsData.stats);
+        } catch (parseError) {
+          console.error('통계 JSON 파싱 실패:', parseError);
+          setStats(null);
+        }
+      } else {
+        console.error('통계 조회 실패:', statsResponse.status, statsResponse.statusText);
+        setStats(null);
+      }
 
     } catch (error) {
       console.error('상태 조회 실패:', error);
+      setStatus(null);
+      setStats(null);
     } finally {
       setLoading(false);
     }

@@ -75,14 +75,22 @@ export default function VectorDBAnalysis() {
       setError(null);
       
       const response = await fetch('/api/vector-db-analysis');
-      const data = await response.json();
       
       if (response.ok) {
-        setAnalysis(data);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setAnalysis(data);
+        } else {
+          setError('API 응답 형식이 올바르지 않습니다.');
+        }
       } else {
-        setError(data.error || '분석 실패');
+        const text = await response.text();
+        console.error('분석 API 오류:', response.status, text);
+        setError(`분석 실패: ${response.status}`);
       }
     } catch (err) {
+      console.error('분석 로드 오류:', err);
       setError('네트워크 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -122,8 +130,18 @@ export default function VectorDBAnalysis() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: searchQuery })
       });
-      const data = await response.json();
-      setSearchResults(data);
+      
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setSearchResults(data);
+        } else {
+          console.error('검색 API 응답 형식이 올바르지 않습니다.');
+        }
+      } else {
+        console.error('카테고리별 검색 실패:', response.status, response.statusText);
+      }
     } catch (error) {
       console.error('카테고리별 검색 실패:', error);
     }
