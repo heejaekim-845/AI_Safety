@@ -101,7 +101,7 @@ export default function VectorDBManagement() {
         alert(`실패: ${result.error || result.message}`);
       }
     } catch (error) {
-      alert(`오류: ${error.message}`);
+      alert(`오류: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setOperation(null);
       setLoading(false);
@@ -149,7 +149,7 @@ export default function VectorDBManagement() {
         alert(`업로드 실패: ${result.error || result.message}`);
       }
     } catch (error) {
-      alert(`업로드 오류: ${error.message}`);
+      alert(`업로드 오류: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setUploadProgress(null);
       setLoading(false);
