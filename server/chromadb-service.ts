@@ -348,8 +348,13 @@ export class ChromaDBService {
 
         console.log(`교육자료 ${i + 1}/${educationData.length} 임베딩 완료`);
 
-        // 100개마다 체크포인트 저장
-        if ((i + 1) % 100 === 0) {
+        // 200개마다 체크포인트 저장 (메모리 부담 줄임)
+        if ((i + 1) % 200 === 0) {
+          // 메모리 정리
+          if (global.gc) {
+            global.gc();
+          }
+          
           await this.saveCheckpoint({
             timestamp: new Date().toISOString(),
             phase: 'education',
@@ -358,6 +363,10 @@ export class ChromaDBService {
             totalItemsProcessed: 1793 + i + 1, // 사고사례 + 현재 교육자료
             dataHashes: { incidents: 'hash', education: 'hash', regulations: 'hash' }
           });
+          console.log(`체크포인트 저장: education ${i}/${educationData.length}`);
+          
+          // 시스템 안정화 대기
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       } catch (error) {
         console.error(`교육자료 ${i} 처리 실패:`, error);
