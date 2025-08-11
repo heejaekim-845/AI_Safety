@@ -635,6 +635,8 @@ export class ChromaDBService {
       }
 
       console.log(`부분 재구성 시작: ${dataTypes.join(', ')}`);
+      console.log('dataTypes 배열 내용:', dataTypes);
+      console.log('dataTypes 타입:', typeof dataTypes);
 
       // 기존 데이터 삭제 (해당 타입만)
       const existingItems = await this.index.listItems();
@@ -689,10 +691,13 @@ export class ChromaDBService {
       // 안전법규 재구성
       if (dataTypes.includes('regulation')) {
         const regulationDataPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
+        console.log(`안전법규 파일 경로: ${regulationDataPath}`);
         try {
+          console.log('안전법규 파일 읽기 시도...');
           const regData = await fs.readFile(regulationDataPath, 'utf-8');
           const regulationData = JSON.parse(regData);
           console.log(`안전법규 ${regulationData.length}건 재구성 시작`);
+          console.log('첫 번째 안전법규 데이터 샘플:', JSON.stringify(regulationData[0], null, 2));
 
           for (let i = 0; i < regulationData.length; i++) {
             const reg = regulationData[i];
