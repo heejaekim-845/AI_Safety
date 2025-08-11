@@ -4,14 +4,15 @@
 This is a comprehensive, mobile-first web application designed as an industrial equipment safety management system. Its primary purpose is to enhance workplace safety by guiding workers through safe equipment maintenance and operations. Key capabilities include QR code scanning for equipment identification, real-time AI-powered safety analysis, dynamic work procedure guidance, and comprehensive risk management. The system aims to minimize industrial accidents, streamline safety protocols, and provide contextual safety recommendations, ultimately fostering a safer working environment.
 
 ## Recent Updates (August 2025)
-- **Vector Database Enhancement**: Implemented complete RAG system with OpenAI API integration for embedding 3,388+ safety documents
+- **Vector Database Enhancement**: Implemented complete RAG system with OpenAI API integration for embedding 2,355+ safety documents
 - **Data Protection System**: Added comprehensive checkpoint system with automatic backups every 100 documents
 - **Data Recovery**: Implemented backup and restore functionality to prevent data loss during server interruptions
 - **Management Interface**: Created VectorDBManagement page for checkpoint monitoring and manual recovery operations
-- **Detailed Analytics**: Added VectorDBAnalysis page showing category breakdown, industry distribution, and work type analysis
+- **Detailed Analytics**: Fixed VectorDBAnalysis page data discrepancy issue - now accurately shows real-time statistics matching actual vector database content
 - **UI Reorganization**: Separated Vector DB management into dedicated section with three access points (Status, Management, Analysis)
 - **File Upload Feature**: Successfully restored file upload functionality with JSON/TXT support and automatic embedding processing
-- **Data Coverage**: Stable processing of 3,390+ documents (accident cases + education materials + regulatory chunks + uploaded files)
+- **File Upload UI Fix**: Resolved persistent "파일 업로드 중" message issue with proper state management and auto-clearing
+- **Data Coverage**: Completing embedding of 1,793 accident cases + 562 education materials + regulatory chunks + uploaded files (targeting 2,355+ total documents)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
