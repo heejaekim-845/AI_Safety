@@ -84,11 +84,7 @@ export class ChromaDBService {
     try {
       const response = await this.genai.models.embedContent({
         model: "gemini-embedding-001",
-        content: text, // contents → content로 수정
-        config: {
-          taskType: "RETRIEVAL_DOCUMENT", // 문서 임베딩용
-          outputDimensionality: 768 // 저장 공간 효율을 위해 768 차원 사용
-        }
+        contents: [text] // 기본 형태로 단순화
       });
       
       const embedding = response.embeddings?.[0]?.values;
@@ -297,11 +293,7 @@ export class ChromaDBService {
     try {
       const response = await this.genai.models.embedContent({
         model: "gemini-embedding-001",
-        content: query, // contents → content로 수정
-        config: {
-          taskType: "RETRIEVAL_QUERY", // 검색 쿼리용
-          outputDimensionality: 768
-        }
+        contents: [query] // 기본 형태로 단순화
       });
       
       const embedding = response.embeddings?.[0]?.values;
