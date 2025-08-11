@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-08-11T06:54:45.542Z",
+  "timestamp": "2025-08-11T06:58:58.209Z",
   "phase": "education",
-  "lastCompletedIndex": 2099,
+  "lastCompletedIndex": 1599,
   "totalCount": 6501,
-  "totalItemsProcessed": 3893,
+  "totalItemsProcessed": 3393,
   "dataHashes": {
     "incidents": "hash",
     "education": "hash",
