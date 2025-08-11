@@ -37,6 +37,8 @@ export default function VectorDBManagement() {
   const loadStatus = async () => {
     try {
       setLoading(true);
+      // 업로드 상태 초기화
+      setUploadProgress(null);
       
       // 임베딩 상태 조회
       const statusResponse = await fetch('/api/embedding-status');
@@ -79,6 +81,8 @@ export default function VectorDBManagement() {
 
   useEffect(() => {
     loadStatus();
+    // 컴포넌트 마운트 시 업로드 상태 초기화
+    setUploadProgress(null);
   }, []);
 
   const handleOperation = async (operationType: string, apiEndpoint: string, body?: any) => {
@@ -143,6 +147,8 @@ export default function VectorDBManagement() {
 
       if (response.ok) {
         setUploadProgress('임베딩 완료!');
+        // 잠시 완료 메시지를 보여준 후 초기화
+        setTimeout(() => setUploadProgress(null), 2000);
         alert(`성공: ${result.message}`);
         await loadStatus(); // 상태 새로고침
       } else {
