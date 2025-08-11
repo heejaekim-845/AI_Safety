@@ -59,10 +59,25 @@ export class ChromaDBService {
     try {
       console.log('Vectra 임베디드 모드 초기화 중...');
 
-      // 인덱스 생성 또는 로드
-      if (!await this.index.isIndexCreated()) {
-        console.log('새로운 Vectra 인덱스 생성 중...');
+      // 인덱스 생성 또는 로드 (JSON 파싱 오류 처리 포함)
+      try {
+        if (!await this.index.isIndexCreated()) {
+          console.log('새로운 Vectra 인덱스 생성 중...');
+          await this.index.createIndex();
+        }
+      } catch (jsonError: any) {
+        console.log('인덱스 파일 손상 감지, 재생성 중...', jsonError.message);
+        // 손상된 인덱스 파일 제거
+        try {
+          await fs.rmdir(this.indexPath, { recursive: true });
+        } catch (rmError) {
+          console.log('기존 인덱스 삭제 실패, 계속 진행...');
+        }
+        // 인덱스 디렉토리 재생성
+        await fs.mkdir(this.indexPath, { recursive: true });
+        // 새 인덱스 생성
         await this.index.createIndex();
+        console.log('새로운 인덱스 생성 완료');
       }
 
       // OpenAI API 테스트
