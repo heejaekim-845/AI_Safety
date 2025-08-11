@@ -6,6 +6,9 @@ import { weatherService } from "./weather-service";
 import { simpleRagService as ragService } from "./simple-rag-service";
 import { chromaDBService } from "./chromadb-service";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
+import fs from "fs/promises";
 import { 
   insertEquipmentSchema, 
   insertWorkTypeSchema, 
@@ -16,6 +19,23 @@ import {
   insertWorkScheduleSchema,
   insertSafetyBriefingSchema
 } from "@shared/schema";
+
+// Multer 설정
+const upload = multer({
+  dest: 'uploads/',
+  limits: {
+    fileSize: 50 * 1024 * 1024 // 50MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.json', '.txt', '.pdf'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('지원되지 않는 파일 형식입니다. (.json, .txt, .pdf만 허용)'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -1176,6 +1196,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('부분 임베딩 실패:', error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 파일 업로드 및 임베딩 API
+  app.post("/api/upload-and-embed", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ 
+          success: false,
+          error: "파일이 업로드되지 않았습니다." 
+        });
+      }
+
+      const file = req.file;
+      const originalName = file.originalname;
+      const ext = path.extname(originalName).toLowerCase();
+
+      console.log(`파일 업로드됨: ${originalName} (${file.size} bytes)`);
+
+      // 파일 내용 읽기
+      const fileContent = await fs.readFile(file.path, 'utf-8');
+      
+      let documentsToAdd: any[] = [];
+      
+      if (ext === '.json') {
+        try {
+          const jsonData = JSON.parse(fileContent);
+          documentsToAdd = Array.isArray(jsonData) ? jsonData : [jsonData];
+        } catch (parseError) {
+          await fs.unlink(file.path);
+          return res.status(400).json({
+            success: false,
+            error: "JSON 파일 형식이 올바르지 않습니다."
+          });
+        }
+      } else if (ext === '.txt') {
+        documentsToAdd = [{
+          title: originalName.replace(ext, ''),
+          content: fileContent,
+          type: 'education',
+          source: 'uploaded'
+        }];
+      } else if (ext === '.pdf') {
+        await fs.unlink(file.path);
+        return res.status(400).json({
+          success: false,
+          error: "PDF 파일 처리는 현재 지원되지 않습니다."
+        });
+      }
+
+      // ChromaDB에 문서 추가
+      await chromaDBService.initialize();
+      
+      let addedCount = 0;
+      for (let i = 0; i < documentsToAdd.length; i++) {
+        const doc = documentsToAdd[i];
+        const docType = doc.type || (doc.risk_keywords ? 'incident' : 'education');
+        const content = docType === 'incident' 
+          ? `${doc.title}\n${doc.summary || doc.content}\n위험요소: ${doc.risk_keywords || ''}\n예방대책: ${doc.prevention || ''}`
+          : `${doc.title}\n${doc.content}`;
+        
+        const embedding = await (chromaDBService as any).generateEmbedding(content);
+        await (chromaDBService as any).index.upsertItem({
+          id: `uploaded_${Date.now()}_${i}`,
+          vector: embedding,
+          metadata: {
+            type: docType,
+            title: doc.title,
+            source: 'uploaded',
+            originalFile: originalName,
+            content: content,
+            ...doc
+          }
+        });
+        
+        addedCount++;
+      }
+
+      // 임시 파일 삭제
+      await fs.unlink(file.path);
+
+      // 통계 정보 가져오기
+      const stats = await chromaDBService.getStats();
+
+      res.json({
+        success: true,
+        message: `${addedCount}개 문서가 성공적으로 임베딩되었습니다.`,
+        addedCount,
+        originalFileName: originalName,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        }
+      });
+
+    } catch (error: any) {
+      console.error('파일 업로드 및 임베딩 실패:', error);
+      
+      if (req.file) {
+        try {
+          await fs.unlink(req.file.path);
+        } catch (unlinkError) {
+          console.error('임시 파일 삭제 실패:', unlinkError);
+        }
+      }
+      
+      res.status(500).json({
+        success: false,
+        error: `파일 처리 실패: ${error.message}`
+      });
     }
   });
 

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCw, Database, Shield, AlertTriangle, CheckCircle2, PlayCircle } from 'lucide-react';
+import { RefreshCw, Database, Shield, AlertTriangle, CheckCircle2, PlayCircle, Upload, Loader2 } from 'lucide-react';
 
 interface EmbeddingStatus {
   hasCheckpoint: boolean;
@@ -32,6 +32,7 @@ export default function VectorDBManagement() {
   const [stats, setStats] = useState<VectorDBStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [operation, setOperation] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
 
   const loadStatus = async () => {
     try {
@@ -98,6 +99,43 @@ export default function VectorDBManagement() {
       regulations: '안전법규'
     };
     return names[phase as keyof typeof names] || phase;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadProgress('파일 업로드 중...');
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload-and-embed', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setUploadProgress('임베딩 완료!');
+        alert(`성공: ${result.message}`);
+        await loadStatus(); // 상태 새로고침
+      } else {
+        alert(`업로드 실패: ${result.error || result.message}`);
+      }
+    } catch (error) {
+      alert(`업로드 오류: ${error.message}`);
+    } finally {
+      setUploadProgress(null);
+      setLoading(false);
+      // 파일 입력 초기화
+      if (event.target) {
+        event.target.value = '';
+      }
+    }
   };
 
   return (
@@ -214,6 +252,54 @@ export default function VectorDBManagement() {
           </CardContent>
         </Card>
       )}
+
+      {/* 파일 업로드 및 추가 인덱싱 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="h-5 w-5" />
+            파일 업로드 추가 인덱싱
+          </CardTitle>
+          <CardDescription>
+            새로운 안전 문서 파일을 업로드하여 벡터DB에 추가합니다.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <input
+                type="file"
+                id="fileUpload"
+                className="hidden"
+                accept=".json,.txt,.pdf"
+                onChange={handleFileUpload}
+                disabled={loading || uploadProgress !== null}
+              />
+              <label
+                htmlFor="fileUpload"
+                className="cursor-pointer flex flex-col items-center space-y-2"
+              >
+                <Upload className="h-8 w-8 text-gray-400" />
+                <span className="text-sm text-gray-600">
+                  클릭하여 파일 선택 (.json, .txt, .pdf)
+                </span>
+                <span className="text-xs text-gray-400">
+                  안전 문서, 교육자료, 사고사례 등을 업로드하세요
+                </span>
+              </label>
+            </div>
+            
+            {uploadProgress && (
+              <Alert>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <AlertDescription>
+                  {uploadProgress}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Separator />
 
