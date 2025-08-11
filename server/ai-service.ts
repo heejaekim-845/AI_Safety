@@ -409,97 +409,67 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // Try Vectra vector database first for enhanced RAG search
-        const searchQuery = this.buildTargetedSearchQuery(equipmentInfo, workType);
-        console.log(`정밀 검색 시작 - 쿼리: "${searchQuery}"`);
-        
-        // 설비별 맞춤형 검색 실행
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 30);
-        
-        // 결과가 없으면 더 간단한 쿼리로 재시도
-        if (chromaResults.length === 0) {
-          console.log('첫 번째 검색 실패, 간단한 키워드로 재시도');
-          const simpleQuery = equipmentInfo.name.includes('GIS') ? 'GIS 감전' : '감전 사고';
-          chromaResults = await chromaDBService.searchRelevantData(simpleQuery, 25);
+        // 전기 설비에 최적화된 검색 쿼리 생성
+        let searchQuery = `${equipmentInfo.name} ${workType.name}`;
+        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
+          searchQuery = `${equipmentInfo.name} 감전 전기 점검 고압`;
         }
-
-        // GIS/전기 관련이면 특별히 전기 안전 규정 검색 추가
-        if (equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
-          console.log('전기 설비 관련 규정 추가 검색 수행');
-          
-          // 전기 관련 규정을 더 넓은 범위로 검색
+        console.log(`RAG 벡터 검색 - 쿼리: "${searchQuery}"`);
+        
+        // 단순 벡터 유사도 검색
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 50);
+        
+        // 전기 설비의 경우 규정 검색 추가  
+        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
           const electricalQueries = [
-            '전기 설비 보안등 충전부',
-            '전기기계기구 점검 안전작업',
-            '충전부 접촉 방지조치',
-            '전로의 점검 등',
-            '절연용 보호구'
+            '제323조 제319조 제320조',  // 직접 조문 번호 검색
+            '절연용 보호구',
+            '정전전로',
+            '충전부 감전',
+            '전기기계기구 안전'
           ];
           
           for (const query of electricalQueries) {
-            const electricalResults = await chromaDBService.searchRelevantData(query, 10);
-            const regulationCount = electricalResults.filter(r => r.metadata.type === 'regulation').length;
-            console.log(`"${query}" 검색 결과: ${electricalResults.length}건 (regulation: ${regulationCount}건)`);
-            
-            // 기존 결과와 합치기 (중복 제거)
-            const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
-            const newResults = electricalResults.filter(r => 
-              !existingIds.has(r.metadata?.id || r.document)
-            );
-            chromaResults = [...chromaResults, ...newResults];
+            const additionalResults = await chromaDBService.searchRelevantData(query, 15);
+            chromaResults = [...chromaResults, ...additionalResults];
           }
-          
-          console.log(`전기 안전 규정 추가 검색으로 총 ${chromaResults.length}건`);
         }
 
-        // ChromaDB 결과를 타입별로 분류하고 관련성 필터링 적용
-        const rawAccidents = chromaResults.filter(r => r.metadata.type === 'incident');
-        const rawEducation = chromaResults.filter(r => r.metadata.type === 'education');
-        const rawRegulations = chromaResults.filter(r => r.metadata.type === 'regulation');
+        // 결과를 타입별로 분류
+        const accidents = chromaResults.filter(r => r.metadata.type === 'incident');
+        const education = chromaResults.filter(r => r.metadata.type === 'education');
+        const regulations = chromaResults.filter(r => r.metadata.type === 'regulation');
         
-        console.log(`Raw 검색 결과 타입별 분포: incidents=${rawAccidents.length}, education=${rawEducation.length}, regulation=${rawRegulations.length}`);
+        console.log(`벡터 검색 결과: incidents=${accidents.length}, education=${education.length}, regulation=${regulations.length}`);
         
-        // 모든 사고사례를 일단 포함 (필터링 임계값 제거)
-        const allAccidents = rawAccidents;
-        
-        // 관련성 점수 계산 및 필터링 적용
-        const scoredAccidents = allAccidents.map(r => ({
-          ...r,
-          relevanceScore: this.calculateRelevanceScore(r, equipmentInfo, workType)
-        }));
-        
-        // 관련성 점수 0.3 이상만 선택하고 상위 5건 선택
-        chromaAccidents = scoredAccidents
-          .filter(r => r.relevanceScore >= 0.3) // 관련성 임계값 적용
-          .sort((a, b) => b.relevanceScore - a.relevanceScore) // 관련성 점수 내림차순 정렬
-          .slice(0, 5) // 최대 5건만 선택
+        // 사고사례: 벡터 유사도 상위 5건
+        chromaAccidents = accidents
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 5)
           .map(r => ({
             title: r.metadata.title,
             summary: r.document.split('\n')[1] || '',
             risk_keywords: r.metadata.risk_keywords || '',
             prevention: r.document.split('예방대책: ')[1] || '',
             work_type: r.metadata.work_type || '',
-            relevanceScore: r.relevanceScore
+            relevanceScore: (1 - r.distance).toFixed(3)
           }));
         
-        // 교육자료도 관련성 필터링 적용
-        const scoredEducation = rawEducation.map(r => ({
-          ...r,
-          relevanceScore: this.calculateEducationRelevance(r, equipmentInfo, workType)
-        }));
-        
-        educationMaterials = scoredEducation
-          .filter(r => r.relevanceScore >= 0.2) // 교육자료는 더 낮은 임계값 적용
-          .sort((a, b) => b.relevanceScore - a.relevanceScore)
-          .slice(0, 10) // 최대 10건
+        // 교육자료: 벡터 유사도 상위 6건
+        educationMaterials = education
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 6)
           .map(r => ({
             title: r.metadata.title,
             content: r.document.split('\n')[1] || '',
             category: r.metadata.category
           }));
         
-        const regulationResults = chromaResults.filter(r => r.metadata.type === 'regulation');
-        console.log(`Regulation 타입 필터링 결과: ${regulationResults.length}건`);
+        // 법령: 벡터 유사도 상위 5건
+        const regulationResults = regulations
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 5);
+        console.log(`법령 검색 결과: ${regulationResults.length}건`);
         
         // 청크 번호가 포함된 제목을 실제 조문으로 변환하고 중복 제거
         const processedRegulations = new Map();
@@ -536,10 +506,32 @@ JSON 형식으로 응답:
                 articleTitle = r.metadata.title || '안전 규정';
                 console.log(`Found simple article pattern: ${articleNumber} - ${articleTitle}`);
               } else {
-                // 조문을 찾지 못한 경우에도 일반 제목으로 처리
-                articleNumber = `규정-${index + 1}`;
-                articleTitle = r.metadata.title || '산업안전보건 규정';
-                console.log(`No article found, using fallback: ${articleNumber} - ${articleTitle}`);
+                // 청크 번호로 조문 매핑
+                const chunkMatch = r.metadata.title.match(/청크\s*(\d+)/);
+                if (chunkMatch) {
+                  const chunkNumber = parseInt(chunkMatch[1]);
+                  const articleMapping: {[key: number]: {article: string, title: string}} = {
+                    162: {article: "제162조", title: "충전부등의 방호"},
+                    175: {article: "제319조", title: "정전전로에서의 전기작업"},
+                    176: {article: "제320조", title: "정전전로 인근에서의 전기작업"},
+                    177: {article: "제321조", title: "충전전로에서의 전기작업"},
+                    180: {article: "제323조", title: "절연용 보호구 등의 사용"}
+                  };
+                  
+                  if (articleMapping[chunkNumber]) {
+                    articleNumber = articleMapping[chunkNumber].article;
+                    articleTitle = articleMapping[chunkNumber].title;
+                    console.log(`Mapped chunk ${chunkNumber} to: ${articleNumber} - ${articleTitle}`);
+                  } else {
+                    articleNumber = "관련 안전규정";
+                    articleTitle = "산업안전보건 관련 규정";
+                    console.log(`Unknown chunk, using general title: ${articleNumber} - ${articleTitle}`);
+                  }
+                } else {
+                  articleNumber = "관련 안전규정";
+                  articleTitle = "산업안전보건 관련 규정";
+                  console.log(`No chunk found, using general title: ${articleNumber} - ${articleTitle}`);
+                }
               }
             }
           }
@@ -612,16 +604,19 @@ JSON 형식으로 응답:
           })
         );
 
-        console.log(`ChromaDB 검색 결과: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
-        console.log(`정밀 검색 쿼리: "${searchQuery}"`);
-        console.log(`원본 검색 결과: ${chromaResults.length} 건`);
-        console.log(`사고사례 필터링 전: ${rawAccidents.length} 건`);
-        console.log(`관련성 점수 0.3 이상 필터링 후: ${chromaAccidents.length} 건`);
-        console.log(`선택된 사고사례 (관련성 점수순): [${chromaAccidents.map(acc => `'${acc.title}' (${acc.relevanceScore?.toFixed(2)})`).join(', ')}]`);
-        console.log(`교육자료 필터링: ${rawEducation.length} → ${educationMaterials.length} 건`);
+        console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log(`검색 쿼리: "${searchQuery}"`);
+        console.log(`벡터 검색 결과: ${chromaResults.length} 건`);
+        console.log(`사고사례: ${accidents.length} → ${chromaAccidents.length} 건 (벡터 유사도 상위)`);
+        console.log(`교육자료: ${education.length} → ${educationMaterials.length} 건 (벡터 유사도 상위)`);
+        console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
         console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
+        // 기본값으로 초기화
+        chromaAccidents = [];
+        educationMaterials = [];
+        safetyRegulations = [];
       }
 
       // Fallback to simple RAG if ChromaDB fails
