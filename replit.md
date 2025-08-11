@@ -10,7 +10,8 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **Management Interface**: Created VectorDBManagement page for checkpoint monitoring and manual recovery operations
 - **Detailed Analytics**: Added VectorDBAnalysis page showing category breakdown, industry distribution, and work type analysis
 - **UI Reorganization**: Separated Vector DB management into dedicated section with three access points (Status, Management, Analysis)
-- **Data Coverage**: Stable processing of 3,388 documents (accident cases + education materials + regulatory chunks)
+- **File Upload Feature**: Successfully restored file upload functionality with JSON/TXT support and automatic embedding processing
+- **Data Coverage**: Stable processing of 3,390+ documents (accident cases + education materials + regulatory chunks + uploaded files)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
