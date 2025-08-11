@@ -90,10 +90,10 @@ export class ChromaDBService {
       const embedding = response.embeddings?.[0]?.values;
       return Array.isArray(embedding) ? embedding : Object.values(embedding || {});
     } catch (error: any) {
-      if (error.status === 429 && retryCount < 3) {
-        // 할당량 초과 시 대기 후 재시도
-        const waitTime = Math.pow(2, retryCount) * 60 * 1000; // 1분, 2분, 4분 대기
-        console.log(`API 할당량 초과, ${waitTime/60000}분 대기 후 재시도... (${retryCount + 1}/3)`);
+      if ((error.status === 429 || error.status === 500) && retryCount < 3) {
+        // 할당량 초과 또는 서버 오류 시 대기 후 재시도
+        const waitTime = error.status === 500 ? 30000 : Math.pow(2, retryCount) * 60 * 1000; // 500 오류는 30초, 429는 지수 대기
+        console.log(`API ${error.status === 500 ? '서버' : '할당량'} 오류, ${waitTime/1000}초 대기 후 재시도... (${retryCount + 1}/3)`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
         return this.generateEmbedding(text, retryCount + 1);
       }
