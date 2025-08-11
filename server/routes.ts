@@ -1172,6 +1172,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 교육자료만 제거
+  app.post('/api/remove-education-data', async (req, res) => {
+    try {
+      console.log('교육자료 제거 요청 받음...');
+      
+      const result = await chromaDBService.removeEducationData();
+      
+      res.json({
+        message: '교육자료 제거 완료',
+        removed: result.removed,
+        remaining: result.remaining
+      });
+    } catch (error: any) {
+      console.error('교육자료 제거 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: '교육자료 제거 실패' 
+      });
+    }
+  });
+
   // 체크포인트에서 재개
   app.post('/api/resume-embedding', async (req, res) => {
     try {

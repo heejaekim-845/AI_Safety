@@ -889,6 +889,63 @@ export class ChromaDBService {
     }
   }
 
+  // 교육자료만 선별적으로 제거
+  async removeEducationData(): Promise<{ removed: number; remaining: number }> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      console.log('교육자료 데이터 제거 시작...');
+
+      // 백업 생성
+      await this.createBackup();
+
+      // 모든 아이템 조회
+      const items = await this.index.listItems();
+      console.log(`총 ${items.length}개 아이템 확인 중...`);
+
+      let removedCount = 0;
+      const itemsToRemove: string[] = [];
+
+      // 교육자료 타입의 아이템 식별
+      for (const item of items) {
+        try {
+          const fullItem = await this.index.getItem(item.id);
+          if (fullItem?.metadata?.type === 'education') {
+            itemsToRemove.push(item.id);
+            removedCount++;
+          }
+        } catch (error) {
+          console.warn(`아이템 ${item.id} 조회 실패:`, error);
+        }
+      }
+
+      console.log(`제거할 교육자료: ${removedCount}개`);
+
+      // 배치로 제거
+      for (const itemId of itemsToRemove) {
+        try {
+          await this.index.deleteItem(itemId);
+        } catch (error) {
+          console.warn(`아이템 ${itemId} 제거 실패:`, error);
+        }
+      }
+
+      // 남은 아이템 수 확인
+      const remainingItems = await this.index.listItems();
+      console.log(`교육자료 제거 완료: ${removedCount}개 제거, ${remainingItems.length}개 남음`);
+
+      return {
+        removed: removedCount,
+        remaining: remainingItems.length
+      };
+    } catch (error) {
+      console.error('교육자료 제거 실패:', error);
+      throw error;
+    }
+  }
+
   async searchByCategory(query: string, limitPerCategory: number = 5): Promise<CategorizedSearchResult> {
     try {
       if (!this.isInitialized) {
@@ -1169,7 +1226,7 @@ export class ChromaDBService {
 
       // 교육자료만 재구성
       if (dataTypes.includes('education')) {
-        const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data.json');
+        const educationDataPath = path.join(process.cwd(), 'embed_data', 'education_data_filter.json');
         try {
           const eduData = await fs.readFile(educationDataPath, 'utf-8');
           const educationData = JSON.parse(eduData);
