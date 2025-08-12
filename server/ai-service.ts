@@ -569,19 +569,32 @@ JSON 형식으로 응답:
           relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
 
-        // 특화 검색 결과를 타입별로 분류 (이미 필터링됨)
-        const filteredAccidents = chromaResults.filter(r => r.metadata.type === 'incident');
-        const filteredEducation = chromaResults.filter(r => r.metadata.type === 'education');
+        // 하이브리드 검색: 벡터 유사도 + 키워드 점수 조합
+        const keywordWeights = this.getEquipmentKeywords(equipmentInfo.name);
+        
+        const hybridFilteredAccidents = this.applyHybridScoring(
+          chromaResults.filter(r => r.metadata.type === 'incident'), 
+          keywordWeights
+        ).slice(0, 5);
+        
+        const hybridFilteredEducation = this.applyHybridScoring(
+          chromaResults.filter(r => r.metadata.type === 'education'), 
+          keywordWeights
+        ).slice(0, 6);
+        
         const regulations = chromaResults.filter(r => r.metadata.type === 'regulation');
         
-        console.log(`특화 검색 결과: incidents=${filteredAccidents.length}, education=${filteredEducation.length}, regulation=${regulations.length}`);
+        // 하이브리드 점수 디버깅 로그
+        console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
+        console.log('상위 사고사례 하이브리드 점수:');
+        hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
+          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${acc.hybridScore?.toFixed(3)}, 벡터: ${acc.vectorScore?.toFixed(3)}, 키워드: ${acc.keywordScore}, 핵심키워드: ${acc.criticalKeywordFound}`);
+        });
         
         // 사고사례: 벡터 유사도 상위 5건 (알려진 전기 사고사례 정보와 매칭)
         const knownAccidents = this.getKnownElectricalAccidents();
         
-        chromaAccidents = filteredAccidents
-          .sort((a, b) => a.distance - b.distance)
-          .slice(0, 5)
+        chromaAccidents = hybridFilteredAccidents
           .map((r) => {
               const metadata = r.metadata;
               const title = metadata.title || '';
@@ -647,11 +660,9 @@ JSON 형식으로 응답:
               }
             });
         
-        // 교육자료: 벡터 유사도 상위 6건 (관련성 필터링 적용) + URL 매칭
+        // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
         const educationDataWithUrls = await this.matchEducationWithUrls(
-          filteredEducation
-            .sort((a, b) => a.distance - b.distance)
-            .slice(0, 6)
+          hybridFilteredEducation
         );
         
         educationMaterials = educationDataWithUrls.map(r => ({
@@ -1004,6 +1015,79 @@ ${specialNotes || "없음"}
         relatedAccidentCases: []
       };
     }
+  }
+
+  // 설비별 핵심 키워드 가중치 정의
+  private getEquipmentKeywords(equipmentName: string): { [key: string]: number } {
+    if (equipmentName.includes('170kV') && equipmentName.includes('GIS')) {
+      return {
+        '170kV': 10,
+        'GIS': 10,
+        '가스절연개폐장치': 10,
+        '특별고압': 8,
+        '변전소': 6,
+        '개폐기': 6,
+        '절연': 5,
+        '충전부': 5,
+        '감전': 4,
+        '고압': 3
+      };
+    } else if (equipmentName.includes('kV')) {
+      return {
+        'kV': 8,
+        '고압': 6,
+        '전기': 4,
+        '감전': 4,
+        '절연': 3
+      };
+    }
+    return {};
+  }
+
+  // 하이브리드 점수 계산 (벡터 유사도 + 키워드 매칭)
+  private applyHybridScoring(results: any[], keywordWeights: { [key: string]: number }): any[] {
+    const scoredResults = results.map(result => {
+      const title = result.metadata?.title || '';
+      const content = result.document || '';
+      const searchText = `${title} ${content}`.toLowerCase();
+      
+      // 벡터 유사도 점수 (0-1, 높을수록 좋음)
+      const vectorScore = Math.max(0, 1 - result.distance);
+      
+      // 키워드 매칭 점수
+      let keywordScore = 0;
+      let criticalKeywordFound = false;
+      
+      Object.entries(keywordWeights).forEach(([keyword, weight]) => {
+        if (searchText.includes(keyword.toLowerCase())) {
+          keywordScore += weight;
+          if (weight >= 8) { // 핵심 키워드 (170kV, GIS, 가스절연개폐장치, 특별고압)
+            criticalKeywordFound = true;
+          }
+        }
+      });
+      
+      // 핵심 키워드가 없으면 점수 대폭 감소
+      if (!criticalKeywordFound && Object.keys(keywordWeights).length > 0) {
+        keywordScore = keywordScore * 0.1;
+      }
+      
+      // 하이브리드 점수: 벡터 점수(30%) + 키워드 점수(70%)
+      const hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
+      
+      return {
+        ...result,
+        hybridScore,
+        vectorScore,
+        keywordScore,
+        criticalKeywordFound
+      };
+    });
+    
+    // 하이브리드 점수 순으로 정렬
+    return scoredResults
+      .sort((a, b) => b.hybridScore - a.hybridScore)
+      .filter(r => r.hybridScore > 0.5); // 최소 임계점 설정
   }
 
   // 교육자료 URL 매칭 메서드
