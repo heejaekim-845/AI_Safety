@@ -804,10 +804,10 @@ JSON 형식으로 응답:
         );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
-        console.log(`검색 쿼리: "${searchQuery}"`);
+        console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
         console.log(`벡터 검색 결과: ${chromaResults.length} 건`);
-        console.log(`사고사례: ${accidents.length} → ${chromaAccidents.length} 건 (벡터 유사도 상위)`);
-        console.log(`교육자료: ${education.length} → ${educationMaterials.length} 건 (벡터 유사도 상위)`);
+        console.log(`사고사례: ${filteredAccidents.length} → ${chromaAccidents.length} 건 (벡터 유사도 상위)`);
+        console.log(`교육자료: ${filteredEducation.length} → ${educationMaterials.length} 건 (벡터 유사도 상위)`);
         console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
         console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
