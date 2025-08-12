@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-service";
 import { chromaDBService } from "./chromadb-service";
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -950,9 +952,6 @@ ${specialNotes || "없음"}
   // 교육자료 URL 매칭 메서드
   private async matchEducationWithUrls(educationResults: any[]): Promise<any[]> {
     try {
-      const fs = require('fs');
-      const path = require('path');
-      
       // education_data.json 파일 로드
       const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
       if (!fs.existsSync(educationDataPath)) {
