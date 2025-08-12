@@ -399,12 +399,17 @@ export default function Briefing() {
                       <div className="mt-4">
                         <h4 className="font-semibold mb-2">주요 위험 요인</h4>
                         <ul className="space-y-1">
-                          {briefingData.riskFactors.map((factor, index) => (
+                          {briefingData.riskFactors?.map((factor, index) => (
                             <li key={index} className="flex items-center gap-2">
                               <AlertTriangle className="w-4 h-4 text-orange-500" />
                               <span className="text-sm">{factor}</span>
                             </li>
-                          ))}
+                          )) || (
+                            <li className="flex items-center gap-2">
+                              <AlertTriangle className="w-4 h-4 text-orange-500" />
+                              <span className="text-sm">위험 요인을 확인 중입니다</span>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     </CardContent>
