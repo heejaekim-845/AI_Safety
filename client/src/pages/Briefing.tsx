@@ -692,20 +692,51 @@ export default function Briefing() {
                               </div>
                               <div>
                                 <span className="font-medium text-gray-700">작업유형:</span>
-                                <span className="ml-2 text-gray-600">{accident.workType}</span>
+                                <span className="ml-2 text-gray-600">{accident.work_type}</span>
                               </div>
                               <div>
                                 <span className="font-medium text-gray-700">사고형태:</span>
-                                <span className="ml-2 text-gray-600">{accident.accidentType}</span>
+                                <span className="ml-2 text-gray-600">{accident.accident_type}</span>
                               </div>
                               <div>
                                 <span className="font-medium text-gray-700">사고개요:</span>
                                 <p className="mt-1 text-gray-600 text-xs leading-relaxed">{accident.summary}</p>
                               </div>
+                              
+                              {/* 직접원인 정보 추가 */}
+                              {accident.direct_cause && (
+                                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                                  <span className="font-medium text-red-800">직접원인:</span>
+                                  <p className="mt-1 text-red-700 text-xs leading-relaxed">{accident.direct_cause}</p>
+                                </div>
+                              )}
+                              
+                              {/* 근본원인 정보 추가 */}
+                              {accident.root_cause && (
+                                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                                  <span className="font-medium text-yellow-800">근본원인:</span>
+                                  <p className="mt-1 text-yellow-700 text-xs leading-relaxed">{accident.root_cause}</p>
+                                </div>
+                              )}
+                              
                               <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
                                 <span className="font-medium text-blue-800">예방대책:</span>
                                 <p className="mt-1 text-blue-700 text-xs leading-relaxed">{accident.prevention}</p>
                               </div>
+                              
+                              {/* 위험키워드 추가 */}
+                              {accident.risk_keywords && (
+                                <div className="mt-3">
+                                  <span className="font-medium text-gray-700">위험키워드:</span>
+                                  <div className="mt-1 flex flex-wrap gap-1">
+                                    {accident.risk_keywords.split(',').map((keyword: string, kidx: number) => (
+                                      <span key={kidx} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                                        {keyword.trim()}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}

@@ -321,11 +321,18 @@ export class ChromaDBService {
           vector: embedding,
           metadata: {
             type: 'incident',
-            title: incident.title,
-            date: incident.date,
-            industry: incident.industry,
-            work_type: incident.work_type,
-            risk_keywords: incident.risk_keywords,
+            title: incident.title || '',
+            date: incident.date || '',
+            location: incident.location || '',
+            accident_type: incident.accident_type || '',
+            damage: incident.damage || '',
+            summary: incident.summary || '',
+            direct_cause: incident.direct_cause || '',
+            root_cause: incident.root_cause || '',
+            prevention: incident.prevention || '',
+            industry: incident.industry || '',
+            work_type: incident.work_type || '',
+            risk_keywords: incident.risk_keywords || '',
             content: content
           }
         });
@@ -819,6 +826,8 @@ export class ChromaDBService {
       throw error;
     }
   }
+
+
 
   async searchRelevantData(query: string, limit: number = 5): Promise<SearchResult[]> {
     try {

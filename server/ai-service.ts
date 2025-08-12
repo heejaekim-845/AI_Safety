@@ -20,6 +20,8 @@ export interface RiskAnalysis {
 }
 
 export class AIService {
+  private accidentDataCache?: any[];
+
   async analyzeSafetyConditions(
     equipmentInfo: any,
     workType: any,
@@ -469,18 +471,38 @@ JSON 형식으로 응답:
           console.log(`전기 관련성 필터링: 사고사례 ${accidents.length}→${filteredAccidents.length}건, 교육자료 ${education.length}→${filteredEducation.length}건`);
         }
         
-        // 사고사례: 벡터 유사도 상위 5건 (관련성 필터링 적용)
+        // 사고사례: 벡터 유사도 상위 5건 (document에서 정보 추출)
         chromaAccidents = filteredAccidents
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 5)
-          .map(r => ({
-            title: r.metadata.title,
-            summary: r.document.split('\n')[1] || '',
-            risk_keywords: r.metadata.risk_keywords || '',
-            prevention: r.document.split('예방대책: ')[1] || '',
-            work_type: r.metadata.work_type || '',
-            relevanceScore: (1 - r.distance).toFixed(3)
-          }));
+          .map((r) => {
+            const metadata = r.metadata;
+            const document = r.document;
+            
+            // 문서 내용에서 필드 추출
+            const lines = document.split('\n');
+            const extractField = (pattern: string, fallback = '') => {
+              const line = lines.find(l => l.includes(pattern));
+              return line ? line.split(':')[1]?.trim() || fallback : fallback;
+            };
+            
+            // 메타데이터와 문서 내용 결합
+            return {
+              title: metadata.title || '',
+              date: extractField('날짜') || metadata.date || '',
+              location: extractField('장소') || '',
+              accident_type: extractField('사고형태') || '',
+              damage: extractField('피해규모') || '',
+              summary: extractField('개요') || lines[1] || '',
+              direct_cause: extractField('직접원인') || '',
+              root_cause: extractField('근본원인') || '',
+              prevention: extractField('예방대책') || document.split('예방대책: ')[1] || '',
+              work_type: metadata.work_type || extractField('작업종류') || '',
+              industry: metadata.industry || extractField('업종') || '',
+              risk_keywords: metadata.risk_keywords || extractField('위험요소') || '',
+              relevanceScore: (1 - r.distance).toFixed(3)
+            };
+          });
         
         // 교육자료: 벡터 유사도 상위 6건 (관련성 필터링 적용)
         educationMaterials = filteredEducation
