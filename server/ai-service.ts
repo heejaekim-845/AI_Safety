@@ -500,12 +500,9 @@ JSON 형식으로 응답:
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
-        // 병렬 검색으로 속도 향상
-        const searchPromises = searchQueries.map(query => 
-          chromaDBService.searchRelevantData(query, 12) // 개당 15개 → 12개로 감소
-        );
-        const searchResults = await Promise.all(searchPromises);
-        let chromaResults = searchResults.flat();
+        // 단일 검색으로 최적화 (가장 중요한 쿼리만 사용)
+        const primaryQuery = searchQueries[0]; // 첫 번째 쿼리만 사용
+        let chromaResults = await chromaDBService.searchRelevantData(primaryQuery, 20);
         
         // 중복 제거
         const uniqueResults = new Map();
@@ -517,58 +514,8 @@ JSON 형식으로 응답:
         });
         chromaResults = Array.from(uniqueResults.values());
         
-        // 법령 검색 (설비별 특화)
-        console.log(`법령 특화 검색: ${regulationQueries.length}개 쿼리`);
-        const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
-        
-        for (const query of regulationQueries) {
-          const additionalResults = await chromaDBService.searchRelevantData(query, 6);
-          // 170kV GIS 특화 법령 필터링 (매우 구체적)
-          const relevantRegulations = additionalResults.filter(r => {
-            const content = (r.document || '').toLowerCase();
-            const title = (r.metadata?.title || '').toLowerCase();
-            
-            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              return (content.includes('절연용') || content.includes('보호구') || 
-                     content.includes('전기작업') || content.includes('감전') ||
-                     content.includes('정전전로') || content.includes('특별고압') ||
-                     content.includes('개폐기') || content.includes('안전거리')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            } else {
-              return (content.includes('전기') || content.includes('감전') || 
-                     content.includes('절연') || title.includes('전기')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            }
-          });
-          chromaResults = [...chromaResults, ...relevantRegulations];
-          
-          relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
-        }
-        
-        // 교육자료 검색 (설비별 특화)
-        console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
-        for (const query of educationQueries) {
-          const eduResults = await chromaDBService.searchRelevantData(query, 6);
-          const relevantEducation = eduResults.filter(r => {
-            const content = (r.document || '').toLowerCase();
-            const title = (r.metadata?.title || '').toLowerCase();
-            
-            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              return (title.includes('전기') || title.includes('고압') ||
-                     title.includes('절연') || title.includes('보호구') ||
-                     title.includes('GIS') || title.includes('변전') ||
-                     content.includes('170kV') || content.includes('특별고압')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            } else {
-              return (title.includes('전기') || title.includes('안전') ||
-                     content.includes('전기')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            }
-          });
-          chromaResults = [...chromaResults, ...relevantEducation];
-          
-          relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
-        }
+        // 속도 최적화를 위해 추가 검색 생략
+        console.log('속도 최적화를 위해 추가 검색 생략');
 
         // 하이브리드 검색: 벡터 유사도 + 키워드 점수 조합
         const keywordWeights = this.getEquipmentKeywords(equipmentInfo.name);
@@ -815,23 +762,11 @@ JSON 형식으로 응답:
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 10);
 
-        // 조문 요약 최적화: 상위 5개만 AI 요약, 나머지는 원문 사용
-        const priorityRegulations = sortedRegulations.slice(0, 5);
-        const basicRegulations = sortedRegulations.slice(5);
-        
-        const summaryPromises = priorityRegulations.map(async (reg) => {
-          const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
-          return { ...reg, summary: summary };
-        });
-        
-        const basicMapped = basicRegulations.map(reg => ({
+        // 법령 요약을 완전히 생략하고 원문만 사용 (속도 최우선)
+        safetyRegulations = sortedRegulations.map(reg => ({
           ...reg,
-          summary: reg.fullContent.slice(0, 200) + '...' // 원문 앞부분만 사용
+          summary: reg.fullContent.slice(0, 150) + '...' // 원문 일부만 사용
         }));
-        
-        safetyRegulations = await Promise.all(summaryPromises).then(summaries => 
-          [...summaries, ...basicMapped]
-        );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
@@ -918,8 +853,9 @@ ${safetyRegulations.length > 0 ? `안전규칙: ${this.formatSafetyRegulations(s
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash",
         config: {
-          systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
-          responseMimeType: "application/json"
+          systemInstruction: "간단한 안전 브리핑 생성. 핵심 내용만 포함.",
+          responseMimeType: "application/json",
+          maxOutputTokens: 1000 // 토큰 제한으로 응답 속도 향상
         },
         contents: prompt
       });
