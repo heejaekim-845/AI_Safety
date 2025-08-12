@@ -1,5 +1,5 @@
-import * as XLSX from 'xlsx';
-import path from 'path';
+import XLSX from 'xlsx';
+import * as path from 'path';
 
 export interface AccidentCase {
   id: string;
@@ -29,14 +29,17 @@ class SimpleRAGService {
     try {
       console.log('Initializing Simple RAG Service...');
       const excelPath = path.join(process.cwd(), 'attached_assets', '사고사례_취합_1754296628317.xlsx');
-      const workbook = XLSX.readFile(excelPath);
+      
+      // XLSX 모듈 다이나믹 import로 로드
+      const XLSXModule = await import('xlsx');
+      const workbook = XLSXModule.default.readFile(excelPath);
       
       let allAccidents: AccidentCase[] = [];
       
       // Process all sheets (제조업, 서비스업, 건설업)
       for (const sheetName of workbook.SheetNames) {
         const sheet = workbook.Sheets[sheetName];
-        const data = XLSX.utils.sheet_to_json(sheet, { range: 1 }); // Skip header row
+        const data = XLSXModule.default.utils.sheet_to_json(sheet, { range: 1 }); // Skip header row
         
         const accidents = data.map((row: any, index: number) => {
           const accident: AccidentCase = {

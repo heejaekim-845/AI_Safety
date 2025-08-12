@@ -541,11 +541,11 @@ JSON 형식으로 응답:
             uniqueResults.set(key, r);
           }
         });
-        chromaResults = Array.from(uniqueResults.values());
+        let filteredChromaResults = Array.from(uniqueResults.values());
         
         // 법령 검색 (설비별 특화)
         console.log(`법령 특화 검색: ${regulationQueries.length}개 쿼리`);
-        const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+        const existingIds = new Set(filteredChromaResults.map(r => r.metadata?.id || r.document));
         
         for (const query of regulationQueries) {
           const additionalResults = await timeit(
@@ -569,7 +569,7 @@ JSON 형식으로 응답:
                      !existingIds.has(r.metadata?.id || r.document);
             }
           });
-          chromaResults = [...chromaResults, ...relevantRegulations];
+          filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
           
           relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
@@ -606,7 +606,7 @@ JSON 형식으로 응답:
                      !existingIds.has(r.metadata?.id || r.document);
             }
           });
-          chromaResults = [...chromaResults, ...relevantEducation];
+          filteredChromaResults = [...filteredChromaResults, ...relevantEducation];
           
           relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
@@ -615,16 +615,16 @@ JSON 형식으로 응답:
         const keywordWeights = this.getEquipmentKeywords(equipmentInfo.name);
         
         const hybridFilteredAccidents = this.applyHybridScoring(
-          chromaResults.filter(r => r.metadata.type === 'incident'), 
+          filteredChromaResults.filter(r => r.metadata.type === 'incident'), 
           keywordWeights
         ).slice(0, 5);
         
         const hybridFilteredEducation = this.applyHybridScoring(
-          chromaResults.filter(r => r.metadata.type === 'education'), 
+          filteredChromaResults.filter(r => r.metadata.type === 'education'), 
           keywordWeights
         ).slice(0, 8); // 교육자료 상위 8개로 증가
         
-        const regulations = chromaResults.filter(r => r.metadata.type === 'regulation');
+        const regulations = filteredChromaResults.filter(r => r.metadata.type === 'regulation');
         
         // 하이브리드 점수 디버깅 로그
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
@@ -634,7 +634,7 @@ JSON 형식으로 응답:
         });
         
         // 교육자료 필터링 전후 비교
-        const rawEducationResults = chromaResults.filter(r => r.metadata.type === 'education');
+        const rawEducationResults = filteredChromaResults.filter(r => r.metadata.type === 'education');
         console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
         console.log('교육자료 하이브리드 점수:');
         rawEducationResults.slice(0, 3).forEach((edu, idx) => {
@@ -873,7 +873,7 @@ JSON 형식으로 응답:
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
-        console.log(`벡터 검색 결과: ${chromaResults.length} 건`);
+        console.log(`벡터 검색 결과: ${filteredChromaResults.length} 건`);
         console.log(`사고사례: ${hybridFilteredAccidents.length} → ${chromaAccidents.length} 건 (하이브리드 점수 상위)`);
         console.log(`교육자료: ${hybridFilteredEducation.length} → ${educationMaterials.length} 건 (하이브리드 점수 상위)`);
         console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
@@ -1132,6 +1132,8 @@ ${specialNotes || "없음"}
       let criticalKeywordFound = false;
       let educationKeywordFound = false;
       
+      console.log(`[scoring] "${title}" - 타입: ${isEducation ? 'education' : 'incident'}, 벡터점수: ${vectorScore.toFixed(3)}, 거리: ${result.distance}`);
+      
       Object.entries(keywordWeights).forEach(([keyword, weight]) => {
         if (searchText.includes(keyword.toLowerCase())) {
           keywordScore += weight;
@@ -1179,6 +1181,8 @@ ${specialNotes || "없음"}
           }
         }
         
+        console.log(`[education] "${title}" 최종점수: ${hybridScore.toFixed(3)} (벡터: ${vectorScore.toFixed(3)}, 키워드: ${keywordScore}, 불필요키워드: ${hasIrrelevantKeyword})`);
+        
         return {
           ...result,
           hybridScore,
@@ -1194,6 +1198,8 @@ ${specialNotes || "없음"}
         
         const hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
         
+        console.log(`[incident] "${title}" 최종점수: ${hybridScore.toFixed(3)} (벡터: ${vectorScore.toFixed(3)}, 키워드: ${keywordScore}, 핵심키워드: ${criticalKeywordFound})`);
+        
         return {
           ...result,
           hybridScore,
@@ -1207,10 +1213,21 @@ ${specialNotes || "없음"}
     // 하이브리드 점수 순으로 정렬
     const sorted = scoredResults.sort((a, b) => b.hybridScore - a.hybridScore);
     
-    // 교육자료는 조정된 임계값 적용 (불필요한 내용 제거를 위해 상향 조정)
+    // 교육자료는 조정된 임계값 적용 (더 관대하게 설정)
     const isEducationType = results.some(r => r.metadata?.type === 'education');
-    const threshold = isEducationType ? 0.25 : 0.5;
-    return sorted.filter(r => r.hybridScore > threshold);
+    const threshold = isEducationType ? 0.05 : 0.05; // 0.25, 0.5에서 0.05로 완화
+    
+    console.log(`[applyHybridScoring] 임계값: ${threshold}, 타입: ${isEducationType ? 'education' : 'incident'}`);
+    console.log(`[applyHybridScoring] 필터링 전 결과: ${sorted.length}개`);
+    
+    const filtered = sorted.filter(r => {
+      const pass = r.hybridScore > threshold;
+      if (!pass) console.log(`[필터링] "${r.metadata?.title}" 점수: ${r.hybridScore?.toFixed(3)} <= ${threshold} (제외)`);
+      return pass;
+    });
+    
+    console.log(`[applyHybridScoring] 필터링 후 결과: ${filtered.length}개`);
+    return filtered;
   }
 
   // 교육자료 URL 매칭 메서드
