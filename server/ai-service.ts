@@ -506,7 +506,7 @@ JSON 형식으로 응답:
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
         // 다중 검색으로 관련성 높은 결과 확보
-        let chromaResults = [];
+        let chromaResults: any[] = [];
         for (const query of searchQueries) {
           const results = await chromaDBService.searchRelevantData(query, 15);
           chromaResults = [...chromaResults, ...results];
@@ -514,7 +514,7 @@ JSON 형식으로 응답:
         
         // 중복 제거
         const uniqueResults = new Map();
-        chromaResults.forEach(r => {
+        chromaResults.forEach((r: any) => {
           const key = r.metadata?.id || r.document;
           if (!uniqueResults.has(key)) {
             uniqueResults.set(key, r);
@@ -664,7 +664,7 @@ JSON 형식으로 응답:
                 const document = r.document;
                 const lines = document.split('\n');
                 const extractField = (pattern: string, fallback = '') => {
-                  const line = lines.find(l => l.includes(pattern));
+                  const line = lines.find((l: string) => l.includes(pattern));
                   return line ? line.split(':')[1]?.trim() || fallback : fallback;
                 };
                 
@@ -776,7 +776,7 @@ JSON 형식으로 응답:
 
           // 조문의 실제 내용 추출 (전체 텍스트)
           let fullContent = '';
-          const lines = content.split('\n').filter(line => line.trim().length > 0);
+          const lines = content.split('\n').filter((line: string) => line.trim().length > 0);
           
           // 조문 시작 위치 찾기
           let startIndex = -1;
@@ -802,7 +802,7 @@ JSON 형식으로 응답:
             fullContent = contentLines.join(' ');
           } else {
             // 조문을 찾을 수 없으면 전체 내용 사용
-            const meaningfulLines = lines.filter(line => 
+            const meaningfulLines = lines.filter((line: string) => 
               !line.includes('법제처') && 
               !line.includes('국가법령정보센터') &&
               !line.includes('고용노동부') &&
@@ -1206,7 +1206,7 @@ ${specialNotes || "없음"}
             
             // 키워드 기반 매칭
             const titleWords = searchTitle.split(/\s+/);
-            return titleWords.some(word => word.length > 1 && eduTitle.includes(word));
+            return titleWords.some((word: string) => word.length > 1 && eduTitle.includes(word));
           });
         }
         

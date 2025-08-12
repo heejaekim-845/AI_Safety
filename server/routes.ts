@@ -1076,7 +1076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`부분 재구성 요청: ${category}`);
       
       // 부분 재구성 실행
-      await chromaDBService.rebuildPartialData([category]);
+      await chromaDBService.rebuildPartialData([category as "incident" | "education" | "regulation"]);
       
       // 재구성 후 통계 확인
       const stats = await chromaDBService.getStats();
@@ -1096,6 +1096,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error: any) {
+      const { category } = req.body;
       console.error(`${category} 부분 재구성 실패:`, error);
       res.status(500).json({ 
         error: error.message,

@@ -399,12 +399,12 @@ export default function Briefing() {
                       <div className="mt-4">
                         <h4 className="font-semibold mb-2">주요 위험 요인</h4>
                         <ul className="space-y-1">
-                          {briefingData.riskFactors.map((factor, index) => (
+                          {briefingData.riskFactors?.map((factor, index) => (
                             <li key={index} className="flex items-center gap-2">
                               <AlertTriangle className="w-4 h-4 text-orange-500" />
                               <span className="text-sm">{factor}</span>
                             </li>
-                          ))}
+                          )) || []}
                         </ul>
                       </div>
                     </CardContent>
@@ -455,7 +455,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {briefingData.requiredTools.map((tool, index) => {
+                        {briefingData.requiredTools?.map((tool, index) => {
                           const toolItem = typeof tool === 'string' ? { name: tool, source: 'registered' } : tool;
                           return (
                             <li key={index} className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export default function Briefing() {
                               )}
                             </li>
                           );
-                        })}
+                        }) || []}
                       </ul>
                     </CardContent>
                   </Card>
@@ -482,7 +482,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {briefingData.requiredSafetyEquipment.map((equipment, index) => {
+                        {briefingData.requiredSafetyEquipment?.map((equipment, index) => {
                           const equipmentItem = typeof equipment === 'string' ? { name: equipment, source: 'registered' } : equipment;
                           return (
                             <li key={index} className="flex items-center gap-2">
@@ -495,7 +495,7 @@ export default function Briefing() {
                               )}
                             </li>
                           );
-                        })}
+                        }) || []}
                       </ul>
                     </CardContent>
                   </Card>
@@ -511,7 +511,7 @@ export default function Briefing() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {briefingData.safetyRecommendations.map((recommendation, index) => (
+                      {briefingData.safetyRecommendations?.map((recommendation, index) => (
                         <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
                           <div className="flex items-start gap-2">
                             <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
@@ -520,7 +520,7 @@ export default function Briefing() {
                             <span className="text-green-800 text-sm leading-relaxed">{recommendation}</span>
                           </div>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
                   </CardContent>
                 </Card>
@@ -660,7 +660,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-6">
-                        {briefingData.relatedIncidents.map((accident: any, index: number) => (
+                        {briefingData.relatedIncidents?.map((accident: any, index: number) => (
                           <div key={index} className="border border-orange-200 rounded-lg p-5 bg-white shadow-sm">
                             {/* Header with title and severity badge */}
                             <div className="flex items-start justify-between mb-4">
@@ -774,7 +774,7 @@ export default function Briefing() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-6">
-                        {briefingData.quizQuestions.map((quiz: any, quizIndex) => {
+                        {briefingData.quizQuestions?.map((quiz: any, quizIndex) => {
                           const userAnswer = quizAnswers[quizIndex];
                           const hasAnswered = userAnswer !== undefined;
                           
@@ -782,7 +782,7 @@ export default function Briefing() {
                             <div key={quizIndex} className="border rounded-lg p-4">
                               <h4 className="font-medium mb-4">Q{quizIndex + 1}. {quiz.question}</h4>
                               <div className="space-y-2 mb-4">
-                                {quiz.options.map((option: string, optIndex: number) => {
+                                {quiz.options?.map((option: string, optIndex: number) => {
                                   const isCorrect = optIndex === quiz.correctAnswer;
                                   const isSelected = userAnswer === optIndex;
                                   
