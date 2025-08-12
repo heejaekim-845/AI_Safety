@@ -459,79 +459,122 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // 설비 특성에 맞는 정확한 검색 쿼리 생성
-        let searchQuery = `${equipmentInfo.name} ${workType.name}`;
-        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
-          searchQuery = `${equipmentInfo.name} 감전 전기 점검`;
-        }
-        console.log(`RAG 벡터 검색 - 주요 쿼리: "${searchQuery}"`);
-        
-        // 충분한 검색 결과 확보
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 40);
-        
-        // 전기 설비의 경우에만 규정 검색 추가 (더 구체적인 검색)
-        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
-          console.log('전기 설비 규정 검색 추가');
-          const regulationQueries = [
-            '전기작업 감전방지 절연용 보호구',
-            '정전전로 인근 전기작업',
-            '활선작업 절연용 보호구',
-            '고압전기설비 접근금지',
-            '전기설비 점검 안전조치'
+        // 설비별 특화 검색 쿼리 생성
+        let searchQueries = [];
+        let regulationQueries = [];
+        let educationQueries = [];
+
+        if (equipmentInfo.name.includes('kV') && equipmentInfo.name.includes('GIS')) {
+          // 170kV GIS 전용 검색
+          searchQueries = [
+            `${equipmentInfo.name} 감전 사고`,
+            '가스절연개폐장치 GIS 감전',
+            '특별고압 170kV 충전부 접촉',
+            '변전소 개폐기 조작 감전'
           ];
-          
-          const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
-          
-          for (const query of regulationQueries) {
-            const additionalResults = await chromaDBService.searchRelevantData(query, 8);
-            // 전기 관련 법령 필터링 (더 완화된 조건)
-            const electricalResults = additionalResults.filter(r => {
-              const content = (r.document || '').toLowerCase();
-              const title = (r.metadata?.title || '').toLowerCase();
-              return (content.includes('전기') || content.includes('감전') || 
-                     content.includes('절연') || content.includes('활선') ||
-                     content.includes('보호구') || content.includes('차단') ||
-                     content.includes('접지') || content.includes('점검') ||
-                     title.includes('전기') || title.includes('감전') ||
-                     title.includes('규칙')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            });
-            chromaResults = [...chromaResults, ...electricalResults];
-            
-            // 새로운 ID들 추가
-            electricalResults.forEach(r => existingIds.add(r.metadata?.id || r.document));
-          }
+          regulationQueries = [
+            '제323조 절연용 보호구 착용',
+            '제319조 정전전로 작업',
+            '제320조 정전전로 인근 전기작업',
+            '특별고압 전기설비 안전거리',
+            '개폐기 조작 안전조치'
+          ];
+          educationQueries = [
+            '특별고압 전기안전',
+            'GIS 가스절연개폐장치',
+            '170kV 변전설비 안전',
+            '절연용 보호구 착용법'
+          ];
+        } else if (equipmentInfo.name.includes('kV')) {
+          // 일반 고압 전기설비
+          searchQueries = [`${equipmentInfo.name} 감전`, '고압전기 충전부 접촉'];
+          regulationQueries = ['전기작업 절연용 보호구', '고압전기설비 안전거리'];
+          educationQueries = ['고압전기 안전교육'];
+        } else {
+          // 기본 검색
+          searchQueries = [`${equipmentInfo.name} ${workType.name} 사고`];
+          regulationQueries = [`${workType.name} 안전규정`];
+          educationQueries = [`${equipmentInfo.name} 안전교육`];
         }
 
-        // 결과를 타입별로 분류
-        const accidents = chromaResults.filter(r => r.metadata.type === 'incident');
-        const education = chromaResults.filter(r => r.metadata.type === 'education');
+        console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
+        
+        // 다중 검색으로 관련성 높은 결과 확보
+        let chromaResults = [];
+        for (const query of searchQueries) {
+          const results = await chromaDBService.searchRelevantData(query, 15);
+          chromaResults = [...chromaResults, ...results];
+        }
+        
+        // 중복 제거
+        const uniqueResults = new Map();
+        chromaResults.forEach(r => {
+          const key = r.metadata?.id || r.document;
+          if (!uniqueResults.has(key)) {
+            uniqueResults.set(key, r);
+          }
+        });
+        chromaResults = Array.from(uniqueResults.values());
+        
+        // 법령 검색 (설비별 특화)
+        console.log(`법령 특화 검색: ${regulationQueries.length}개 쿼리`);
+        const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+        
+        for (const query of regulationQueries) {
+          const additionalResults = await chromaDBService.searchRelevantData(query, 6);
+          // 170kV GIS 특화 법령 필터링 (매우 구체적)
+          const relevantRegulations = additionalResults.filter(r => {
+            const content = (r.document || '').toLowerCase();
+            const title = (r.metadata?.title || '').toLowerCase();
+            
+            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
+              return (content.includes('절연용') || content.includes('보호구') || 
+                     content.includes('전기작업') || content.includes('감전') ||
+                     content.includes('정전전로') || content.includes('특별고압') ||
+                     content.includes('개폐기') || content.includes('안전거리')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            } else {
+              return (content.includes('전기') || content.includes('감전') || 
+                     content.includes('절연') || title.includes('전기')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            }
+          });
+          chromaResults = [...chromaResults, ...relevantRegulations];
+          
+          relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
+        }
+        
+        // 교육자료 검색 (설비별 특화)
+        console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
+        for (const query of educationQueries) {
+          const eduResults = await chromaDBService.searchRelevantData(query, 6);
+          const relevantEducation = eduResults.filter(r => {
+            const content = (r.document || '').toLowerCase();
+            const title = (r.metadata?.title || '').toLowerCase();
+            
+            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
+              return (title.includes('전기') || title.includes('고압') ||
+                     title.includes('절연') || title.includes('보호구') ||
+                     title.includes('GIS') || title.includes('변전') ||
+                     content.includes('170kV') || content.includes('특별고압')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            } else {
+              return (title.includes('전기') || title.includes('안전') ||
+                     content.includes('전기')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            }
+          });
+          chromaResults = [...chromaResults, ...relevantEducation];
+          
+          relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
+        }
+
+        // 특화 검색 결과를 타입별로 분류 (이미 필터링됨)
+        const filteredAccidents = chromaResults.filter(r => r.metadata.type === 'incident');
+        const filteredEducation = chromaResults.filter(r => r.metadata.type === 'education');
         const regulations = chromaResults.filter(r => r.metadata.type === 'regulation');
         
-        console.log(`벡터 검색 결과: incidents=${accidents.length}, education=${education.length}, regulation=${regulations.length}`);
-        
-        // 전기 설비의 경우 관련성 필터링 적용
-        let filteredAccidents = accidents;
-        let filteredEducation = education;
-        
-        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
-          const electricalKeywords = ['전기', 'kV', 'GIS', '감전', '고압', '큐비클', '특별고압', '충전부', '절연', '정전'];
-          
-          filteredAccidents = accidents.filter(r => 
-            electricalKeywords.some(keyword => r.metadata.title.includes(keyword))
-          );
-          
-          filteredEducation = education.filter(r => 
-            electricalKeywords.some(keyword => r.metadata.title.includes(keyword)) || 
-            r.metadata.title.includes('안전') || 
-            r.metadata.title.includes('보호구') ||
-            r.metadata.title.includes('교육') ||
-            r.metadata.title.includes('작업') ||
-            r.metadata.title.includes('점검')
-          );
-          
-          console.log(`전기 관련성 필터링: 사고사례 ${accidents.length}→${filteredAccidents.length}건, 교육자료 ${education.length}→${filteredEducation.length}건`);
-        }
+        console.log(`특화 검색 결과: incidents=${filteredAccidents.length}, education=${filteredEducation.length}, regulation=${regulations.length}`);
         
         // 사고사례: 벡터 유사도 상위 5건 (알려진 전기 사고사례 정보와 매칭)
         const knownAccidents = this.getKnownElectricalAccidents();
