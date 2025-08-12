@@ -409,29 +409,36 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // 전기 설비에 최적화된 검색 쿼리 생성
+        // 설비 특성에 맞는 정확한 검색 쿼리 생성
         let searchQuery = `${equipmentInfo.name} ${workType.name}`;
         if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
-          searchQuery = `${equipmentInfo.name} 감전 전기 점검 고압`;
+          searchQuery = `${equipmentInfo.name} 감전 전기 점검`;
         }
-        console.log(`RAG 벡터 검색 - 쿼리: "${searchQuery}"`);
+        console.log(`RAG 벡터 검색 - 주요 쿼리: "${searchQuery}"`);
         
-        // 단순 벡터 유사도 검색
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 50);
+        // 관련성 높은 소량 검색으로 품질 향상
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 20);
         
-        // 전기 설비의 경우 규정 검색 추가  
-        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
-          const electricalQueries = [
-            '제323조 제319조 제320조',  // 직접 조문 번호 검색
-            '절연용 보호구',
-            '정전전로',
-            '충전부 감전',
-            '전기기계기구 안전'
+        // 전기 설비의 경우에만 규정 검색 추가 (중복 제거 포함)
+        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
+          console.log('전기 설비 규정 검색 추가');
+          const regulationQueries = [
+            '제323조 절연용 보호구',
+            '제319조 정전전로',
+            '제320조 전기작업'
           ];
           
-          for (const query of electricalQueries) {
-            const additionalResults = await chromaDBService.searchRelevantData(query, 15);
-            chromaResults = [...chromaResults, ...additionalResults];
+          const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+          
+          for (const query of regulationQueries) {
+            const additionalResults = await chromaDBService.searchRelevantData(query, 8);
+            const uniqueResults = additionalResults.filter(r => 
+              !existingIds.has(r.metadata?.id || r.document)
+            );
+            chromaResults = [...chromaResults, ...uniqueResults];
+            
+            // 새로운 ID들 추가
+            uniqueResults.forEach(r => existingIds.add(r.metadata?.id || r.document));
           }
         }
 
@@ -442,8 +449,28 @@ JSON 형식으로 응답:
         
         console.log(`벡터 검색 결과: incidents=${accidents.length}, education=${education.length}, regulation=${regulations.length}`);
         
-        // 사고사례: 벡터 유사도 상위 5건
-        chromaAccidents = accidents
+        // 전기 설비의 경우 관련성 필터링 적용
+        let filteredAccidents = accidents;
+        let filteredEducation = education;
+        
+        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
+          const electricalKeywords = ['전기', 'kV', 'GIS', '감전', '고압', '큐비클', '특별고압', '충전부', '절연', '정전'];
+          
+          filteredAccidents = accidents.filter(r => 
+            electricalKeywords.some(keyword => r.metadata.title.includes(keyword))
+          );
+          
+          filteredEducation = education.filter(r => 
+            electricalKeywords.some(keyword => r.metadata.title.includes(keyword)) || 
+            r.metadata.title.includes('안전') || 
+            r.metadata.title.includes('보호구')
+          );
+          
+          console.log(`전기 관련성 필터링: 사고사례 ${accidents.length}→${filteredAccidents.length}건, 교육자료 ${education.length}→${filteredEducation.length}건`);
+        }
+        
+        // 사고사례: 벡터 유사도 상위 5건 (관련성 필터링 적용)
+        chromaAccidents = filteredAccidents
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 5)
           .map(r => ({
@@ -455,8 +482,8 @@ JSON 형식으로 응답:
             relevanceScore: (1 - r.distance).toFixed(3)
           }));
         
-        // 교육자료: 벡터 유사도 상위 6건
-        educationMaterials = education
+        // 교육자료: 벡터 유사도 상위 6건 (관련성 필터링 적용)
+        educationMaterials = filteredEducation
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 6)
           .map(r => ({
