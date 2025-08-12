@@ -4,6 +4,18 @@ import { chromaDBService } from "./chromadb-service";
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Timing utilities for performance analysis
+const t0 = () => performance.now();
+const ms = (s: number) => `${s.toFixed(1)}ms`;
+async function timeit<T>(name: string, f: () => Promise<T>): Promise<T> {
+  const s = t0();
+  try { 
+    return await f(); 
+  } finally { 
+    console.log(`[AIService][timing] ${name}: ${ms(t0() - s)}`); 
+  }
+}
+
 // Using Google Gemini for AI-powered safety analysis
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -450,7 +462,10 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    try {
+    return await timeit(
+      "generateEnhancedSafetyBriefing TOTAL",
+      async () => {
+        try {
       // Get relevant accident cases using both ChromaDB RAG and simple RAG
       let relevantAccidents: AccidentCase[] = [];
       let workTypeAccidents: AccidentCase[] = [];
@@ -506,11 +521,17 @@ JSON 형식으로 응답:
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
         // 다중 검색으로 관련성 높은 결과 확보
-        let chromaResults: any[] = [];
-        for (const query of searchQueries) {
-          const results = await chromaDBService.searchRelevantData(query, 15);
-          chromaResults = [...chromaResults, ...results];
-        }
+        const chromaResults = await timeit(
+          `chroma.search parallel ${searchQueries.length}q`, 
+          async () => {
+            let results: any[] = [];
+            for (const query of searchQueries) {
+              const queryResults = await chromaDBService.searchRelevantData(query, 15);
+              results = [...results, ...queryResults];
+            }
+            return results;
+          }
+        );
         
         // 중복 제거
         const uniqueResults = new Map();
@@ -527,7 +548,10 @@ JSON 형식으로 응답:
         const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
         
         for (const query of regulationQueries) {
-          const additionalResults = await chromaDBService.searchRelevantData(query, 6);
+          const additionalResults = await timeit(
+            `regulation.search "${query.substring(0, 20)}..."`, 
+            () => chromaDBService.searchRelevantData(query, 6)
+          );
           // 170kV GIS 특화 법령 필터링 (매우 구체적)
           const relevantRegulations = additionalResults.filter(r => {
             const content = (r.document || '').toLowerCase();
@@ -553,7 +577,10 @@ JSON 형식으로 응답:
         // 교육자료 검색 (설비별 특화, 더 많은 결과)
         console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
         for (const query of educationQueries) {
-          const eduResults = await chromaDBService.searchRelevantData(query, 8); // 검색량 증가
+          const eduResults = await timeit(
+            `education.search "${query.substring(0, 20)}..."`, 
+            () => chromaDBService.searchRelevantData(query, 8)
+          ); // 검색량 증가
           const relevantEducation = eduResults.filter(r => {
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
@@ -687,8 +714,9 @@ JSON 형식으로 응답:
             });
         
         // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
-        const educationDataWithUrls = await this.matchEducationWithUrls(
-          hybridFilteredEducation
+        const educationDataWithUrls = await timeit(
+          `matchEducationWithUrls x${hybridFilteredEducation.length}`,
+          () => this.matchEducationWithUrls(hybridFilteredEducation)
         );
         
         educationMaterials = educationDataWithUrls.map(r => ({
@@ -830,14 +858,17 @@ JSON 형식으로 응답:
           .slice(0, 10);
 
         // AI를 사용하여 각 조문 요약
-        safetyRegulations = await Promise.all(
-          sortedRegulations.map(async (reg) => {
-            const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
-            return {
-              ...reg,
-              summary: summary
-            };
-          })
+        safetyRegulations = await timeit(
+          `summarizeRegulationCached x${sortedRegulations.length}`,
+          () => Promise.all(
+            sortedRegulations.map(async (reg) => {
+              const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
+              return {
+                ...reg,
+                summary: summary
+              };
+            })
+          )
         );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
@@ -946,14 +977,17 @@ ${specialNotes || "없음"}
   "safetySlogan": "오늘의 안전 슬로건"
 }`;
 
-      const response = await genai.models.generateContent({
-        model: "gemini-2.5-flash",
-        config: {
-          systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
-          responseMimeType: "application/json"
-        },
-        contents: prompt
-      });
+      const response = await timeit(
+        "gemini.generateContent(briefing)",
+        () => genai.models.generateContent({
+          model: "gemini-2.5-flash",
+          config: {
+            systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
+            responseMimeType: "application/json"
+          },
+          contents: prompt
+        })
+      );
 
       const result = JSON.parse(response.text || "{}");
       
@@ -1011,36 +1045,38 @@ ${specialNotes || "없음"}
 
       return result;
 
-    } catch (error) {
-      console.error("Enhanced safety briefing generation error:", error);
-      
-      // Fallback to basic briefing without RAG, but include registered checklist items
-      const fallbackTools = this.mergeRegisteredAndAIItems(
-        workType.requiredTools || [],
-        ["기본 작업도구"]
-      );
-      
-      const fallbackSafetyEquipment = this.mergeRegisteredAndAIItems(
-        workType.requiredEquipment || [],
-        ["안전모", "안전화", "보안경"]
-      );
-      
-      return {
-        workSummary: `${equipmentInfo.name}에서 ${workType.name} 작업을 수행합니다.`,
-        riskFactors: ["기본 안전수칙 준수"],
-        riskAssessment: { totalScore: 5, riskFactors: [] },
-        requiredTools: fallbackTools,
-        requiredSafetyEquipment: fallbackSafetyEquipment,
-        weatherConsiderations: ["현재 날씨 조건 확인"],
-        safetyRecommendations: ["안전수칙을 준수하며 작업하세요"],
-        regulations: [],
-        relatedIncidents: [],
-        educationMaterials: [],
-        quizQuestions: [],
-        safetySlogan: "안전이 최우선입니다",
-        relatedAccidentCases: []
-      };
-    }
+        } catch (error) {
+          console.error("Enhanced safety briefing generation error:", error);
+          
+          // Fallback to basic briefing without RAG, but include registered checklist items
+          const fallbackTools = this.mergeRegisteredAndAIItems(
+            workType.requiredTools || [],
+            ["기본 작업도구"]
+          );
+          
+          const fallbackSafetyEquipment = this.mergeRegisteredAndAIItems(
+            workType.requiredEquipment || [],
+            ["안전모", "안전화", "보안경"]
+          );
+          
+          return {
+            workSummary: `${equipmentInfo.name}에서 ${workType.name} 작업을 수행합니다.`,
+            riskFactors: ["기본 안전수칙 준수"],
+            riskAssessment: { totalScore: 5, riskFactors: [] },
+            requiredTools: fallbackTools,
+            requiredSafetyEquipment: fallbackSafetyEquipment,
+            weatherConsiderations: ["현재 날씨 조건 확인"],
+            safetyRecommendations: ["안전수칙을 준수하며 작업하세요"],
+            regulations: [],
+            relatedIncidents: [],
+            educationMaterials: [],
+            quizQuestions: [],
+            safetySlogan: "안전이 최우선입니다",
+            relatedAccidentCases: []
+          };
+        }
+      }
+    );
   }
 
   // 설비별 핵심 키워드 가중치 정의
@@ -1389,13 +1425,16 @@ ${content}
 
 250자 이내로 핵심 내용만 요약해주세요.`;
 
-        const response = await genai.models.generateContent({
-          model: "gemini-2.5-flash",
-          config: {
-            systemInstruction: "당신은 법령 전문가입니다. 주어진 조문의 내용을 정확하게 요약하되, 내용을 변경하거나 왜곡하지 않고 원문의 의미를 그대로 유지합니다.",
-          },
-          contents: prompt
-        });
+        const response = await timeit(
+          `summarizeRegulation AI.generateContent`,
+          () => genai.models.generateContent({
+            model: "gemini-2.5-flash",
+            config: {
+              systemInstruction: "당신은 법령 전문가입니다. 주어진 조문의 내용을 정확하게 요약하되, 내용을 변경하거나 왜곡하지 않고 원문의 의미를 그대로 유지합니다.",
+            },
+            contents: prompt
+          })
+        );
 
         const aiSummary = response.text?.trim();
         if (aiSummary && aiSummary.length > 10) {
