@@ -23,7 +23,6 @@ export interface RiskAnalysis {
 
 export class AIService {
   private accidentDataCache?: any[];
-  private educationDataCache: any[] | null = null; // 교육자료 데이터 캐싱
 
   // 알려진 전기 관련 사고사례 정보 (매칭용)
   private getKnownElectricalAccidents(): Record<string, any> {
@@ -500,9 +499,12 @@ JSON 형식으로 응답:
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
-        // 단일 검색으로 최적화 (가장 중요한 쿼리만 사용)
-        const primaryQuery = searchQueries[0]; // 첫 번째 쿼리만 사용
-        let chromaResults = await chromaDBService.searchRelevantData(primaryQuery, 20);
+        // 다중 검색으로 관련성 높은 결과 확보
+        let chromaResults = [];
+        for (const query of searchQueries) {
+          const results = await chromaDBService.searchRelevantData(query, 15);
+          chromaResults = [...chromaResults, ...results];
+        }
         
         // 중복 제거
         const uniqueResults = new Map();
@@ -514,8 +516,58 @@ JSON 형식으로 응답:
         });
         chromaResults = Array.from(uniqueResults.values());
         
-        // 속도 최적화를 위해 추가 검색 생략
-        console.log('속도 최적화를 위해 추가 검색 생략');
+        // 법령 검색 (설비별 특화)
+        console.log(`법령 특화 검색: ${regulationQueries.length}개 쿼리`);
+        const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
+        
+        for (const query of regulationQueries) {
+          const additionalResults = await chromaDBService.searchRelevantData(query, 6);
+          // 170kV GIS 특화 법령 필터링 (매우 구체적)
+          const relevantRegulations = additionalResults.filter(r => {
+            const content = (r.document || '').toLowerCase();
+            const title = (r.metadata?.title || '').toLowerCase();
+            
+            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
+              return (content.includes('절연용') || content.includes('보호구') || 
+                     content.includes('전기작업') || content.includes('감전') ||
+                     content.includes('정전전로') || content.includes('특별고압') ||
+                     content.includes('개폐기') || content.includes('안전거리')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            } else {
+              return (content.includes('전기') || content.includes('감전') || 
+                     content.includes('절연') || title.includes('전기')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            }
+          });
+          chromaResults = [...chromaResults, ...relevantRegulations];
+          
+          relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
+        }
+        
+        // 교육자료 검색 (설비별 특화)
+        console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
+        for (const query of educationQueries) {
+          const eduResults = await chromaDBService.searchRelevantData(query, 6);
+          const relevantEducation = eduResults.filter(r => {
+            const content = (r.document || '').toLowerCase();
+            const title = (r.metadata?.title || '').toLowerCase();
+            
+            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
+              return (title.includes('전기') || title.includes('고압') ||
+                     title.includes('절연') || title.includes('보호구') ||
+                     title.includes('GIS') || title.includes('변전') ||
+                     content.includes('170kV') || content.includes('특별고압')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            } else {
+              return (title.includes('전기') || title.includes('안전') ||
+                     content.includes('전기')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            }
+          });
+          chromaResults = [...chromaResults, ...relevantEducation];
+          
+          relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
+        }
 
         // 하이브리드 검색: 벡터 유사도 + 키워드 점수 조합
         const keywordWeights = this.getEquipmentKeywords(equipmentInfo.name);
@@ -762,11 +814,16 @@ JSON 형식으로 응답:
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 10);
 
-        // 법령 요약을 완전히 생략하고 원문만 사용 (속도 최우선)
-        safetyRegulations = sortedRegulations.map(reg => ({
-          ...reg,
-          summary: reg.fullContent.slice(0, 150) + '...' // 원문 일부만 사용
-        }));
+        // AI를 사용하여 각 조문 요약
+        safetyRegulations = await Promise.all(
+          sortedRegulations.map(async (reg) => {
+            const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
+            return {
+              ...reg,
+              summary: summary
+            };
+          })
+        );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
@@ -799,18 +856,42 @@ JSON 형식으로 응답:
         ? this.formatChromaAccidentCases(chromaAccidents)
         : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
 
-      const prompt = `${equipmentInfo.name} ${workType.name} 작업 안전 브리핑을 생성해주세요.
+      const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
-설비: ${equipmentInfo.name} (위험도: ${equipmentInfo.riskLevel})
-작업: ${workType.name} (${workType.estimatedDuration}분)
-날씨: ${weatherData.condition}, ${weatherData.temperature}°C
+【설비 정보】
+- 설비명: ${equipmentInfo.name}
+- 위치: ${equipmentInfo.location}
+- 위험도: ${equipmentInfo.riskLevel}
+- 주요 위험 요소: ${this.formatRisks(equipmentInfo)}
+- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
 
-필수장비: ${workType.requiredEquipment?.join(", ") || "없음"}
-필수도구: ${workType.requiredTools?.join(", ") || "없음"}
+【작업 정보】
+- 작업 유형: ${workType.name}
+- 작업 설명: ${workType.description}
+- 예상 소요 시간: ${workType.estimatedDuration}분
+- 등록된 필수 안전장비: ${workType.requiredEquipment?.join(", ") || "없음"}
+- 등록된 필수 작업도구: ${workType.requiredTools?.join(", ") || "없음"}
 
-사고사례: ${accidentContext.slice(0, 500)}...
+【날씨 정보】
+- 현재 날씨: ${weatherData.condition}
+- 온도: ${weatherData.temperature}°C
+- 습도: ${weatherData.humidity}%
+- 풍속: ${weatherData.windSpeed}m/s
+- 안전 주의사항: ${weatherData.safetyWarnings?.join(", ") || "없음"}
 
-${safetyRegulations.length > 0 ? `안전규칙: ${this.formatSafetyRegulations(safetyRegulations).slice(0, 300)}...` : ''}
+【관련 사고사례】
+${accidentContext}
+
+${educationMaterials.length > 0 ? `【관련 교육자료】
+${this.formatEducationMaterials(educationMaterials)}` : ''}
+
+${safetyRegulations.length > 0 ? `【관련 안전규칙】
+${this.formatSafetyRegulations(safetyRegulations)}` : ''}
+
+【특이사항】
+${specialNotes || "없음"}
+
+등록된 필수 안전장비와 작업도구를 우선적으로 포함하되, 추가로 필요하다고 판단되는 항목들을 AI 추천으로 포함해주세요.
 
 다음 형식으로 JSON 응답을 제공해주세요:
 {
@@ -853,9 +934,8 @@ ${safetyRegulations.length > 0 ? `안전규칙: ${this.formatSafetyRegulations(s
       const response = await genai.models.generateContent({
         model: "gemini-2.5-flash",
         config: {
-          systemInstruction: "간단한 안전 브리핑 생성. 핵심 내용만 포함.",
-          responseMimeType: "application/json",
-          maxOutputTokens: 1000 // 토큰 제한으로 응답 속도 향상
+          systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
+          responseMimeType: "application/json"
         },
         contents: prompt
       });
@@ -1026,19 +1106,15 @@ ${safetyRegulations.length > 0 ? `안전규칙: ${this.formatSafetyRegulations(s
   // 교육자료 URL 매칭 메서드
   private async matchEducationWithUrls(educationResults: any[]): Promise<any[]> {
     try {
-      // 캐싱된 데이터가 없으면 로드
-      if (!this.educationDataCache) {
-        const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
-        if (!fs.existsSync(educationDataPath)) {
-          console.warn('교육자료 URL 매칭용 파일을 찾을 수 없습니다:', educationDataPath);
-          return educationResults;
-        }
-        
-        this.educationDataCache = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
-        console.log(`교육자료 URL 매칭용 데이터 ${this.educationDataCache.length}건 캐싱`);
+      // education_data.json 파일 로드
+      const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
+      if (!fs.existsSync(educationDataPath)) {
+        console.warn('교육자료 URL 매칭용 파일을 찾을 수 없습니다:', educationDataPath);
+        return educationResults;
       }
       
-      const educationData = this.educationDataCache;
+      const educationData = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
+      console.log(`교육자료 URL 매칭용 데이터 ${educationData.length}건 로드`);
       
       return educationResults.map(result => {
         const title = result.metadata.title;
