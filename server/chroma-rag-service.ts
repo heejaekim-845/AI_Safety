@@ -182,11 +182,13 @@ export class ChromaRAGService {
         console.log(`사고사례 ${this.accidentData.length}건 로드 완료`);
       }
 
-      // 교육자료 데이터 로드
-      const educationDataPath = path.join(process.cwd(), 'data', 'education_data.json');
+      // 교육자료 데이터 로드 (attached_assets에서)
+      const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
       if (fs.existsSync(educationDataPath)) {
         this.educationData = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
         console.log(`교육자료 ${this.educationData.length}건 로드 완료`);
+      } else {
+        console.warn('교육자료 파일을 찾을 수 없습니다:', educationDataPath);
       }
 
       // 안전보건 법규 데이터 추가 - 전기설비 중심으로 확장
@@ -478,12 +480,45 @@ export class ChromaRAGService {
         expandedTerms.push('교육', '훈련', '안전', '예방');
       }
       
-      const relevantEducation = this.educationData.filter(edu => {
+      // 관련도 점수 계산으로 검색 개선
+      const scoredEducation = this.educationData.map(edu => {
         const searchText = `${edu.title} ${edu.keywords} ${edu.content} ${edu.type}`.toLowerCase();
-        return expandedTerms.some(term => searchText.includes(term));
+        
+        let score = 0;
+        expandedTerms.forEach(term => {
+          if (term && searchText.includes(term)) {
+            // 제목에 포함된 경우 더 높은 점수
+            if (edu.title.toLowerCase().includes(term)) {
+              score += 3;
+            }
+            // 키워드에 포함된 경우 중간 점수
+            else if (edu.keywords.toLowerCase().includes(term)) {
+              score += 2;
+            }
+            // 내용이나 타입에 포함된 경우 기본 점수
+            else {
+              score += 1;
+            }
+          }
+        });
+        
+        return { education: edu, score };
       });
+      
+      // 점수순으로 정렬하고 점수가 0보다 큰 것들만 반환 (URL 포함)
+      const results = scoredEducation
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(item => ({
+          ...item.education,
+          // URL이 있으면 그대로, 없으면 공백으로 유지
+          url: item.education.url || '',
+          file_url: item.education.file_url || ''
+        }));
 
-      return relevantEducation.slice(0, limit);
+      console.log(`교육자료 검색 결과: ${results.length}건 (URL 포함)`);
+      return results;
 
     } catch (error) {
       console.error('교육자료 검색 실패:', error);

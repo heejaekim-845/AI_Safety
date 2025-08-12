@@ -588,15 +588,22 @@ JSON 형식으로 응답:
               }
             });
         
-        // 교육자료: 벡터 유사도 상위 6건 (관련성 필터링 적용)
-        educationMaterials = filteredEducation
-          .sort((a, b) => a.distance - b.distance)
-          .slice(0, 6)
-          .map(r => ({
-            title: r.metadata.title,
-            content: r.document.split('\n')[1] || '',
-            category: r.metadata.category
-          }));
+        // 교육자료: 벡터 유사도 상위 6건 (관련성 필터링 적용) + URL 매칭
+        const educationDataWithUrls = await this.matchEducationWithUrls(
+          filteredEducation
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 6)
+        );
+        
+        educationMaterials = educationDataWithUrls.map(r => ({
+          title: r.metadata.title,
+          content: r.document.split('\n')[1] || '',
+          category: r.metadata.category,
+          url: r.url || '',
+          type: r.type || 'unknown',
+          date: r.date || '',
+          keywords: r.keywords || ''
+        }));
         
         // 법령: 벡터 유사도 상위 5건
         const regulationResults = regulations
@@ -937,6 +944,71 @@ ${specialNotes || "없음"}
         safetySlogan: "안전이 최우선입니다",
         relatedAccidentCases: []
       };
+    }
+  }
+
+  // 교육자료 URL 매칭 메서드
+  private async matchEducationWithUrls(educationResults: any[]): Promise<any[]> {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      // education_data.json 파일 로드
+      const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
+      if (!fs.existsSync(educationDataPath)) {
+        console.warn('교육자료 URL 매칭용 파일을 찾을 수 없습니다:', educationDataPath);
+        return educationResults;
+      }
+      
+      const educationData = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
+      console.log(`교육자료 URL 매칭용 데이터 ${educationData.length}건 로드`);
+      
+      return educationResults.map(result => {
+        const title = result.metadata.title;
+        
+        // 제목으로 완전 매칭 시도
+        let matchedEducation = educationData.find((edu: any) => 
+          edu.title === title
+        );
+        
+        // 완전 매칭이 안 되면 부분 매칭 시도
+        if (!matchedEducation) {
+          matchedEducation = educationData.find((edu: any) => {
+            const eduTitle = edu.title.toLowerCase().trim();
+            const searchTitle = title.toLowerCase().trim();
+            
+            // 키워드 기반 매칭
+            const titleWords = searchTitle.split(/\s+/);
+            return titleWords.some(word => word.length > 1 && eduTitle.includes(word));
+          });
+        }
+        
+        if (matchedEducation) {
+          console.log(`✅ 교육자료 URL 매칭 성공: ${title} -> ${matchedEducation.url}`);
+          return {
+            ...result,
+            url: matchedEducation.url,
+            file_url: matchedEducation.file_url,
+            type: matchedEducation.type,
+            date: matchedEducation.date,
+            keywords: matchedEducation.keywords
+          };
+        } else {
+          console.log(`❌ 교육자료 URL 매칭 실패: ${title}`);
+          return {
+            ...result,
+            url: '',
+            file_url: '',
+            type: 'unknown',
+            date: '',
+            keywords: ''
+          };
+        }
+      });
+      
+    } catch (error) {
+      console.error('교육자료 URL 매칭 중 오류:', error);
+      return educationResults;
     }
   }
 
