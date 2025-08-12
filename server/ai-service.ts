@@ -466,8 +466,8 @@ JSON 형식으로 응답:
         }
         console.log(`RAG 벡터 검색 - 주요 쿼리: "${searchQuery}"`);
         
-        // 관련성 높은 소량 검색으로 품질 향상
-        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 20);
+        // 충분한 검색 결과 확보
+        let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 40);
         
         // 전기 설비의 경우에만 규정 검색 추가 (더 구체적인 검색)
         if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
@@ -483,14 +483,17 @@ JSON 형식으로 응답:
           const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
           
           for (const query of regulationQueries) {
-            const additionalResults = await chromaDBService.searchRelevantData(query, 5);
-            // 전기 관련 법령만 필터링
+            const additionalResults = await chromaDBService.searchRelevantData(query, 8);
+            // 전기 관련 법령 필터링 (더 완화된 조건)
             const electricalResults = additionalResults.filter(r => {
               const content = (r.document || '').toLowerCase();
               const title = (r.metadata?.title || '').toLowerCase();
               return (content.includes('전기') || content.includes('감전') || 
                      content.includes('절연') || content.includes('활선') ||
-                     title.includes('전기') || title.includes('감전')) &&
+                     content.includes('보호구') || content.includes('차단') ||
+                     content.includes('접지') || content.includes('점검') ||
+                     title.includes('전기') || title.includes('감전') ||
+                     title.includes('규칙')) &&
                      !existingIds.has(r.metadata?.id || r.document);
             });
             chromaResults = [...chromaResults, ...electricalResults];
@@ -521,7 +524,10 @@ JSON 형식으로 응답:
           filteredEducation = education.filter(r => 
             electricalKeywords.some(keyword => r.metadata.title.includes(keyword)) || 
             r.metadata.title.includes('안전') || 
-            r.metadata.title.includes('보호구')
+            r.metadata.title.includes('보호구') ||
+            r.metadata.title.includes('교육') ||
+            r.metadata.title.includes('작업') ||
+            r.metadata.title.includes('점검')
           );
           
           console.log(`전기 관련성 필터링: 사고사례 ${accidents.length}→${filteredAccidents.length}건, 교육자료 ${education.length}→${filteredEducation.length}건`);
