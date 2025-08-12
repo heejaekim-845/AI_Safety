@@ -469,26 +469,34 @@ JSON 형식으로 응답:
         // 관련성 높은 소량 검색으로 품질 향상
         let chromaResults = await chromaDBService.searchRelevantData(searchQuery, 20);
         
-        // 전기 설비의 경우에만 규정 검색 추가 (중복 제거 포함)
+        // 전기 설비의 경우에만 규정 검색 추가 (더 구체적인 검색)
         if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS')) {
           console.log('전기 설비 규정 검색 추가');
           const regulationQueries = [
-            '제323조 절연용 보호구',
-            '제319조 정전전로',
-            '제320조 전기작업'
+            '전기작업 감전방지 절연용 보호구',
+            '정전전로 인근 전기작업',
+            '활선작업 절연용 보호구',
+            '고압전기설비 접근금지',
+            '전기설비 점검 안전조치'
           ];
           
           const existingIds = new Set(chromaResults.map(r => r.metadata?.id || r.document));
           
           for (const query of regulationQueries) {
-            const additionalResults = await chromaDBService.searchRelevantData(query, 8);
-            const uniqueResults = additionalResults.filter(r => 
-              !existingIds.has(r.metadata?.id || r.document)
-            );
-            chromaResults = [...chromaResults, ...uniqueResults];
+            const additionalResults = await chromaDBService.searchRelevantData(query, 5);
+            // 전기 관련 법령만 필터링
+            const electricalResults = additionalResults.filter(r => {
+              const content = (r.document || '').toLowerCase();
+              const title = (r.metadata?.title || '').toLowerCase();
+              return (content.includes('전기') || content.includes('감전') || 
+                     content.includes('절연') || content.includes('활선') ||
+                     title.includes('전기') || title.includes('감전')) &&
+                     !existingIds.has(r.metadata?.id || r.document);
+            });
+            chromaResults = [...chromaResults, ...electricalResults];
             
             // 새로운 ID들 추가
-            uniqueResults.forEach(r => existingIds.add(r.metadata?.id || r.document));
+            electricalResults.forEach(r => existingIds.add(r.metadata?.id || r.document));
           }
         }
 
