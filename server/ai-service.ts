@@ -591,6 +591,17 @@ JSON 형식으로 응답:
           console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${acc.hybridScore?.toFixed(3)}, 벡터: ${acc.vectorScore?.toFixed(3)}, 키워드: ${acc.keywordScore}, 핵심키워드: ${acc.criticalKeywordFound}`);
         });
         
+        // 교육자료 필터링 전후 비교
+        const rawEducationResults = chromaResults.filter(r => r.metadata.type === 'education');
+        console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
+        console.log('교육자료 하이브리드 점수:');
+        rawEducationResults.slice(0, 3).forEach((edu, idx) => {
+          const scored = this.applyHybridScoring([edu], keywordWeights)[0];
+          if (scored) {
+            console.log(`  ${idx+1}. "${edu.metadata?.title}" - 종합점수: ${scored.hybridScore?.toFixed(3)}, 벡터: ${scored.vectorScore?.toFixed(3)}, 키워드: ${scored.keywordScore}, 핵심키워드: ${scored.criticalKeywordFound}`);
+          }
+        });
+        
         // 사고사례: 벡터 유사도 상위 5건 (알려진 전기 사고사례 정보와 매칭)
         const knownAccidents = this.getKnownElectricalAccidents();
         
@@ -817,8 +828,8 @@ JSON 형식으로 응답:
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
         console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
         console.log(`벡터 검색 결과: ${chromaResults.length} 건`);
-        console.log(`사고사례: ${filteredAccidents.length} → ${chromaAccidents.length} 건 (벡터 유사도 상위)`);
-        console.log(`교육자료: ${filteredEducation.length} → ${educationMaterials.length} 건 (벡터 유사도 상위)`);
+        console.log(`사고사례: ${hybridFilteredAccidents.length} → ${chromaAccidents.length} 건 (하이브리드 점수 상위)`);
+        console.log(`교육자료: ${hybridFilteredEducation.length} → ${educationMaterials.length} 건 (하이브리드 점수 상위)`);
         console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
         console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
@@ -1085,9 +1096,11 @@ ${specialNotes || "없음"}
     });
     
     // 하이브리드 점수 순으로 정렬
-    return scoredResults
-      .sort((a, b) => b.hybridScore - a.hybridScore)
-      .filter(r => r.hybridScore > 0.5); // 최소 임계점 설정
+    const sorted = scoredResults.sort((a, b) => b.hybridScore - a.hybridScore);
+    
+    // 교육자료는 더 관대한 임계값 적용
+    const threshold = results.some(r => r.metadata?.type === 'education') ? 0.2 : 0.5;
+    return sorted.filter(r => r.hybridScore > threshold);
   }
 
   // 교육자료 URL 매칭 메서드
