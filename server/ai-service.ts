@@ -23,6 +23,7 @@ export interface RiskAnalysis {
 
 export class AIService {
   private accidentDataCache?: any[];
+  private educationDataCache: any[] | null = null; // 교육자료 데이터 캐싱
 
   // 알려진 전기 관련 사고사례 정보 (매칭용)
   private getKnownElectricalAccidents(): Record<string, any> {
@@ -499,12 +500,12 @@ JSON 형식으로 응답:
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
-        // 다중 검색으로 관련성 높은 결과 확보
-        let chromaResults = [];
-        for (const query of searchQueries) {
-          const results = await chromaDBService.searchRelevantData(query, 15);
-          chromaResults = [...chromaResults, ...results];
-        }
+        // 병렬 검색으로 속도 향상
+        const searchPromises = searchQueries.map(query => 
+          chromaDBService.searchRelevantData(query, 12) // 개당 15개 → 12개로 감소
+        );
+        const searchResults = await Promise.all(searchPromises);
+        let chromaResults = searchResults.flat();
         
         // 중복 제거
         const uniqueResults = new Map();
@@ -814,15 +815,22 @@ JSON 형식으로 응답:
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 10);
 
-        // AI를 사용하여 각 조문 요약
-        safetyRegulations = await Promise.all(
-          sortedRegulations.map(async (reg) => {
-            const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
-            return {
-              ...reg,
-              summary: summary
-            };
-          })
+        // 조문 요약 최적화: 상위 5개만 AI 요약, 나머지는 원문 사용
+        const priorityRegulations = sortedRegulations.slice(0, 5);
+        const basicRegulations = sortedRegulations.slice(5);
+        
+        const summaryPromises = priorityRegulations.map(async (reg) => {
+          const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
+          return { ...reg, summary: summary };
+        });
+        
+        const basicMapped = basicRegulations.map(reg => ({
+          ...reg,
+          summary: reg.fullContent.slice(0, 200) + '...' // 원문 앞부분만 사용
+        }));
+        
+        safetyRegulations = await Promise.all(summaryPromises).then(summaries => 
+          [...summaries, ...basicMapped]
         );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
@@ -856,42 +864,18 @@ JSON 형식으로 응답:
         ? this.formatChromaAccidentCases(chromaAccidents)
         : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
 
-      const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
+      const prompt = `${equipmentInfo.name} ${workType.name} 작업 안전 브리핑을 생성해주세요.
 
-【설비 정보】
-- 설비명: ${equipmentInfo.name}
-- 위치: ${equipmentInfo.location}
-- 위험도: ${equipmentInfo.riskLevel}
-- 주요 위험 요소: ${this.formatRisks(equipmentInfo)}
-- 필요 안전장비: ${equipmentInfo.requiredSafetyEquipment?.join(", ") || "기본 안전장비"}
+설비: ${equipmentInfo.name} (위험도: ${equipmentInfo.riskLevel})
+작업: ${workType.name} (${workType.estimatedDuration}분)
+날씨: ${weatherData.condition}, ${weatherData.temperature}°C
 
-【작업 정보】
-- 작업 유형: ${workType.name}
-- 작업 설명: ${workType.description}
-- 예상 소요 시간: ${workType.estimatedDuration}분
-- 등록된 필수 안전장비: ${workType.requiredEquipment?.join(", ") || "없음"}
-- 등록된 필수 작업도구: ${workType.requiredTools?.join(", ") || "없음"}
+필수장비: ${workType.requiredEquipment?.join(", ") || "없음"}
+필수도구: ${workType.requiredTools?.join(", ") || "없음"}
 
-【날씨 정보】
-- 현재 날씨: ${weatherData.condition}
-- 온도: ${weatherData.temperature}°C
-- 습도: ${weatherData.humidity}%
-- 풍속: ${weatherData.windSpeed}m/s
-- 안전 주의사항: ${weatherData.safetyWarnings?.join(", ") || "없음"}
+사고사례: ${accidentContext.slice(0, 500)}...
 
-【관련 사고사례】
-${accidentContext}
-
-${educationMaterials.length > 0 ? `【관련 교육자료】
-${this.formatEducationMaterials(educationMaterials)}` : ''}
-
-${safetyRegulations.length > 0 ? `【관련 안전규칙】
-${this.formatSafetyRegulations(safetyRegulations)}` : ''}
-
-【특이사항】
-${specialNotes || "없음"}
-
-등록된 필수 안전장비와 작업도구를 우선적으로 포함하되, 추가로 필요하다고 판단되는 항목들을 AI 추천으로 포함해주세요.
+${safetyRegulations.length > 0 ? `안전규칙: ${this.formatSafetyRegulations(safetyRegulations).slice(0, 300)}...` : ''}
 
 다음 형식으로 JSON 응답을 제공해주세요:
 {
@@ -1106,15 +1090,19 @@ ${specialNotes || "없음"}
   // 교육자료 URL 매칭 메서드
   private async matchEducationWithUrls(educationResults: any[]): Promise<any[]> {
     try {
-      // education_data.json 파일 로드
-      const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
-      if (!fs.existsSync(educationDataPath)) {
-        console.warn('교육자료 URL 매칭용 파일을 찾을 수 없습니다:', educationDataPath);
-        return educationResults;
+      // 캐싱된 데이터가 없으면 로드
+      if (!this.educationDataCache) {
+        const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
+        if (!fs.existsSync(educationDataPath)) {
+          console.warn('교육자료 URL 매칭용 파일을 찾을 수 없습니다:', educationDataPath);
+          return educationResults;
+        }
+        
+        this.educationDataCache = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
+        console.log(`교육자료 URL 매칭용 데이터 ${this.educationDataCache.length}건 캐싱`);
       }
       
-      const educationData = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
-      console.log(`교육자료 URL 매칭용 데이터 ${educationData.length}건 로드`);
+      const educationData = this.educationDataCache;
       
       return educationResults.map(result => {
         const title = result.metadata.title;
