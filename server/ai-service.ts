@@ -483,7 +483,13 @@ JSON 형식으로 응답:
             '특별고압 전기안전',
             'GIS 가스절연개폐장치',
             '170kV 변전설비 안전',
-            '절연용 보호구 착용법'
+            '절연용 보호구 착용법',
+            '전기안전 교육',
+            '고압전기 안전교육',
+            '절연장갑 착용',
+            '전기작업 안전수칙',
+            '충전부 접근금지',
+            '변전소 안전교육'
           ];
         } else if (equipmentInfo.name.includes('kV')) {
           // 일반 고압 전기설비
@@ -544,23 +550,26 @@ JSON 형식으로 응답:
           relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
         
-        // 교육자료 검색 (설비별 특화)
+        // 교육자료 검색 (설비별 특화, 더 많은 결과)
         console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
         for (const query of educationQueries) {
-          const eduResults = await chromaDBService.searchRelevantData(query, 6);
+          const eduResults = await chromaDBService.searchRelevantData(query, 8); // 검색량 증가
           const relevantEducation = eduResults.filter(r => {
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
             
             if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              return (title.includes('전기') || title.includes('고압') ||
-                     title.includes('절연') || title.includes('보호구') ||
-                     title.includes('GIS') || title.includes('변전') ||
-                     content.includes('170kV') || content.includes('특별고압')) &&
+              // 170kV GIS에 대해 더 관대한 필터링
+              return (title.includes('전기') || title.includes('고압') || title.includes('절연') || 
+                     title.includes('보호구') || title.includes('GIS') || title.includes('변전') ||
+                     title.includes('안전') || title.includes('교육') || title.includes('감전') ||
+                     content.includes('170kV') || content.includes('특별고압') ||
+                     content.includes('전기') || content.includes('안전') || content.includes('고압')) &&
                      !existingIds.has(r.metadata?.id || r.document);
             } else {
               return (title.includes('전기') || title.includes('안전') ||
-                     content.includes('전기')) &&
+                     title.includes('교육') || content.includes('전기') ||
+                     content.includes('안전') || content.includes('고압')) &&
                      !existingIds.has(r.metadata?.id || r.document);
             }
           });
@@ -580,7 +589,7 @@ JSON 형식으로 응답:
         const hybridFilteredEducation = this.applyHybridScoring(
           chromaResults.filter(r => r.metadata.type === 'education'), 
           keywordWeights
-        ).slice(0, 6);
+        ).slice(0, 8); // 교육자료 상위 8개로 증가
         
         const regulations = chromaResults.filter(r => r.metadata.type === 'regulation');
         
@@ -1041,7 +1050,14 @@ ${specialNotes || "없음"}
         '절연': 5,
         '충전부': 5,
         '감전': 4,
-        '고압': 3
+        '고압': 3,
+        // 교육자료 전용 키워드
+        '교육': 3,
+        '안전교육': 4,
+        '보호구': 4,
+        '절연장갑': 5,
+        '안전수칙': 3,
+        '작업지침': 3
       };
     } else if (equipmentName.includes('kV')) {
       return {
@@ -1049,7 +1065,10 @@ ${specialNotes || "없음"}
         '고압': 6,
         '전기': 4,
         '감전': 4,
-        '절연': 3
+        '절연': 3,
+        '교육': 3,
+        '안전교육': 4,
+        '보호구': 4
       };
     }
     return {};
@@ -1061,6 +1080,7 @@ ${specialNotes || "없음"}
       const title = result.metadata?.title || '';
       const content = result.document || '';
       const searchText = `${title} ${content}`.toLowerCase();
+      const isEducation = result.metadata?.type === 'education';
       
       // 벡터 유사도 점수 (0-1, 높을수록 좋음)
       const vectorScore = Math.max(0, 1 - result.distance);
@@ -1068,6 +1088,7 @@ ${specialNotes || "없음"}
       // 키워드 매칭 점수
       let keywordScore = 0;
       let criticalKeywordFound = false;
+      let educationKeywordFound = false;
       
       Object.entries(keywordWeights).forEach(([keyword, weight]) => {
         if (searchText.includes(keyword.toLowerCase())) {
@@ -1075,31 +1096,55 @@ ${specialNotes || "없음"}
           if (weight >= 8) { // 핵심 키워드 (170kV, GIS, 가스절연개폐장치, 특별고압)
             criticalKeywordFound = true;
           }
+          if (['교육', '안전교육', '보호구', '절연장갑', '안전수칙', '작업지침'].includes(keyword)) {
+            educationKeywordFound = true;
+          }
         }
       });
       
-      // 핵심 키워드가 없으면 점수 대폭 감소
-      if (!criticalKeywordFound && Object.keys(keywordWeights).length > 0) {
-        keywordScore = keywordScore * 0.1;
+      // 교육자료별 점수 조정
+      if (isEducation) {
+        // 교육자료는 벡터 점수에 더 많은 가중치
+        const hybridScore = (vectorScore * 0.6) + (keywordScore * 0.4);
+        
+        // 교육자료에 대해서는 더 관대한 핵심 키워드 판정
+        if (!criticalKeywordFound && !educationKeywordFound && keywordScore > 0) {
+          keywordScore = keywordScore * 0.5; // 덜 엄격한 감점
+        } else if (!criticalKeywordFound && !educationKeywordFound) {
+          keywordScore = keywordScore * 0.2;
+        }
+        
+        return {
+          ...result,
+          hybridScore,
+          vectorScore,
+          keywordScore,
+          criticalKeywordFound: criticalKeywordFound || educationKeywordFound
+        };
+      } else {
+        // 사고사례는 기존 로직 유지
+        if (!criticalKeywordFound && Object.keys(keywordWeights).length > 0) {
+          keywordScore = keywordScore * 0.1;
+        }
+        
+        const hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
+        
+        return {
+          ...result,
+          hybridScore,
+          vectorScore,
+          keywordScore,
+          criticalKeywordFound
+        };
       }
-      
-      // 하이브리드 점수: 벡터 점수(30%) + 키워드 점수(70%)
-      const hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
-      
-      return {
-        ...result,
-        hybridScore,
-        vectorScore,
-        keywordScore,
-        criticalKeywordFound
-      };
     });
     
     // 하이브리드 점수 순으로 정렬
     const sorted = scoredResults.sort((a, b) => b.hybridScore - a.hybridScore);
     
     // 교육자료는 더 관대한 임계값 적용
-    const threshold = results.some(r => r.metadata?.type === 'education') ? 0.2 : 0.5;
+    const isEducationType = results.some(r => r.metadata?.type === 'education');
+    const threshold = isEducationType ? 0.1 : 0.5;
     return sorted.filter(r => r.hybridScore > threshold);
   }
 
