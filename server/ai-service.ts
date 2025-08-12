@@ -559,13 +559,19 @@ JSON 형식으로 응답:
             const title = (r.metadata?.title || '').toLowerCase();
             
             if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              // 170kV GIS에 대해 더 관대한 필터링
-              return (title.includes('전기') || title.includes('고압') || title.includes('절연') || 
+              // 170kV GIS 특화 필터링 - 불필요한 내용 제외
+              const hasRelevantContent = (title.includes('전기') || title.includes('고압') || title.includes('절연') || 
                      title.includes('보호구') || title.includes('GIS') || title.includes('변전') ||
-                     title.includes('안전') || title.includes('교육') || title.includes('감전') ||
-                     content.includes('170kV') || content.includes('특별고압') ||
-                     content.includes('전기') || content.includes('안전') || content.includes('고압')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
+                     title.includes('감전') || content.includes('170kV') || content.includes('특별고압') ||
+                     content.includes('전기') || content.includes('고압') || content.includes('절연'));
+              
+              // 불필요한 내용 제외
+              const hasIrrelevantContent = title.includes('용접') || title.includes('방열') || 
+                     title.includes('외국인') || title.includes('캄보디아') || title.includes('제조업') ||
+                     title.includes('화학물질') || title.includes('석면') || content.includes('용접') ||
+                     content.includes('화학') || content.includes('외국인');
+              
+              return hasRelevantContent && !hasIrrelevantContent && !existingIds.has(r.metadata?.id || r.document);
             } else {
               return (title.includes('전기') || title.includes('안전') ||
                      title.includes('교육') || content.includes('전기') ||
@@ -1104,14 +1110,37 @@ ${specialNotes || "없음"}
       
       // 교육자료별 점수 조정
       if (isEducation) {
-        // 교육자료는 벡터 점수에 더 많은 가중치
-        const hybridScore = (vectorScore * 0.6) + (keywordScore * 0.4);
+        // 불필요한 키워드 패널티 검사
+        const irrelevantKeywords = ['용접', '방열', '외국인', '캄보디아', '제조업', '화학물질', '석면', '화학'];
+        let hasIrrelevantKeyword = false;
         
-        // 교육자료에 대해서는 더 관대한 핵심 키워드 판정
-        if (!criticalKeywordFound && !educationKeywordFound && keywordScore > 0) {
-          keywordScore = keywordScore * 0.5; // 덜 엄격한 감점
-        } else if (!criticalKeywordFound && !educationKeywordFound) {
-          keywordScore = keywordScore * 0.2;
+        for (const keyword of irrelevantKeywords) {
+          if (searchText.includes(keyword)) {
+            hasIrrelevantKeyword = true;
+            break;
+          }
+        }
+        
+        // 불필요한 키워드가 있으면 점수 대폭 감소
+        if (hasIrrelevantKeyword) {
+          keywordScore = keywordScore * 0.05;
+        }
+        
+        // 교육자료는 벡터 점수에 더 많은 가중치
+        let hybridScore = (vectorScore * 0.6) + (keywordScore * 0.4);
+        
+        // 불필요한 키워드가 있으면 전체 점수도 감소
+        if (hasIrrelevantKeyword) {
+          hybridScore = hybridScore * 0.1;
+        }
+        
+        // 교육자료에 대해서는 더 관대한 핵심 키워드 판정 (불필요한 키워드가 없을 때만)
+        if (!hasIrrelevantKeyword) {
+          if (!criticalKeywordFound && !educationKeywordFound && keywordScore > 0) {
+            keywordScore = keywordScore * 0.5; // 덜 엄격한 감점
+          } else if (!criticalKeywordFound && !educationKeywordFound) {
+            keywordScore = keywordScore * 0.2;
+          }
         }
         
         return {
@@ -1142,9 +1171,9 @@ ${specialNotes || "없음"}
     // 하이브리드 점수 순으로 정렬
     const sorted = scoredResults.sort((a, b) => b.hybridScore - a.hybridScore);
     
-    // 교육자료는 더 관대한 임계값 적용
+    // 교육자료는 조정된 임계값 적용 (불필요한 내용 제거를 위해 상향 조정)
     const isEducationType = results.some(r => r.metadata?.type === 'education');
-    const threshold = isEducationType ? 0.1 : 0.5;
+    const threshold = isEducationType ? 0.25 : 0.5;
     return sorted.filter(r => r.hybridScore > threshold);
   }
 
