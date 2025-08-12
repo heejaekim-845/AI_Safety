@@ -659,85 +659,100 @@ export default function Briefing() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {briefingData.relatedIncidents.map((accident: any, index: number) => (
-                          <div key={index} className="border-l-4 border-orange-400 pl-4 py-3 bg-orange-50 rounded-r-lg">
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-orange-900">{accident.title}</h4>
-                              <span className="text-xs px-2 py-1 bg-orange-200 text-orange-800 rounded-full">
-                                {accident.severity}
-                              </span>
+                          <div key={index} className="border border-orange-200 rounded-lg p-5 bg-white shadow-sm">
+                            {/* Header with title and severity badge */}
+                            <div className="flex items-start justify-between mb-4">
+                              <h4 className="text-lg font-bold text-gray-900 leading-tight">{accident.title}</h4>
+                              <Badge className="bg-red-100 text-red-800 border-red-200 font-semibold">
+                                HIGH
+                              </Badge>
                             </div>
-                            <div className="space-y-2 text-sm">
-                              {/* 날짜, 장소, 사고규모 정보 추가 */}
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 p-2 bg-gray-50 rounded text-xs">
-                                {accident.date && (
-                                  <div>
-                                    <span className="font-medium text-gray-700">날짜:</span>
-                                    <span className="ml-1 text-gray-600">{accident.date}</span>
-                                  </div>
-                                )}
-                                {accident.location && (
-                                  <div>
-                                    <span className="font-medium text-gray-700">장소:</span>
-                                    <span className="ml-1 text-gray-600">{accident.location}</span>
-                                  </div>
-                                )}
-                                {accident.damage && (
-                                  <div>
-                                    <span className="font-medium text-gray-700">사고규모:</span>
-                                    <span className="ml-1 text-red-600 font-medium">{accident.damage}</span>
-                                  </div>
-                                )}
+                            
+                            {/* Basic information - moved out of gray box */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              {accident.date && (
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-700 mb-1">날짜</span>
+                                  <span className="text-sm text-gray-900">{accident.date}</span>
+                                </div>
+                              )}
+                              {accident.location && (
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-700 mb-1">장소</span>
+                                  <span className="text-sm text-gray-900">{accident.location}</span>
+                                </div>
+                              )}
+                              {accident.damage && (
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-700 mb-1">피해규모</span>
+                                  <span className="text-sm font-semibold text-red-600">{accident.damage}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Additional details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              {accident.work_type && (
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-700 mb-1">작업유형</span>
+                                  <span className="text-sm text-gray-900">{accident.work_type}</span>
+                                </div>
+                              )}
+                              {accident.accident_type && (
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-700 mb-1">사고형태</span>
+                                  <span className="text-sm text-gray-900">{accident.accident_type}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Summary */}
+                            {accident.summary && (
+                              <div className="mb-4">
+                                <span className="text-sm font-medium text-gray-700 block mb-2">사고개요</span>
+                                <p className="text-sm text-gray-900 leading-relaxed">{accident.summary}</p>
                               </div>
-                              <div>
-                                <span className="font-medium text-gray-700">작업유형:</span>
-                                <span className="ml-2 text-gray-600">{accident.work_type}</span>
-                              </div>
-                              <div>
-                                <span className="font-medium text-gray-700">사고형태:</span>
-                                <span className="ml-2 text-gray-600">{accident.accident_type}</span>
-                              </div>
-                              <div>
-                                <span className="font-medium text-gray-700">사고개요:</span>
-                                <p className="mt-1 text-gray-600 text-xs leading-relaxed">{accident.summary}</p>
-                              </div>
-                              
-                              {/* 직접원인 정보 추가 */}
+                            )}
+
+                            {/* Causes and prevention in colored boxes */}
+                            <div className="space-y-3">
                               {accident.direct_cause && (
-                                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
-                                  <span className="font-medium text-red-800">직접원인:</span>
-                                  <p className="mt-1 text-red-700 text-xs leading-relaxed">{accident.direct_cause}</p>
+                                <div className="p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg">
+                                  <span className="text-sm font-semibold text-red-800 block mb-2">직접원인</span>
+                                  <p className="text-sm text-red-700 leading-relaxed">{accident.direct_cause}</p>
                                 </div>
                               )}
                               
-                              {/* 근본원인 정보 추가 */}
                               {accident.root_cause && (
-                                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                                  <span className="font-medium text-yellow-800">근본원인:</span>
-                                  <p className="mt-1 text-yellow-700 text-xs leading-relaxed">{accident.root_cause}</p>
+                                <div className="p-4 bg-orange-50 border-l-4 border-orange-400 rounded-r-lg">
+                                  <span className="text-sm font-semibold text-orange-800 block mb-2">근본원인</span>
+                                  <p className="text-sm text-orange-700 leading-relaxed">{accident.root_cause}</p>
                                 </div>
                               )}
                               
-                              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                                <span className="font-medium text-blue-800">예방대책:</span>
-                                <p className="mt-1 text-blue-700 text-xs leading-relaxed">{accident.prevention}</p>
-                              </div>
-                              
-                              {/* 위험키워드 추가 */}
-                              {accident.risk_keywords && (
-                                <div className="mt-3">
-                                  <span className="font-medium text-gray-700">위험키워드:</span>
-                                  <div className="mt-1 flex flex-wrap gap-1">
-                                    {accident.risk_keywords.split(',').map((keyword: string, kidx: number) => (
-                                      <span key={kidx} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">
-                                        {keyword.trim()}
-                                      </span>
-                                    ))}
-                                  </div>
+                              {accident.prevention && (
+                                <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                                  <span className="text-sm font-semibold text-blue-800 block mb-2">예방대책</span>
+                                  <p className="text-sm text-blue-700 leading-relaxed">{accident.prevention}</p>
                                 </div>
                               )}
                             </div>
+
+                            {/* Risk keywords */}
+                            {accident.risk_keywords && (
+                              <div className="mt-4 pt-4 border-t border-gray-200">
+                                <span className="text-sm font-medium text-gray-700 block mb-2">위험키워드</span>
+                                <div className="flex flex-wrap gap-2">
+                                  {accident.risk_keywords.split(',').map((keyword: string, kidx: number) => (
+                                    <span key={kidx} className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                                      {keyword.trim()}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
