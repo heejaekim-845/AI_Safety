@@ -73,7 +73,7 @@ Preferred communication style: Simple, everyday language.
 - **Form Handling**: React Hook Form with Zod validation
 - **Styling**: Tailwind CSS
 - **QR Scanning**: ZXing library
-- **RAG System**: Enhanced retrieval system with Vectra vector database, checkpoint-based data protection, comprehensive analytics dashboard, and real-time monitoring. Includes backup/restore functionality and detailed content analysis (category breakdown, industry distribution, work type analysis).
+- **RAG System**: Enhanced retrieval system with Vectra vector database (LocalIndex), checkpoint-based data protection, comprehensive analytics dashboard, and real-time monitoring. Includes backup/restore functionality and detailed content analysis (category breakdown, industry distribution, work type analysis).
 
 ### Production Infrastructure
 - **Deployment**: Replit autoscale deployment
