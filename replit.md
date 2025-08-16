@@ -26,6 +26,7 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **Data Coverage**: Vector database with 8,947 documents (1,793 incidents + 6,503 education materials + 653 safety regulations)
 - **Vector DB Analysis Fix**: Resolved data discrepancy between target and actual document counts by updating loadAllData method to properly read from safety_rules.json instead of deprecated PDF regulation files
 - **Time-based Badge Status (August 16, 2025)**: Implemented automatic badge status changes on briefing page - "예정" (scheduled) badges automatically change to gray "종료" (completed) badges when work time has passed, with real-time time comparison and robust date parsing
+- **Profile-Based Architecture Migration (August 16, 2025)**: Successfully migrated from hardcoded electrical/170kV GIS specific logic to configurable profile-based system. Implemented SearchProfile interface with equipment tags, risk categories, keyword groups, and search strategies. Created config/search-profiles.json with electrical-power and manufacturing profiles. Updated ai-service.ts to use profile-based keyword weighting, hybrid scoring, and content filtering for universal multi-industry support.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

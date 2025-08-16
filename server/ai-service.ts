@@ -3,6 +3,17 @@ import { simpleRagService as ragService, type AccidentCase } from "./simple-rag-
 import { chromaDBService } from "./chromadb-service";
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  resolveProfile,
+  buildTargetedSearchQuery,
+  computeUniversalHybridScore,
+  shouldIncludeContent,
+  inferEquipmentTags,
+  inferRiskTags,
+  type EquipmentInfo,
+  type SearchItem,
+  type Profile
+} from './profiles.js';
 
 // Timing utilities for performance analysis
 const t0 = () => performance.now();
@@ -36,8 +47,9 @@ export interface RiskAnalysis {
 export class AIService {
   private accidentDataCache?: any[];
 
-  // 알려진 전기 관련 사고사례 정보 (매칭용)
-  private getKnownElectricalAccidents(): Record<string, any> {
+  // 범용 사고사례 정보 매칭 (프로파일 기반)
+  private getKnownAccidentsByProfile(profile: Profile): Record<string, any> {
+    // 프로파일별 알려진 사고사례 매핑 (필요시 확장 가능)
     return {
       "비상발전기 정비 중 고압활선 감전": {
         date: "2011.03.09.(수) 08:30경",
@@ -474,49 +486,35 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // 설비별 특화 검색 쿼리 생성
-        let searchQueries = [];
-        let regulationQueries = [];
-        let educationQueries = [];
+        // 프로파일 기반 설비 정보 해석
+        const equipmentInfoObj: EquipmentInfo = {
+          name: equipmentInfo.name,
+          type: equipmentInfo.type || 'unknown',
+          location: equipmentInfo.location || '',
+          workType: workType.name || '',
+          specialNotes: specialNotes || '',
+          riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
+        };
+        
+        const resolvedProfile = resolveProfile(equipmentInfoObj);
+        console.log(`[프로파일] 선택된 프로파일: ${resolvedProfile.id}`);
+        console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
+        console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
+        
+        // 프로파일 기반 검색 쿼리 생성
+        const targetedQuery = buildTargetedSearchQuery(equipmentInfoObj, resolvedProfile);
+        console.log(`[프로파일] 생성된 검색 쿼리: ${targetedQuery}`);
+        
+        // 프로파일 기반 검색 쿼리 생성
+        let searchQueries = [targetedQuery];
+        let regulationQueries = resolvedProfile.searchStrategies.regulation.keywords;
+        let educationQueries = resolvedProfile.searchStrategies.education.keywords;
 
-        if (equipmentInfo.name.includes('kV') && equipmentInfo.name.includes('GIS')) {
-          // 170kV GIS 전용 검색
-          searchQueries = [
-            `${equipmentInfo.name} 감전 사고`,
-            '가스절연개폐장치 GIS 감전',
-            '특별고압 170kV 충전부 접촉',
-            '변전소 개폐기 조작 감전'
-          ];
-          regulationQueries = [
-            '제323조 절연용 보호구 착용',
-            '제319조 정전전로 작업',
-            '제320조 정전전로 인근 전기작업',
-            '특별고압 전기설비 안전거리',
-            '개폐기 조작 안전조치'
-          ];
-          educationQueries = [
-            '특별고압 전기안전',
-            'GIS 가스절연개폐장치',
-            '170kV 변전설비 안전',
-            '절연용 보호구 착용법',
-            '전기안전 교육',
-            '고압전기 안전교육',
-            '절연장갑 착용',
-            '전기작업 안전수칙',
-            '충전부 접근금지',
-            '변전소 안전교육'
-          ];
-        } else if (equipmentInfo.name.includes('kV')) {
-          // 일반 고압 전기설비
-          searchQueries = [`${equipmentInfo.name} 감전`, '고압전기 충전부 접촉'];
-          regulationQueries = ['전기작업 절연용 보호구', '고압전기설비 안전거리'];
-          educationQueries = ['고압전기 안전교육'];
-        } else {
-          // 기본 검색
-          searchQueries = [`${equipmentInfo.name} ${workType.name} 사고`];
-          regulationQueries = [`${workType.name} 안전규정`];
-          educationQueries = [`${equipmentInfo.name} 안전교육`];
-        }
+        // 백워드 호환성을 위한 추가 쿼리
+        searchQueries.push(`${equipmentInfo.name} ${workType.name} 사고`);
+        
+        console.log(`[프로파일] 법규 검색 키워드: ${regulationQueries.slice(0,3).join(', ')}...`);
+        console.log(`[프로파일] 교육자료 검색 키워드: ${educationQueries.slice(0,3).join(', ')}...`);
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
@@ -591,21 +589,19 @@ JSON 형식으로 응답:
               return false;
             }
             
-            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              const hasRelevantContent = content.includes('절연용') || content.includes('보호구') || 
-                     content.includes('전기작업') || content.includes('감전') ||
-                     content.includes('정전전로') || content.includes('특별고압') ||
-                     content.includes('개폐기') || content.includes('안전거리') ||
-                     content.includes('전기') || content.includes('절연');
-              const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
-              console.log(`  법령 필터링: "${title.substring(0, 30)}" - 관련성: ${hasRelevantContent}, 중복여부: ${!notDuplicate}`);
-              return hasRelevantContent && notDuplicate;
-            } else {
-              const hasRelevantContent = content.includes('전기') || content.includes('감전') || 
-                     content.includes('절연') || title.includes('전기');
-              const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
-              return hasRelevantContent && notDuplicate;
-            }
+            // 프로파일 기반 관련성 확인
+            const searchItem: SearchItem = {
+              content,
+              title,
+              metadata: r.metadata
+            };
+            
+            const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+            const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
+            
+            console.log(`[법령 필터링] "${title.substring(0, 30)}..." - 관련성: ${isRelevant}, 중복: ${!notDuplicate}`);
+            
+            return isRelevant && notDuplicate;
           });
           console.log(`법령 필터링 후: ${relevantRegulations.length}건`);
           filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
@@ -624,43 +620,38 @@ JSON 형식으로 응답:
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
             
-            if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              // 170kV GIS 특화 필터링 - 불필요한 내용 제외
-              const hasRelevantContent = (title.includes('전기') || title.includes('고압') || title.includes('절연') || 
-                     title.includes('보호구') || title.includes('GIS') || title.includes('변전') ||
-                     title.includes('감전') || content.includes('170kV') || content.includes('특별고압') ||
-                     content.includes('전기') || content.includes('고압') || content.includes('절연'));
-              
-              // 불필요한 내용 제외
-              const hasIrrelevantContent = title.includes('용접') || title.includes('방열') || 
-                     title.includes('외국인') || title.includes('캄보디아') || title.includes('제조업') ||
-                     title.includes('화학물질') || title.includes('석면') || content.includes('용접') ||
-                     content.includes('화학') || content.includes('외국인');
-              
-              return hasRelevantContent && !hasIrrelevantContent && !existingIds.has(r.metadata?.id || r.document);
-            } else {
-              return (title.includes('전기') || title.includes('안전') ||
-                     title.includes('교육') || content.includes('전기') ||
-                     content.includes('안전') || content.includes('고압')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
-            }
+            // 프로파일 기반 관련성 확인
+            const searchItem: SearchItem = {
+              content,
+              title,
+              metadata: r.metadata
+            };
+            
+            const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+            const isNotDuplicate = !existingIds.has(r.metadata?.id || r.document);
+            
+            console.log(`[교육자료 필터링] "${title.substring(0, 30)}..." - 관련성: ${isRelevant}, 중복: ${!isNotDuplicate}`);
+            
+            return isRelevant && isNotDuplicate;
           });
           filteredChromaResults = [...filteredChromaResults, ...relevantEducation];
           
           relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
 
-        // 하이브리드 검색: 벡터 유사도 + 키워드 점수 조합
-        const keywordWeights = this.getEquipmentKeywords(equipmentInfo.name);
+        // 하이브리드 검색: 프로파일 기반 벡터 유사도 + 키워드 점수 조합
+        const keywordWeights = this.getProfileKeywords(resolvedProfile);
         
         const hybridFilteredAccidents = this.applyHybridScoring(
           filteredChromaResults.filter(r => r.metadata.type === 'incident'), 
-          keywordWeights
+          keywordWeights,
+          resolvedProfile
         ).slice(0, 5);
         
         const hybridFilteredEducation = this.applyHybridScoring(
           filteredChromaResults.filter(r => r.metadata.type === 'education'), 
-          keywordWeights
+          keywordWeights,
+          resolvedProfile
         ).slice(0, 8); // 교육자료 상위 8개로 증가
         
         // 법규 검색 디버깅 추가
@@ -691,90 +682,79 @@ JSON 형식으로 응답:
           });
         }
         
-        // 전기작업과 관련성 검사
+        // 프로파일 기반 관련성 검사
         let regulations = allRegulations.filter(reg => {
           const content = (reg.document || '').toLowerCase();
           const title = (reg.metadata?.title || '').toLowerCase();
           
-          console.log(`[DEBUG] 관련성 검사: "${reg.metadata?.title}"`);
-          console.log(`  제목 키워드: ${title.substring(0, 50)}...`);
+          console.log(`[프로파일] 관련성 검사: "${reg.metadata?.title}"`);
           
-          // 전기작업과 관련된 키워드 확인
-          const isElectricRelated = 
-            content.includes('전기') || content.includes('감전') || content.includes('절연') ||
-            content.includes('충전부') || content.includes('정전') || content.includes('특별고압') ||
-            content.includes('고압') || content.includes('전압') || content.includes('배전') ||
-            title.includes('전기') || title.includes('감전') || title.includes('절연') ||
-            title.includes('충전') || title.includes('고압') || title.includes('전압');
+          // 프로파일 기반 관련성 확인
+          const searchItem: SearchItem = {
+            content,
+            title,
+            metadata: reg.metadata
+          };
           
-          // 불관련 키워드 제외
-          const isIrrelevant = 
-            content.includes('안전밸브') || content.includes('낙반') || content.includes('발파') ||
-            content.includes('의사') || content.includes('진찰') || content.includes('폭풍') ||
-            title.includes('밸브') || title.includes('낙반') || title.includes('발파') ||
-            title.includes('의사') || title.includes('폭풍');
+          const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+          console.log(`  프로파일 기반 관련성: ${isRelevant}`);
           
-          console.log(`  전기관련: ${isElectricRelated}, 불관련: ${isIrrelevant}, 결과: ${isElectricRelated && !isIrrelevant}`);
-          
-          return isElectricRelated && !isIrrelevant;
+          return isRelevant;
         });
         
-        console.log(`[DEBUG] 전기작업 관련성 필터링 후: ${regulations.length}건 (${allRegulations.length}건 중)`);
+        console.log(`[프로파일] 관련성 필터링 후: ${regulations.length}건 (${allRegulations.length}건 중)`);
 
-        // 항상 전기법규 강제 검색 실행 (regulation 타입 부족 문제 해결)
-        console.log(`기본 regulation 검색 결과: ${regulations.length}건, 강제 전기법규 검색 실행...`);
+        // 프로파일 기반 강제 검색 실행 (regulation 타입 부족 문제 해결)
+        console.log(`기본 regulation 검색 결과: ${regulations.length}건, 프로파일 기반 강제 검색 실행...`);
         try {
-            // 전기작업에 특화된 법규 검색
-            const electricWorkQueries = [
-              '전기기계기구',
-              '감전 방지 조치',
-              '전기설비 안전',
-              '고압 전기작업',
-              '절연 보호구'
-            ];
+            // 프로파일에서 법규 검색 쿼리 사용
+            const profileRegulationQueries = regulationQueries.slice(0, 5);
             
-            let electricRegulations: any[] = [];
-            for (const query of electricWorkQueries) {
+            let profileRegulations: any[] = [];
+            for (const query of profileRegulationQueries) {
               const searchResult = await chromaDBService.searchByCategory(query, 3);
               if (searchResult.regulation && searchResult.regulation.length > 0) {
-                electricRegulations = [...electricRegulations, ...searchResult.regulation];
+                profileRegulations = [...profileRegulations, ...searchResult.regulation];
               }
             }
             
-            // 중복 제거 및 전기 관련성 필터링 (관대한 조건)
-            const uniqueElectricRegs = new Map();
-            electricRegulations.forEach(reg => {
+            // 중복 제거 및 프로파일 기반 관련성 필터링
+            const uniqueProfileRegs = new Map();
+            profileRegulations.forEach(reg => {
               const content = (reg.document || '').toLowerCase();
               const title = (reg.metadata?.title || '').toLowerCase();
               
-              console.log(`[강제검색] 검사중: "${reg.metadata?.title}"`);
+              console.log(`[프로파일 강제검색] 검사중: "${reg.metadata?.title}"`);
               
-              // 명백히 무관한 키워드만 제외
-              const isIrrelevant = 
-                title.includes('안전밸브') || title.includes('낙반') || title.includes('발파') ||
-                title.includes('의사') || title.includes('폭풍') || title.includes('압력') ||
-                title.includes('파열판') || title.includes('크레인');
+              // 프로파일 기반 관련성 확인
+              const searchItem: SearchItem = {
+                content,
+                title,
+                metadata: reg.metadata
+              };
               
-              if (!isIrrelevant) {
-                console.log(`[강제검색] 포함: "${reg.metadata?.title}"`);
+              const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+              
+              if (isRelevant) {
+                console.log(`[프로파일 강제검색] 포함: "${reg.metadata?.title}"`);
                 const key = reg.metadata?.id || reg.document;
-                if (!uniqueElectricRegs.has(key)) {
-                  uniqueElectricRegs.set(key, reg);
+                if (!uniqueProfileRegs.has(key)) {
+                  uniqueProfileRegs.set(key, reg);
                 }
               } else {
-                console.log(`[강제검색] 제외: "${reg.metadata?.title}" - 무관 키워드`);
+                console.log(`[프로파일 강제검색] 제외: "${reg.metadata?.title}" - 프로파일 기준 무관`);
               }
             });
             
-            const additionalRegulations = Array.from(uniqueElectricRegs.values()).slice(0, 5);
+            const additionalRegulations = Array.from(uniqueProfileRegs.values()).slice(0, 5);
             regulations = [...regulations, ...additionalRegulations].slice(0, 5);
-            console.log(`강제 전기법규 검색 완료: +${additionalRegulations.length}건 (총 ${regulations.length}건)`);
+            console.log(`프로파일 기반 강제 법규 검색 완료: +${additionalRegulations.length}건 (총 ${regulations.length}건)`);
             regulations.forEach((reg, idx) => {
               console.log(`  최종 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
             });
             
         } catch (error) {
-          console.error('강제 전기법규 검색 실패:', error);
+          console.error('프로파일 기반 강제 법규 검색 실패:', error);
         }
         
         // 하이브리드 점수 디버깅 로그
@@ -789,14 +769,14 @@ JSON 형식으로 응답:
         console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
         console.log('교육자료 하이브리드 점수:');
         rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          const scored = this.applyHybridScoring([edu], keywordWeights)[0];
+          const scored = this.applyHybridScoring([edu], keywordWeights, resolvedProfile)[0];
           if (scored) {
             console.log(`  ${idx+1}. "${edu.metadata?.title}" - 종합점수: ${scored.hybridScore?.toFixed(3)}, 벡터: ${scored.vectorScore?.toFixed(3)}, 키워드: ${scored.keywordScore}, 핵심키워드: ${scored.criticalKeywordFound}`);
           }
         });
         
-        // 사고사례: 벡터 유사도 상위 5건 (알려진 전기 사고사례 정보와 매칭)
-        const knownAccidents = this.getKnownElectricalAccidents();
+        // 사고사례: 벡터 유사도 상위 5건 (알려진 사고사례 정보와 매칭)
+        const knownAccidents = this.getKnownAccidentsByProfile(resolvedProfile);
         
         chromaAccidents = hybridFilteredAccidents
           .map((r) => {
@@ -1231,45 +1211,41 @@ ${specialNotes || "없음"}
     );
   }
 
-  // 설비별 핵심 키워드 가중치 정의
-  private getEquipmentKeywords(equipmentName: string): { [key: string]: number } {
-    if (equipmentName.includes('170kV') && equipmentName.includes('GIS')) {
-      return {
-        '170kV': 10,
-        'GIS': 10,
-        '가스절연개폐장치': 10,
-        '특별고압': 8,
-        '변전소': 6,
-        '개폐기': 6,
-        '절연': 5,
-        '충전부': 5,
-        '감전': 4,
-        '고압': 3,
-        // 교육자료 전용 키워드
-        '교육': 3,
-        '안전교육': 4,
-        '보호구': 4,
-        '절연장갑': 5,
-        '안전수칙': 3,
-        '작업지침': 3
-      };
-    } else if (equipmentName.includes('kV')) {
-      return {
-        'kV': 8,
-        '고압': 6,
-        '전기': 4,
-        '감전': 4,
-        '절연': 3,
-        '교육': 3,
-        '안전교육': 4,
-        '보호구': 4
-      };
+  // 프로파일 기반 핵심 키워드 가중치 정의
+  private getProfileKeywords(profile: Profile): { [key: string]: number } {
+    const keywordWeights: { [key: string]: number } = {};
+    
+    // 프로파일의 키워드 그룹별 가중치 적용
+    if (profile.keywordGroups.critical) {
+      profile.keywordGroups.critical.forEach(keyword => {
+        keywordWeights[keyword] = 10;
+      });
     }
-    return {};
+    
+    if (profile.keywordGroups.important) {
+      profile.keywordGroups.important.forEach(keyword => {
+        keywordWeights[keyword] = 6;
+      });
+    }
+    
+    if (profile.keywordGroups.relevant) {
+      profile.keywordGroups.relevant.forEach(keyword => {
+        keywordWeights[keyword] = 3;
+      });
+    }
+    
+    if (profile.keywordGroups.education) {
+      profile.keywordGroups.education.forEach(keyword => {
+        keywordWeights[keyword] = 4;
+      });
+    }
+    
+    console.log(`[프로파일] ${profile.id} 키워드 가중치 생성: ${Object.keys(keywordWeights).length}개`);
+    return keywordWeights;
   }
 
-  // 하이브리드 점수 계산 (벡터 유사도 + 키워드 매칭)
-  private applyHybridScoring(results: any[], keywordWeights: { [key: string]: number }): any[] {
+  // 프로파일 기반 하이브리드 점수 계산 (벡터 유사도 + 키워드 매칭)
+  private applyHybridScoring(results: any[], keywordWeights: { [key: string]: number }, profile?: Profile): any[] {
     const scoredResults = results.map(result => {
       const title = result.metadata?.title || '';
       const content = result.document || '';
@@ -1300,16 +1276,15 @@ ${specialNotes || "없음"}
       
       // 교육자료별 점수 조정
       if (isEducation) {
-        // 불필요한 키워드 패널티 검사
-        const irrelevantKeywords = ['용접', '방열', '외국인', '캄보디아', '제조업', '화학물질', '석면', '화학'];
-        let hasIrrelevantKeyword = false;
+        // 프로파일 기반 관련성 검사
+        const searchItem: SearchItem = {
+          content: searchText,
+          title: title,
+          metadata: result.metadata
+        };
         
-        for (const keyword of irrelevantKeywords) {
-          if (searchText.includes(keyword)) {
-            hasIrrelevantKeyword = true;
-            break;
-          }
-        }
+        const isRelevant = profile ? shouldIncludeContent(searchItem, profile) : true;
+        const hasIrrelevantKeyword = !isRelevant;
         
         // 불필요한 키워드가 있으면 점수 대폭 감소
         if (hasIrrelevantKeyword) {
