@@ -1,0 +1,343 @@
+Below are minimal, copy‑pasteable patches. Each section gives a unified diff first; if it doesn’t apply cleanly, use the Drop‑in replacement right below it.
+
+1) profiles.ts
+
+목적: content 필드까지 포함해서 관련성 판단/스코어링 강화. 공통 텍스트 블롭 유틸 추가. (이미 함수가 있다면 내용을 교체)
+
+1.1 Unified diff
+
+*** a/server/profiles.ts
+--- b/server/profiles.ts
+@@
+ export type SearchItem = {
+   id: string;
+   title?: string;
+   text?: string;           // 본문
++  content?: string;        // 추가 본문(외부 호출부에서 주로 여기에 채움)
+   metadata?: {
+     sourceType?: "regulation" | "education" | "accident" | string;
+     work_type?: string;
+     equipment?: string;
+     risk_keywords?: string;  // comma-separated 가능
+@@
+ };
+
++// 공통 텍스트 블롭 생성 유틸: title/text/content/metadata를 묶어 판단 정확도 개선
++function toTextBlob(item: SearchItem): string {
++  const parts = [
++    item.title ?? "",
++    item.text ?? "",
++    item.content ?? "",
++    item.metadata ? JSON.stringify(item.metadata) : ""
++  ];
++  return parts.join(" ").toLowerCase();
++}
++
+@@
+-export function applyHybridScoring(
+-  item: SearchItem,
+-  profile: Profile,
+-  equipment: EquipmentInfo,
+-  workType?: WorkType,
+-  opts: HybridScoreOptions = {}
+-): number {
++export function applyHybridScoring(
++  item: SearchItem,
++  profile: Profile,
++  equipment: EquipmentInfo,
++  workType?: WorkType,
++  opts: HybridScoreOptions = {}
++): number {
+   const o = { ...DEFAULT_OPTS, ...opts };
+-  const text = [o.textFields]
+-    .flat()
+-    .map((f) => (item[f] as string) ?? "")
+-    .join("\n");
++  // content까지 포함해 판단 (기존 title/text만 보던 문제 수정)
++  const text = toTextBlob(item);
+@@
+ }
++
++// 프로파일 기반 포함/제외 1차 판단 (사고/교육/법규 공통 사용)
++export function shouldIncludeContent(item: SearchItem, profile: Profile): boolean {
++  const hay = toTextBlob(item);
++  const ex = (profile.exclude_keywords ?? []).map((x) => x.toLowerCase());
++  const exAny = (profile.exclude_if_any_keywords ?? []).map((x) => x.toLowerCase());
++  const incAny = (profile.include_if_any_keywords ?? []).map((x) => x.toLowerCase());
++
++  if (ex.length && ex.some((k) => hay.includes(k))) return false;
++  if (exAny.length && exAny.some((k) => hay.includes(k))) return false;
++  if (incAny.length && incAny.some((k) => hay.includes(k))) return true;
++  // include_if_any가 없으면 보수적으로 true를 반환하고, 스코어 단계에서 걸러짐
++  return true;
++}
+
+1.2 Drop‑in replacement (함수만 교체)
+
+// in server/profiles.ts
+export type SearchItem = {
+  id: string;
+  title?: string;
+  text?: string;
+  content?: string;
+  metadata?: {
+    sourceType?: "regulation" | "education" | "accident" | string;
+    work_type?: string;
+    equipment?: string;
+    risk_keywords?: string;
+    industry?: string;
+    tags?: string[];
+    [k: string]: any;
+  };
+  vectorScore?: number;
+};
+
+function toTextBlob(item: SearchItem): string {
+  const parts = [
+    item.title ?? "",
+    item.text ?? "",
+    item.content ?? "",
+    item.metadata ? JSON.stringify(item.metadata) : ""
+  ];
+  return parts.join(" ").toLowerCase();
+}
+
+export function shouldIncludeContent(item: SearchItem, profile: Profile): boolean {
+  const hay = toTextBlob(item);
+  const ex = (profile.exclude_keywords ?? []).map((x) => x.toLowerCase());
+  const exAny = (profile.exclude_if_any_keywords ?? []).map((x) => x.toLowerCase());
+  const incAny = (profile.include_if_any_keywords ?? []).map((x) => x.toLowerCase());
+
+  if (ex.length && ex.some((k) => hay.includes(k))) return false;
+  if (exAny.length && exAny.some((k) => hay.includes(k))) return false;
+  if (incAny.length && incAny.some((k) => hay.includes(k))) return true;
+  return true;
+}
+
+export function applyHybridScoring(
+  item: SearchItem,
+  profile: Profile,
+  equipment: EquipmentInfo,
+  workType?: WorkType,
+  opts: HybridScoreOptions = {}
+): number {
+  const o = { ...DEFAULT_OPTS, ...opts };
+  const text = toTextBlob(item);
+
+  const eqTokens = tokenize(equipment?.name).concat((equipment?.tags ?? []));
+  const wtTokens = tokenize(workType?.name);
+  const riskTokens = (equipment?.riskTags ?? []);
+
+  const vec = Math.max(0, Math.min(1, item.vectorScore ?? 0));
+
+  const kwHits = containsAny(text, profile.keywords ?? []);
+  const eqHits = containsAny(text, eqTokens);
+  const wtHits = containsAny(text, wtTokens);
+  const riskHits = containsAny(text, riskTokens);
+
+  const includeAny = profile.include_if_any_keywords ?? [];
+  const exclude = profile.exclude_keywords ?? [];
+  const exclAny = profile.exclude_if_any_keywords ?? [];
+
+  let bonus = 0;
+  if (includeAny.length && containsAny(text, includeAny) > 0) bonus += o.bonusForIncludedAny;
+  let penalty = 0;
+  if (exclude.length && containsAny(text, exclude) > 0) penalty += Math.abs(o.penaltyForExcluded);
+  if (exclAny.length && containsAny(text, exclAny) > 0) penalty += Math.abs(o.penaltyForExcluded);
+
+  const st = item.metadata?.sourceType;
+  const regHit = st === "regulation" ? 1 : 0;
+  const eduHit = st === "education" ? 1 : 0;
+
+  const s_kw = normalize(kwHits, 8);
+  const s_eq = normalize(eqHits, 6);
+  const s_wt = normalize(wtHits, 4);
+  const s_rk = normalize(riskHits, 4);
+
+  const w = profile.weights;
+
+  let score = 0;
+  score += w.vector * vec;
+  score += w.keyword * s_kw;
+  score += w.equipment * s_eq;
+  score += w.work_type * s_wt;
+  score += w.risk * s_rk;
+  score += w.regulation_hit * regHit;
+  score += w.education_hit * eduHit;
+
+  score += bonus;
+  score -= penalty;
+
+  return Math.max(0, Math.min(1, score));
+}
+
+2) ai-service (2).ts
+
+목적: (a) 프로파일 기대 태그 기반 패널티(하드코드 제거), (b) resolveProfile에 workType 전달, (c) 메타데이터 기본값 왜곡 제거, (d) 임계값 조정(동적 또는 상향), (e) 구 빌더 제거.
+
+2.1 Unified diff (핵심 부분만)
+
+*** a/server/ai-service.ts
+--- b/server/ai-service.ts
+@@
+-import { buildTargetedSearchQuery } from './profiles.js';
++import { buildTargetedSearchQuery, shouldIncludeContent, applyHybridScoring } from './profiles';
+@@
+-const resolvedProfile = resolveProfile(equipmentInfoObj);
++const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
+@@
+-// (과거) 수동 searchQueries 조립 블록 삭제
+-// this.buildTargetedSearchQuery(...) 등 구식 메서드 사용부 제거
++// 프로파일 기반 쿼리로 일원화
++const { accidents, regulation, education, all } =
++  buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
++
++// 제조업 잡음 NOT 토큰 주입(선택) — 키워드 검색기에만 적용
++const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
++  .concat(['사출','성형기','소각','컨베이어','벨트','제조','생산라인','가공']);
++const keywordQueries = all.map(q => negatives.reduce((s, n) => `${s} -${n}`, q));
+@@
+-// knownData 매핑 시 기본 메타데이터 보정(전기작업/제조업/감전 등 하드코드 제거)
+-const itemMeta = {
+-  work_type: metadata.work_type || "전기작업",
+-  industry: metadata.industry || "제조업",
+-  risk_keywords: metadata.risk_keywords || "감전, 고압, 충전부",
+-  ...metadata
+-};
++// 기본 메타데이터는 입력/프로파일에서 유추
++const itemMeta = {
++  work_type: metadata.work_type || (workType?.name ?? '일반작업'),
++  industry: metadata.industry || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
++  risk_keywords: metadata.risk_keywords || (inferRiskTags(equipmentInfoObj).join(', ') || undefined),
++  ...metadata
++};
+@@
+-// 교육자료 전용 필터만 있던 shouldIncludeContent를 사고/법규에도 적용
+-const preFilteredIncidents = results.filter(r => r.metadata?.type === 'incident');
++const preFilteredIncidents = results.filter(r => r.metadata?.type === 'incident')
++  .filter(r => shouldIncludeContent({
++    id: r.id,
++    title: r.metadata?.title,
++    text: r.document,
++    content: r.document,
++    metadata: r.metadata
++  }, resolvedProfile));
+@@
+-// 산업 불일치 패널티: 기대 태그를 하드코드하지 말고 프로파일 기반으로
+-function applyHybridScoringWithPenalty(list, isEducation = false) {
+-  const expect = new Set(['electrical','substation','gis']);
+-  return list.map(r => {
+-    let score = computeHybrid(r); // 기존 계산
+-    const tags = (r.metadata?.tags || []).map((x) => x.toLowerCase());
+-    const industry = (r.metadata?.industry || '').toLowerCase();
+-    const ok = tags.some(t => expect.has(t)) || expect.has(industry);
+-    if (!ok) score = Math.max(0, score - (isEducation ? 0.15 : 0.30));
+-    return { ...r, hybridScore: score };
+-  });
+-}
++function applyHybridScoringWithPenalty(list: any[], isEducation = false) {
++  const expected = new Set(
++    (resolvedProfile.match?.tags_any ?? inferEquipmentTags(equipmentInfoObj) ?? [])
++      .map((t: string) => t.toLowerCase())
++  );
++  return list.map((r) => {
++    const base = applyHybridScoring({
++      id: r.id,
++      title: r.metadata?.title,
++      text: r.document,
++      content: r.document,
++      metadata: r.metadata,
++      vectorScore: r.vectorScore ?? r.score ?? r.similarity
++    }, resolvedProfile, equipmentInfoObj, workType);
++
++    const tags = (r.metadata?.tags || []).map((x: string) => x.toLowerCase());
++    const industry = (r.metadata?.industry || '').toLowerCase();
++    const expectEmpty = expected.size === 0;
++    const ok = expectEmpty || tags.some((t) => expected.has(t)) || expected.has(industry);
++    const penalty = ok ? 0 : (isEducation ? 0.15 : 0.30);
++    const score = Math.max(0, base - penalty);
++    return { ...r, hybridScore: score };
++  });
++}
+@@
+-// 임계값 고정(0.05) → 동적 상향
+-const threshold = 0.05;
++// 임계값 동적/상향: 상위 30% 컷, 교육은 완화
++function computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
++  if (!scores.length) return 0;
++  const sorted = [...scores].sort((a,b)=>a-b);
++  const idx = Math.floor(sorted.length * 0.70); // 상위 30% 통과
++  const p = sorted[idx];
++  const cap = kind === 'education' ? 0.25 : 0.35;
++  return Math.min(p, cap);
++}
++
++const incidentScores = scoredIncidents.map(x => x.hybridScore ?? 0);
++const educationScores = scoredEducation.map(x => x.hybridScore ?? 0);
++const regulationScores = scoredRegulations.map(x => x.hybridScore ?? 0);
++
++const incidentThreshold = computeThreshold(incidentScores, 'incident');
++const educationThreshold = computeThreshold(educationScores, 'education');
++const regulationThreshold = computeThreshold(regulationScores, 'regulation');
+
+2.2 Drop‑in replacement: 패널티/임계값 래퍼 함수
+
+// 기대 태그 기반 산업 불일치 패널티 + 하이브리드 스코어링
+function applyHybridScoringWithPenalty(
+  list: any[],
+  resolvedProfile: Profile,
+  equipmentInfoObj: EquipmentInfo,
+  workType?: WorkType,
+  isEducation = false
+) {
+  const expected = new Set(
+    (resolvedProfile.match?.tags_any ?? inferEquipmentTags(equipmentInfoObj) ?? [])
+      .map((t: string) => t.toLowerCase())
+  );
+  return list.map((r) => {
+    const base = applyHybridScoring({
+      id: r.id,
+      title: r.metadata?.title,
+      text: r.document,
+      content: r.document,
+      metadata: r.metadata,
+      vectorScore: r.vectorScore ?? r.score ?? r.similarity
+    }, resolvedProfile, equipmentInfoObj, workType);
+
+    const tags = (r.metadata?.tags || []).map((x: string) => x.toLowerCase());
+    const industry = (r.metadata?.industry || '').toLowerCase();
+    const expectEmpty = expected.size === 0;
+    const ok = expectEmpty || tags.some((t) => expected.has(t)) || expected.has(industry);
+    const penalty = ok ? 0 : (isEducation ? 0.15 : 0.30);
+    return { ...r, hybridScore: Math.max(0, base - penalty) };
+  });
+}
+
+// 임계값 계산: 상위 30% + 상한
+function computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a,b)=>a-b);
+  const idx = Math.floor(sorted.length * 0.70);
+  const p = sorted[idx];
+  const cap = kind === 'education' ? 0.25 : 0.35;
+  return Math.min(p, cap);
+}
+
+3) 구 빌더/데드코드 정리 체크리스트
+
+private buildTargetedSearchQuery(...) (클래스 내부 예전 함수) → 삭제
+
+computeUniversalHybridScore를 더 이상 쓰지 않으면 import 제거
+
+TS import 경로: from './profiles' (번들 전 .js 확장자 지양)
+
+타입 정합: EquipmentInfo에 workType?: string가 없다면 미참조 또는 타입 확장
+
+4) 빠른 검증용 로그
+
+console.log(`[profiles] match id=%s name="%s" tags=%j work="%s" risks=%j`,
+  resolvedProfile.id, equipmentInfoObj.name, equipmentInfoObj.tags, workType?.name, equipmentInfoObj.riskTags);
+console.log(`[queries]`, { count: all.length, sample: all.slice(0,5) });
+console.log(`[thresholds]`, {
+  incidentThreshold, educationThreshold, regulationThreshold
+});
