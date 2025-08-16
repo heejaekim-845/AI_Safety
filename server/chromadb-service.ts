@@ -679,6 +679,134 @@ export class ChromaDBService {
     }
   }
 
+  // 특정 타입의 문서들을 삭제하는 메서드
+  public async deleteDocumentsByType(type: string): Promise<void> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      console.log(`${type} 타입 문서 삭제 시작...`);
+      
+      // 백업 생성
+      await this.createBackup();
+      
+      // 현재 모든 아이템 조회
+      const items = await this.index.listItems();
+      console.log(`전체 아이템 수: ${items.length}`);
+      
+      // 삭제할 아이템들 찾기
+      const itemsToDelete = items.filter(item => item.metadata?.type === type);
+      console.log(`삭제 대상 ${type} 아이템 수: ${itemsToDelete.length}`);
+      
+      if (itemsToDelete.length === 0) {
+        console.log(`삭제할 ${type} 타입 문서가 없습니다.`);
+        return;
+      }
+      
+      // 배치로 삭제 (인덱스 업데이트 시작)
+      await this.index.beginUpdate();
+      
+      try {
+        // 각 아이템 삭제
+        for (const item of itemsToDelete) {
+          await this.index.deleteItem(item.id);
+        }
+        
+        // 인덱스 업데이트 완료
+        await this.index.endUpdate();
+        
+        console.log(`${type} 타입 문서 ${itemsToDelete.length}건 삭제 완료`);
+        
+        // 삭제 후 통계 출력
+        const remainingItems = await this.index.listItems();
+        console.log(`삭제 후 남은 아이템 수: ${remainingItems.length}`);
+        
+        // 카테고리별 통계
+        const categoryCount = { incident: 0, education: 0, regulation: 0 };
+        for (const item of remainingItems) {
+          const itemType = item.metadata?.type;
+          if (itemType && categoryCount[itemType] !== undefined) {
+            categoryCount[itemType]++;
+          }
+        }
+        console.log('삭제 후 카테고리별 개수:', categoryCount);
+        
+      } catch (error) {
+        // 업데이트 중 오류 발생 시 롤백
+        await this.index.endUpdate();
+        throw error;
+      }
+      
+    } catch (error) {
+      console.error(`${type} 타입 문서 삭제 실패:`, error);
+      
+      // 백업에서 복구 시도
+      const restored = await this.restoreFromBackup();
+      if (restored) {
+        console.log('백업에서 복구 완료');
+      }
+      
+      throw error;
+    }
+  }
+
+  // 안전법규 데이터만 삭제하는 편의 메서드
+  public async deleteRegulations(): Promise<void> {
+    console.log('=== deleteRegulations() 시작 ===');
+    await this.deleteDocumentsByType('regulation');
+    console.log('=== deleteRegulations() 완료 ===');
+  }
+
+  // 새로운 안전법규 파일로 재임베딩하는 메서드
+  public async reembedRegulations(newRegulationFile?: string): Promise<void> {
+    try {
+      console.log('안전법규 재임베딩 시작...');
+      
+      // 1. 기존 안전법규 데이터 삭제
+      await this.deleteRegulations();
+      
+      // 2. 새로운 파일이 지정된 경우 해당 파일 사용, 아니면 기본 파일 사용
+      const regulationFilePath = newRegulationFile || './embed_data/pdf_regulations_chunks.json';
+      console.log(`새로운 안전법규 파일 경로: ${regulationFilePath}`);
+      
+      // 3. 새로운 데이터 로드
+      let newRegulations: any[] = [];
+      try {
+        const regulationContent = await fs.readFile(regulationFilePath, 'utf-8');
+        newRegulations = JSON.parse(regulationContent);
+        console.log(`새로운 안전법규 데이터 ${newRegulations.length}건 로드`);
+      } catch (error) {
+        console.error(`안전법규 파일 로드 실패 (${regulationFilePath}):`, error);
+        throw new Error(`안전법규 파일을 찾을 수 없습니다: ${regulationFilePath}`);
+      }
+      
+      // 4. 새로운 데이터 임베딩 및 추가
+      if (newRegulations.length > 0) {
+        await this.processRegulations(newRegulations, 0);
+        console.log(`새로운 안전법규 ${newRegulations.length}건 임베딩 완료`);
+      }
+      
+      // 5. 최종 통계 출력
+      const finalItems = await this.index.listItems();
+      const categoryCount = { incident: 0, education: 0, regulation: 0 };
+      for (const item of finalItems) {
+        const type = item.metadata?.type;
+        if (type && categoryCount[type] !== undefined) {
+          categoryCount[type]++;
+        }
+      }
+      
+      console.log('안전법규 재임베딩 완료');
+      console.log('최종 카테고리별 개수:', categoryCount);
+      console.log(`전체 문서 수: ${finalItems.length}`);
+      
+    } catch (error) {
+      console.error('안전법규 재임베딩 실패:', error);
+      throw error;
+    }
+  }
+
   // 상세 분석 정보 제공
   public async getDetailedAnalysis(): Promise<any> {
     try {

@@ -1194,6 +1194,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 안전법규 데이터만 삭제
+  app.post('/api/delete-regulations', async (req, res) => {
+    try {
+      console.log('=== 안전법규 데이터 삭제 요청 받음 ===');
+      
+      // 삭제 전 통계
+      const beforeStats = await chromaDBService.getStats();
+      console.log(`삭제 전 전체 문서 수: ${beforeStats.count}`);
+      
+      // 안전법규 삭제 실행
+      console.log('deleteRegulations() 호출 시작...');
+      await chromaDBService.deleteRegulations();
+      console.log('deleteRegulations() 호출 완료');
+      
+      // 삭제 후 통계 확인
+      const afterStats = await chromaDBService.getStats();
+      console.log(`삭제 후 전체 문서 수: ${afterStats.count}`);
+      
+      res.json({
+        message: '안전법규 데이터 삭제 완료',
+        before: beforeStats.count,
+        after: afterStats.count,
+        deleted: beforeStats.count - afterStats.count,
+        stats: {
+          totalDocuments: afterStats.count,
+          collections: afterStats.collections
+        }
+      });
+    } catch (error: any) {
+      console.error('안전법규 삭제 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        stack: error.stack,
+        message: '안전법규 삭제 실패' 
+      });
+    }
+  });
+
+  // 새로운 안전법규 파일로 재임베딩
+  app.post('/api/reembed-regulations', async (req, res) => {
+    try {
+      console.log('안전법규 재임베딩 요청 받음...');
+      
+      const { regulationFile } = req.body;
+      
+      await chromaDBService.reembedRegulations(regulationFile);
+      
+      // 재임베딩 후 통계 확인
+      const stats = await chromaDBService.getStats();
+      
+      res.json({
+        message: '안전법규 재임베딩 완료',
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        },
+        regulationFile: regulationFile || './embed_data/pdf_regulations_chunks.json'
+      });
+    } catch (error: any) {
+      console.error('안전법규 재임베딩 실패:', error);
+      res.status(500).json({ 
+        error: error.message,
+        message: '안전법규 재임베딩 실패' 
+      });
+    }
+  });
+
+  // 특정 타입 문서 삭제 (범용)
+  app.post('/api/delete-documents-by-type', async (req, res) => {
+    try {
+      const { type } = req.body;
+      
+      if (!type || typeof type !== 'string') {
+        return res.status(400).json({ 
+          message: "삭제할 문서 타입을 지정해주세요 (incident, education, regulation)" 
+        });
+      }
+
+      const validTypes = ['incident', 'education', 'regulation'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ 
+          message: "유효한 문서 타입이 아닙니다. (incident, education, regulation 중 선택)" 
+        });
+      }
+
+      console.log(`${type} 타입 문서 삭제 요청 받음...`);
+      
+      await chromaDBService.deleteDocumentsByType(type);
+      
+      // 삭제 후 통계 확인
+      const stats = await chromaDBService.getStats();
+      
+      const typeNames = {
+        incident: '사고사례',
+        education: '교육자료',
+        regulation: '안전법규'
+      };
+      
+      res.json({
+        message: `${typeNames[type as keyof typeof typeNames]} 삭제 완료`,
+        type,
+        stats: {
+          totalDocuments: stats.count,
+          collections: stats.collections
+        }
+      });
+    } catch (error: any) {
+      const { type } = req.body;
+      console.error(`${type} 타입 문서 삭제 실패:`, error);
+      res.status(500).json({ 
+        error: error.message,
+        message: `${type} 타입 문서 삭제 실패` 
+      });
+    }
+  });
+
   // 체크포인트에서 재개
   app.post('/api/resume-embedding', async (req, res) => {
     try {

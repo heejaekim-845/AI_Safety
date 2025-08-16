@@ -22,7 +22,8 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **UI Reorganization**: Separated Vector DB management into dedicated section with three access points (Status, Management, Analysis)
 - **File Upload Feature**: Successfully restored file upload functionality with JSON/TXT support and automatic embedding processing
 - **File Upload UI Fix**: Resolved persistent "파일 업로드 중" message issue with proper state management and auto-clearing
-- **Data Coverage**: Complete vector database with 8,661 documents (1,793 incidents + 6,503 education materials + 367 safety regulations)
+- **Data Coverage**: Vector database with 8,294 documents (1,793 incidents + 6,501 education materials + 0 safety regulations)
+- **Regulation Data Management**: Successfully implemented regulation-specific deletion functionality, allowing for selective data updates without affecting other document categories
 - **Regulation Retrieval Fix**: Successfully resolved issue where safety regulations weren't appearing in AI briefings by optimizing search keywords and implementing multi-query search strategy for electrical safety regulations
 
 ## User Preferences
