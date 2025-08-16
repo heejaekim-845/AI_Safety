@@ -486,11 +486,11 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // 프로파일 기반 설비 정보 해석
+        // 프로파일 기반 설비 정보 해석 (태그 자동 추론)
         const equipmentInfoObj: EquipmentInfo = {
           name: equipmentInfo.name,
-          tags: equipmentInfo.tags || [],
-          riskTags: equipmentInfo.riskTags || [],
+          tags: equipmentInfo.tags || inferEquipmentTags(equipmentInfo.name),
+          riskTags: equipmentInfo.riskTags || inferRiskTags(equipmentInfo.name),
           metadata: {
             type: equipmentInfo.type || 'unknown',
             location: equipmentInfo.location || '',
@@ -510,14 +510,24 @@ JSON 형식으로 응답:
         let regulationQueries: string[] = resolvedProfile.queries?.regulation || [];
         let educationQueries: string[] = resolvedProfile.queries?.education || [];
         
-        // 프로파일 키워드로 검색 쿼리 생성
-        if (resolvedProfile.keywords && resolvedProfile.keywords.length > 0) {
+        // 프로파일별 특화 검색 쿼리 생성
+        if (resolvedProfile.id === 'electrical-hv-gis') {
+          // 전기설비 특화 쿼리 (제조업 키워드 배제)
+          searchQueries.push(`전기설비 감전 사고`);
+          searchQueries.push(`변전소 고압 작업 안전`); 
+          searchQueries.push(`GIS 개폐기 점검 사고`);
+          searchQueries.push(`특별고압 충전부 감전`);
+        } else if (resolvedProfile.keywords && resolvedProfile.keywords.length > 0) {
           searchQueries.push(`${equipmentInfo.name} ${resolvedProfile.keywords[0]} 사고`);
           searchQueries.push(`${resolvedProfile.keywords[0]} ${resolvedProfile.keywords[1] || ''} 작업안전`);
         }
 
-        // 백워드 호환성을 위한 추가 쿼리
-        searchQueries.push(`${equipmentInfo.name} ${workType.name} 사고`);
+        // 백워드 호환성을 위한 기본 쿼리 (제조업 키워드 배제)
+        if (resolvedProfile.id === 'electrical-hv-gis') {
+          searchQueries.push(`${equipmentInfo.name} 전기 작업 안전`);
+        } else {
+          searchQueries.push(`${equipmentInfo.name} ${workType.name} 사고`);
+        }
         
         console.log(`[프로파일] 법규 검색 키워드: ${regulationQueries.slice(0,3).join(', ')}...`);
         console.log(`[프로파일] 교육자료 검색 키워드: ${educationQueries.slice(0,3).join(', ')}...`);
@@ -594,20 +604,33 @@ JSON 형식으로 응답:
             if (type !== 'regulation') {
               return false;
             }
-            
-            // 프로파일 기반 관련성 확인
+
+            // 강화된 산업별 관련성 확인
             const searchItem: SearchItem = {
               content,
               title,
               metadata: r.metadata
             };
             
+            // 1차: 프로파일 기반 관련성 확인
             const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+            
+            // 2차: 설비 특화 키워드 매칭 (전기설비용)
+            let equipmentRelevant = false;
+            if (resolvedProfile.id === 'electrical-hv-gis') {
+              const electricalKeywords = ['전기', '절연', '고압', '특별고압', '변전', 'gis', '개폐기', '충전부', '활선'];
+              equipmentRelevant = electricalKeywords.some(keyword => 
+                title.includes(keyword) || content.includes(keyword)
+              );
+            } else {
+              equipmentRelevant = true; // 다른 프로파일은 기본 통과
+            }
+            
             const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
             
-            console.log(`[법령 필터링] "${title.substring(0, 30)}..." - 관련성: ${isRelevant}, 중복: ${!notDuplicate}`);
+            console.log(`[법령 필터링] "${title.substring(0, 30)}..." - 프로파일: ${isRelevant}, 설비: ${equipmentRelevant}, 중복: ${!notDuplicate}`);
             
-            return isRelevant && notDuplicate;
+            return isRelevant && equipmentRelevant && notDuplicate;
           });
           console.log(`법령 필터링 후: ${relevantRegulations.length}건`);
           filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
@@ -625,6 +648,7 @@ JSON 형식으로 응답:
           const relevantEducation = eduResults.filter(r => {
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
+            const industry = (r.metadata?.industry || '').toLowerCase();
             
             // 프로파일 기반 관련성 확인
             const searchItem: SearchItem = {
@@ -633,12 +657,32 @@ JSON 형식으로 응답:
               metadata: r.metadata
             };
             
+            // 1차: 프로파일 기반 관련성 확인
             const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
+            
+            // 2차: 산업별 관련성 추가 확인 (전기설비용)
+            let industryRelevant = true;
+            if (resolvedProfile.id === 'electrical-hv-gis') {
+              // 전기 관련 산업만 허용, 제조업 제외
+              const electricalIndustries = ['전기', '전력', '에너지', '발전', '송전', '배전', '변전'];
+              const manufacturingKeywords = ['제조', '생산', '가공', '포장', '운반'];
+              
+              const hasElectricalContent = electricalIndustries.some(keyword => 
+                title.includes(keyword) || content.includes(keyword) || industry.includes(keyword)
+              );
+              
+              const hasManufacturingContent = manufacturingKeywords.some(keyword => 
+                title.includes(keyword) || content.includes(keyword) || industry.includes(keyword)
+              );
+              
+              industryRelevant = hasElectricalContent || !hasManufacturingContent;
+            }
+            
             const isNotDuplicate = !existingIds.has(r.metadata?.id || r.document);
             
-            console.log(`[교육자료 필터링] "${title.substring(0, 30)}..." - 관련성: ${isRelevant}, 중복: ${!isNotDuplicate}`);
+            console.log(`[교육자료 필터링] "${title.substring(0, 30)}..." - 프로파일: ${isRelevant}, 산업: ${industryRelevant}, 중복: ${!isNotDuplicate}`);
             
-            return isRelevant && isNotDuplicate;
+            return isRelevant && industryRelevant && isNotDuplicate;
           });
           filteredChromaResults = [...filteredChromaResults, ...relevantEducation];
           
@@ -661,8 +705,31 @@ JSON 형식으로 응답:
           };
         }
         
+        // 사고사례 산업별 추가 필터링 후 하이브리드 스코어링
+        const preFilteredAccidents = filteredChromaResults.filter(r => {
+          if (r.metadata.type !== 'incident') return false;
+          
+          // 전기설비 프로파일일 때 제조업 사고 제외
+          if (resolvedProfile.id === 'electrical-hv-gis') {
+            const title = (r.metadata?.title || '').toLowerCase();
+            const content = (r.document || '').toLowerCase();
+            const excludePatterns = ['사출', '성형기', '소각', '컨베이어', '벨트', '제조', '생산라인', '가공'];
+            
+            const isManufacturing = excludePatterns.some(pattern => 
+              title.includes(pattern) || content.includes(pattern)
+            );
+            
+            if (isManufacturing) {
+              console.log(`[사고사례 제외] "${title}" - 제조업 관련 사고`);
+              return false;
+            }
+          }
+          
+          return true;
+        });
+
         const hybridFilteredAccidents = this.applyHybridScoring(
-          filteredChromaResults.filter(r => r.metadata.type === 'incident'), 
+          preFilteredAccidents, 
           keywordWeights,
           resolvedProfile
         ).slice(0, 5);

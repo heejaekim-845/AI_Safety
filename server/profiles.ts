@@ -299,7 +299,7 @@ export function shouldIncludeContent(
     }
   }
 
-  // 제외 조건 키워드 체크
+  // 제외 조건 키워드 체크 (강화된 산업별 필터링)
   const excludeIfAny = profile.exclude_if_any_keywords ?? [];
   if (excludeIfAny.length > 0) {
     for (const exclude of excludeIfAny) {
@@ -309,7 +309,9 @@ export function shouldIncludeContent(
     }
   }
 
-  // 포함 조건 키워드 체크 (있을 경우에만)
+
+
+  // 포함 조건 키워드 체크 (강화된 관련성 확인)
   const includeIfAny = profile.include_if_any_keywords ?? [];
   if (includeIfAny.length > 0) {
     let hasRequiredKeyword = false;
