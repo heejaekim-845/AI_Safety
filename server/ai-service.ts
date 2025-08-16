@@ -721,17 +721,16 @@ JSON 형식으로 응답:
         
         console.log(`[DEBUG] 전기작업 관련성 필터링 후: ${regulations.length}건 (${allRegulations.length}건 중)`);
 
-        // 기본 검색에서 regulation이 없으면 별도로 검색
-        if (regulations.length === 0) {
-          console.log('기본 검색에서 regulation 없음, 별도 검색 실행...');
-          try {
-            // 170kV GIS 작업에 특화된 전기작업 법규 검색
+        // 항상 전기법규 강제 검색 실행 (regulation 타입 부족 문제 해결)
+        console.log(`기본 regulation 검색 결과: ${regulations.length}건, 강제 전기법규 검색 실행...`);
+        try {
+            // 전기작업에 특화된 법규 검색
             const electricWorkQueries = [
-              '전기작업 절연 보호구 착용',
-              '충전부 접근 금지 안전거리',
-              '정전작업 안전수칙 확인',
-              '특별고압 전기설비 작업기준',
-              '전기기계기구 정기점검'
+              '전기기계기구',
+              '감전 방지 조치',
+              '전기설비 안전',
+              '고압 전기작업',
+              '절연 보호구'
             ];
             
             let electricRegulations: any[] = [];
@@ -742,107 +741,40 @@ JSON 형식으로 응답:
               }
             }
             
-            // 중복 제거 및 전기 관련성 필터링
+            // 중복 제거 및 전기 관련성 필터링 (관대한 조건)
             const uniqueElectricRegs = new Map();
             electricRegulations.forEach(reg => {
               const content = (reg.document || '').toLowerCase();
               const title = (reg.metadata?.title || '').toLowerCase();
               
-              // 전기작업과 관련된 키워드 확인
-              const isElectricRelated = 
-                content.includes('전기') || content.includes('감전') || content.includes('절연') ||
-                content.includes('충전부') || content.includes('정전') || content.includes('특별고압') ||
-                title.includes('전기') || title.includes('감전') || title.includes('절연') ||
-                title.includes('충전') || title.includes('고압');
+              console.log(`[강제검색] 검사중: "${reg.metadata?.title}"`);
               
-              // 불관련 키워드 제외
+              // 명백히 무관한 키워드만 제외
               const isIrrelevant = 
-                content.includes('안전밸브') || content.includes('낙반') || content.includes('발파') ||
-                content.includes('의사') || content.includes('진찰') || title.includes('밸브') ||
-                title.includes('낙반') || title.includes('발파');
+                title.includes('안전밸브') || title.includes('낙반') || title.includes('발파') ||
+                title.includes('의사') || title.includes('폭풍') || title.includes('압력') ||
+                title.includes('파열판') || title.includes('크레인');
               
-              if (isElectricRelated && !isIrrelevant) {
+              if (!isIrrelevant) {
+                console.log(`[강제검색] 포함: "${reg.metadata?.title}"`);
                 const key = reg.metadata?.id || reg.document;
                 if (!uniqueElectricRegs.has(key)) {
                   uniqueElectricRegs.set(key, reg);
                 }
+              } else {
+                console.log(`[강제검색] 제외: "${reg.metadata?.title}" - 무관 키워드`);
               }
             });
             
-            regulations = Array.from(uniqueElectricRegs.values()).slice(0, 5);
-            console.log(`전기작업 관련 regulation 필터링 후: ${regulations.length}건`);
+            const additionalRegulations = Array.from(uniqueElectricRegs.values()).slice(0, 5);
+            regulations = [...regulations, ...additionalRegulations].slice(0, 5);
+            console.log(`강제 전기법규 검색 완료: +${additionalRegulations.length}건 (총 ${regulations.length}건)`);
             regulations.forEach((reg, idx) => {
-              console.log(`  전기관련 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
+              console.log(`  최종 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
             });
             
-          } catch (error) {
-            console.error('별도 regulation 검색 실패:', error);
-          }
-        } else {
-          console.log(`기본검색에서 regulation ${regulations.length}건 발견, 전기작업 관련성 검사 실행`);
-          
-          // 전기작업과 무관한 regulations 필터링
-          const originalCount = regulations.length;
-          regulations = regulations.filter(reg => {
-            const content = (reg.document || '').toLowerCase();
-            const title = (reg.metadata?.title || '').toLowerCase();
-            
-            console.log(`[검사중] "${reg.metadata?.title}"`);
-            
-            // 명백히 무관한 키워드 체크
-            const hasIrrelevantKeywords = 
-              title.includes('안전밸브') || title.includes('낙반') || title.includes('발파') ||
-              title.includes('의사') || title.includes('폭풍') || title.includes('압력') ||
-              title.includes('파열판') || title.includes('크레인') || title.includes('조정');
-            
-            if (hasIrrelevantKeywords) {
-              console.log(`[제외됨] "${reg.metadata?.title}" - 무관 키워드 포함`);
-              return false;
-            }
-            
-            // 전기 관련 키워드 확인
-            const hasElectricKeywords = 
-              content.includes('전기') || content.includes('감전') || content.includes('절연') ||
-              content.includes('충전부') || content.includes('정전') || content.includes('특별고압') ||
-              content.includes('고압') || content.includes('전압') || content.includes('배전') ||
-              title.includes('전기') || title.includes('감전') || title.includes('절연') ||
-              title.includes('충전') || title.includes('고압') || title.includes('전압');
-            
-            if (!hasElectricKeywords) {
-              console.log(`[제외됨] "${reg.metadata?.title}" - 전기 관련 키워드 없음`);
-              return false;
-            }
-            
-            console.log(`[포함됨] "${reg.metadata?.title}" - 전기 관련 법규 유지`);
-            return true;
-          });
-          
-          console.log(`기본검색 법규 필터링 완료: ${regulations.length}건 (${originalCount}건 중)`);
-          
-          // 전기 관련 규정이 부족하면 직접 검색 추가
-          if (regulations.length < 2) {
-            console.log('전기 관련 규정 부족, 직접 전기법규 검색 추가 실행...');
-            try {
-              const directElectricSearch = await chromaDBService.searchByCategory('전기작업 절연 보호구 감전 방지 충전부 접근금지', 5);
-              if (directElectricSearch.regulation && directElectricSearch.regulation.length > 0) {
-                const additionalElectricRegs = directElectricSearch.regulation.filter(reg => {
-                  const content = (reg.document || '').toLowerCase();
-                  const title = (reg.metadata?.title || '').toLowerCase();
-                  return (content.includes('전기') || content.includes('감전') || content.includes('절연') ||
-                         title.includes('전기') || title.includes('감전') || title.includes('절연')) &&
-                         !title.includes('밸브') && !title.includes('낙반') && !title.includes('의사');
-                });
-                regulations = [...regulations, ...additionalElectricRegs].slice(0, 5);
-                console.log(`직접 전기법규 검색 추가: ${additionalElectricRegs.length}건 (총 ${regulations.length}건)`);
-              }
-            } catch (error) {
-              console.error('직접 전기법규 검색 실패:', error);
-            }
-          }
-          
-          regulations.forEach((reg, idx) => {
-            console.log(`  최종 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
-          });
+        } catch (error) {
+          console.error('강제 전기법규 검색 실패:', error);
         }
         
         // 하이브리드 점수 디버깅 로그
