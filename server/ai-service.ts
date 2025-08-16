@@ -16,6 +16,38 @@ import {
   type WorkType
 } from './profiles';
 
+// ===== Precision Tuning =====
+const TUNING = {
+  categoryTargets: {
+    incident:  { min: 3, max: 6 },   // 사고사례
+    education: { min: 2, max: 5 },   // 교육자료
+    regulation:{ min: 3, max: 6 }    // 법령
+  },
+  thresholds: {
+    // Use higher quantiles to be stricter
+    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
+    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
+    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 } // if p < floor, use floor
+  },
+  gating: {
+    minVectorScore: 0.18,              // too weak vectors are cut unless compensated by tokens
+    minKeywordHits: { incident: 2, education: 1, regulation: 1 },
+    requireSetsAnyOf: ["equipment", "workType", "risk"],
+    minSetsMatched: 2                   // e.g., text must match at least 2 of the sets
+  },
+  penalties: {
+    industryMismatch: { education: 0.20, other: 0.40 },
+    titleMissingEquipment: 0.08         // drop if equipment tokens absent in title
+  },
+  diversity: {
+    maxPerDoc: 1,                       // keep at most 1 chunk per doc
+    dedupKeys: ["docId", "url", "title"]
+  },
+  recency: {
+    years: 10                           // optional: ignore items older than N years (if date exists)
+  }
+} as const;
+
 // ---------- Diagnostics ----------
 function dbgCount<T>(label: string, list: T[]) {
   const n = Array.isArray(list) ? list.length : 0;
@@ -84,6 +116,116 @@ function ensureNonEmpty<T>(label: string, arr: T[], fallback: () => T[]): T[] {
   if (arr.length > 0) return arr;
   console.warn(`[warn] ${label} empty → fallback`);
   return fallback();
+}
+
+// ---------- Precision Control Helpers ----------
+function quantile(sortedAsc: number[], q: number) {
+  if (!sortedAsc.length) return 0;
+  const pos = Math.min(sortedAsc.length - 1, Math.max(0, Math.floor(sortedAsc.length * q)));
+  return sortedAsc[pos] ?? 0;
+}
+
+function normalizeStr(x?: string) { return (x || '').toLowerCase().trim(); }
+
+function getMetaStr(m: any, k: string) { return normalizeStr(m?.[k]); }
+
+function toTextBlobForGating(r: any) {
+  return [normalizeStr(r.metadata?.title), normalizeStr(r.document)].join(' ');
+}
+
+function parseYear(maybeDate: string): number | undefined {
+  if (!maybeDate) return undefined;
+  const m = maybeDate.match(/(19|20)\d{2}/);
+  return m ? Number(m[0]) : undefined;
+}
+
+function isRecentEnough(r: any, years: number): boolean {
+  if (!years) return true;
+  const y = parseYear(getMetaStr(r.metadata, 'date') || getMetaStr(r.metadata, 'year'));
+  if (!y) return true; // no date → keep
+  const now = new Date().getFullYear();
+  return (now - y) <= years;
+}
+
+function countHits(text: string, needles: string[]): number {
+  const s = text;
+  let hits = 0;
+  for (const n of (needles || [])) {
+    const t = normalizeStr(n);
+    if (!t) continue;
+    if (s.includes(t)) hits += 1;
+  }
+  return hits;
+}
+
+function anyHit(text: string, needles: string[]) {
+  return countHits(text, needles) > 0;
+}
+
+function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: any) {
+  const text = toTextBlobForGating(r);
+  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
+    .concat(equipmentInfoObj?.tags || []).map(normalizeStr);
+  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map(normalizeStr);
+  const rkTokens = (equipmentInfoObj?.riskTags || []).map(normalizeStr);
+
+  const sets = {
+    equipment: countHits(text, eqTokens),
+    workType:  countHits(text, wtTokens),
+    risk:      countHits(text, rkTokens)
+  };
+  const matchedSets = Object.values(sets).filter(v => v > 0).length;
+
+  const minSet = TUNING.gating.minSetsMatched;
+  if (minSet > 0 && matchedSets < minSet) return false;
+
+  // keyword hits
+  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
+  const kwList = (profile.keywords || []) as string[];
+  const kwHits = countHits(text, kwList);
+  const minKwHits = (TUNING.gating.minKeywordHits as any)[kind] || 0;
+  if (kwHits < minKwHits) return false;
+
+  // vector score gate
+  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
+  if (v < TUNING.gating.minVectorScore && matchedSets < (minSet + 1)) return false;
+
+  // title must contain some equipment tokens (soft)
+  const title = normalizeStr(r.metadata?.title);
+  if (title && !anyHit(title, eqTokens)) {
+    r.hybridScore = Math.max(0, (r.hybridScore ?? 0) - TUNING.penalties.titleMissingEquipment);
+  }
+
+  // recency
+  if (!isRecentEnough(r, TUNING.recency.years)) return false;
+
+  return true;
+}
+
+function diversifyAndTrim(list: any[], maxPerDoc: number, keys: string[]) {
+  if (!Array.isArray(list) || !list.length) return [];
+  const buckets = new Map<string, any[]>();
+  for (const r of list) {
+    const m = r.metadata || {};
+    const key = keys.map(k => normalizeStr(m[k])).find(Boolean) || normalizeStr(r.id);
+    const arr = buckets.get(key) || [];
+    if (arr.length < maxPerDoc) arr.push(r);
+    buckets.set(key, arr);
+  }
+  // flatten preserving order
+  const out: any[] = [];
+  buckets.forEach(arr => out.push(...arr));
+  return out;
+}
+
+function computeStrictThreshold(scores: number[], kind: 'incident'|'education'|'regulation') {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a,b)=>a-b);
+  const q = (TUNING.thresholds.quantile as any)[kind] ?? 0.8;
+  const cap = (TUNING.thresholds.cap as any)[kind] ?? 0.35;
+  const floor = (TUNING.thresholds.floor as any)[kind] ?? 0.1;
+  const p = quantile(sorted, q);
+  return Math.max(floor, Math.min(p, cap));
 }
 
 // Timing utilities for performance analysis
@@ -884,14 +1026,82 @@ JSON 형식으로 응답:
           preRegulations, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ false
         ));
 
-        const finalIncidents   = dbgCount('incidents.post-threshold', applyThresholdWithFallback(scoredIncidents, 'incident'));
-        const finalEducation   = dbgCount('education.post-threshold', applyThresholdWithFallback(scoredEducation, 'education'));
-        const finalRegulations = dbgCount('regulations.post-threshold', applyThresholdWithFallback(scoredRegulations, 'regulation'));
+        // ===== PRECISION CONTROL PATCH APPLIED =====
+        console.log('[PRECISION] Applying gating controls...');
+        
+        // Apply gating controls
+        const gatedIncidents = scoredIncidents.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile));
+        const gatedEducation = scoredEducation.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile)); 
+        const gatedRegulations = scoredRegulations.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile));
+        
+        console.log(`[PRECISION] Gating results: incidents ${scoredIncidents.length} → ${gatedIncidents.length}, education ${scoredEducation.length} → ${gatedEducation.length}, regulations ${scoredRegulations.length} → ${gatedRegulations.length}`);
+        
+        // Apply strict thresholds
+        const incidentScores = gatedIncidents.map(r => r.hybridScore ?? 0);
+        const educationScores = gatedEducation.map(r => r.hybridScore ?? 0);
+        const regulationScores = gatedRegulations.map(r => r.hybridScore ?? 0);
+        
+        const incidentThreshold = computeStrictThreshold(incidentScores, 'incident');
+        const educationThreshold = computeStrictThreshold(educationScores, 'education');
+        const regulationThreshold = computeStrictThreshold(regulationScores, 'regulation');
+        
+        console.log(`[PRECISION] Strict thresholds: incident=${incidentThreshold.toFixed(3)}, education=${educationThreshold.toFixed(3)}, regulation=${regulationThreshold.toFixed(3)}`);
+        
+        let thresholdedIncidents = gatedIncidents.filter(r => (r.hybridScore ?? 0) >= incidentThreshold);
+        let thresholdedEducation = gatedEducation.filter(r => (r.hybridScore ?? 0) >= educationThreshold);
+        let thresholdedRegulations = gatedRegulations.filter(r => (r.hybridScore ?? 0) >= regulationThreshold);
+        
+        // Apply diversity trimming
+        const dedupKeys = ["docId", "url", "title"];
+        thresholdedIncidents = diversifyAndTrim(thresholdedIncidents, TUNING.diversity.maxPerDoc, dedupKeys);
+        thresholdedEducation = diversifyAndTrim(thresholdedEducation, TUNING.diversity.maxPerDoc, dedupKeys);
+        thresholdedRegulations = diversifyAndTrim(thresholdedRegulations, TUNING.diversity.maxPerDoc, dedupKeys);
+        
+        // Apply category caps with min/max enforcement
+        const incidentTargets = TUNING.categoryTargets.incident;
+        const educationTargets = TUNING.categoryTargets.education;
+        const regulationTargets = TUNING.categoryTargets.regulation;
+        
+        // Sort by hybrid score and apply limits
+        thresholdedIncidents = thresholdedIncidents
+          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
+          .slice(0, incidentTargets.max);
+        
+        thresholdedEducation = thresholdedEducation
+          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
+          .slice(0, educationTargets.max);
+        
+        thresholdedRegulations = thresholdedRegulations
+          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
+          .slice(0, regulationTargets.max);
+        
+        // Ensure minimum requirements are met with fallbacks
+        if (thresholdedIncidents.length < incidentTargets.min && gatedIncidents.length > 0) {
+          thresholdedIncidents = gatedIncidents.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, incidentTargets.min);
+        }
+        if (thresholdedEducation.length < educationTargets.min && gatedEducation.length > 0) {
+          thresholdedEducation = gatedEducation.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, educationTargets.min);
+        }
+        if (thresholdedRegulations.length < regulationTargets.min && gatedRegulations.length > 0) {
+          thresholdedRegulations = gatedRegulations.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, regulationTargets.min);
+        }
+        
+        console.log(`[PRECISION] Final precision-controlled results: incidents=${thresholdedIncidents.length}, education=${thresholdedEducation.length}, regulations=${thresholdedRegulations.length}`);
+        
+        // Override the old scoring results with precision-controlled ones
+        const precisionScoredIncidents = thresholdedIncidents;
+        const precisionScoredEducation = thresholdedEducation;
+        const precisionScoredRegulations = thresholdedRegulations;
 
-        // Safety: guarantee some output if everything is empty
-        const incidentsOut   = ensureNonEmpty('incidents', finalIncidents, () => scoredIncidents.slice(0, Math.min(5, scoredIncidents.length)));
-        const educationOut   = ensureNonEmpty('education', finalEducation, () => scoredEducation.slice(0, Math.min(5, scoredEducation.length)));
-        const regulationsOut = ensureNonEmpty('regulations', finalRegulations, () => scoredRegulations.slice(0, Math.min(5, scoredRegulations.length)));
+        // Use precision-controlled results instead of old threshold system
+        const finalIncidents   = dbgCount('incidents.post-threshold', precisionScoredIncidents);
+        const finalEducation   = dbgCount('education.post-threshold', precisionScoredEducation);
+        const finalRegulations = dbgCount('regulations.post-threshold', precisionScoredRegulations);
+
+        // Safety: guarantee some output if everything is empty (using precision-controlled results)
+        const incidentsOut   = ensureNonEmpty('incidents', finalIncidents, () => precisionScoredIncidents.slice(0, Math.min(5, precisionScoredIncidents.length)));
+        const educationOut   = ensureNonEmpty('education', finalEducation, () => precisionScoredEducation.slice(0, Math.min(5, precisionScoredEducation.length)));
+        const regulationsOut = ensureNonEmpty('regulations', finalRegulations, () => precisionScoredRegulations.slice(0, Math.min(5, precisionScoredRegulations.length)));
 
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;

@@ -1,0 +1,151 @@
+This patch adds precision controls to reduce overfetch of education and incident results while maintaining recall. It introduces: (1) category caps, (2) stricter gating rules, (3) higher dynamic thresholds, (4) diversity trimming, and (5) optional recency filters — all with metrics logs.
+
+Copy into server/ai-service.ts (your latest ai-service (4).ts). Search for the indicated anchors and paste the blocks. Adjust constants as needed.
+
+0) Tuning knobs (put near top, after imports)
+
+// ===== Precision Tuning =====
+const TUNING = {
+  categoryTargets: {
+    incident:  { min: 3, max: 6 },   // 사고사례
+    education: { min: 2, max: 5 },   // 교육자료
+    regulation:{ min: 3, max: 6 }    // 법령
+  },
+  thresholds: {
+    // Use higher quantiles to be stricter
+    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
+    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
+    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 } // if p < floor, use floor
+  },
+  gating: {
+    minVectorScore: 0.18,              // too weak vectors are cut unless compensated by tokens
+    minKeywordHits: { incident: 2, education: 1, regulation: 1 },
+    requireSetsAnyOf: ["equipment", "workType", "risk"],
+    minSetsMatched: 2                   // e.g., text must match at least 2 of the sets
+  },
+  penalties: {
+    industryMismatch: { education: 0.20, other: 0.40 },
+    titleMissingEquipment: 0.08         // drop if equipment tokens absent in title
+  },
+  diversity: {
+    maxPerDoc: 1,                       // keep at most 1 chunk per doc
+    dedupKeys: ["docId", "url", "title"]
+  },
+  recency: {
+    years: 10                           // optional: ignore items older than N years (if date exists)
+  }
+} as const;
+
+1) Helpers (add once, or merge with your existing ones)
+
+function quantile(sortedAsc: number[], q: number) {
+  if (!sortedAsc.length) return 0;
+  const pos = Math.min(sortedAsc.length - 1, Math.max(0, Math.floor(sortedAsc.length * q)));
+  return sortedAsc[pos] ?? 0;
+}
+
+function normalizeStr(x?: string) { return (x || '').toLowerCase().trim(); }
+
+function getMetaStr(m: any, k: string) { return normalizeStr(m?.[k]); }
+
+function toTextBlobForGating(r: any) {
+  return [normalizeStr(r.metadata?.title), normalizeStr(r.document)].join(' ');
+}
+
+function parseYear(maybeDate: string): number | undefined {
+  if (!maybeDate) return undefined;
+  const m = maybeDate.match(/(19|20)\d{2}/);
+  return m ? Number(m[0]) : undefined;
+}
+
+function isRecentEnough(r: any, years: number): boolean {
+  if (!years) return true;
+  const y = parseYear(getMetaStr(r.metadata, 'date') || getMetaStr(r.metadata, 'year'));
+  if (!y) return true; // no date → keep
+  const now = new Date().getFullYear();
+  return (now - y) <= years;
+}
+
+function countHits(text: string, needles: string[]): number {
+  const s = text;
+  let hits = 0;
+  for (const n of (needles || [])) {
+    const t = normalizeStr(n);
+    if (!t) continue;
+    if (s.includes(t)) hits += 1;
+  }
+  return hits;
+}
+
+function anyHit(text: string, needles: string[]) {
+  return countHits(text, needles) > 0;
+}
+
+function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: any) {
+  const text = toTextBlobForGating(r);
+  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
+    .concat(equipmentInfoObj?.tags || []).map(normalizeStr);
+  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map(normalizeStr);
+  const rkTokens = (equipmentInfoObj?.riskTags || []).map(normalizeStr);
+
+  const sets = {
+    equipment: countHits(text, eqTokens),
+    workType:  countHits(text, wtTokens),
+    risk:      countHits(text, rkTokens)
+  };
+  const matchedSets = Object.values(sets).filter(v => v > 0).length;
+
+  const minSet = TUNING.gating.minSetsMatched;
+  if (minSet > 0 && matchedSets < minSet) return false;
+
+  // keyword hits
+  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
+  const kwList = (profile.keywords || []) as string[];
+  const kwHits = countHits(text, kwList);
+  if (kwHits < (TUNING.gating.minKeywordHits as any)[kind] ?? 0) return false;
+
+  // vector score gate
+  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
+  if (v < TUNING.gating.minVectorScore && matchedSets < (minSet + 1)) return false;
+
+  // title must contain some equipment tokens (soft)
+  const title = normalizeStr(r.metadata?.title);
+  if (title && !anyHit(title, eqTokens)) {
+    r.hybridScore = Math.max(0, (r.hybridScore ?? 0) - TUNING.penalties.titleMissingEquipment);
+  }
+
+  // recency
+  if (!isRecentEnough(r, TUNING.recency.years)) return false;
+
+  return true;
+}
+
+function diversifyAndTrim(list: any[], maxPerDoc: number, keys: string[]) {
+  if (!Array.isArray(list) || !list.length) return [];
+  const buckets = new Map<string, any[]>();
+  for (const r of list) {
+    const m = r.metadata || {};
+    const key = keys.map(k => normalizeStr(m[k])).find(Boolean) || normalizeStr(r.id);
+    const arr = buckets.get(key) || [];
+    if (arr.length < maxPerDoc) arr.push(r);
+    buckets.set(key, arr);
+  }
+  // flatten preserving order
+  const out: any[] = [];
+  for (const [, arr] of buckets) out.push(...arr);
+  return out;
+}
+
+function computeStrictThreshold(scores: number[], kind: 'incident'|'education'|'regulation') {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a,b)=>a-b);
+  const q = (TUNING.thresholds.quantile as any)[kind] ?? 0.8;
+  const cap = (TUNING.thresholds.cap as any)[kind] ?? 0.35;
+  const floor = (TUNING.thresholds.floor as any)[kind] ?? 0.1;
+  const p = quantile(sorted, q);
+  return Math.max(floor, Math.min(p, cap));
+}
+
+2) Apply gating → scoring → strict thresholds → diversity → caps
+
+Insert after you form preIncidents, preEducation, preRegulations and compute base scores.
