@@ -80,7 +80,10 @@ export function loadProfiles(): Profile[] {
     cachedProfiles = null;
   }
   
-  if (cachedProfiles) return cachedProfiles;
+  if (cachedProfiles) {
+    console.log(`[profiles] cached: ${cachedProfiles.length} loaded`);
+    return cachedProfiles;
+  }
   
   try {
     const configPath = path.join(process.cwd(), 'config', 'search-profiles.json');
@@ -93,7 +96,7 @@ export function loadProfiles(): Profile[] {
     cachedProfiles = json.profiles;
     return cachedProfiles;
   } catch (error) {
-    console.error('프로파일 로딩 실패, 기본 프로파일 사용:', error);
+    console.error('[profiles] 로딩 실패 → default 사용:', error);
     // 기본 프로파일 반환
     cachedProfiles = [{
       id: "default",

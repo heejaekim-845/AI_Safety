@@ -500,34 +500,24 @@ JSON 형식으로 응답:
           }
         };
         
-        const resolvedProfile = resolveProfile(equipmentInfoObj);
+        const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
         console.log(`[프로파일] 선택된 프로파일: ${resolvedProfile.id}`);
         console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
         console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
         
-        // 프로파일 기반 기본 검색 키워드 사용 
-        let searchQueries: string[] = [];
-        let regulationQueries: string[] = resolvedProfile.queries?.regulation || [];
-        let educationQueries: string[] = resolvedProfile.queries?.education || [];
+        // 프로파일 기반 쿼리 빌더 사용
+        const { accidents, regulation, education, all } = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
         
-        // 프로파일별 특화 검색 쿼리 생성
-        if (resolvedProfile.id === 'electrical-hv-gis') {
-          // 전기설비 특화 쿼리 (제조업 키워드 배제)
-          searchQueries.push(`전기설비 감전 사고`);
-          searchQueries.push(`변전소 고압 작업 안전`); 
-          searchQueries.push(`GIS 개폐기 점검 사고`);
-          searchQueries.push(`특별고압 충전부 감전`);
-        } else if (resolvedProfile.keywords && resolvedProfile.keywords.length > 0) {
-          searchQueries.push(`${equipmentInfo.name} ${resolvedProfile.keywords[0]} 사고`);
-          searchQueries.push(`${resolvedProfile.keywords[0]} ${resolvedProfile.keywords[1] || ''} 작업안전`);
-        }
-
-        // 백워드 호환성을 위한 기본 쿼리 (제조업 키워드 배제)
-        if (resolvedProfile.id === 'electrical-hv-gis') {
-          searchQueries.push(`${equipmentInfo.name} 전기 작업 안전`);
-        } else {
-          searchQueries.push(`${equipmentInfo.name} ${workType.name} 사고`);
-        }
+        // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
+        const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
+          .concat(['사출','성형기','소각','컨베이어','벨트','제조','생산라인','가공']);
+        
+        // 검색 쿼리에 NOT 키워드 적용 (벡터 검색용)
+        const searchQueries = all.map(q =>
+          negatives.reduce((s, n) => `${s} -${n}`, q)
+        );
+        const regulationQueries = regulation;
+        const educationQueries = education;
         
         console.log(`[프로파일] 법규 검색 키워드: ${regulationQueries.slice(0,3).join(', ')}...`);
         console.log(`[프로파일] 교육자료 검색 키워드: ${educationQueries.slice(0,3).join(', ')}...`);
@@ -708,6 +698,17 @@ JSON 형식으로 응답:
         // 사고사례 산업별 추가 필터링 후 하이브리드 스코어링
         const preFilteredAccidents = filteredChromaResults.filter(r => {
           if (r.metadata.type !== 'incident') return false;
+
+          // 프로파일 기반 관련성 필터 (교육자료뿐 아니라 사고에도)
+          const searchItem: SearchItem = {
+            content: `${r.metadata?.title || ''}\n${r.document || ''}`,
+            title: r.metadata?.title,
+            metadata: r.metadata
+          };
+          if (!shouldIncludeContent(searchItem, resolvedProfile)) {
+            console.log(`[사고사례 제외] "${r.metadata?.title}" - 프로파일 관련성 필터`);
+            return false;
+          }
           
           // 전기설비 프로파일일 때 제조업 사고 제외
           if (resolvedProfile.id === 'electrical-hv-gis') {
@@ -1376,6 +1377,17 @@ ${specialNotes || "없음"}
         // 교육자료는 벡터 점수에 더 많은 가중치
         let hybridScore = (vectorScore * 0.6) + (keywordScore * 0.4);
         
+        // 산업/설비 불일치 패널티
+        const tags = (result.metadata?.tags || []).map((x: string) => x.toLowerCase());
+        const industry = (result.metadata?.industry || '').toLowerCase();
+        const expect = new Set(['electrical','substation','gis']);
+        const industryOk = tags.some((t: string) => expect.has(t)) || expect.has(industry);
+        if (!industryOk) {
+          // 교육은 완전 제외보단 패널티
+          const penalty = 0.15;
+          hybridScore = Math.max(0, hybridScore - penalty);
+        }
+        
         // 불필요한 키워드가 있으면 전체 점수도 감소
         if (hasIrrelevantKeyword) {
           hybridScore = hybridScore * 0.1;
@@ -1405,7 +1417,17 @@ ${specialNotes || "없음"}
           keywordScore = keywordScore * 0.1;
         }
         
-        const hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
+        let hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
+        
+        // 산업/설비 불일치 패널티 (사고/법규는 더 강하게)
+        const tags = (result.metadata?.tags || []).map((x: string) => x.toLowerCase());
+        const industry = (result.metadata?.industry || '').toLowerCase();
+        const expect = new Set(['electrical','substation','gis']);
+        const industryOk = tags.some((t: string) => expect.has(t)) || expect.has(industry);
+        if (!industryOk) {
+          const penalty = 0.3;
+          hybridScore = Math.max(0, hybridScore - penalty);
+        }
         
         console.log(`[incident] "${title}" 최종점수: ${hybridScore.toFixed(3)} (벡터: ${vectorScore.toFixed(3)}, 키워드: ${keywordScore}, 핵심키워드: ${criticalKeywordFound})`);
         
