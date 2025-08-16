@@ -283,58 +283,11 @@ function processCategoryAdaptive(
     return [];
   }
 
-  for (const lvl of BACKOFF) {
-    console.log(`[ADAPTIVE] ${kind} trying level ${lvl.label} with minSets=${lvl.gating.minSetsMatched}, minVector=${lvl.gating.minVectorScore}`);
-    
-    const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lvl));
-    console.log(`[ADAPTIVE] ${kind}.${lvl.label} gated: ${gated.length}/${preList.length}`);
-    dbgCount(`${kind}.gated.${lvl.label}`, gated);
-
-    if (gated.length === 0) {
-      console.log(`[ADAPTIVE] ${kind}.${lvl.label} - No items passed gating, trying next level`);
-      continue;
-    }
-
-    const scored = gated.map((r: any) => {
-      const base = applyHybridScoring({
-        id: r.metadata?.id || r.document || 'unknown',
-        title: r.metadata?.title,
-        text: r.document,
-        content: r.document,
-        metadata: r.metadata,
-        vectorScore: r.vectorScore ?? r.score ?? r.similarity
-      } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
-      return { ...r, hybridScore: base };
-    });
-    dbgCount(`${kind}.scored.${lvl.label}`, scored);
-
-    const scores = scored.map(x => x.hybridScore ?? 0);
-    const th = computeThresholdWithLevel(scores, kind, lvl);
-    console.log(`[ADAPTIVE] ${kind}.${lvl.label} threshold: ${th.toFixed(3)}, scores range: ${Math.min(...scores).toFixed(3)}-${Math.max(...scores).toFixed(3)}`);
-    
-    let top = scored.filter(x => (x.hybridScore ?? 0) >= th)
-      .sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
-    console.log(`[ADAPTIVE] ${kind}.${lvl.label} passed threshold: ${top.length}`);
-
-    // diversity trimming
-    top = diversifyAndTrim(top, 1, ['docId','url','title']);
-    console.log(`[ADAPTIVE] ${kind}.${lvl.label} after diversity: ${top.length}`);
-
-    // cap and ensure min
-    top = top.slice(0, maxOut);
-    console.log(`[ADAPTIVE] ${kind}.${lvl.label} final: ${top.length}, need min: ${minOut}`);
-    
-    if (top.length >= minOut) {
-      console.log(`[ADAPTIVE] ${kind} SUCCESS at level ${lvl.label} with ${top.length} results`);
-      return top;
-    }
-  }
-
-  // Hard fallback: return whatever we can get
-  console.log(`[ADAPTIVE] ${kind} FALLBACK - all levels failed, using relaxed approach`);
-  const lastLvl = BACKOFF[BACKOFF.length - 1];
-  const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lastLvl));
-  const scored = gated.map((r: any) => {
+  // ENHANCED FALLBACK: Skip strict gating for better content recall
+  console.log(`[ADAPTIVE] ${kind} ENHANCED FALLBACK - applying relaxed filtering for better recall`);
+  
+  // Apply only basic scoring without strict gating
+  const scored = preList.map((r: any) => {
     const base = applyHybridScoring({
       id: r.metadata?.id || r.document || 'unknown',
       title: r.metadata?.title,
@@ -344,11 +297,39 @@ function processCategoryAdaptive(
       vectorScore: r.vectorScore ?? r.score ?? r.similarity
     } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
     return { ...r, hybridScore: base };
-  }).sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+  });
   
-  const fallbackResult = scored.slice(0, Math.max(minOut, Math.min(maxOut, 3)));
-  console.log(`[ADAPTIVE] ${kind} FALLBACK returned ${fallbackResult.length} results`);
-  return fallbackResult;
+  console.log(`[ADAPTIVE] ${kind} scored all ${scored.length} candidates`);
+  
+  // Sort by hybrid score
+  const sorted = scored.sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+  
+  // For debugging, show score distribution
+  const scores = sorted.map(x => x.hybridScore ?? 0);
+  if (scores.length > 0) {
+    console.log(`[ADAPTIVE] ${kind} score range: ${Math.min(...scores).toFixed(3)}-${Math.max(...scores).toFixed(3)}`);
+  }
+  
+  // Apply very relaxed threshold - just take top candidates
+  const relaxedThreshold = 0.01; // Very low threshold to ensure content gets through
+  let top = sorted.filter(x => (x.hybridScore ?? 0) >= relaxedThreshold);
+  console.log(`[ADAPTIVE] ${kind} passed relaxed threshold (${relaxedThreshold}): ${top.length}`);
+
+  // If still no results, take the top candidates regardless of score
+  if (top.length === 0 && sorted.length > 0) {
+    console.log(`[ADAPTIVE] ${kind} EMERGENCY FALLBACK - taking top candidates regardless of score`);
+    top = sorted.slice(0, Math.max(minOut, 3));
+  }
+
+  // diversity trimming - but more lenient
+  top = diversifyAndTrim(top, 2, ['docId','url','title']); // Allow 2 per document instead of 1
+  console.log(`[ADAPTIVE] ${kind} after diversity: ${top.length}`);
+
+  // cap and ensure we get something
+  const result = top.slice(0, maxOut);
+  console.log(`[ADAPTIVE] ${kind} ENHANCED FALLBACK returned ${result.length} results`);
+  
+  return result;
 }
 
 // Timing utilities for performance analysis
@@ -1141,10 +1122,10 @@ JSON 형식으로 응답:
         // ===== ADAPTIVE BACKOFF SYSTEM APPLIED =====
         console.log('[ADAPTIVE] Applying adaptive backoff system...');
         
-        // Use adaptive processing with progressive relaxation
-        const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
-        const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/2, /*max*/5);  
-        const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
+        // Use adaptive processing with enhanced fallback for better content recall
+        const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
+        const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/5);  
+        const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
         
         console.log(`[ADAPTIVE] Input counts: preIncidents=${preIncidents.length}, preEducation=${preEducation.length}, preRegulations=${preRegulations.length}`);
         console.log(`[ADAPTIVE] Final adaptive results: incidents=${finalIncidents.length}, education=${finalEducation.length}, regulations=${finalRegulations.length}`);
