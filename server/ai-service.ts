@@ -1108,23 +1108,33 @@ JSON 형식으로 응답:
         }
         
         // RELAXED: Prefilter by type only (remove profile filtering to let adaptive system handle it)
+        console.log(`[DEBUG] Total candidates before filtering: ${candidatesRaw?.length || 0}`);
+        
         const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
           const type = normType(r.metadata);
-          console.log(`[DEBUG] Incident type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          if (type === 'incident') {
+            console.log(`[DEBUG] ✓ Incident found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
+          }
           return type === 'incident';
         }));
 
         const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
           const type = normType(r.metadata);
-          console.log(`[DEBUG] Education type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          if (type === 'education') {
+            console.log(`[DEBUG] ✓ Education found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
+          }
           return type === 'education';
         }));
 
         const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
           const type = normType(r.metadata);
-          console.log(`[DEBUG] Regulation type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          if (type === 'regulation') {
+            console.log(`[DEBUG] ✓ Regulation found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
+          }
           return type === 'regulation';
         }));
+        
+        console.log(`[DEBUG] Prefilter results: incidents=${preIncidents.length}, education=${preEducation.length}, regulations=${preRegulations.length}`);
 
         // Remove old scoring logic - now handled by adaptive system
 
