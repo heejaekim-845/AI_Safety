@@ -822,19 +822,38 @@ JSON 형식으로 응답:
           const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
           const safetyRulesData = JSON.parse(fs.readFileSync(safetyRulesPath, 'utf-8'));
           
-          // 전기설비 관련 핵심 조문들 (170kV GIS 작업 특화)
-          const electricalArticles = [
-            319, // 정전전로에서의 전기작업
-            320, // 정전전로 인근에서의 전기작업  
-            321, // 충전전로에서의 전기작업
-            323, // 절연용 보호구 등의 사용
-            325, // 절연용 보호구의 점검
-            306, // 전기기계ㆍ기구에 의한 위험의 방지
-            315, // 접지
-            316, // 접지의 종류 및 시기
-            317, // 절연 등
-            318  // 누전차단기의 설치
+          // 전기설비 관련 핵심 조문들 (170kV GIS 고압설비 작업 특화)
+          const electricalKeywords = [
+            '전기', '감전', '충전부', '절연', '접지', '정전', '활선',
+            '특별고압', '고압', '변전', '개폐기', '절연보호구', 
+            'GIS', '가스절연', 'SF6', '배전반', '차단기',
+            '전로', '전기기계', '전기기구', '누전차단기', '단로기'
           ];
+          
+          // 키워드 기반으로 관련 법령 검색
+          const relevantArticles = safetyRulesData.articles.filter((article: any) => {
+            const title = article.article_korean_title?.toLowerCase() || '';
+            const body = article.body?.toLowerCase() || '';
+            const content = title + ' ' + body;
+            
+            // 전기설비 관련 키워드 매칭 점수 계산
+            const keywordMatches = electricalKeywords.filter(keyword => 
+              content.includes(keyword)
+            ).length;
+            
+            // 최소 2개 이상의 키워드가 매칭되어야 선택
+            return keywordMatches >= 2;
+          })
+          .sort((a: any, b: any) => {
+            // 키워드 매칭 수로 정렬 (많은 것부터)
+            const aMatches = electricalKeywords.filter(keyword => 
+              (a.article_korean_title?.toLowerCase() + ' ' + a.body?.toLowerCase()).includes(keyword)
+            ).length;
+            const bMatches = electricalKeywords.filter(keyword => 
+              (b.article_korean_title?.toLowerCase() + ' ' + b.body?.toLowerCase()).includes(keyword)
+            ).length;
+            return bMatches - aMatches;
+          });
           
           const selectedArticles = safetyRulesData.articles
             .filter((article: any) => electricalArticles.includes(article.article_number))
