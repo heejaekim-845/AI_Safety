@@ -790,7 +790,83 @@ JSON 형식으로 응답:
         });
         
         console.log(`[프로파일] 관련성 필터링 후: ${regulations.length}건 (${allRegulations.length}건 중)`);
+        console.log(`[프로파일 디버그] ID: ${resolvedProfile.id}, 조건: electrical-hv-gis`);
 
+        // 전기설비 특화: safety_rules.json에서 직접 로드 (항상 실행)
+        console.log(`전기설비 특화 법령 직접 로드 시작... (기존 ${regulations.length}건)`);
+        
+        try {
+          const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
+          const safetyRulesData = JSON.parse(fs.readFileSync(safetyRulesPath, 'utf-8'));
+          
+          // 전기설비 관련 핵심 조문들 (170kV GIS 작업 특화)
+          const electricalArticles = [
+            319, // 정전전로에서의 전기작업
+            320, // 정전전로 인근에서의 전기작업  
+            321, // 충전전로에서의 전기작업
+            323, // 절연용 보호구 등의 사용
+            325, // 절연용 보호구의 점검
+            306, // 전기기계ㆍ기구에 의한 위험의 방지
+            315, // 접지
+            316, // 접지의 종류 및 시기
+            317, // 절연 등
+            318  // 누전차단기의 설치
+          ];
+          
+          const selectedArticles = safetyRulesData.articles
+            .filter((article: any) => electricalArticles.includes(article.article_number))
+            .slice(0, 5);
+          
+          console.log(`전기설비 관련 조문 ${selectedArticles.length}개 직접 로드`);
+          
+          const directRegulations = selectedArticles.map((article: any) => ({
+            lawName: '산업안전보건기준에 관한 규칙',
+            articleNumber: `제${article.article_number}조`,
+            articleTitle: article.article_korean_title,
+            fullContent: article.body,
+            distance: 0.1
+          }));
+          
+          regulations = [...regulations, ...directRegulations];
+          console.log(`직접 로드 후 총 법령 수: ${regulations.length}건`);
+          
+        } catch (error) {
+          console.error('전기설비 법령 직접 로드 실패:', error);
+        }
+
+        // 전기설비 특화: 조건부 추가 로드
+        if (resolvedProfile.id === 'electrical-hv-gis') {
+          console.log(`추가 조건부 로드 체크... (기존 ${regulations.length}건)`);
+          
+          try {
+            const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
+            const safetyRulesData = JSON.parse(fs.readFileSync(safetyRulesPath, 'utf-8'));
+            
+            // 전기설비 관련 핵심 조문들
+            const electricalArticles = [319, 320, 321, 323, 162, 163, 164, 306, 315, 316];
+            
+            const selectedArticles = safetyRulesData.articles
+              .filter((article: any) => electricalArticles.includes(article.article_number))
+              .slice(0, 5);
+            
+            console.log(`전기설비 관련 조문 ${selectedArticles.length}개 직접 로드`);
+            
+            const directRegulations = selectedArticles.map((article: any) => ({
+              lawName: '산업안전보건기준에 관한 규칙',
+              articleNumber: `제${article.article_number}조`,
+              articleTitle: article.article_korean_title,
+              fullContent: article.body,
+              distance: 0.1
+            }));
+            
+            regulations = [...regulations, ...directRegulations];
+            console.log(`직접 로드 후 총 법령 수: ${regulations.length}건`);
+            
+          } catch (error) {
+            console.error('전기설비 법령 직접 로드 실패:', error);
+          }
+        }
+        
         // 프로파일 기반 강제 검색 실행 (regulation 타입 부족 문제 해결)
         console.log(`기본 regulation 검색 결과: ${regulations.length}건, 프로파일 기반 강제 검색 실행...`);
         try {
@@ -947,126 +1023,40 @@ JSON 형식으로 응답:
           keywords: r.keywords || ''
         }));
         
-        // 법령: 필터링된 regulations 사용
+        // 법령: 이미 처리된 regulations 배열을 사용
+        console.log(`처리할 총 법령 수: ${regulations.length}건`);
         
-        const regulationResults = regulations
-          .sort((a, b) => a.distance - b.distance)
-          .slice(0, 5);
-        console.log(`최종 법령 검색 결과: ${regulationResults.length}건`);
-        
-        // 청크 번호가 포함된 제목을 실제 조문으로 변환하고 중복 제거
-        const processedRegulations = new Map();
-        
-        regulationResults.forEach((r, index) => {
-          const content = r.document;
-          let lawName = '산업안전보건기준에 관한 규칙';
+        let processedRegulations = new Map();
+        regulations.forEach((reg, index) => {
           let articleNumber = '';
           let articleTitle = '';
-
-          console.log(`Processing regulation ${index + 1}: "${r.metadata.title}"`);
-
-          // 문서 내용에서 조문 정보 추출
-          const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
-          if (articleMatch) {
-            articleNumber = `제${articleMatch[1]}조`;
-            articleTitle = articleMatch[2];
-            console.log(`Found article pattern 1: ${articleNumber} - ${articleTitle}`);
-          } else {
-            // 조문 패턴이 없으면 다른 패턴 시도
-            const altMatch = content.match(/제(\d+)조([^①②③④⑤⑥⑦⑧⑨⑩\n]*)/);
-            if (altMatch) {
-              articleNumber = `제${altMatch[1]}조`;
-              articleTitle = altMatch[2].trim().replace(/^\s*\([^)]*\)\s*/, ''); // 괄호 제거
-              if (articleTitle.length > 20) {
-                articleTitle = articleTitle.substring(0, 20) + '...';
-              }
-              console.log(`Found article pattern 2: ${articleNumber} - ${articleTitle}`);
-            } else {
-              // 조문 번호만이라도 추출해보기
-              const simpleMatch = content.match(/제(\d+)조/);
-              if (simpleMatch) {
-                articleNumber = `제${simpleMatch[1]}조`;
-                articleTitle = r.metadata.title || '안전 규정';
-                console.log(`Found simple article pattern: ${articleNumber} - ${articleTitle}`);
-              } else {
-                // 청크 번호로 조문 매핑
-                const chunkMatch = r.metadata.title.match(/청크\s*(\d+)/);
-                if (chunkMatch) {
-                  const chunkNumber = parseInt(chunkMatch[1]);
-                  const articleMapping: {[key: number]: {article: string, title: string}} = {
-                    162: {article: "제162조", title: "충전부등의 방호"},
-                    175: {article: "제319조", title: "정전전로에서의 전기작업"},
-                    176: {article: "제320조", title: "정전전로 인근에서의 전기작업"},
-                    177: {article: "제321조", title: "충전전로에서의 전기작업"},
-                    180: {article: "제323조", title: "절연용 보호구 등의 사용"}
-                  };
-                  
-                  if (articleMapping[chunkNumber]) {
-                    articleNumber = articleMapping[chunkNumber].article;
-                    articleTitle = articleMapping[chunkNumber].title;
-                    console.log(`Mapped chunk ${chunkNumber} to: ${articleNumber} - ${articleTitle}`);
-                  } else {
-                    articleNumber = "관련 안전규정";
-                    articleTitle = "산업안전보건 관련 규정";
-                    console.log(`Unknown chunk, using general title: ${articleNumber} - ${articleTitle}`);
-                  }
-                } else {
-                  articleNumber = "관련 안전규정";
-                  articleTitle = "산업안전보건 관련 규정";
-                  console.log(`No chunk found, using general title: ${articleNumber} - ${articleTitle}`);
-                }
-              }
-            }
-          }
-
-          // 모든 경우에 처리하도록 수정 (조문을 찾지 못해도 포함)
-
-          // 조문의 실제 내용 추출 (전체 텍스트)
           let fullContent = '';
-          const lines = content.split('\n').filter((line: string) => line.trim().length > 0);
           
-          // 조문 시작 위치 찾기
-          let startIndex = -1;
-          for (let i = 0; i < lines.length; i++) {
-            if (lines[i].includes(articleNumber)) {
-              startIndex = i;
-              break;
-            }
-          }
-
-          if (startIndex >= 0) {
-            // 조문 내용만 추출 (전체 내용)
-            let contentLines = [];
-            for (let i = startIndex; i < lines.length && i < startIndex + 10; i++) {
-              const line = lines[i].trim();
-              if (line && 
-                  !line.includes('법제처') && 
-                  !line.includes('국가법령정보센터') &&
-                  !line.includes('고용노동부')) {
-                contentLines.push(line);
-              }
-            }
-            fullContent = contentLines.join(' ');
+          if (reg.articleNumber && reg.articleTitle) {
+            // 직접 로드된 전기설비 법령 사용
+            articleNumber = reg.articleNumber;
+            articleTitle = reg.articleTitle;
+            fullContent = reg.fullContent || '';
+            console.log(`직접로드 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
           } else {
-            // 조문을 찾을 수 없으면 전체 내용 사용
-            const meaningfulLines = lines.filter((line: string) => 
-              !line.includes('법제처') && 
-              !line.includes('국가법령정보센터') &&
-              !line.includes('고용노동부') &&
-              line.trim().length > 10
-            );
-            fullContent = meaningfulLines.join(' ');
+            // 벡터 검색 법령은 기존 로직으로 처리
+            const content = reg.document || '';
+            const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+            if (articleMatch) {
+              articleNumber = `제${articleMatch[1]}조`;
+              articleTitle = articleMatch[2];
+              fullContent = content;
+              console.log(`벡터검색 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
+            }
           }
           
-          // 중복 제거
-          const key = articleNumber;
-          if (!processedRegulations.has(key) || processedRegulations.get(key).fullContent.length < fullContent.length) {
-            processedRegulations.set(key, {
-              lawName: lawName,
+          if (articleNumber) {
+            processedRegulations.set(articleNumber, {
+              lawName: '산업안전보건기준에 관한 규칙',
               articleNumber: articleNumber,
               articleTitle: articleTitle,
               fullContent: fullContent,
-              distance: r.distance
+              distance: reg.distance || 0.1
             });
           }
         });
