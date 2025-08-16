@@ -735,8 +735,31 @@ JSON 형식으로 응답:
           resolvedProfile
         ).slice(0, 5);
         
+        // 교육자료에서 외국어 자료 제외 필터링
+        const educationResults = filteredChromaResults.filter(r => {
+          if (r.metadata.type !== 'education') return false;
+          
+          const title = (r.metadata?.title || '').toLowerCase();
+          // 외국어 교육자료 패턴들
+          const foreignLanguagePatterns = [
+            '스리랑카', '태국', '방글라데시', '베트남', '캄보디아', '네팔', 
+            'english', 'working safely', 'appliances'
+          ];
+          
+          const isForeignLanguage = foreignLanguagePatterns.some(pattern => 
+            title.includes(pattern)
+          );
+          
+          if (isForeignLanguage) {
+            console.log(`[교육자료 제외] "${r.metadata?.title}" - 외국어 교육자료`);
+            return false;
+          }
+          
+          return true;
+        });
+        
         const hybridFilteredEducation = this.applyHybridScoring(
-          filteredChromaResults.filter(r => r.metadata.type === 'education'), 
+          educationResults, 
           keywordWeights,
           resolvedProfile
         ).slice(0, 8); // 교육자료 상위 8개로 증가
@@ -1013,7 +1036,27 @@ JSON 형식으로 응답:
           () => this.matchEducationWithUrls(hybridFilteredEducation)
         );
         
-        educationMaterials = educationDataWithUrls.map(r => ({
+        // 외국어 교육자료 제거 (URL 매칭 후 최종 필터링)
+        const filteredEducationData = educationDataWithUrls.filter(r => {
+          const title = (r.metadata?.title || '').toLowerCase();
+          const foreignLanguagePatterns = [
+            '스리랑카', '태국', '방글라데시', '베트남', '캄보디아', '네팔', 
+            'english', 'working safely', 'appliances'
+          ];
+          
+          const isForeignLanguage = foreignLanguagePatterns.some(pattern => 
+            title.includes(pattern)
+          );
+          
+          if (isForeignLanguage) {
+            console.log(`[최종 교육자료 제외] "${r.metadata?.title}" - 외국어 교육자료`);
+            return false;
+          }
+          
+          return true;
+        });
+        
+        educationMaterials = filteredEducationData.map(r => ({
           title: r.metadata.title,
           content: r.document.split('\n')[1] || '',
           category: r.metadata.category,
@@ -1022,6 +1065,8 @@ JSON 형식으로 응답:
           date: r.date || '',
           keywords: r.keywords || ''
         }));
+        
+        console.log(`교육자료 최종 필터링: ${educationDataWithUrls.length}건 → ${filteredEducationData.length}건`);
         
         // 법령: 이미 처리된 regulations 배열을 사용
         console.log(`처리할 총 법령 수: ${regulations.length}건`);
