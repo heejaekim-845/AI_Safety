@@ -16,6 +16,76 @@ import {
   type WorkType
 } from './profiles';
 
+// ---------- Diagnostics ----------
+function dbgCount<T>(label: string, list: T[]) {
+  const n = Array.isArray(list) ? list.length : 0;
+  console.log(`[dbg] ${label}:`, n);
+  return list;
+}
+
+// ---------- Type normalization ----------
+function normType(m: any) {
+  const s = (m?.type || m?.sourceType || '').toLowerCase();
+  if (s === 'accident') return 'incident';
+  return s;
+}
+
+// ---------- Negatives for keyword-only queries ----------
+function applyNegatives(query: string, negatives: string[]): string {
+  return negatives.reduce((s, n) => `${s} -${n}`, query);
+}
+
+// ---------- Upstream where (relaxed) ----------
+function buildRelaxedWhere(expectedTags: string[] | undefined) {
+  const tags = (expectedTags || []).filter(Boolean);
+  if (!tags.length) return undefined; // no upstream filter when none
+  return {
+    $or: [
+      { tags: { $containsAny: tags } },
+      { tags: { $exists: false } },
+      { industry: { $exists: false } }
+    ]
+  };
+}
+
+// ---------- Dedup ----------
+function dedupById<T extends { metadata?: any; document?: string }>(arr: T[]): T[] {
+  const m = new Map<string, T>();
+  for (const x of arr) {
+    if (x) {
+      const id = x.metadata?.id || x.document || JSON.stringify(x);
+      m.set(id, x);
+    }
+  }
+  return Array.from(m.values());
+}
+
+// ---------- Thresholds & fallbacks ----------
+function computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a, b) => a - b);
+  const idx = Math.floor(sorted.length * 0.70); // pass top 30%
+  const p = sorted[idx] ?? 0;
+  const cap = kind === 'education' ? 0.25 : 0.35;
+  return Math.min(p, cap);
+}
+
+function applyThresholdWithFallback(list: any[], kind: 'incident' | 'education' | 'regulation') {
+  const scores = list.map(x => x.hybridScore ?? 0);
+  let th = computeThreshold(scores, kind);
+  let out = list.filter(x => (x.hybridScore ?? 0) >= th);
+  if (out.length === 0) out = list.filter(x => (x.hybridScore ?? 0) >= 0);
+  if (out.length === 0 && list.length) out = list.sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0)).slice(0, Math.min(5, list.length));
+  return out;
+}
+
+// ---------- Non-empty safeguard ----------
+function ensureNonEmpty<T>(label: string, arr: T[], fallback: () => T[]): T[] {
+  if (arr.length > 0) return arr;
+  console.warn(`[warn] ${label} empty → fallback`);
+  return fallback();
+}
+
 // Timing utilities for performance analysis
 const t0 = () => performance.now();
 const ms = (s: number) => `${s.toFixed(1)}ms`;
@@ -48,7 +118,7 @@ export interface RiskAnalysis {
 export class AIService {
   private accidentDataCache?: any[];
 
-  // 기대 태그 기반 산업 불일치 패널티 + 하이브리드 스코어링
+  // Improved penalty wrapper over hybrid scoring from patch
   private applyHybridScoringWithPenalty(
     list: any[],
     resolvedProfile: Profile,
@@ -57,26 +127,53 @@ export class AIService {
     isEducation = false
   ) {
     const expected = new Set(
-      (resolvedProfile.match?.tags_any ?? inferEquipmentTags(equipmentInfoObj) ?? [])
-        .map((t: string) => t.toLowerCase())
+      (resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? [])).map((t: string) => t.toLowerCase())
     );
     return list.map((r) => {
       const base = applyHybridScoring({
-        id: r.id || r.document || 'unknown',
+        id: r.id,
         title: r.metadata?.title,
         text: r.document,
         content: r.document,
         metadata: r.metadata,
         vectorScore: r.vectorScore ?? r.score ?? r.similarity
-      }, resolvedProfile, equipmentInfoObj, workType);
+      } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
 
       const tags = (r.metadata?.tags || []).map((x: string) => x.toLowerCase());
       const industry = (r.metadata?.industry || '').toLowerCase();
       const expectEmpty = expected.size === 0;
-      const ok = expectEmpty || tags.some((t) => expected.has(t)) || expected.has(industry);
+      const ok = expectEmpty || tags.some((t: string) => expected.has(t)) || expected.has(industry);
       const penalty = ok ? 0 : (isEducation ? 0.15 : 0.30);
       return { ...r, hybridScore: Math.max(0, base - penalty) };
     });
+  }
+
+  // Search adapters for vector and keyword queries
+  private async runVectorQueries(queries: string[], where?: any): Promise<any[]> {
+    const out: any[] = [];
+    for (const q of queries) {
+      try {
+        const res = await chromaDBService.searchRelevantData(q, 15);
+        out.push(...(Array.isArray(res) ? res : []));
+      } catch (e) {
+        console.warn('[vec] query failed', q, e);
+      }
+    }
+    return out;
+  }
+
+  private async runKeywordQueries(queries: string[]): Promise<any[]> {
+    const out: any[] = [];
+    for (const q of queries) {
+      try {
+        // For now, using the same chromaDB service but in future could use different keyword service
+        const res = await chromaDBService.searchRelevantData(q, 15);
+        out.push(...(Array.isArray(res) ? res : []));
+      } catch (e) {
+        console.warn('[kw] query failed', q, e);
+      }
+    }
+    return out;
   }
 
   // 임계값 계산: 상위 30% + 상한
@@ -570,18 +667,20 @@ JSON 형식으로 응답:
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
-        // 다중 검색으로 관련성 높은 결과 확보
-        const chromaResults = await timeit(
-          `chroma.search parallel ${searchQueries.length}q`, 
-          async () => {
-            let results: any[] = [];
-            for (const query of searchQueries) {
-              const queryResults = await chromaDBService.searchRelevantData(query, 15);
-              results = [...results, ...queryResults];
-            }
-            return results;
-          }
-        );
+        // NEW PATCHED SEARCH FLOW: Separate vector vs keyword queries
+        const queriesForVector = all; // NO negatives for vector search
+        const queriesForKeyword = all.map(q => applyNegatives(q, negatives));
+
+        const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
+        const where = buildRelaxedWhere(expectedTags);
+
+        // Run searches (vector + keyword) and combine
+        const vecCandidates = await timeit('vector.search', () => this.runVectorQueries(queriesForVector, where));
+        const kwCandidates = await timeit('keyword.search', () => this.runKeywordQueries(queriesForKeyword));
+
+        const candidatesRaw = dbgCount('candidates.raw', dedupById([...(vecCandidates || []), ...(kwCandidates || [])]));
+        
+        const chromaResults = candidatesRaw;
 
         // 별도 regulation 검색 추가 (확실히 법규 데이터를 포함시키기 위해)
         console.log('별도 regulation 검색 실행...');
@@ -743,145 +842,69 @@ JSON 형식으로 응답:
           };
         }
         
-        // 사고사례 산업별 추가 필터링 후 하이브리드 스코어링
-        const preFilteredAccidents = filteredChromaResults.filter(r => {
-          if (r.metadata.type !== 'incident') return false;
-
-          // 프로파일 기반 관련성 필터 (교육자료뿐 아니라 사고에도)
-          const searchItem: SearchItem = {
+        // PATCHED: Prefilter by type + profile
+        const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
+          return normType(r.metadata) === 'incident' && shouldIncludeContent({
             id: r.metadata?.id || r.document || 'unknown',
-            content: `${r.metadata?.title || ''}\n${r.document || ''}`,
             title: r.metadata?.title,
+            text: r.document,
+            content: r.document,
             metadata: r.metadata
-          };
-          if (!shouldIncludeContent(searchItem, resolvedProfile)) {
-            console.log(`[사고사례 제외] "${r.metadata?.title}" - 프로파일 관련성 필터`);
-            return false;
-          }
-          
-          // 전기설비 프로파일일 때 제조업 사고 제외
-          if (resolvedProfile.id === 'electrical-hv-gis') {
-            const title = (r.metadata?.title || '').toLowerCase();
-            const content = (r.document || '').toLowerCase();
-            const excludePatterns = ['사출', '성형기', '소각', '컨베이어', '벨트', '제조', '생산라인', '가공'];
-            
-            const isManufacturing = excludePatterns.some(pattern => 
-              title.includes(pattern) || content.includes(pattern)
-            );
-            
-            if (isManufacturing) {
-              console.log(`[사고사례 제외] "${title}" - 제조업 관련 사고`);
-              return false;
-            }
-          }
-          
-          return true;
-        });
+          }, resolvedProfile);
+        }));
 
-        const scoredIncidents = this.applyHybridScoringWithPenalty(
-          preFilteredAccidents, 
-          resolvedProfile,
-          equipmentInfoObj,
-          workType,
-          false
-        );
-        
-        const incidentScores = scoredIncidents.map(x => x.hybridScore ?? 0);
-        const incidentThreshold = this.computeThreshold(incidentScores, 'incident');
-        console.log(`[thresholds] incident: ${incidentThreshold.toFixed(3)} (from ${incidentScores.length} scores)`);
-        const hybridFilteredAccidents = scoredIncidents
-          .filter(x => (x.hybridScore ?? 0) > incidentThreshold)
-          .slice(0, 5);
-        
-        // 교육자료에서 외국어 자료 제외 필터링
-        const educationResults = filteredChromaResults.filter(r => {
-          if (r.metadata.type !== 'education') return false;
-          
-          const title = (r.metadata?.title || '').toLowerCase();
-          // 외국어 교육자료 패턴들
-          const foreignLanguagePatterns = [
-            '스리랑카', '태국', '방글라데시', '베트남', '캄보디아', '네팔', 
-            'english', 'working safely', 'appliances'
-          ];
-          
-          const isForeignLanguage = foreignLanguagePatterns.some(pattern => 
-            title.includes(pattern)
-          );
-          
-          if (isForeignLanguage) {
-            console.log(`[교육자료 제외] "${r.metadata?.title}" - 외국어 교육자료`);
-            return false;
-          }
-          
-          return true;
-        });
-        
-        const scoredEducation = this.applyHybridScoringWithPenalty(
-          educationResults, 
-          resolvedProfile,
-          equipmentInfoObj,
-          workType,
-          true
-        );
-        
-        const educationScores = scoredEducation.map(x => x.hybridScore ?? 0);
-        const educationThreshold = this.computeThreshold(educationScores, 'education');
-        console.log(`[thresholds] education: ${educationThreshold.toFixed(3)} (from ${educationScores.length} scores)`);
-        const hybridFilteredEducation = scoredEducation
-          .filter(x => (x.hybridScore ?? 0) > educationThreshold)
-          .slice(0, 8); // 교육자료 상위 8개로 증가
-        
-        // 법규 검색 디버깅 추가
-        console.log(`전체 검색 결과: ${filteredChromaResults.length}건`);
-        console.log(`유형별 분포:`, {
-          incident: filteredChromaResults.filter(r => r.metadata.type === 'incident').length,
-          education: filteredChromaResults.filter(r => r.metadata.type === 'education').length,
-          regulation: filteredChromaResults.filter(r => r.metadata.type === 'regulation').length,
-          unknown: filteredChromaResults.filter(r => !r.metadata.type || r.metadata.type === 'unknown').length
-        });
-        
-        // 검색된 아이템들의 type 확인
-        if (filteredChromaResults.length > 0) {
-          const sampleTypes = filteredChromaResults.slice(0, 10).map(r => ({
-            title: r.metadata?.title?.substring(0, 30) || 'No title',
-            type: r.metadata?.type || 'undefined'
-          }));
-          console.log('검색 결과 샘플:', sampleTypes);
-        }
+        const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
+          return normType(r.metadata) === 'education' && shouldIncludeContent({
+            id: r.metadata?.id || r.document || 'unknown',
+            title: r.metadata?.title,
+            text: r.document,
+            content: r.document,
+            metadata: r.metadata
+          }, resolvedProfile);
+        }));
 
-        let allRegulations = filteredChromaResults.filter(r => r.metadata.type === 'regulation');
-        console.log(`[DEBUG] 기본 regulation 타입 필터링 결과: ${allRegulations.length}건`);
+        const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
+          return normType(r.metadata) === 'regulation' && shouldIncludeContent({
+            id: r.metadata?.id || r.document || 'unknown',
+            title: r.metadata?.title,
+            text: r.document,
+            content: r.document,
+            metadata: r.metadata
+          }, resolvedProfile);
+        }));
+
+        // Score + penalty + thresholds + fallbacks
+        const scoredIncidents = dbgCount('incidents.scored', this.applyHybridScoringWithPenalty(
+          preIncidents, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ false
+        ));
+        const scoredEducation = dbgCount('education.scored', this.applyHybridScoringWithPenalty(
+          preEducation, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ true
+        ));
+        const scoredRegulations = dbgCount('regulations.scored', this.applyHybridScoringWithPenalty(
+          preRegulations, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ false
+        ));
+
+        const finalIncidents   = dbgCount('incidents.post-threshold', applyThresholdWithFallback(scoredIncidents, 'incident'));
+        const finalEducation   = dbgCount('education.post-threshold', applyThresholdWithFallback(scoredEducation, 'education'));
+        const finalRegulations = dbgCount('regulations.post-threshold', applyThresholdWithFallback(scoredRegulations, 'regulation'));
+
+        // Safety: guarantee some output if everything is empty
+        const incidentsOut   = ensureNonEmpty('incidents', finalIncidents, () => scoredIncidents.slice(0, Math.min(5, scoredIncidents.length)));
+        const educationOut   = ensureNonEmpty('education', finalEducation, () => scoredEducation.slice(0, Math.min(5, scoredEducation.length)));
+        const regulationsOut = ensureNonEmpty('regulations', finalRegulations, () => scoredRegulations.slice(0, Math.min(5, scoredRegulations.length)));
+
+        const hybridFilteredAccidents = incidentsOut;
+        const hybridFilteredEducation = educationOut;
         
-        if (allRegulations.length > 0) {
-          console.log('[DEBUG] 검색된 regulation 목록:');
-          allRegulations.forEach((reg, idx) => {
-            console.log(`  ${idx+1}. "${reg.metadata?.title}" - 거리: ${reg.distance}`);
-          });
-        }
+        // Patched search results summary
+        console.log(`[PATCHED] Raw candidates: ${candidatesRaw.length}건`);
+        dbgCount('final.incidents', hybridFilteredAccidents);
+        dbgCount('final.education', hybridFilteredEducation); 
+        dbgCount('final.regulations', regulationsOut);
+
+        let regulations = regulationsOut;
         
-        // 프로파일 기반 관련성 검사
-        let regulations = allRegulations.filter(reg => {
-          const content = (reg.document || '').toLowerCase();
-          const title = (reg.metadata?.title || '').toLowerCase();
-          
-          console.log(`[프로파일] 관련성 검사: "${reg.metadata?.title}"`);
-          
-          // 프로파일 기반 관련성 확인
-          const searchItem: SearchItem = {
-            id: reg.metadata?.id || reg.document || 'unknown',
-            content,
-            title,
-            metadata: reg.metadata
-          };
-          
-          const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
-          console.log(`  프로파일 기반 관련성: ${isRelevant}`);
-          
-          return isRelevant;
-        });
-        
-        console.log(`[프로파일] 관련성 필터링 후: ${regulations.length}건 (${allRegulations.length}건 중)`);
-        console.log(`[프로파일 디버그] ID: ${resolvedProfile.id}, 조건: electrical-hv-gis`);
+        console.log(`[PATCHED] 최종 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulations=${regulations.length}`);
 
         // 전기설비 특화: safety_rules.json에서 직접 로드 (항상 실행)
         console.log(`전기설비 특화 법령 직접 로드 시작... (기존 ${regulations.length}건)`);
