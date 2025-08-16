@@ -30,10 +30,10 @@ const TUNING = {
     floor:    { incident: 0.10, education: 0.08, regulation: 0.08 } // if p < floor, use floor
   },
   gating: {
-    minVectorScore: 0.05,              // relaxed: was 0.18, now much lower
-    minKeywordHits: { incident: 0, education: 0, regulation: 1 }, // relaxed: was 2/1/1
+    minVectorScore: 0.18,              // too weak vectors are cut unless compensated by tokens
+    minKeywordHits: { incident: 2, education: 1, regulation: 1 },
     requireSetsAnyOf: ["equipment", "workType", "risk"],
-    minSetsMatched: 1                   // relaxed: was 2, now just 1 set needed
+    minSetsMatched: 2                   // e.g., text must match at least 2 of the sets
   },
   penalties: {
     industryMismatch: { education: 0.20, other: 0.40 },
@@ -175,44 +175,20 @@ function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: a
     risk:      countHits(text, rkTokens)
   };
   const matchedSets = Object.values(sets).filter(v => v > 0).length;
-  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
-
-  // DEBUG: Log gating details for incidents and education
-  if (kind === 'incident' || kind === 'education') {
-    console.log(`[GATING DEBUG] ${kind}: "${r.metadata?.title?.substring(0, 40)}..."`);
-    console.log(`  Equipment tokens (${eqTokens.length}): ${eqTokens.join(', ')}`);
-    console.log(`  Sets matched: ${matchedSets} (eq:${sets.equipment}, wt:${sets.workType}, risk:${sets.risk})`);
-    console.log(`  Vector score: ${r.vectorScore ?? r.score ?? r.similarity ?? 0}`);
-    console.log(`  Keywords: ${(profile.keywords || []).length} available`);
-  }
 
   const minSet = TUNING.gating.minSetsMatched;
-  if (minSet > 0 && matchedSets < minSet) {
-    if (kind === 'incident' || kind === 'education') {
-      console.log(`  REJECTED: Sets matched ${matchedSets} < required ${minSet}`);
-    }
-    return false;
-  }
+  if (minSet > 0 && matchedSets < minSet) return false;
 
-  // keyword hits - relaxed for debugging
+  // keyword hits
+  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
   const kwList = (profile.keywords || []) as string[];
   const kwHits = countHits(text, kwList);
   const minKwHits = (TUNING.gating.minKeywordHits as any)[kind] || 0;
-  if (kwHits < minKwHits) {
-    if (kind === 'incident' || kind === 'education') {
-      console.log(`  REJECTED: Keyword hits ${kwHits} < required ${minKwHits}`);
-    }
-    return false;
-  }
+  if (kwHits < minKwHits) return false;
 
-  // vector score gate - relaxed
+  // vector score gate
   const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
-  if (v < TUNING.gating.minVectorScore && matchedSets < (minSet + 1)) {
-    if (kind === 'incident' || kind === 'education') {
-      console.log(`  REJECTED: Vector score ${v} < ${TUNING.gating.minVectorScore} and sets ${matchedSets} < ${minSet + 1}`);
-    }
-    return false;
-  }
+  if (v < TUNING.gating.minVectorScore && matchedSets < (minSet + 1)) return false;
 
   // title must contain some equipment tokens (soft)
   const title = normalizeStr(r.metadata?.title);
@@ -221,16 +197,8 @@ function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: a
   }
 
   // recency
-  if (!isRecentEnough(r, TUNING.recency.years)) {
-    if (kind === 'incident' || kind === 'education') {
-      console.log(`  REJECTED: Too old (${TUNING.recency.years} years limit)`);
-    }
-    return false;
-  }
+  if (!isRecentEnough(r, TUNING.recency.years)) return false;
 
-  if (kind === 'incident' || kind === 'education') {
-    console.log(`  PASSED: All gating criteria met`);
-  }
   return true;
 }
 
@@ -1016,54 +984,25 @@ JSON 형식으로 응답:
           };
         }
         
-        // DEBUG: Check raw candidate types
-        const rawTypeCounts = {};
-        (candidatesRaw || []).forEach(r => {
-          const type = normType(r.metadata);
-          rawTypeCounts[type] = (rawTypeCounts[type] || 0) + 1;
-        });
-        console.log(`[DEBUG] Raw candidates by type:`, rawTypeCounts);
-        console.log(`[DEBUG] Total raw candidates: ${(candidatesRaw || []).length}`);
-
         // PATCHED: Prefilter by type + profile
         const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
-          const type = normType(r.metadata);
-          const isIncident = type === 'incident';
-          if (!isIncident) return false;
-          
-          const profileMatch = shouldIncludeContent({
+          return normType(r.metadata) === 'incident' && shouldIncludeContent({
             id: r.metadata?.id || r.document || 'unknown',
             title: r.metadata?.title,
             text: r.document,
             content: r.document,
             metadata: r.metadata
           }, resolvedProfile);
-          
-          if (!profileMatch) {
-            console.log(`[DEBUG] Incident filtered by profile: "${r.metadata?.title?.substring(0, 30)}..."`);
-          }
-          
-          return profileMatch;
         }));
 
         const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
-          const type = normType(r.metadata);
-          const isEducation = type === 'education';
-          if (!isEducation) return false;
-          
-          const profileMatch = shouldIncludeContent({
+          return normType(r.metadata) === 'education' && shouldIncludeContent({
             id: r.metadata?.id || r.document || 'unknown',
             title: r.metadata?.title,
             text: r.document,
             content: r.document,
             metadata: r.metadata
           }, resolvedProfile);
-          
-          if (!profileMatch) {
-            console.log(`[DEBUG] Education filtered by profile: "${r.metadata?.title?.substring(0, 30)}..."`);
-          }
-          
-          return profileMatch;
         }));
 
         const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
@@ -1166,8 +1105,6 @@ JSON 형식으로 응답:
 
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
-        
-        console.log(`[PRECISION FIX] Using precision-controlled results: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}`);
         
         // Patched search results summary
         console.log(`[PATCHED] Raw candidates: ${candidatesRaw.length}건`);
@@ -1361,7 +1298,6 @@ JSON 형식으로 응답:
         // 사고사례: 벡터 유사도 상위 5건 (알려진 사고사례 정보와 매칭)
         const knownAccidents = this.getKnownAccidentsByProfile(resolvedProfile);
         
-        console.log(`[DEBUG] Processing ${hybridFilteredAccidents.length} precision-controlled incidents`);
         chromaAccidents = hybridFilteredAccidents
           .map((r) => {
               const metadata = r.metadata;
@@ -1433,8 +1369,6 @@ JSON 형식으로 응답:
           `matchEducationWithUrls x${hybridFilteredEducation.length}`,
           () => this.matchEducationWithUrls(hybridFilteredEducation)
         );
-        
-        console.log(`[DEBUG] Education materials before URL matching: ${hybridFilteredEducation.length}`);
         
         // 외국어 교육자료 제거 (URL 매칭 후 최종 필터링)
         const filteredEducationData = educationDataWithUrls.filter(r => {
