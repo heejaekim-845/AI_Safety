@@ -100,23 +100,23 @@ export class MemStorage implements IStorage {
       name: "압축기 A-101",
       code: "COMP-A-101",
       location: "공장 A동 1층",
-      riskLevel: "YELLOW",
       manufacturer: "현대중공업",
       installYear: 2020,
-      modelName: "HHI-AC-500",
-      imageUrl: "/attached_assets/air-compressor-solution_1750831656695.jpg",
       specification: "압력: 8bar, 용량: 500L, 전력: 37kW",
-      highVoltage: true,
-      highPressure: true,
-      highTemperature: false,
-      chemical: false,
-      moving: true,
-      lifting: false,
-      confined: false,
-      height: false,
-      noise: true,
-      requiredSafetyItems: ["안전모", "안전화", "보호안경", "귀마개"],
-      hazardousChemicals: [],
+      imageUrl: "/attached_assets/air-compressor-solution_1750831656695.jpg",
+      modelName: "HHI-AC-500",
+      riskLevel: "YELLOW",
+      highTemperatureRisk: false,
+      highTemperatureDetails: null,
+      highPressureRisk: true,
+      highPressureDetails: "작동 압력: 8bar",
+      highVoltageRisk: true,
+      highVoltageDetails: "37kW 전력 사용",
+      heightRisk: false,
+      heightDetails: null,
+      heavyWeightRisk: true,
+      heavyWeightDetails: "압축기 무게: 500kg",
+      riskFactors: null,
       lotoPoints: [
         {
           id: "주 전원 차단기",
@@ -129,6 +129,7 @@ export class MemStorage implements IStorage {
           location: "압축기 입구"
         }
       ],
+      safetyFacilityLocations: null,
       emergencyContacts: [
         {
           name: "설비 담당자",
@@ -141,7 +142,11 @@ export class MemStorage implements IStorage {
           role: "안전"
         }
       ],
+      requiredSafetyEquipment: ["안전모", "안전화", "보호안경", "귀마개"],
       safetyDeviceImages: null,
+      hazardousChemicalType: null,
+      hazardousChemicalName: null,
+      msdsImageUrl: null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -151,29 +156,23 @@ export class MemStorage implements IStorage {
       name: "보일러 B-201",
       code: "BOILER-B-201",
       location: "공장 B동 지하 1층",
-      riskLevel: "RED",
       manufacturer: "삼성보일러",
       installYear: 2018,
-      modelName: "SB-HT-1000",
-      imageUrl: null,
       specification: "압력: 16bar, 온도: 180°C, 연료: 천연가스",
-      highVoltage: true,
-      highPressure: true,
-      highTemperature: true,
-      chemical: true,
-      moving: false,
-      lifting: false,
-      confined: true,
-      height: false,
-      noise: true,
-      requiredSafetyItems: ["안전모", "안전화", "보호안경", "내열장갑", "가스검지기"],
-      hazardousChemicals: [
-        {
-          name: "천연가스",
-          cas: "74-82-8",
-          msdsUrl: "/msds/natural-gas.pdf"
-        }
-      ],
+      imageUrl: null,
+      modelName: "SB-HT-1000",
+      riskLevel: "RED",
+      highTemperatureRisk: true,
+      highTemperatureDetails: "작동 온도: 180°C",
+      highPressureRisk: true,
+      highPressureDetails: "작동 압력: 16bar",
+      highVoltageRisk: true,
+      highVoltageDetails: "전기 제어 시스템",
+      heightRisk: false,
+      heightDetails: null,
+      heavyWeightRisk: false,
+      heavyWeightDetails: null,
+      riskFactors: null,
       lotoPoints: [
         {
           id: "가스 공급 밸브",
@@ -186,6 +185,7 @@ export class MemStorage implements IStorage {
           location: "제어판넬"
         }
       ],
+      safetyFacilityLocations: null,
       emergencyContacts: [
         {
           name: "보일러 기술자",
@@ -198,7 +198,11 @@ export class MemStorage implements IStorage {
           role: "응급"
         }
       ],
+      requiredSafetyEquipment: ["안전모", "안전화", "보호안경", "내열장갑", "가스검지기"],
       safetyDeviceImages: null,
+      hazardousChemicalType: "가스",
+      hazardousChemicalName: "천연가스",
+      msdsImageUrl: null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -216,11 +220,10 @@ export class MemStorage implements IStorage {
       estimatedDuration: 30,
       requiredQualifications: ["기계정비기능사"],
       requiredEquipment: null,
+      requiredTools: null,
       environmentalRequirements: null,
-      safetyPrecautions: null,
       legalRequirements: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     const workType2: WorkType = {
@@ -232,11 +235,10 @@ export class MemStorage implements IStorage {
       estimatedDuration: 60,
       requiredQualifications: ["기계정비기능사", "환경안전교육"],
       requiredEquipment: null,
+      requiredTools: null,
       environmentalRequirements: null,
-      safetyPrecautions: null,
       legalRequirements: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     const workType3: WorkType = {
@@ -248,11 +250,10 @@ export class MemStorage implements IStorage {
       estimatedDuration: 45,
       requiredQualifications: ["보일러기능사", "가스안전교육"],
       requiredEquipment: null,
+      requiredTools: null,
       environmentalRequirements: null,
-      safetyPrecautions: null,
       legalRequirements: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     const workType4: WorkType = {
@@ -264,11 +265,10 @@ export class MemStorage implements IStorage {
       estimatedDuration: 20,
       requiredQualifications: ["보일러기능사"],
       requiredEquipment: null,
+      requiredTools: null,
       environmentalRequirements: null,
-      safetyPrecautions: null,
       legalRequirements: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     this.workTypes.set(1, workType1);
@@ -277,44 +277,43 @@ export class MemStorage implements IStorage {
     this.workTypes.set(4, workType4);
 
     // Sample work procedures
-    const procedures = [
-      {
-        id: 1,
-        workTypeId: 1,
-        stepNumber: 1,
-        category: "안전조치",
-        title: "전원 차단 및 LOTO 적용",
-        description: "주 전원을 차단하고 잠금 장치를 설치합니다.",
-        checklistItems: ["주 전원 차단 확인", "LOTO 태그 부착", "에너지 격리 확인"],
-        safetyNotes: "전원 차단 후 반드시 전압 측정기로 무전압 상태를 확인하세요.",
-        createdAt: new Date()
-      },
-      {
-        id: 2,
-        workTypeId: 1,
-        stepNumber: 2,
-        category: "기기조작",
-        title: "압력 게이지 확인",
-        description: "압축기의 압력 게이지를 확인합니다.",
-        checklistItems: ["압력 게이지 수치 기록", "이상 유무 확인"],
-        safetyNotes: "압력이 완전히 해제된 후 작업을 진행하세요.",
-        createdAt: new Date()
-      }
-    ];
+    const procedure1: WorkProcedure = {
+      id: 1,
+      workTypeId: 1,
+      stepNumber: 1,
+      category: "안전조치",
+      title: "전원 차단 및 LOTO 적용",
+      description: "주 전원을 차단하고 잠금 장치를 설치합니다.",
+      checklistItems: ["주 전원 차단 확인", "LOTO 태그 부착", "에너지 격리 확인"],
+      safetyNotes: "전원 차단 후 반드시 전압 측정기로 무전압 상태를 확인하세요.",
+      createdAt: new Date()
+    };
 
-    procedures.forEach(proc => {
-      this.workProcedures.set(proc.id, proc as WorkProcedure);
-    });
+    const procedure2: WorkProcedure = {
+      id: 2,
+      workTypeId: 1,
+      stepNumber: 2,
+      category: "기기조작",
+      title: "압력 게이지 확인",
+      description: "압축기의 압력 게이지를 확인합니다.",
+      checklistItems: ["압력 게이지 수치 기록", "이상 유무 확인"],
+      safetyNotes: "압력이 완전히 해제된 후 작업을 진행하세요.",
+      createdAt: new Date()
+    };
+
+    this.workProcedures.set(1, procedure1);
+    this.workProcedures.set(2, procedure2);
 
     // Sample incident
     const incident1: Incident = {
       id: 1,
       equipmentId: 1,
       workTypeId: null,
-      title: "압력 게이지 이상",
       description: "압력 게이지가 정상 범위를 벗어남",
       severity: "MEDIUM",
+      reporterName: "점검자",
       incidentDate: new Date(),
+      actionsTaken: null,
       createdAt: new Date()
     };
 
@@ -338,7 +337,34 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newEquipment: Equipment = {
       id,
-      ...equipmentData,
+      name: equipmentData.name,
+      code: equipmentData.code,
+      location: equipmentData.location,
+      manufacturer: equipmentData.manufacturer ?? null,
+      installYear: equipmentData.installYear ?? null,
+      specification: equipmentData.specification ?? null,
+      imageUrl: equipmentData.imageUrl ?? null,
+      modelName: equipmentData.modelName ?? null,
+      riskLevel: equipmentData.riskLevel ?? "MEDIUM",
+      highTemperatureRisk: equipmentData.highTemperatureRisk ?? false,
+      highTemperatureDetails: equipmentData.highTemperatureDetails ?? null,
+      highPressureRisk: equipmentData.highPressureRisk ?? false,
+      highPressureDetails: equipmentData.highPressureDetails ?? null,
+      highVoltageRisk: equipmentData.highVoltageRisk ?? false,
+      highVoltageDetails: equipmentData.highVoltageDetails ?? null,
+      heightRisk: equipmentData.heightRisk ?? false,
+      heightDetails: equipmentData.heightDetails ?? null,
+      heavyWeightRisk: equipmentData.heavyWeightRisk ?? false,
+      heavyWeightDetails: equipmentData.heavyWeightDetails ?? null,
+      riskFactors: equipmentData.riskFactors ?? null,
+      lotoPoints: equipmentData.lotoPoints ?? null,
+      safetyFacilityLocations: equipmentData.safetyFacilityLocations ?? null,
+      emergencyContacts: equipmentData.emergencyContacts ?? null,
+      requiredSafetyEquipment: equipmentData.requiredSafetyEquipment ?? null,
+      safetyDeviceImages: equipmentData.safetyDeviceImages ?? null,
+      hazardousChemicalType: equipmentData.hazardousChemicalType ?? null,
+      hazardousChemicalName: equipmentData.hazardousChemicalName ?? null,
+      msdsImageUrl: equipmentData.msdsImageUrl ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -350,7 +376,38 @@ export class MemStorage implements IStorage {
     const existing = this.equipment.get(id);
     if (!existing) throw new Error(`Equipment with id ${id} not found`);
     
-    const updated = { ...existing, ...equipmentData, updatedAt: new Date() };
+    const updated: Equipment = {
+      ...existing,
+      ...(equipmentData.name && { name: equipmentData.name }),
+      ...(equipmentData.code && { code: equipmentData.code }),
+      ...(equipmentData.location && { location: equipmentData.location }),
+      ...(equipmentData.manufacturer !== undefined && { manufacturer: equipmentData.manufacturer }),
+      ...(equipmentData.installYear !== undefined && { installYear: equipmentData.installYear }),
+      ...(equipmentData.specification !== undefined && { specification: equipmentData.specification }),
+      ...(equipmentData.imageUrl !== undefined && { imageUrl: equipmentData.imageUrl }),
+      ...(equipmentData.modelName !== undefined && { modelName: equipmentData.modelName }),
+      ...(equipmentData.riskLevel !== undefined && { riskLevel: equipmentData.riskLevel }),
+      ...(equipmentData.highTemperatureRisk !== undefined && { highTemperatureRisk: equipmentData.highTemperatureRisk }),
+      ...(equipmentData.highTemperatureDetails !== undefined && { highTemperatureDetails: equipmentData.highTemperatureDetails }),
+      ...(equipmentData.highPressureRisk !== undefined && { highPressureRisk: equipmentData.highPressureRisk }),
+      ...(equipmentData.highPressureDetails !== undefined && { highPressureDetails: equipmentData.highPressureDetails }),
+      ...(equipmentData.highVoltageRisk !== undefined && { highVoltageRisk: equipmentData.highVoltageRisk }),
+      ...(equipmentData.highVoltageDetails !== undefined && { highVoltageDetails: equipmentData.highVoltageDetails }),
+      ...(equipmentData.heightRisk !== undefined && { heightRisk: equipmentData.heightRisk }),
+      ...(equipmentData.heightDetails !== undefined && { heightDetails: equipmentData.heightDetails }),
+      ...(equipmentData.heavyWeightRisk !== undefined && { heavyWeightRisk: equipmentData.heavyWeightRisk }),
+      ...(equipmentData.heavyWeightDetails !== undefined && { heavyWeightDetails: equipmentData.heavyWeightDetails }),
+      ...(equipmentData.riskFactors !== undefined && { riskFactors: equipmentData.riskFactors }),
+      ...(equipmentData.lotoPoints !== undefined && { lotoPoints: equipmentData.lotoPoints }),
+      ...(equipmentData.safetyFacilityLocations !== undefined && { safetyFacilityLocations: equipmentData.safetyFacilityLocations }),
+      ...(equipmentData.emergencyContacts !== undefined && { emergencyContacts: equipmentData.emergencyContacts }),
+      ...(equipmentData.requiredSafetyEquipment !== undefined && { requiredSafetyEquipment: equipmentData.requiredSafetyEquipment }),
+      ...(equipmentData.safetyDeviceImages !== undefined && { safetyDeviceImages: equipmentData.safetyDeviceImages }),
+      ...(equipmentData.hazardousChemicalType !== undefined && { hazardousChemicalType: equipmentData.hazardousChemicalType }),
+      ...(equipmentData.hazardousChemicalName !== undefined && { hazardousChemicalName: equipmentData.hazardousChemicalName }),
+      ...(equipmentData.msdsImageUrl !== undefined && { msdsImageUrl: equipmentData.msdsImageUrl }),
+      updatedAt: new Date()
+    };
     this.equipment.set(id, updated);
     return updated;
   }
@@ -442,6 +499,19 @@ export class MemStorage implements IStorage {
     };
     this.incidents.set(id, newIncident);
     return newIncident;
+  }
+
+  async updateIncident(id: number, incidentData: Partial<InsertIncident>): Promise<Incident> {
+    const existing = this.incidents.get(id);
+    if (!existing) throw new Error(`Incident with id ${id} not found`);
+    
+    const updated = { ...existing, ...incidentData };
+    this.incidents.set(id, updated);
+    return updated;
+  }
+
+  async deleteIncident(id: number): Promise<void> {
+    this.incidents.delete(id);
   }
 
   // Work sessions operations
