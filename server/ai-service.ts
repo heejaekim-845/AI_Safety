@@ -684,7 +684,7 @@ JSON 형식으로 응답:
         try {
           keywordWeights = this.getProfileKeywords(resolvedProfile);
         } catch (error) {
-          console.log(`[프로파일] 키워드 가중치 생성 실패, 기본값 사용:`, error.message);
+          console.log(`[프로파일] 키워드 가중치 생성 실패, 기본값 사용:`, error);
           // 기본 키워드 가중치
           keywordWeights = {
             "안전": 5,
@@ -837,12 +837,18 @@ JSON 형식으로 응답:
             const content = title + ' ' + body;
             
             // 전기설비 관련 키워드 매칭 점수 계산
-            const keywordMatches = electricalKeywords.filter(keyword => 
+            const matchedKeywords = electricalKeywords.filter(keyword => 
               content.includes(keyword)
-            ).length;
+            );
+            const keywordMatches = matchedKeywords.length;
             
-            // 최소 2개 이상의 키워드가 매칭되어야 선택
-            return keywordMatches >= 2;
+            // 매칭된 키워드 로깅 (상위 10개만)
+            if (keywordMatches > 0 && article.article_number <= 10) {
+              console.log(`  조문 ${article.article_number}: "${title}" - 매칭 키워드 ${keywordMatches}개: ${matchedKeywords.join(', ')}`);
+            }
+            
+            // 최소 1개 이상의 키워드가 매칭되어야 선택 (조건 완화)
+            return keywordMatches >= 1;
           })
           .sort((a: any, b: any) => {
             // 키워드 매칭 수로 정렬 (많은 것부터)
@@ -855,11 +861,18 @@ JSON 형식으로 응답:
             return bMatches - aMatches;
           });
           
-          const selectedArticles = safetyRulesData.articles
-            .filter((article: any) => electricalArticles.includes(article.article_number))
+          const selectedArticles = relevantArticles
             .slice(0, 5);
           
-          console.log(`전기설비 관련 조문 ${selectedArticles.length}개 직접 로드`);
+          console.log(`키워드 기반 법령 검색: 총 ${relevantArticles.length}개 매칭, 상위 ${selectedArticles.length}개 선택`);
+          
+          // 선택된 법령들 로깅
+          selectedArticles.forEach((article: any, idx: number) => {
+            const matchedKeywords = electricalKeywords.filter(keyword => 
+              (article.article_korean_title?.toLowerCase() + ' ' + article.body?.toLowerCase()).includes(keyword)
+            );
+            console.log(`  키워드선택 ${idx+1}. 제${article.article_number}조: "${article.article_korean_title}" (키워드 ${matchedKeywords.length}개)`);
+          });
           
           const directRegulations = selectedArticles.map((article: any) => ({
             lawName: '산업안전보건기준에 관한 규칙',
