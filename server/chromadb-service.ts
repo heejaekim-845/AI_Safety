@@ -252,12 +252,30 @@ export class ChromaDBService {
     if (phase === 'incidents') {
       await this.processIncidents(accidentCases, startIndex);
       await this.processEducation(educationData, 0);
-      await this.processRegulations(pdfRegulations, 0);
+      // safety_rules.json 임베딩
+      try {
+        await this.embedSafetyRulesFile();
+      } catch (error) {
+        console.error('safety_rules.json 임베딩 실패, PDF로 폴백:', error);
+        await this.processRegulations(pdfRegulations, 0);
+      }
     } else if (phase === 'education') {
       await this.processEducation(educationData, startIndex);
-      await this.processRegulations(pdfRegulations, 0);
+      // safety_rules.json 임베딩
+      try {
+        await this.embedSafetyRulesFile();
+      } catch (error) {
+        console.error('safety_rules.json 임베딩 실패, PDF로 폴백:', error);
+        await this.processRegulations(pdfRegulations, 0);
+      }
     } else if (phase === 'regulations') {
-      await this.processRegulations(pdfRegulations, startIndex);
+      // safety_rules.json 임베딩
+      try {
+        await this.embedSafetyRulesFile();
+      } catch (error) {
+        console.error('safety_rules.json 임베딩 실패, PDF로 폴백:', error);
+        await this.processRegulations(pdfRegulations, startIndex);
+      }
     }
   }
 
@@ -1078,7 +1096,20 @@ export class ChromaDBService {
       // 단계별 처리 (체크포인트와 함께)
       await this.processIncidents(accidentCases, 0);
       await this.processEducation(educationData, 0);
-      await this.processRegulations(pdfRegulations, 0);
+      
+      // safety_rules.json 전용 임베딩 메서드 호출
+      try {
+        console.log('safety_rules.json 임베딩 시작...');
+        await this.embedSafetyRulesFile();
+        console.log('safety_rules.json 임베딩 완료');
+      } catch (error) {
+        console.error('safety_rules.json 임베딩 실패:', error);
+        // PDF 법규가 있다면 그것을 사용
+        if (pdfRegulations.length > 0) {
+          console.log('PDF 법규로 폴백 처리...');
+          await this.processRegulations(pdfRegulations, 0);
+        }
+      }
 
       // 최종 체크포인트 제거
       await this.clearCheckpoint();

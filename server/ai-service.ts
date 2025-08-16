@@ -532,8 +532,22 @@ JSON 형식으로 응답:
             return results;
           }
         );
+
+        // 별도 regulation 검색 추가 (확실히 법규 데이터를 포함시키기 위해)
+        console.log('별도 regulation 검색 실행...');
+        const regulationSearchResults = await timeit(
+          'regulation.direct.search',
+          async () => {
+            const regResults = await chromaDBService.searchByCategory(regulationQueries[0] || '전기 작업 안전규정', 10);
+            return regResults.regulation || [];
+          }
+        );
+        console.log(`별도 regulation 검색 결과: ${regulationSearchResults.length}건`);
+        regulationSearchResults.forEach((reg, idx) => {
+          console.log(`  별도검색 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
+        });
         
-        // 중복 제거
+        // 중복 제거 (기본 검색 결과 + 별도 regulation 검색 결과)
         const uniqueResults = new Map();
         chromaResults.forEach((r: any) => {
           const key = r.metadata?.id || r.document;
@@ -541,6 +555,15 @@ JSON 형식으로 응답:
             uniqueResults.set(key, r);
           }
         });
+        
+        // 별도 regulation 검색 결과 추가
+        regulationSearchResults.forEach((r: any) => {
+          const key = r.metadata?.id || r.document;
+          if (!uniqueResults.has(key)) {
+            uniqueResults.set(key, r);
+          }
+        });
+        
         let filteredChromaResults = Array.from(uniqueResults.values());
         
         // 법령 검색 (설비별 특화)
@@ -553,22 +576,38 @@ JSON 형식으로 응답:
             () => chromaDBService.searchRelevantData(query, 6)
           );
           // 170kV GIS 특화 법령 필터링 (매우 구체적)
+          console.log(`법령 쿼리 "${query}" 결과: ${additionalResults.length}건`);
+          additionalResults.forEach((r, idx) => {
+            console.log(`  ${idx+1}. 제목: "${r.metadata?.title}", 타입: ${r.metadata?.type}, 거리: ${r.distance}`);
+          });
+          
           const relevantRegulations = additionalResults.filter(r => {
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
+            const type = r.metadata?.type;
+            
+            // 타입이 regulation인지 먼저 확인
+            if (type !== 'regulation') {
+              return false;
+            }
             
             if (equipmentInfo.name.includes('170kV') && equipmentInfo.name.includes('GIS')) {
-              return (content.includes('절연용') || content.includes('보호구') || 
+              const hasRelevantContent = content.includes('절연용') || content.includes('보호구') || 
                      content.includes('전기작업') || content.includes('감전') ||
                      content.includes('정전전로') || content.includes('특별고압') ||
-                     content.includes('개폐기') || content.includes('안전거리')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
+                     content.includes('개폐기') || content.includes('안전거리') ||
+                     content.includes('전기') || content.includes('절연');
+              const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
+              console.log(`  법령 필터링: "${title.substring(0, 30)}" - 관련성: ${hasRelevantContent}, 중복여부: ${!notDuplicate}`);
+              return hasRelevantContent && notDuplicate;
             } else {
-              return (content.includes('전기') || content.includes('감전') || 
-                     content.includes('절연') || title.includes('전기')) &&
-                     !existingIds.has(r.metadata?.id || r.document);
+              const hasRelevantContent = content.includes('전기') || content.includes('감전') || 
+                     content.includes('절연') || title.includes('전기');
+              const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
+              return hasRelevantContent && notDuplicate;
             }
           });
+          console.log(`법령 필터링 후: ${relevantRegulations.length}건`);
           filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
           
           relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
@@ -624,7 +663,49 @@ JSON 형식으로 응답:
           keywordWeights
         ).slice(0, 8); // 교육자료 상위 8개로 증가
         
-        const regulations = filteredChromaResults.filter(r => r.metadata.type === 'regulation');
+        // 법규 검색 디버깅 추가
+        console.log(`전체 검색 결과: ${filteredChromaResults.length}건`);
+        console.log(`유형별 분포:`, {
+          incident: filteredChromaResults.filter(r => r.metadata.type === 'incident').length,
+          education: filteredChromaResults.filter(r => r.metadata.type === 'education').length,
+          regulation: filteredChromaResults.filter(r => r.metadata.type === 'regulation').length,
+          unknown: filteredChromaResults.filter(r => !r.metadata.type || r.metadata.type === 'unknown').length
+        });
+        
+        // 검색된 아이템들의 type 확인
+        if (filteredChromaResults.length > 0) {
+          const sampleTypes = filteredChromaResults.slice(0, 10).map(r => ({
+            title: r.metadata?.title?.substring(0, 30) || 'No title',
+            type: r.metadata?.type || 'undefined'
+          }));
+          console.log('검색 결과 샘플:', sampleTypes);
+        }
+
+        let regulations = filteredChromaResults.filter(r => r.metadata.type === 'regulation');
+        console.log(`기본 regulation 타입 필터링 결과: ${regulations.length}건`);
+
+        // 기본 검색에서 regulation이 없으면 별도로 검색
+        if (regulations.length === 0) {
+          console.log('기본 검색에서 regulation 없음, 별도 검색 실행...');
+          try {
+            const directRegulationSearch = await chromaDBService.searchByCategory('전기작업 안전규정', 5);
+            if (directRegulationSearch.regulation && directRegulationSearch.regulation.length > 0) {
+              regulations = directRegulationSearch.regulation;
+              console.log(`별도 regulation 검색 성공: ${regulations.length}건`);
+              regulations.forEach((reg, idx) => {
+                console.log(`  별도검색 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
+              });
+            } else {
+              console.log('별도 regulation 검색에서도 결과 없음');
+            }
+          } catch (error) {
+            console.error('별도 regulation 검색 실패:', error);
+          }
+        } else {
+          regulations.forEach((reg, idx) => {
+            console.log(`  기본검색 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
+          });
+        }
         
         // 하이브리드 점수 디버깅 로그
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
