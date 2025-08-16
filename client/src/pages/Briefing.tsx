@@ -122,6 +122,34 @@ export default function Briefing() {
     }));
   };
 
+  // 작업 시간이 지났는지 확인하는 함수
+  const isWorkTimeExpired = (schedule: WorkSchedule) => {
+    if (!schedule.briefingTime || !schedule.scheduledDate) {
+      return false;
+    }
+    
+    const now = new Date();
+    const scheduledDateTime = new Date(`${schedule.scheduledDate}T${schedule.briefingTime}`);
+    
+    return now > scheduledDateTime;
+  };
+
+  // 뱃지 상태와 스타일을 결정하는 함수
+  const getBadgeInfo = (schedule: WorkSchedule) => {
+    if (schedule.status === 'completed') {
+      return { variant: 'secondary' as const, text: '완료', className: 'bg-green-100 text-green-800 hover:bg-green-200' };
+    }
+    
+    if (schedule.status === 'scheduled') {
+      if (isWorkTimeExpired(schedule)) {
+        return { variant: 'secondary' as const, text: '종료', className: 'bg-gray-100 text-gray-600 hover:bg-gray-200' };
+      }
+      return { variant: 'default' as const, text: '예정', className: '' };
+    }
+    
+    return { variant: 'secondary' as const, text: schedule.status, className: '' };
+  };
+
   const getRiskLevelColor = (level: string) => {
     switch (level?.toUpperCase()) {
       case 'HIGH': return 'bg-red-100 text-red-800 border-red-200';
@@ -234,9 +262,17 @@ export default function Briefing() {
                                   : '작업 설명 없음'
                                 }
                               </h3>
-                              <Badge variant={schedule.status === 'scheduled' ? 'default' : 'secondary'}>
-                                {schedule.status === 'scheduled' ? '예정' : schedule.status}
-                              </Badge>
+                              {(() => {
+                                const badgeInfo = getBadgeInfo(schedule);
+                                return (
+                                  <Badge 
+                                    variant={badgeInfo.variant}
+                                    className={badgeInfo.className}
+                                  >
+                                    {badgeInfo.text}
+                                  </Badge>
+                                );
+                              })()}
                             </div>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-sm text-gray-600 gap-1">
                               <span className="flex items-center gap-1">
