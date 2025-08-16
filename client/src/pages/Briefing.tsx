@@ -554,6 +554,40 @@ export default function Briefing() {
                   </Card>
                 </div>
 
+                {/* Related Accident History - Moved below Required Safety Equipment */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <History className="w-5 h-5" />
+                      관련 사고이력
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {briefingData.registeredIncidents && briefingData.registeredIncidents.length > 0 ? (
+                        briefingData.registeredIncidents.map((incident: any, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-red-50 rounded border border-red-200">
+                            <div className="font-medium text-red-800">{incident.title}</div>
+                            <div className="text-red-600 mt-1 text-xs">위험도: {incident.severity}</div>
+                            {incident.description && (
+                              <div className="text-gray-600 mt-2 text-xs leading-relaxed">{incident.description}</div>
+                            )}
+                            {incident.correctiveActions && (
+                              <div className="text-blue-700 mt-2 text-xs font-medium">
+                                조치사항: {incident.correctiveActions}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
+                          해당 설비에 등록된 사고이력이 없습니다.
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Safety Recommendations */}
                 <Card>
                   <CardHeader>
@@ -579,7 +613,7 @@ export default function Briefing() {
                 </Card>
 
                 {/* Related Information Tabs */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -609,39 +643,6 @@ export default function Briefing() {
                           <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
                             현재 작업에 해당하는 특별 규정이 검색되지 않았습니다.<br/>
                             기본 산업안전보건법을 준수하세요.
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <History className="w-5 h-5" />
-                        관련 사고이력
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {briefingData.registeredIncidents && briefingData.registeredIncidents.length > 0 ? (
-                          briefingData.registeredIncidents.map((incident: any, index: number) => (
-                            <div key={index} className="text-sm p-3 bg-red-50 rounded border border-red-200">
-                              <div className="font-medium text-red-800">{incident.title}</div>
-                              <div className="text-red-600 mt-1 text-xs">위험도: {incident.severity}</div>
-                              {incident.description && (
-                                <div className="text-gray-600 mt-2 text-xs leading-relaxed">{incident.description}</div>
-                              )}
-                              {incident.correctiveActions && (
-                                <div className="text-blue-700 mt-2 text-xs font-medium">
-                                  조치사항: {incident.correctiveActions}
-                                </div>
-                              )}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
-                            해당 설비에 등록된 사고이력이 없습니다.
                           </div>
                         )}
                       </div>
