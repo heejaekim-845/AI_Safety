@@ -758,6 +758,150 @@ export class ChromaDBService {
     console.log('=== deleteRegulations() 완료 ===');
   }
 
+  // safety_rules.json 파일 임베딩 (AI 브리핑 최적화)
+  public async embedSafetyRulesFile(): Promise<any> {
+    try {
+      console.log('=== safety_rules.json 임베딩 시작 ===');
+      const regulationPath = './embed_data/safety_rules.json';
+      
+      // 파일 읽기
+      let data;
+      try {
+        const fileContent = await fs.readFile(regulationPath, 'utf8');
+        data = JSON.parse(fileContent);
+        console.log('파일 읽기 성공');
+      } catch (error) {
+        console.error('파일 읽기 실패:', error);
+        throw new Error('safety_rules.json 파일을 찾을 수 없거나 읽을 수 없습니다');
+      }
+
+      if (!this.isInitialized) {
+        console.log('ChromaDB 초기화...');
+        await this.initialize();
+      }
+      console.log(`안전법규 데이터 로드: ${data.articles?.length || 0}개 조항`);
+      console.log(`문서 정보: ${data.document_title_ko} (${data.effective_date} 시행)`);
+
+      if (!data.articles || data.articles.length === 0) {
+        throw new Error('안전법규 조항이 없습니다');
+      }
+
+      // 백업 생성
+      await this.createBackup();
+
+      let processedCount = 0;
+
+      // 각 조항을 임베딩 (AI 브리핑 최적화)
+      for (let i = 0; i < data.articles.length; i++) {
+        const article = data.articles[i];
+        
+        // 임베딩 생성 진행률 표시
+        if (i % 50 === 0) {
+          console.log(`안전법규 임베딩 진행: ${i}/${data.articles.length} (${Math.round(i/data.articles.length*100)}%)`);
+        }
+
+        try {
+          // AI 브리핑에 최적화된 콘텐츠 구성
+          const optimizedContent = [
+            `제${article.article_number}조 ${article.article_korean_title}`,
+            `법조번호: ${article.article_number}`,
+            `조항명: ${article.article_korean_title}`,
+            `법령내용: ${article.body}`,
+            `적용범위: 산업안전보건기준규칙`,
+            `시행일: ${data.effective_date}`
+          ].join('\n');
+
+          const embedding = await this.generateEmbedding(optimizedContent);
+
+          // AI 브리핑용 메타데이터 구성
+          const vectorItem = {
+            id: `regulation_${article.article_number}`,
+            vector: embedding,
+            metadata: {
+              type: 'regulation',
+              title: `제${article.article_number}조 ${article.article_korean_title}`,
+              article_number: article.article_number,
+              article_title: article.article_korean_title,
+              content: article.body,
+              source_document: data.document_title_ko,
+              effective_date: data.effective_date,
+              regulation_category: this.categorizeRegulation(article.article_korean_title, article.body),
+              search_keywords: this.extractRegulationKeywords(article.article_korean_title, article.body)
+            }
+          };
+
+          await this.index.upsertItem(vectorItem);
+          processedCount++;
+          
+          // 백업 생성 (100개 조항마다)
+          if (i % 100 === 0 && i > 0) {
+            await this.createBackup();
+          }
+          
+        } catch (error) {
+          console.error(`안전법규 조항 ${article.article_number} 임베딩 실패:`, error);
+          continue;
+        }
+      }
+
+      console.log(`안전법규 임베딩 완료: ${processedCount}/${data.articles.length}개 조항`);
+      
+      return {
+        articlesProcessed: processedCount,
+        totalArticles: data.articles.length,
+        documentInfo: {
+          title: data.document_title_ko,
+          effectiveDate: data.effective_date,
+          sourceFile: data.source_file
+        }
+      };
+      
+    } catch (error) {
+      console.error('safety_rules.json 임베딩 실패:', error);
+      throw error;
+    }
+  }
+
+  // 안전법규 카테고리 분류 (AI 브리핑 최적화용)
+  private categorizeRegulation(title: string, content: string): string {
+    const text = `${title} ${content}`.toLowerCase();
+    
+    if (text.includes('전기') || text.includes('감전') || text.includes('충전부')) return '전기안전';
+    if (text.includes('추락') || text.includes('비계') || text.includes('안전대')) return '추락방지';
+    if (text.includes('화재') || text.includes('폭발') || text.includes('인화성')) return '화재폭발방지';
+    if (text.includes('기계') || text.includes('설비') || text.includes('장치')) return '기계설비안전';
+    if (text.includes('화학') || text.includes('유해물질') || text.includes('독성')) return '화학물질안전';
+    if (text.includes('작업장') || text.includes('환경') || text.includes('위생')) return '작업환경';
+    if (text.includes('보호구') || text.includes('안전모') || text.includes('안전화')) return '개인보호구';
+    if (text.includes('크레인') || text.includes('리프트') || text.includes('운반')) return '운반하역';
+    if (text.includes('용접') || text.includes('절단') || text.includes('가스')) return '용접절단';
+    if (text.includes('건설') || text.includes('토목') || text.includes('굴착')) return '건설작업';
+    
+    return '일반안전';
+  }
+
+  // 안전법규 검색 키워드 추출 (AI 브리핑 최적화용)
+  private extractRegulationKeywords(title: string, content: string): string {
+    const text = `${title} ${content}`;
+    const keywords: string[] = [];
+    
+    // 핵심 안전 키워드 추출
+    const safetyTerms = [
+      '안전', '위험', '방지', '보호', '예방', '조치', '점검', '관리', '설치', '착용',
+      '전기', '감전', '추락', '화재', '폭발', '기계', '설비', '화학', '유해', '독성',
+      '작업장', '근로자', '사업주', '비계', '안전대', '보호구', '안전모', '크레인',
+      '용접', '절단', '건설', '굴착', '환기', '조명', '소음', '진동', '분진'
+    ];
+    
+    safetyTerms.forEach(term => {
+      if (text.includes(term)) {
+        keywords.push(term);
+      }
+    });
+    
+    return keywords.join(', ');
+  }
+
   // 새로운 안전법규 파일로 재임베딩하는 메서드
   public async reembedRegulations(newRegulationFile?: string): Promise<void> {
     try {

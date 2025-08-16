@@ -1232,31 +1232,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 새로운 안전법규 파일로 재임베딩
-  app.post('/api/reembed-regulations', async (req, res) => {
+  // safety_rules.json 임베딩 (AI 브리핑 최적화)
+  app.post('/api/embed-safety-rules', async (req, res) => {
     try {
-      console.log('안전법규 재임베딩 요청 받음...');
+      console.log('=== safety_rules.json 임베딩 시작 ===');
       
-      const { regulationFile } = req.body;
+      // safety_rules.json 파일 임베딩
+      const result = await chromaDBService.embedSafetyRulesFile();
       
-      await chromaDBService.reembedRegulations(regulationFile);
-      
-      // 재임베딩 후 통계 확인
+      // 임베딩 후 통계 확인
       const stats = await chromaDBService.getStats();
       
       res.json({
-        message: '안전법규 재임베딩 완료',
+        message: 'safety_rules.json 임베딩 완료',
+        articlesProcessed: result.articlesProcessed,
+        totalArticles: result.totalArticles,
+        documentInfo: result.documentInfo,
         stats: {
           totalDocuments: stats.count,
           collections: stats.collections
-        },
-        regulationFile: regulationFile || './embed_data/pdf_regulations_chunks.json'
+        }
       });
     } catch (error: any) {
-      console.error('안전법규 재임베딩 실패:', error);
+      console.error('safety_rules.json 임베딩 실패:', error);
       res.status(500).json({ 
         error: error.message,
-        message: '안전법규 재임베딩 실패' 
+        stack: error.stack,
+        message: 'safety_rules.json 임베딩 실패' 
       });
     }
   });
