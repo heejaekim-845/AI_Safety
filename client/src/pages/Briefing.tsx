@@ -128,10 +128,27 @@ export default function Briefing() {
       return false;
     }
     
-    const now = new Date();
-    const scheduledDateTime = new Date(`${schedule.scheduledDate}T${schedule.briefingTime}`);
-    
-    return now > scheduledDateTime;
+    try {
+      const now = new Date();
+      
+      // scheduledDate가 ISO 문자열인 경우 날짜 부분만 추출
+      const dateOnly = schedule.scheduledDate.split('T')[0];
+      const scheduledDateTimeString = `${dateOnly}T${schedule.briefingTime}:00`;
+      const scheduledDateTime = new Date(scheduledDateTimeString);
+      
+      // 유효한 날짜인지 확인
+      if (isNaN(scheduledDateTime.getTime())) {
+        console.warn('유효하지 않은 날짜:', scheduledDateTimeString);
+        return false;
+      }
+      
+
+      
+      return now > scheduledDateTime;
+    } catch (error) {
+      console.error('시간 비교 오류:', error);
+      return false;
+    }
   };
 
   // 뱃지 상태와 스타일을 결정하는 함수

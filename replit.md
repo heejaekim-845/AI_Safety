@@ -25,6 +25,7 @@ This is a comprehensive, mobile-first web application designed as an industrial 
 - **Safety Rules Integration (August 16, 2025)**: Successfully migrated from PDF-based regulations to structured safety_rules.json containing 653 Korean regulations from 2025 Industrial Safety and Health Standards Rules. Optimized for AI briefing generation with categorized metadata and search keywords.
 - **Data Coverage**: Vector database with 8,947 documents (1,793 incidents + 6,503 education materials + 653 safety regulations)
 - **Vector DB Analysis Fix**: Resolved data discrepancy between target and actual document counts by updating loadAllData method to properly read from safety_rules.json instead of deprecated PDF regulation files
+- **Time-based Badge Status (August 16, 2025)**: Implemented automatic badge status changes on briefing page - "예정" (scheduled) badges automatically change to gray "종료" (completed) badges when work time has passed, with real-time time comparison and robust date parsing
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
