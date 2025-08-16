@@ -1,0 +1,157 @@
+This patch adds an adaptive backoff flow: if education/incident vanish after tightening, the system automatically relaxes gating/thresholds in up to two steps and guarantees a small, relevant set rather than zero.
+
+Paste into your latest server/ai-service.ts (ai-service (5).ts). It builds on the previous precision patch. Minimal wiring required: call processCategoryAdaptive(...) instead of the strict pipeline when producing each category.
+
+0) Backoff configurations (add near top, after TUNING or in its place)
+
+// ===== Adaptive Backoff Levels =====
+// strict → relax1 → relax2
+const BACKOFF = [
+  {
+    label: 'strict',
+    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
+    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
+    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 },
+    gating: {
+      minSetsMatched: 3,
+      minKeywordHits: { incident: 3, education: 1, regulation: 1 },
+      minVectorScore: 0.18,
+      enforceTitleEquip: true,
+      recencyYears: 10
+    }
+  },
+  {
+    label: 'relax1',
+    quantile: { incident: 0.75, education: 0.70, regulation: 0.75 },
+    cap:      { incident: 0.45, education: 0.32, regulation: 0.38 },
+    floor:    { incident: 0.08, education: 0.06, regulation: 0.06 },
+    gating: {
+      minSetsMatched: 2,
+      minKeywordHits: { incident: 2, education: 1, regulation: 1 },
+      minVectorScore: 0.14,
+      enforceTitleEquip: false,
+      recencyYears: 20
+    }
+  },
+  {
+    label: 'relax2',
+    quantile: { incident: 0.60, education: 0.60, regulation: 0.65 },
+    cap:      { incident: 0.40, education: 0.30, regulation: 0.35 },
+    floor:    { incident: 0.05, education: 0.05, regulation: 0.05 },
+    gating: {
+      minSetsMatched: 1,
+      minKeywordHits: { incident: 1, education: 0, regulation: 0 },
+      minVectorScore: 0.10,
+      enforceTitleEquip: false,
+      recencyYears: 0 // 0 = disable
+    }
+  }
+] as const;
+
+1) Helpers to apply a backoff level (add once)
+
+function computeThresholdWithLevel(scores: number[], kind: 'incident'|'education'|'regulation', lvl: typeof BACKOFF[number]) {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a,b)=>a-b);
+  const q = (lvl.quantile as any)[kind];
+  const cap = (lvl.cap as any)[kind];
+  const floor = (lvl.floor as any)[kind];
+  const pos = Math.min(sorted.length - 1, Math.max(0, Math.floor(sorted.length * q)));
+  const p = sorted[pos] ?? 0;
+  return Math.max(floor, Math.min(p, cap));
+}
+
+function mustPassGatingWithLevel(r: any, equipmentInfoObj: any, workType: any, profile: any, lvl: typeof BACKOFF[number]) {
+  const text = [String(r?.metadata?.title || ''), String(r?.document || '')].join(' ').toLowerCase();
+  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
+    .concat(equipmentInfoObj?.tags || []).map((s: string)=>s.toLowerCase());
+  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map((s: string)=>s.toLowerCase());
+  const rkTokens = (equipmentInfoObj?.riskTags || []).map((s: string)=>s.toLowerCase());
+
+  const sets = {
+    equipment: eqTokens.some(t => t && text.includes(t)) ? 1 : 0,
+    workType:  wtTokens.some(t => t && text.includes(t)) ? 1 : 0,
+    risk:      rkTokens.some(t => t && text.includes(t)) ? 1 : 0
+  };
+  const matchedSets = Object.values(sets).reduce((a,b)=>a+b,0);
+  if (matchedSets < lvl.gating.minSetsMatched) return false;
+
+  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
+  const kwHits = (profile.keywords || []).reduce((n: number, k: string)=> n + (k && text.includes(k.toLowerCase()) ? 1 : 0), 0);
+  const minKw = (lvl.gating.minKeywordHits as any)[kind] ?? 0;
+  if (kwHits < minKw) return false;
+
+  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
+  if (v < lvl.gating.minVectorScore && matchedSets < (lvl.gating.minSetsMatched + 1)) return false;
+
+  if (lvl.gating.enforceTitleEquip) {
+    const title = String(r?.metadata?.title || '').toLowerCase();
+    if (title && !eqTokens.some(t => t && title.includes(t))) return false;
+  }
+
+  // recency: 0 disables
+  if (lvl.gating.recencyYears && !isRecentEnough(r, lvl.gating.recencyYears)) return false;
+
+  return true;
+}
+
+2) Adaptive processor for a category (plug-in function)
+
+function processCategoryAdaptive(
+  preList: any[],
+  kind: 'incident'|'education'|'regulation',
+  resolvedProfile: Profile,
+  equipmentInfoObj: EquipmentInfo,
+  workType?: WorkType,
+  minOut = 2,
+  maxOut = 6
+) {
+  for (const lvl of BACKOFF) {
+    console.log(`[backoff] ${kind} try`, lvl.label);
+    const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lvl));
+    dbgCount(`${kind}.gated.${lvl.label}`, gated);
+
+    const scored = applyHybridScoringWithPenalty(gated, resolvedProfile, equipmentInfoObj, workType, kind === 'education');
+    dbgCount(`${kind}.scored.${lvl.label}`, scored);
+
+    const th = computeThresholdWithLevel(scored.map(x => x.hybridScore ?? 0), kind, lvl);
+    let top = scored.filter(x => (x.hybridScore ?? 0) >= th)
+      .sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+
+    // diversity (same as before; change keys if needed)
+    top = diversifyAndTrim(top, 1, ['docId','url','title']);
+
+    // cap and ensure min
+    top = top.slice(0, maxOut);
+    if (top.length >= minOut) return top;
+  }
+
+  // Hard fallback: if still empty, return top-k from least strict scoring
+  const lastLvl = BACKOFF[BACKOFF.length - 1];
+  const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lastLvl));
+  const scored = applyHybridScoringWithPenalty(gated, resolvedProfile, equipmentInfoObj, workType, kind === 'education')
+    .sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+  return scored.slice(0, Math.max(minOut, Math.min(maxOut, 3)));
+}
+
+3) Replace strict per-category block with adaptive calls
+
+Where you previously did strict: gated → scored → thresholds → caps, replace with:
+
+const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
+const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/2, /*max*/5);
+const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
+
+You can keep your previous strict pipeline around a feature flag (e.g., USE_ADAPTIVE=true) to toggle between them.
+
+4) Common pitfalls that lead to zero (double-check)
+
+Negatives must be keyword-only; never apply to vector queries.
+
+If your metadata uses type: 'accident' not 'incident', ensure normType(...) converts it.
+
+If documents lack docId/url, diversity key will degrade to id — OK.
+
+If expected tags are empty, industry mismatch penalty must be skipped (previous patch handles this).
+
+If your corpus is old, backoff’s recencyYears: 0 in relax2 ensures older docs can pass.

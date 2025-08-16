@@ -16,35 +16,60 @@ import {
   type WorkType
 } from './profiles';
 
-// ===== Precision Tuning =====
+// ===== Adaptive Backoff Levels =====
+// strict → relax1 → relax2
+const BACKOFF = [
+  {
+    label: 'strict',
+    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
+    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
+    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 },
+    gating: {
+      minSetsMatched: 3,
+      minKeywordHits: { incident: 3, education: 1, regulation: 1 },
+      minVectorScore: 0.18,
+      enforceTitleEquip: true,
+      recencyYears: 10
+    }
+  },
+  {
+    label: 'relax1',
+    quantile: { incident: 0.75, education: 0.70, regulation: 0.75 },
+    cap:      { incident: 0.45, education: 0.32, regulation: 0.38 },
+    floor:    { incident: 0.08, education: 0.06, regulation: 0.06 },
+    gating: {
+      minSetsMatched: 2,
+      minKeywordHits: { incident: 2, education: 1, regulation: 1 },
+      minVectorScore: 0.14,
+      enforceTitleEquip: false,
+      recencyYears: 20
+    }
+  },
+  {
+    label: 'relax2',
+    quantile: { incident: 0.60, education: 0.60, regulation: 0.65 },
+    cap:      { incident: 0.40, education: 0.30, regulation: 0.35 },
+    floor:    { incident: 0.05, education: 0.05, regulation: 0.05 },
+    gating: {
+      minSetsMatched: 1,
+      minKeywordHits: { incident: 1, education: 0, regulation: 0 },
+      minVectorScore: 0.10,
+      enforceTitleEquip: false,
+      recencyYears: 0 // 0 = disable
+    }
+  }
+] as const;
+
+// Keep legacy TUNING for backward compatibility
 const TUNING = {
   categoryTargets: {
     incident:  { min: 3, max: 6 },   // 사고사례
     education: { min: 2, max: 5 },   // 교육자료
     regulation:{ min: 3, max: 6 }    // 법령
   },
-  thresholds: {
-    // Use higher quantiles to be stricter
-    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
-    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
-    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 } // if p < floor, use floor
-  },
-  gating: {
-    minVectorScore: 0.18,              // too weak vectors are cut unless compensated by tokens
-    minKeywordHits: { incident: 2, education: 1, regulation: 1 },
-    requireSetsAnyOf: ["equipment", "workType", "risk"],
-    minSetsMatched: 2                   // e.g., text must match at least 2 of the sets
-  },
-  penalties: {
-    industryMismatch: { education: 0.20, other: 0.40 },
-    titleMissingEquipment: 0.08         // drop if equipment tokens absent in title
-  },
   diversity: {
     maxPerDoc: 1,                       // keep at most 1 chunk per doc
     dedupKeys: ["docId", "url", "title"]
-  },
-  recency: {
-    years: 10                           // optional: ignore items older than N years (if date exists)
   }
 } as const;
 
@@ -162,44 +187,11 @@ function anyHit(text: string, needles: string[]) {
   return countHits(text, needles) > 0;
 }
 
+// Legacy gating function - now replaced by adaptive system
 function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: any) {
-  const text = toTextBlobForGating(r);
-  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
-    .concat(equipmentInfoObj?.tags || []).map(normalizeStr);
-  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map(normalizeStr);
-  const rkTokens = (equipmentInfoObj?.riskTags || []).map(normalizeStr);
-
-  const sets = {
-    equipment: countHits(text, eqTokens),
-    workType:  countHits(text, wtTokens),
-    risk:      countHits(text, rkTokens)
-  };
-  const matchedSets = Object.values(sets).filter(v => v > 0).length;
-
-  const minSet = TUNING.gating.minSetsMatched;
-  if (minSet > 0 && matchedSets < minSet) return false;
-
-  // keyword hits
-  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
-  const kwList = (profile.keywords || []) as string[];
-  const kwHits = countHits(text, kwList);
-  const minKwHits = (TUNING.gating.minKeywordHits as any)[kind] || 0;
-  if (kwHits < minKwHits) return false;
-
-  // vector score gate
-  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
-  if (v < TUNING.gating.minVectorScore && matchedSets < (minSet + 1)) return false;
-
-  // title must contain some equipment tokens (soft)
-  const title = normalizeStr(r.metadata?.title);
-  if (title && !anyHit(title, eqTokens)) {
-    r.hybridScore = Math.max(0, (r.hybridScore ?? 0) - TUNING.penalties.titleMissingEquipment);
-  }
-
-  // recency
-  if (!isRecentEnough(r, TUNING.recency.years)) return false;
-
-  return true;
+  // Use the most relaxed settings from BACKOFF for legacy compatibility
+  const relaxedLevel = BACKOFF[BACKOFF.length - 1];
+  return mustPassGatingWithLevel(r, equipmentInfoObj, workType, profile, relaxedLevel);
 }
 
 function diversifyAndTrim(list: any[], maxPerDoc: number, keys: string[]) {
@@ -221,11 +213,114 @@ function diversifyAndTrim(list: any[], maxPerDoc: number, keys: string[]) {
 function computeStrictThreshold(scores: number[], kind: 'incident'|'education'|'regulation') {
   if (!scores.length) return 0;
   const sorted = [...scores].sort((a,b)=>a-b);
-  const q = (TUNING.thresholds.quantile as any)[kind] ?? 0.8;
-  const cap = (TUNING.thresholds.cap as any)[kind] ?? 0.35;
-  const floor = (TUNING.thresholds.floor as any)[kind] ?? 0.1;
+  const q = 0.8;
+  const cap = kind === 'education' ? 0.35 : 0.4;
+  const floor = 0.1;
   const p = quantile(sorted, q);
   return Math.max(floor, Math.min(p, cap));
+}
+
+// ===== Adaptive Backoff Helpers =====
+function computeThresholdWithLevel(scores: number[], kind: 'incident'|'education'|'regulation', lvl: typeof BACKOFF[number]) {
+  if (!scores.length) return 0;
+  const sorted = [...scores].sort((a,b)=>a-b);
+  const q = (lvl.quantile as any)[kind];
+  const cap = (lvl.cap as any)[kind];
+  const floor = (lvl.floor as any)[kind];
+  const pos = Math.min(sorted.length - 1, Math.max(0, Math.floor(sorted.length * q)));
+  const p = sorted[pos] ?? 0;
+  return Math.max(floor, Math.min(p, cap));
+}
+
+function mustPassGatingWithLevel(r: any, equipmentInfoObj: any, workType: any, profile: any, lvl: typeof BACKOFF[number]) {
+  const text = [String(r?.metadata?.title || ''), String(r?.document || '')].join(' ').toLowerCase();
+  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
+    .concat(equipmentInfoObj?.tags || []).map((s: any)=>String(s).toLowerCase());
+  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map((s: any)=>String(s).toLowerCase());
+  const rkTokens = (equipmentInfoObj?.riskTags || []).map((s: any)=>String(s).toLowerCase());
+
+  const sets = {
+    equipment: eqTokens.some(t => t && text.includes(t)) ? 1 : 0,
+    workType:  wtTokens.some(t => t && text.includes(t)) ? 1 : 0,
+    risk:      rkTokens.some(t => t && text.includes(t)) ? 1 : 0
+  };
+  const matchedSets = Object.values(sets).reduce((a,b)=>a+b,0);
+  if (matchedSets < lvl.gating.minSetsMatched) return false;
+
+  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
+  const kwHits = (profile.keywords || []).reduce((n: number, k: string)=> n + (k && text.includes(k.toLowerCase()) ? 1 : 0), 0);
+  const minKw = (lvl.gating.minKeywordHits as any)[kind] ?? 0;
+  if (kwHits < minKw) return false;
+
+  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
+  if (v < lvl.gating.minVectorScore && matchedSets < (lvl.gating.minSetsMatched + 1)) return false;
+
+  if (lvl.gating.enforceTitleEquip) {
+    const title = String(r?.metadata?.title || '').toLowerCase();
+    if (title && !eqTokens.some((t: any) => t && title.includes(String(t)))) return false;
+  }
+
+  // recency: 0 disables
+  if (lvl.gating.recencyYears && !isRecentEnough(r, lvl.gating.recencyYears)) return false;
+
+  return true;
+}
+
+// ===== Adaptive Category Processor =====
+function processCategoryAdaptive(
+  preList: any[],
+  kind: 'incident'|'education'|'regulation',
+  resolvedProfile: Profile,
+  equipmentInfoObj: EquipmentInfo,
+  workType?: WorkType,
+  minOut = 2,
+  maxOut = 6
+) {
+  for (const lvl of BACKOFF) {
+    console.log(`[backoff] ${kind} try`, lvl.label);
+    const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lvl));
+    dbgCount(`${kind}.gated.${lvl.label}`, gated);
+
+    const scored = gated.map((r: any) => {
+      const base = applyHybridScoring({
+        id: r.metadata?.id || r.document || 'unknown',
+        title: r.metadata?.title,
+        text: r.document,
+        content: r.document,
+        metadata: r.metadata,
+        vectorScore: r.vectorScore ?? r.score ?? r.similarity
+      } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
+      return { ...r, hybridScore: base };
+    });
+    dbgCount(`${kind}.scored.${lvl.label}`, scored);
+
+    const th = computeThresholdWithLevel(scored.map(x => x.hybridScore ?? 0), kind, lvl);
+    let top = scored.filter(x => (x.hybridScore ?? 0) >= th)
+      .sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+
+    // diversity (same as before; change keys if needed)
+    top = diversifyAndTrim(top, 1, ['docId','url','title']);
+
+    // cap and ensure min
+    top = top.slice(0, maxOut);
+    if (top.length >= minOut) return top;
+  }
+
+  // Hard fallback: if still empty, return top-k from least strict scoring
+  const lastLvl = BACKOFF[BACKOFF.length - 1];
+  const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lastLvl));
+  const scored = gated.map((r: any) => {
+    const base = applyHybridScoring({
+      id: r.metadata?.id || r.document || 'unknown',
+      title: r.metadata?.title,
+      text: r.document,
+      content: r.document,
+      metadata: r.metadata,
+      vectorScore: r.vectorScore ?? r.score ?? r.similarity
+    } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
+    return { ...r, hybridScore: base };
+  }).sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+  return scored.slice(0, Math.max(minOut, Math.min(maxOut, 3)));
 }
 
 // Timing utilities for performance analysis
@@ -1015,93 +1110,27 @@ JSON 형식으로 응답:
           }, resolvedProfile);
         }));
 
-        // Score + penalty + thresholds + fallbacks
-        const scoredIncidents = dbgCount('incidents.scored', this.applyHybridScoringWithPenalty(
-          preIncidents, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ false
-        ));
-        const scoredEducation = dbgCount('education.scored', this.applyHybridScoringWithPenalty(
-          preEducation, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ true
-        ));
-        const scoredRegulations = dbgCount('regulations.scored', this.applyHybridScoringWithPenalty(
-          preRegulations, resolvedProfile, equipmentInfoObj, workType, /*isEducation*/ false
-        ));
+        // Remove old scoring logic - now handled by adaptive system
 
-        // ===== PRECISION CONTROL PATCH APPLIED =====
-        console.log('[PRECISION] Applying gating controls...');
+        // ===== ADAPTIVE BACKOFF SYSTEM APPLIED =====
+        console.log('[ADAPTIVE] Applying adaptive backoff system...');
         
-        // Apply gating controls
-        const gatedIncidents = scoredIncidents.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile));
-        const gatedEducation = scoredEducation.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile)); 
-        const gatedRegulations = scoredRegulations.filter(r => mustPassGating(r, equipmentInfoObj, workType, resolvedProfile));
+        // Use adaptive processing with progressive relaxation
+        const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
+        const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/2, /*max*/5);  
+        const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
         
-        console.log(`[PRECISION] Gating results: incidents ${scoredIncidents.length} → ${gatedIncidents.length}, education ${scoredEducation.length} → ${gatedEducation.length}, regulations ${scoredRegulations.length} → ${gatedRegulations.length}`);
-        
-        // Apply strict thresholds
-        const incidentScores = gatedIncidents.map(r => r.hybridScore ?? 0);
-        const educationScores = gatedEducation.map(r => r.hybridScore ?? 0);
-        const regulationScores = gatedRegulations.map(r => r.hybridScore ?? 0);
-        
-        const incidentThreshold = computeStrictThreshold(incidentScores, 'incident');
-        const educationThreshold = computeStrictThreshold(educationScores, 'education');
-        const regulationThreshold = computeStrictThreshold(regulationScores, 'regulation');
-        
-        console.log(`[PRECISION] Strict thresholds: incident=${incidentThreshold.toFixed(3)}, education=${educationThreshold.toFixed(3)}, regulation=${regulationThreshold.toFixed(3)}`);
-        
-        let thresholdedIncidents = gatedIncidents.filter(r => (r.hybridScore ?? 0) >= incidentThreshold);
-        let thresholdedEducation = gatedEducation.filter(r => (r.hybridScore ?? 0) >= educationThreshold);
-        let thresholdedRegulations = gatedRegulations.filter(r => (r.hybridScore ?? 0) >= regulationThreshold);
-        
-        // Apply diversity trimming
-        const dedupKeys = ["docId", "url", "title"];
-        thresholdedIncidents = diversifyAndTrim(thresholdedIncidents, TUNING.diversity.maxPerDoc, dedupKeys);
-        thresholdedEducation = diversifyAndTrim(thresholdedEducation, TUNING.diversity.maxPerDoc, dedupKeys);
-        thresholdedRegulations = diversifyAndTrim(thresholdedRegulations, TUNING.diversity.maxPerDoc, dedupKeys);
-        
-        // Apply category caps with min/max enforcement
-        const incidentTargets = TUNING.categoryTargets.incident;
-        const educationTargets = TUNING.categoryTargets.education;
-        const regulationTargets = TUNING.categoryTargets.regulation;
-        
-        // Sort by hybrid score and apply limits
-        thresholdedIncidents = thresholdedIncidents
-          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
-          .slice(0, incidentTargets.max);
-        
-        thresholdedEducation = thresholdedEducation
-          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
-          .slice(0, educationTargets.max);
-        
-        thresholdedRegulations = thresholdedRegulations
-          .sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0))
-          .slice(0, regulationTargets.max);
-        
-        // Ensure minimum requirements are met with fallbacks
-        if (thresholdedIncidents.length < incidentTargets.min && gatedIncidents.length > 0) {
-          thresholdedIncidents = gatedIncidents.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, incidentTargets.min);
-        }
-        if (thresholdedEducation.length < educationTargets.min && gatedEducation.length > 0) {
-          thresholdedEducation = gatedEducation.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, educationTargets.min);
-        }
-        if (thresholdedRegulations.length < regulationTargets.min && gatedRegulations.length > 0) {
-          thresholdedRegulations = gatedRegulations.sort((a, b) => (b.hybridScore ?? 0) - (a.hybridScore ?? 0)).slice(0, regulationTargets.min);
-        }
-        
-        console.log(`[PRECISION] Final precision-controlled results: incidents=${thresholdedIncidents.length}, education=${thresholdedEducation.length}, regulations=${thresholdedRegulations.length}`);
-        
-        // Override the old scoring results with precision-controlled ones
-        const precisionScoredIncidents = thresholdedIncidents;
-        const precisionScoredEducation = thresholdedEducation;
-        const precisionScoredRegulations = thresholdedRegulations;
+        console.log(`[ADAPTIVE] Final adaptive results: incidents=${finalIncidents.length}, education=${finalEducation.length}, regulations=${finalRegulations.length}`);
 
-        // Use precision-controlled results instead of old threshold system
-        const finalIncidents   = dbgCount('incidents.post-threshold', precisionScoredIncidents);
-        const finalEducation   = dbgCount('education.post-threshold', precisionScoredEducation);
-        const finalRegulations = dbgCount('regulations.post-threshold', precisionScoredRegulations);
+        // Use adaptive results (already processed with backoff logic)
+        const adaptiveIncidents   = dbgCount('incidents.adaptive', finalIncidents);
+        const adaptiveEducation   = dbgCount('education.adaptive', finalEducation);
+        const adaptiveRegulations = dbgCount('regulations.adaptive', finalRegulations);
 
-        // Safety: guarantee some output if everything is empty (using precision-controlled results)
-        const incidentsOut   = ensureNonEmpty('incidents', finalIncidents, () => precisionScoredIncidents.slice(0, Math.min(5, precisionScoredIncidents.length)));
-        const educationOut   = ensureNonEmpty('education', finalEducation, () => precisionScoredEducation.slice(0, Math.min(5, precisionScoredEducation.length)));
-        const regulationsOut = ensureNonEmpty('regulations', finalRegulations, () => precisionScoredRegulations.slice(0, Math.min(5, precisionScoredRegulations.length)));
+        // Safety: guarantee some output if everything is empty (using adaptive results)
+        const incidentsOut   = ensureNonEmpty('incidents', adaptiveIncidents, () => finalIncidents.slice(0, Math.min(3, finalIncidents.length)));
+        const educationOut   = ensureNonEmpty('education', adaptiveEducation, () => finalEducation.slice(0, Math.min(2, finalEducation.length)));
+        const regulationsOut = ensureNonEmpty('regulations', adaptiveRegulations, () => finalRegulations.slice(0, Math.min(3, finalRegulations.length)));
 
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
