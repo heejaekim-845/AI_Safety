@@ -5,7 +5,7 @@
       "id": "electrical-hv-gis",
       "description": "전기 · 특별고압 · GIS/SF6/변전 설비",
       "match": {
-        "equipment_name_regex": "(?i)(170\\s*kV|gis|sf6|변전|가스절연|전기)",
+        "equipment_name_regex": "(170\\s*kV|gis|sf6|변전|가스절연|전기)",
         "tags_any": ["electrical", "substation", "gis"]
       },
       "keywords": [
@@ -40,7 +40,7 @@
       "id": "mechanical-rotating",
       "description": "기계 · 회전체/축계/베어링",
       "match": { 
-        "equipment_name_regex": "(?i)(회전|축|베어링|터빈|모터|펌프)",
+        "equipment_name_regex": "(회전|축|베어링|터빈|모터|펌프)",
         "tags_any": ["mechanical", "rotating"] 
       },
       "keywords": [
@@ -66,7 +66,7 @@
       "id": "hydraulic-pressure",
       "description": "유압/가압 · 압력용기/배관/밸브",
       "match": { 
-        "equipment_name_regex": "(?i)(유압|압력|배관|밸브|탱크)",
+        "equipment_name_regex": "(유압|압력|배관|밸브|탱크)",
         "tags_any": ["hydraulic", "pressure"] 
       },
       "keywords": ["유압", "압력", "배관", "밸브", "누설", "압력용기", "파열"],
@@ -89,7 +89,7 @@
       "id": "conveyor-belt",
       "description": "컨베이어 벨트 시스템",
       "match": { 
-        "equipment_name_regex": "(?i)(컨베이어|벨트|이송)",
+        "equipment_name_regex": "(컨베이어|벨트|이송)",
         "tags_any": ["conveyor", "transport"] 
       },
       "keywords": ["컨베이어", "벨트", "이송", "롤러", "풀리", "끼임", "협착"],

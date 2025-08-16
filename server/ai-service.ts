@@ -489,11 +489,15 @@ JSON 형식으로 응답:
         // 프로파일 기반 설비 정보 해석
         const equipmentInfoObj: EquipmentInfo = {
           name: equipmentInfo.name,
-          type: equipmentInfo.type || 'unknown',
-          location: equipmentInfo.location || '',
-          workType: workType.name || '',
-          specialNotes: specialNotes || '',
-          riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
+          tags: equipmentInfo.tags || [],
+          riskTags: equipmentInfo.riskTags || [],
+          metadata: {
+            type: equipmentInfo.type || 'unknown',
+            location: equipmentInfo.location || '',
+            workType: workType.name || '',
+            specialNotes: specialNotes || '',
+            riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
+          }
         };
         
         const resolvedProfile = resolveProfile(equipmentInfoObj);
@@ -501,14 +505,16 @@ JSON 형식으로 응답:
         console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
         console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
         
-        // 프로파일 기반 검색 쿼리 생성
-        const targetedQuery = buildTargetedSearchQuery(equipmentInfoObj, resolvedProfile);
-        console.log(`[프로파일] 생성된 검색 쿼리: ${targetedQuery}`);
+        // 프로파일 기반 기본 검색 키워드 사용 
+        let searchQueries: string[] = [];
+        let regulationQueries: string[] = resolvedProfile.queries?.regulation || [];
+        let educationQueries: string[] = resolvedProfile.queries?.education || [];
         
-        // 프로파일 기반 검색 쿼리 생성
-        let searchQueries = [targetedQuery];
-        let regulationQueries = resolvedProfile.searchStrategies.regulation.keywords;
-        let educationQueries = resolvedProfile.searchStrategies.education.keywords;
+        // 프로파일 키워드로 검색 쿼리 생성
+        if (resolvedProfile.keywords && resolvedProfile.keywords.length > 0) {
+          searchQueries.push(`${equipmentInfo.name} ${resolvedProfile.keywords[0]} 사고`);
+          searchQueries.push(`${resolvedProfile.keywords[0]} ${resolvedProfile.keywords[1] || ''} 작업안전`);
+        }
 
         // 백워드 호환성을 위한 추가 쿼리
         searchQueries.push(`${equipmentInfo.name} ${workType.name} 사고`);
@@ -640,7 +646,20 @@ JSON 형식으로 응답:
         }
 
         // 하이브리드 검색: 프로파일 기반 벡터 유사도 + 키워드 점수 조합
-        const keywordWeights = this.getProfileKeywords(resolvedProfile);
+        let keywordWeights: { [key: string]: number } = {};
+        try {
+          keywordWeights = this.getProfileKeywords(resolvedProfile);
+        } catch (error) {
+          console.log(`[프로파일] 키워드 가중치 생성 실패, 기본값 사용:`, error.message);
+          // 기본 키워드 가중치
+          keywordWeights = {
+            "안전": 5,
+            "점검": 4,
+            "정비": 4,
+            "위험": 6,
+            "사고": 6
+          };
+        }
         
         const hybridFilteredAccidents = this.applyHybridScoring(
           filteredChromaResults.filter(r => r.metadata.type === 'incident'), 
@@ -1215,27 +1234,23 @@ ${specialNotes || "없음"}
   private getProfileKeywords(profile: Profile): { [key: string]: number } {
     const keywordWeights: { [key: string]: number } = {};
     
-    // 프로파일의 키워드 그룹별 가중치 적용
-    if (profile.keywordGroups.critical) {
-      profile.keywordGroups.critical.forEach(keyword => {
-        keywordWeights[keyword] = 10;
+    // 프로파일의 기본 키워드로 가중치 적용
+    if (profile.keywords) {
+      profile.keywords.forEach((keyword, index) => {
+        // 첫 번째 키워드들에 더 높은 가중치
+        keywordWeights[keyword] = index < 3 ? 8 : 5;
       });
     }
     
-    if (profile.keywordGroups.important) {
-      profile.keywordGroups.important.forEach(keyword => {
+    // 쿼리 키워드들에도 가중치 적용
+    if (profile.queries?.regulation) {
+      profile.queries.regulation.forEach(keyword => {
         keywordWeights[keyword] = 6;
       });
     }
     
-    if (profile.keywordGroups.relevant) {
-      profile.keywordGroups.relevant.forEach(keyword => {
-        keywordWeights[keyword] = 3;
-      });
-    }
-    
-    if (profile.keywordGroups.education) {
-      profile.keywordGroups.education.forEach(keyword => {
+    if (profile.queries?.education) {
+      profile.queries.education.forEach(keyword => {
         keywordWeights[keyword] = 4;
       });
     }

@@ -14,9 +14,10 @@ export type EquipmentInfo = {
 };
 
 export type SearchItem = {
-  id: string;
+  id?: string;
   title?: string;
   text?: string;           // 본문
+  content?: string;        // 대체 콘텐츠 필드
   metadata?: {
     sourceType?: "regulation" | "education" | "accident" | string;
     work_type?: string;
@@ -74,6 +75,11 @@ export interface SearchProfilesConfig {
 let cachedProfiles: Profile[] | null = null;
 
 export function loadProfiles(): Profile[] {
+  // 개발 중에는 항상 재로드 (캐시 무효화)
+  if (process.env.NODE_ENV === 'development') {
+    cachedProfiles = null;
+  }
+  
   if (cachedProfiles) return cachedProfiles;
   
   try {
@@ -129,7 +135,7 @@ export function resolveProfile(
     if (!m) continue;
 
     const nameOk = m.equipment_name_regex
-      ? new RegExp(m.equipment_name_regex).test(name)
+      ? new RegExp(m.equipment_name_regex, 'i').test(name)
       : true;
 
     const tagsOk = m.tags_any?.length
@@ -323,8 +329,8 @@ export function shouldIncludeContent(
 
 // ------------------ Equipment Tag Inference ------------------
 
-export function inferEquipmentTags(equipmentName: string): string[] {
-  const name = equipmentName.toLowerCase();
+export function inferEquipmentTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {
+  const name = typeof equipment === 'string' ? equipment.toLowerCase() : equipment.name.toLowerCase();
   const tags: string[] = [];
 
   // 전기 관련
@@ -357,8 +363,10 @@ export function inferEquipmentTags(equipmentName: string): string[] {
   return tags;
 }
 
-export function inferRiskTags(equipmentName: string, workTypeName: string = ""): string[] {
-  const combined = `${equipmentName} ${workTypeName}`.toLowerCase();
+export function inferRiskTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {
+  const name = typeof equipment === 'string' ? equipment.toLowerCase() : equipment.name.toLowerCase();
+  const workTypeName = typeof equipment === 'string' ? '' : (equipment.workType || '');
+  const combined = `${name} ${workTypeName}`.toLowerCase();
   const risks: string[] = [];
 
   if (/전기|감전|고압|충전/.test(combined)) risks.push("감전");
