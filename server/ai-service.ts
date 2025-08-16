@@ -276,10 +276,24 @@ function processCategoryAdaptive(
   minOut = 2,
   maxOut = 6
 ) {
+  console.log(`[ADAPTIVE] Processing ${kind} with ${preList.length} candidates, targets: ${minOut}-${maxOut}`);
+  
+  if (!preList || preList.length === 0) {
+    console.log(`[ADAPTIVE] ${kind} - No input candidates, returning empty`);
+    return [];
+  }
+
   for (const lvl of BACKOFF) {
-    console.log(`[backoff] ${kind} try`, lvl.label);
+    console.log(`[ADAPTIVE] ${kind} trying level ${lvl.label} with minSets=${lvl.gating.minSetsMatched}, minVector=${lvl.gating.minVectorScore}`);
+    
     const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lvl));
+    console.log(`[ADAPTIVE] ${kind}.${lvl.label} gated: ${gated.length}/${preList.length}`);
     dbgCount(`${kind}.gated.${lvl.label}`, gated);
+
+    if (gated.length === 0) {
+      console.log(`[ADAPTIVE] ${kind}.${lvl.label} - No items passed gating, trying next level`);
+      continue;
+    }
 
     const scored = gated.map((r: any) => {
       const base = applyHybridScoring({
@@ -294,19 +308,30 @@ function processCategoryAdaptive(
     });
     dbgCount(`${kind}.scored.${lvl.label}`, scored);
 
-    const th = computeThresholdWithLevel(scored.map(x => x.hybridScore ?? 0), kind, lvl);
+    const scores = scored.map(x => x.hybridScore ?? 0);
+    const th = computeThresholdWithLevel(scores, kind, lvl);
+    console.log(`[ADAPTIVE] ${kind}.${lvl.label} threshold: ${th.toFixed(3)}, scores range: ${Math.min(...scores).toFixed(3)}-${Math.max(...scores).toFixed(3)}`);
+    
     let top = scored.filter(x => (x.hybridScore ?? 0) >= th)
       .sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
+    console.log(`[ADAPTIVE] ${kind}.${lvl.label} passed threshold: ${top.length}`);
 
-    // diversity (same as before; change keys if needed)
+    // diversity trimming
     top = diversifyAndTrim(top, 1, ['docId','url','title']);
+    console.log(`[ADAPTIVE] ${kind}.${lvl.label} after diversity: ${top.length}`);
 
     // cap and ensure min
     top = top.slice(0, maxOut);
-    if (top.length >= minOut) return top;
+    console.log(`[ADAPTIVE] ${kind}.${lvl.label} final: ${top.length}, need min: ${minOut}`);
+    
+    if (top.length >= minOut) {
+      console.log(`[ADAPTIVE] ${kind} SUCCESS at level ${lvl.label} with ${top.length} results`);
+      return top;
+    }
   }
 
-  // Hard fallback: if still empty, return top-k from least strict scoring
+  // Hard fallback: return whatever we can get
+  console.log(`[ADAPTIVE] ${kind} FALLBACK - all levels failed, using relaxed approach`);
   const lastLvl = BACKOFF[BACKOFF.length - 1];
   const gated = (preList || []).filter(r => mustPassGatingWithLevel(r, equipmentInfoObj, workType, resolvedProfile, lastLvl));
   const scored = gated.map((r: any) => {
@@ -320,7 +345,10 @@ function processCategoryAdaptive(
     } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
     return { ...r, hybridScore: base };
   }).sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
-  return scored.slice(0, Math.max(minOut, Math.min(maxOut, 3)));
+  
+  const fallbackResult = scored.slice(0, Math.max(minOut, Math.min(maxOut, 3)));
+  console.log(`[ADAPTIVE] ${kind} FALLBACK returned ${fallbackResult.length} results`);
+  return fallbackResult;
 }
 
 // Timing utilities for performance analysis
@@ -1079,35 +1107,23 @@ JSON 형식으로 응답:
           };
         }
         
-        // PATCHED: Prefilter by type + profile
+        // RELAXED: Prefilter by type only (remove profile filtering to let adaptive system handle it)
         const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'incident' && shouldIncludeContent({
-            id: r.metadata?.id || r.document || 'unknown',
-            title: r.metadata?.title,
-            text: r.document,
-            content: r.document,
-            metadata: r.metadata
-          }, resolvedProfile);
+          const type = normType(r.metadata);
+          console.log(`[DEBUG] Incident type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          return type === 'incident';
         }));
 
         const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'education' && shouldIncludeContent({
-            id: r.metadata?.id || r.document || 'unknown',
-            title: r.metadata?.title,
-            text: r.document,
-            content: r.document,
-            metadata: r.metadata
-          }, resolvedProfile);
+          const type = normType(r.metadata);
+          console.log(`[DEBUG] Education type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          return type === 'education';
         }));
 
         const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'regulation' && shouldIncludeContent({
-            id: r.metadata?.id || r.document || 'unknown',
-            title: r.metadata?.title,
-            text: r.document,
-            content: r.document,
-            metadata: r.metadata
-          }, resolvedProfile);
+          const type = normType(r.metadata);
+          console.log(`[DEBUG] Regulation type check: ${type} for ${r.metadata?.title?.substring(0, 30)}`);
+          return type === 'regulation';
         }));
 
         // Remove old scoring logic - now handled by adaptive system
@@ -1120,6 +1136,7 @@ JSON 형식으로 응답:
         const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/2, /*max*/5);  
         const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/3, /*max*/6);
         
+        console.log(`[ADAPTIVE] Input counts: preIncidents=${preIncidents.length}, preEducation=${preEducation.length}, preRegulations=${preRegulations.length}`);
         console.log(`[ADAPTIVE] Final adaptive results: incidents=${finalIncidents.length}, education=${finalEducation.length}, regulations=${finalRegulations.length}`);
 
         // Use adaptive results (already processed with backoff logic)
