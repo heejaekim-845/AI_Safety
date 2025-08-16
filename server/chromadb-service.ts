@@ -294,15 +294,22 @@ export class ChromaDBService {
     }
     console.log(`교육자료 총 ${educationData.length}건 로드`);
 
-    // 3. PDF 안전법규 데이터 로드
-    const pdfJsonPath = path.join(process.cwd(), 'embed_data', 'pdf_regulations_chunks.json');
+    // 3. 안전법규 데이터 로드 (safety_rules.json)
+    const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
     let pdfRegulations: any[] = [];
     try {
-      const pdfData = await fs.readFile(pdfJsonPath, 'utf-8');
-      pdfRegulations = JSON.parse(pdfData);
-      console.log(`PDF 안전법규 청크 ${pdfRegulations.length}건 로드`);
+      const safetyRulesData = await fs.readFile(safetyRulesPath, 'utf-8');
+      const safetyRulesJson = JSON.parse(safetyRulesData);
+      
+      // safety_rules.json 구조에 맞게 변환
+      if (safetyRulesJson.articles && Array.isArray(safetyRulesJson.articles)) {
+        pdfRegulations = safetyRulesJson.articles;
+        console.log(`안전법규 ${pdfRegulations.length}건 로드 (${safetyRulesJson.document_title_ko})`);
+      } else {
+        console.log('안전법규 파일 형식이 올바르지 않습니다. 구조:', Object.keys(safetyRulesJson));
+      }
     } catch (error) {
-      console.log('PDF 법규 파일이 없어 건너뜁니다.');
+      console.log(`안전법규 파일 로드 실패 (경로: ${safetyRulesPath}):`, error.message);
     }
 
     return { accidentCases, educationData, pdfRegulations };
