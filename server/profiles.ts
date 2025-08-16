@@ -14,15 +14,17 @@ export type EquipmentInfo = {
 };
 
 export type SearchItem = {
-  id?: string;
+  id: string;
   title?: string;
   text?: string;           // 본문
-  content?: string;        // 대체 콘텐츠 필드
+  content?: string;        // 추가 본문(외부 호출부에서 주로 여기에 채움)
   metadata?: {
     sourceType?: "regulation" | "education" | "accident" | string;
     work_type?: string;
     equipment?: string;
     risk_keywords?: string;  // comma-separated 가능
+    industry?: string;
+    tags?: string[];
     [k: string]: any;
   };
   vectorScore?: number;    // 0..1 (임베딩 유사도 점수)
@@ -185,6 +187,31 @@ function tokenize(str = ""): string[] {
     .filter(Boolean);
 }
 
+// 공통 텍스트 블롭 생성 유틸: title/text/content/metadata를 묶어 판단 정확도 개선
+function toTextBlob(item: SearchItem): string {
+  const parts = [
+    item.title ?? "",
+    item.text ?? "",
+    item.content ?? "",
+    item.metadata ? JSON.stringify(item.metadata) : ""
+  ];
+  return parts.join(" ").toLowerCase();
+}
+
+// 프로파일 기반 포함/제외 1차 판단 (사고/교육/법규 공통 사용)
+export function shouldIncludeContent(item: SearchItem, profile: Profile): boolean {
+  const hay = toTextBlob(item);
+  const ex = (profile.exclude_keywords ?? []).map((x) => x.toLowerCase());
+  const exAny = (profile.exclude_if_any_keywords ?? []).map((x) => x.toLowerCase());
+  const incAny = (profile.include_if_any_keywords ?? []).map((x) => x.toLowerCase());
+
+  if (ex.length && ex.some((k) => hay.includes(k))) return false;
+  if (exAny.length && exAny.some((k) => hay.includes(k))) return false;
+  if (incAny.length && incAny.some((k) => hay.includes(k))) return true;
+  // include_if_any가 없으면 보수적으로 true를 반환하고, 스코어 단계에서 걸러짐
+  return true;
+}
+
 export function buildTargetedSearchQuery(
   profile: Profile,
   equipment: EquipmentInfo,
@@ -286,50 +313,89 @@ export function computeUniversalHybridScore(
   return hybridScore;
 }
 
-// ------------------ Content Filtering ------------------
+// ------------------ Enhanced Hybrid Scoring ------------------
 
-export function shouldIncludeContent(
+// Helper functions for scoring
+function containsAny(text: string, keywords: string[]): number {
+  let hits = 0;
+  for (const keyword of keywords) {
+    if (text.includes(keyword.toLowerCase())) hits++;
+  }
+  return hits;
+}
+
+function normalize(score: number, max: number): number {
+  return max > 0 ? Math.min(score / max, 1) : 0;
+}
+
+export type HybridScoreOptions = {
+  textFields?: string[];
+  bonusForIncludedAny?: number;
+  penaltyForExcluded?: number;
+};
+
+const DEFAULT_OPTS: HybridScoreOptions = {
+  textFields: ['title', 'text', 'content'],
+  bonusForIncludedAny: 0.1,
+  penaltyForExcluded: 0.2
+};
+
+export function applyHybridScoring(
   item: SearchItem,
-  profile: Profile
-): boolean {
-  const text = (item.text ?? item.title ?? "").toLowerCase();
-  
-  // 제외 키워드 체크
-  const excludeKeywords = profile.exclude_keywords ?? [];
-  for (const exclude of excludeKeywords) {
-    if (text.includes(exclude.toLowerCase())) {
-      return false;
-    }
-  }
+  profile: Profile,
+  equipment: EquipmentInfo,
+  workType?: WorkType,
+  opts: HybridScoreOptions = {}
+): number {
+  const o = { ...DEFAULT_OPTS, ...opts };
+  // content까지 포함해 판단 (기존 title/text만 보던 문제 수정)
+  const text = toTextBlob(item);
 
-  // 제외 조건 키워드 체크 (강화된 산업별 필터링)
-  const excludeIfAny = profile.exclude_if_any_keywords ?? [];
-  if (excludeIfAny.length > 0) {
-    for (const exclude of excludeIfAny) {
-      if (text.includes(exclude.toLowerCase())) {
-        return false;
-      }
-    }
-  }
+  const eqTokens = tokenize(equipment?.name).concat((equipment?.tags ?? []));
+  const wtTokens = tokenize(workType?.name);
+  const riskTokens = (equipment?.riskTags ?? []);
 
+  const vec = Math.max(0, Math.min(1, item.vectorScore ?? 0));
 
+  const kwHits = containsAny(text, profile.keywords ?? []);
+  const eqHits = containsAny(text, eqTokens);
+  const wtHits = containsAny(text, wtTokens);
+  const riskHits = containsAny(text, riskTokens);
 
-  // 포함 조건 키워드 체크 (강화된 관련성 확인)
-  const includeIfAny = profile.include_if_any_keywords ?? [];
-  if (includeIfAny.length > 0) {
-    let hasRequiredKeyword = false;
-    for (const include of includeIfAny) {
-      if (text.includes(include.toLowerCase())) {
-        hasRequiredKeyword = true;
-        break;
-      }
-    }
-    if (!hasRequiredKeyword) {
-      return false;
-    }
-  }
+  const includeAny = profile.include_if_any_keywords ?? [];
+  const exclude = profile.exclude_keywords ?? [];
+  const exclAny = profile.exclude_if_any_keywords ?? [];
 
-  return true;
+  let bonus = 0;
+  if (includeAny.length && containsAny(text, includeAny) > 0) bonus += (o.bonusForIncludedAny || 0.1);
+  let penalty = 0;
+  if (exclude.length && containsAny(text, exclude) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
+  if (exclAny.length && containsAny(text, exclAny) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
+
+  const st = item.metadata?.sourceType;
+  const regHit = st === "regulation" ? 1 : 0;
+  const eduHit = st === "education" ? 1 : 0;
+
+  const s_kw = normalize(kwHits, 8);
+  const s_eq = normalize(eqHits, 6);
+  const s_wt = normalize(wtHits, 4);
+  const s_rk = normalize(riskHits, 4);
+
+  const w = profile.weights;
+
+  let score = 0;
+  score += w.vector * vec;
+  score += w.keyword * s_kw;
+  score += w.equipment * s_eq;
+  score += w.work_type * s_wt;
+  score += w.risk * s_rk;
+  score += w.regulation_hit * regHit;
+  score += w.education_hit * eduHit;
+
+  score += bonus;
+  score -= penalty;
+
+  return Math.max(0, Math.min(1, score));
 }
 
 // ------------------ Equipment Tag Inference ------------------
@@ -370,7 +436,7 @@ export function inferEquipmentTags(equipment: EquipmentInfo | string, profile?: 
 
 export function inferRiskTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {
   const name = typeof equipment === 'string' ? equipment.toLowerCase() : equipment.name.toLowerCase();
-  const workTypeName = typeof equipment === 'string' ? '' : (equipment.workType || '');
+  const workTypeName = typeof equipment === 'string' ? '' : '';
   const combined = `${name} ${workTypeName}`.toLowerCase();
   const risks: string[] = [];
 

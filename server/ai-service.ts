@@ -6,14 +6,15 @@ import * as path from 'path';
 import {
   resolveProfile,
   buildTargetedSearchQuery,
-  computeUniversalHybridScore,
   shouldIncludeContent,
+  applyHybridScoring,
   inferEquipmentTags,
   inferRiskTags,
   type EquipmentInfo,
   type SearchItem,
-  type Profile
-} from './profiles.js';
+  type Profile,
+  type WorkType
+} from './profiles';
 
 // Timing utilities for performance analysis
 const t0 = () => performance.now();
@@ -46,6 +47,47 @@ export interface RiskAnalysis {
 
 export class AIService {
   private accidentDataCache?: any[];
+
+  // 기대 태그 기반 산업 불일치 패널티 + 하이브리드 스코어링
+  private applyHybridScoringWithPenalty(
+    list: any[],
+    resolvedProfile: Profile,
+    equipmentInfoObj: EquipmentInfo,
+    workType?: WorkType,
+    isEducation = false
+  ) {
+    const expected = new Set(
+      (resolvedProfile.match?.tags_any ?? inferEquipmentTags(equipmentInfoObj) ?? [])
+        .map((t: string) => t.toLowerCase())
+    );
+    return list.map((r) => {
+      const base = applyHybridScoring({
+        id: r.id || r.document || 'unknown',
+        title: r.metadata?.title,
+        text: r.document,
+        content: r.document,
+        metadata: r.metadata,
+        vectorScore: r.vectorScore ?? r.score ?? r.similarity
+      }, resolvedProfile, equipmentInfoObj, workType);
+
+      const tags = (r.metadata?.tags || []).map((x: string) => x.toLowerCase());
+      const industry = (r.metadata?.industry || '').toLowerCase();
+      const expectEmpty = expected.size === 0;
+      const ok = expectEmpty || tags.some((t) => expected.has(t)) || expected.has(industry);
+      const penalty = ok ? 0 : (isEducation ? 0.15 : 0.30);
+      return { ...r, hybridScore: Math.max(0, base - penalty) };
+    });
+  }
+
+  // 임계값 계산: 상위 30% + 상한
+  private computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
+    if (!scores.length) return 0;
+    const sorted = [...scores].sort((a,b)=>a-b);
+    const idx = Math.floor(sorted.length * 0.70);
+    const p = sorted[idx];
+    const cap = kind === 'education' ? 0.25 : 0.35;
+    return Math.min(p, cap);
+  }
 
   // 범용 사고사례 정보 매칭 (프로파일 기반)
   private getKnownAccidentsByProfile(profile: Profile): Record<string, any> {
@@ -502,11 +544,15 @@ JSON 형식으로 응답:
         
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
         console.log(`[프로파일] 선택된 프로파일: ${resolvedProfile.id}`);
-        console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
-        console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj, resolvedProfile).join(', ')}`);
+        console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj).join(', ')}`);
+        console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj).join(', ')}`);
         
         // 프로파일 기반 쿼리 빌더 사용
         const { accidents, regulation, education, all } = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
+        
+        // 빠른 검증용 로그
+        console.log(`[profiles] match id=${resolvedProfile.id} name="${equipmentInfoObj.name}" tags=${JSON.stringify(equipmentInfoObj.tags)} work="${workType?.name}" risks=${JSON.stringify(equipmentInfoObj.riskTags)}`);
+        console.log(`[queries]`, { count: all.length, sample: all.slice(0,5) });
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
@@ -597,6 +643,7 @@ JSON 형식으로 응답:
 
             // 강화된 산업별 관련성 확인
             const searchItem: SearchItem = {
+              id: r.metadata?.id || r.document || 'unknown',
               content,
               title,
               metadata: r.metadata
@@ -642,6 +689,7 @@ JSON 형식으로 응답:
             
             // 프로파일 기반 관련성 확인
             const searchItem: SearchItem = {
+              id: r.metadata?.id || r.document || 'unknown',
               content,
               title,
               metadata: r.metadata
@@ -701,6 +749,7 @@ JSON 형식으로 응답:
 
           // 프로파일 기반 관련성 필터 (교육자료뿐 아니라 사고에도)
           const searchItem: SearchItem = {
+            id: r.metadata?.id || r.document || 'unknown',
             content: `${r.metadata?.title || ''}\n${r.document || ''}`,
             title: r.metadata?.title,
             metadata: r.metadata
@@ -729,11 +778,20 @@ JSON 형식으로 응답:
           return true;
         });
 
-        const hybridFilteredAccidents = this.applyHybridScoring(
+        const scoredIncidents = this.applyHybridScoringWithPenalty(
           preFilteredAccidents, 
-          keywordWeights,
-          resolvedProfile
-        ).slice(0, 5);
+          resolvedProfile,
+          equipmentInfoObj,
+          workType,
+          false
+        );
+        
+        const incidentScores = scoredIncidents.map(x => x.hybridScore ?? 0);
+        const incidentThreshold = this.computeThreshold(incidentScores, 'incident');
+        console.log(`[thresholds] incident: ${incidentThreshold.toFixed(3)} (from ${incidentScores.length} scores)`);
+        const hybridFilteredAccidents = scoredIncidents
+          .filter(x => (x.hybridScore ?? 0) > incidentThreshold)
+          .slice(0, 5);
         
         // 교육자료에서 외국어 자료 제외 필터링
         const educationResults = filteredChromaResults.filter(r => {
@@ -758,11 +816,20 @@ JSON 형식으로 응답:
           return true;
         });
         
-        const hybridFilteredEducation = this.applyHybridScoring(
+        const scoredEducation = this.applyHybridScoringWithPenalty(
           educationResults, 
-          keywordWeights,
-          resolvedProfile
-        ).slice(0, 8); // 교육자료 상위 8개로 증가
+          resolvedProfile,
+          equipmentInfoObj,
+          workType,
+          true
+        );
+        
+        const educationScores = scoredEducation.map(x => x.hybridScore ?? 0);
+        const educationThreshold = this.computeThreshold(educationScores, 'education');
+        console.log(`[thresholds] education: ${educationThreshold.toFixed(3)} (from ${educationScores.length} scores)`);
+        const hybridFilteredEducation = scoredEducation
+          .filter(x => (x.hybridScore ?? 0) > educationThreshold)
+          .slice(0, 8); // 교육자료 상위 8개로 증가
         
         // 법규 검색 디버깅 추가
         console.log(`전체 검색 결과: ${filteredChromaResults.length}건`);
@@ -801,6 +868,7 @@ JSON 형식으로 응답:
           
           // 프로파일 기반 관련성 확인
           const searchItem: SearchItem = {
+            id: reg.metadata?.id || reg.document || 'unknown',
             content,
             title,
             metadata: reg.metadata
@@ -946,6 +1014,7 @@ JSON 형식으로 응답:
               
               // 프로파일 기반 관련성 확인
               const searchItem: SearchItem = {
+                id: reg.metadata?.id || reg.document || 'unknown',
                 content,
                 title,
                 metadata: reg.metadata
@@ -987,7 +1056,7 @@ JSON 형식으로 응답:
         console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
         console.log('교육자료 하이브리드 점수:');
         rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          const scored = this.applyHybridScoring([edu], keywordWeights, resolvedProfile)[0];
+          const scored = this.applyLegacyHybridScoring([edu], keywordWeights, resolvedProfile)[0];
           if (scored) {
             console.log(`  ${idx+1}. "${edu.metadata?.title}" - 종합점수: ${scored.hybridScore?.toFixed(3)}, 벡터: ${scored.vectorScore?.toFixed(3)}, 키워드: ${scored.keywordScore}, 핵심키워드: ${scored.criticalKeywordFound}`);
           }
@@ -1030,9 +1099,9 @@ JSON 형식으로 응답:
                   direct_cause: knownData.direct_cause,
                   root_cause: knownData.root_cause,
                   prevention: r.document.split('예방대책: ')[1] || "안전교육 실시, 보호구 착용, 정전작업 원칙 준수",
-                  work_type: metadata.work_type || "전기작업",
-                  industry: metadata.industry || "제조업",
-                  risk_keywords: metadata.risk_keywords || "감전, 고압, 충전부",
+                  work_type: metadata.work_type || (workType?.name ?? '일반작업'),
+                  industry: metadata.industry || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
+                  risk_keywords: metadata.risk_keywords || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
                   relevanceScore: (1 - r.distance).toFixed(3)
                 };
               } else {
@@ -1054,9 +1123,9 @@ JSON 형식으로 응답:
                   direct_cause: extractField('직접원인') || '직접원인 미상',
                   root_cause: extractField('근본원인') || '근본원인 미상', 
                   prevention: extractField('예방대책') || document.split('예방대책: ')[1] || '예방대책 미상',
-                  work_type: metadata.work_type || extractField('작업종류') || '미상',
-                  industry: metadata.industry || extractField('업종') || '미상',
-                  risk_keywords: metadata.risk_keywords || extractField('위험요소') || '미상',
+                  work_type: metadata.work_type || extractField('작업종류') || (workType?.name ?? '일반작업'),
+                  industry: metadata.industry || extractField('업종') || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
+                  risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
                   relevanceScore: (1 - r.distance).toFixed(3)
                 };
               }
@@ -1394,8 +1463,8 @@ ${specialNotes || "없음"}
     return keywordWeights;
   }
 
-  // 프로파일 기반 하이브리드 점수 계산 (벡터 유사도 + 키워드 매칭)
-  private applyHybridScoring(results: any[], keywordWeights: { [key: string]: number }, profile?: Profile): any[] {
+  // 프로파일 기반 하이브리드 점수 계산 (벡터 유사도 + 키워드 매칭) - Legacy method
+  private applyLegacyHybridScoring(results: any[], keywordWeights: { [key: string]: number }, profile?: Profile): any[] {
     const scoredResults = results.map(result => {
       const title = result.metadata?.title || '';
       const content = result.document || '';
@@ -1428,6 +1497,7 @@ ${specialNotes || "없음"}
       if (isEducation) {
         // 프로파일 기반 관련성 검사
         const searchItem: SearchItem = {
+          id: result.metadata?.id || result.document || 'unknown',
           content: searchText,
           title: title,
           metadata: result.metadata
