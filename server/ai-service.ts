@@ -971,10 +971,8 @@ JSON 형식으로 응답:
             () => chromaDBService.searchRelevantData(query, 6)
           );
           // 170kV GIS 특화 법령 필터링 (매우 구체적)
-          console.log(`법령 쿼리 "${query}" 결과: ${additionalResults.length}건`);
-          additionalResults.forEach((r, idx) => {
-            console.log(`  ${idx+1}. 제목: "${r.metadata?.title}", 타입: ${r.metadata?.type}, 거리: ${r.distance}`);
-          });
+
+
           
           const relevantRegulations = additionalResults.filter(r => {
             const content = (r.document || '').toLowerCase();
@@ -1010,18 +1008,15 @@ JSON 형식으로 응답:
             
             const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
             
-            console.log(`[법령 필터링] "${title.substring(0, 30)}..." - 프로파일: ${isRelevant}, 설비: ${equipmentRelevant}, 중복: ${!notDuplicate}`);
-            
             return isRelevant && equipmentRelevant && notDuplicate;
           });
-          console.log(`법령 필터링 후: ${relevantRegulations.length}건`);
+
           filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
           
           relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
         
         // 교육자료 검색 (설비별 특화, 더 많은 결과)
-        console.log(`교육자료 특화 검색: ${educationQueries.length}개 쿼리`);
         for (const query of educationQueries) {
           const eduResults = await timeit(
             `education.search "${query.substring(0, 20)}..."`, 
@@ -1063,8 +1058,6 @@ JSON 형식으로 응답:
             
             const isNotDuplicate = !existingIds.has(r.metadata?.id || r.document);
             
-            console.log(`[교육자료 필터링] "${title.substring(0, 30)}..." - 프로파일: ${isRelevant}, 산업: ${industryRelevant}, 중복: ${!isNotDuplicate}`);
-            
             return isRelevant && industryRelevant && isNotDuplicate;
           });
           filteredChromaResults = [...filteredChromaResults, ...relevantEducation];
@@ -1089,46 +1082,25 @@ JSON 형식으로 응답:
         }
         
         // RELAXED: Prefilter by type only (remove profile filtering to let adaptive system handle it)
-        console.log(`[DEBUG] Total candidates before filtering: ${candidatesRaw?.length || 0}`);
-        
         const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
-          const type = normType(r.metadata);
-          if (type === 'incident') {
-            console.log(`[DEBUG] ✓ Incident found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
-          }
-          return type === 'incident';
+          return normType(r.metadata) === 'incident';
         }));
 
         const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
-          const type = normType(r.metadata);
-          if (type === 'education') {
-            console.log(`[DEBUG] ✓ Education found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
-          }
-          return type === 'education';
+          return normType(r.metadata) === 'education';
         }));
 
         const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
-          const type = normType(r.metadata);
-          if (type === 'regulation') {
-            console.log(`[DEBUG] ✓ Regulation found: ${r.metadata?.title?.substring(0, 50)} (type: ${type})`);
-          }
-          return type === 'regulation';
+          return normType(r.metadata) === 'regulation';
         }));
-        
-        console.log(`[DEBUG] Prefilter results: incidents=${preIncidents.length}, education=${preEducation.length}, regulations=${preRegulations.length}`);
 
         // Remove old scoring logic - now handled by adaptive system
 
         // ===== ADAPTIVE BACKOFF SYSTEM APPLIED =====
-        console.log('[ADAPTIVE] Applying adaptive backoff system...');
-        
         // Use adaptive processing with enhanced fallback for better content recall
         const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
         const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/5);  
         const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
-        
-        console.log(`[ADAPTIVE] Input counts: preIncidents=${preIncidents.length}, preEducation=${preEducation.length}, preRegulations=${preRegulations.length}`);
-        console.log(`[ADAPTIVE] Final adaptive results: incidents=${finalIncidents.length}, education=${finalEducation.length}, regulations=${finalRegulations.length}`);
 
         // Use adaptive results (already processed with backoff logic)
         const adaptiveIncidents   = dbgCount('incidents.adaptive', finalIncidents);
@@ -1143,18 +1115,9 @@ JSON 형식으로 응답:
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
         
-        // Patched search results summary
-        console.log(`[PATCHED] Raw candidates: ${candidatesRaw.length}건`);
-        dbgCount('final.incidents', hybridFilteredAccidents);
-        dbgCount('final.education', hybridFilteredEducation); 
-        dbgCount('final.regulations', regulationsOut);
-
         let regulations = regulationsOut;
-        
-        console.log(`[PATCHED] 최종 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulations=${regulations.length}`);
 
         // 전기설비 특화: safety_rules.json에서 직접 로드 (항상 실행)
-        console.log(`전기설비 특화 법령 직접 로드 시작... (기존 ${regulations.length}건)`);
         
         try {
           const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
@@ -1180,11 +1143,6 @@ JSON 형식으로 응답:
             );
             const keywordMatches = matchedKeywords.length;
             
-            // 매칭된 키워드 로깅 (상위 10개만)
-            if (keywordMatches > 0 && article.article_number <= 10) {
-              console.log(`  조문 ${article.article_number}: "${title}" - 매칭 키워드 ${keywordMatches}개: ${matchedKeywords.join(', ')}`);
-            }
-            
             // 최소 1개 이상의 키워드가 매칭되어야 선택 (조건 완화)
             return keywordMatches >= 1;
           })
@@ -1202,16 +1160,6 @@ JSON 형식으로 응답:
           const selectedArticles = relevantArticles
             .slice(0, 5);
           
-          console.log(`키워드 기반 법령 검색: 총 ${relevantArticles.length}개 매칭, 상위 ${selectedArticles.length}개 선택`);
-          
-          // 선택된 법령들 로깅
-          selectedArticles.forEach((article: any, idx: number) => {
-            const matchedKeywords = electricalKeywords.filter(keyword => 
-              (article.article_korean_title?.toLowerCase() + ' ' + article.body?.toLowerCase()).includes(keyword)
-            );
-            console.log(`  키워드선택 ${idx+1}. 제${article.article_number}조: "${article.article_korean_title}" (키워드 ${matchedKeywords.length}개)`);
-          });
-          
           const directRegulations = selectedArticles.map((article: any) => ({
             lawName: '산업안전보건기준에 관한 규칙',
             articleNumber: `제${article.article_number}조`,
@@ -1221,7 +1169,6 @@ JSON 형식으로 응답:
           }));
           
           regulations = [...regulations, ...directRegulations];
-          console.log(`직접 로드 후 총 법령 수: ${regulations.length}건`);
           
         } catch (error) {
           console.error('전기설비 법령 직접 로드 실패:', error);
@@ -1229,7 +1176,6 @@ JSON 형식으로 응답:
 
         // 전기설비 특화: 조건부 추가 로드
         if (resolvedProfile.id === 'electrical-hv-gis') {
-          console.log(`추가 조건부 로드 체크... (기존 ${regulations.length}건)`);
           
           try {
             const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
@@ -1242,8 +1188,6 @@ JSON 형식으로 응답:
               .filter((article: any) => electricalArticles.includes(article.article_number))
               .slice(0, 5);
             
-            console.log(`전기설비 관련 조문 ${selectedArticles.length}개 직접 로드`);
-            
             const directRegulations = selectedArticles.map((article: any) => ({
               lawName: '산업안전보건기준에 관한 규칙',
               articleNumber: `제${article.article_number}조`,
@@ -1253,7 +1197,6 @@ JSON 형식으로 응답:
             }));
             
             regulations = [...regulations, ...directRegulations];
-            console.log(`직접 로드 후 총 법령 수: ${regulations.length}건`);
             
           } catch (error) {
             console.error('전기설비 법령 직접 로드 실패:', error);
@@ -1261,7 +1204,6 @@ JSON 형식으로 응답:
         }
         
         // 프로파일 기반 강제 검색 실행 (regulation 타입 부족 문제 해결)
-        console.log(`기본 regulation 검색 결과: ${regulations.length}건, 프로파일 기반 강제 검색 실행...`);
         try {
             // 프로파일에서 법규 검색 쿼리 사용
             const profileRegulationQueries = regulationQueries.slice(0, 5);
@@ -1280,8 +1222,6 @@ JSON 형식으로 응답:
               const content = (reg.document || '').toLowerCase();
               const title = (reg.metadata?.title || '').toLowerCase();
               
-              console.log(`[프로파일 강제검색] 검사중: "${reg.metadata?.title}"`);
-              
               // 프로파일 기반 관련성 확인
               const searchItem: SearchItem = {
                 id: reg.metadata?.id || reg.document || 'unknown',
@@ -1293,22 +1233,15 @@ JSON 형식으로 응답:
               const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
               
               if (isRelevant) {
-                console.log(`[프로파일 강제검색] 포함: "${reg.metadata?.title}"`);
                 const key = reg.metadata?.id || reg.document;
                 if (!uniqueProfileRegs.has(key)) {
                   uniqueProfileRegs.set(key, reg);
                 }
-              } else {
-                console.log(`[프로파일 강제검색] 제외: "${reg.metadata?.title}" - 프로파일 기준 무관`);
               }
             });
             
             const additionalRegulations = Array.from(uniqueProfileRegs.values()).slice(0, 5);
             regulations = [...regulations, ...additionalRegulations].slice(0, 5);
-            console.log(`프로파일 기반 강제 법규 검색 완료: +${additionalRegulations.length}건 (총 ${regulations.length}건)`);
-            regulations.forEach((reg, idx) => {
-              console.log(`  최종 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
-            });
             
         } catch (error) {
           console.error('프로파일 기반 강제 법규 검색 실패:', error);
@@ -1340,8 +1273,6 @@ JSON 형식으로 응답:
               const metadata = r.metadata;
               const title = metadata.title || '';
               
-              console.log(`사고사례 매칭 시도: "${title}"`);
-              
               // 알려진 전기 사고사례에서 완전한 정보 찾기 (정확 매칭 및 정규화 매칭)
               const normalizedTitle = title.replace(/[!?.,\s]+$/, '').trim(); // 끝의 특수문자와 공백 제거
               let knownData = knownAccidents[title] || knownAccidents[normalizedTitle];
@@ -1351,14 +1282,12 @@ JSON 형식으로 응답:
                 for (const [knownTitle, data] of Object.entries(knownAccidents)) {
                   if (title.includes(knownTitle) || knownTitle.includes(title.replace(/[!?.,\s]+$/, ''))) {
                     knownData = data;
-                    console.log(`부분 매칭 성공: "${title}" → "${knownTitle}"`);
                     break;
                   }
                 }
               }
               
               if (knownData) {
-                console.log(`✅ 알려진 사고사례 데이터 매칭 성공: ${title}`);
                 return {
                   title: title,
                   date: knownData.date,
@@ -1375,7 +1304,6 @@ JSON 형식으로 응답:
                   relevanceScore: (1 - r.distance).toFixed(3)
                 };
               } else {
-                console.log(`❌ 알려진 데이터 없음, document 파싱: ${title}`);
                 const document = r.document;
                 const lines = document.split('\n');
                 const extractField = (pattern: string, fallback = '') => {
@@ -1420,7 +1348,6 @@ JSON 형식으로 응답:
           );
           
           if (isForeignLanguage) {
-            console.log(`[최종 교육자료 제외] "${r.metadata?.title}" - 외국어 교육자료`);
             return false;
           }
           
@@ -1462,7 +1389,7 @@ JSON 형식으로 응답:
               articleNumber = `제${articleMatch[1]}조`;
               articleTitle = articleMatch[2];
               fullContent = content;
-              console.log(`벡터검색 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
+
             }
           }
           
@@ -1497,12 +1424,6 @@ JSON 형식으로 응답:
         );
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
-        console.log(`검색 쿼리: "${searchQueries.join(', ')}"`);
-        console.log(`벡터 검색 결과: ${filteredChromaResults.length} 건`);
-        console.log(`사고사례: ${hybridFilteredAccidents.length} → ${chromaAccidents.length} 건 (하이브리드 점수 상위)`);
-        console.log(`교육자료: ${hybridFilteredEducation.length} → ${educationMaterials.length} 건 (하이브리드 점수 상위)`);
-        console.log(`선택된 사고사례: [${chromaAccidents.map(acc => `'${acc.title}'`).join(', ')}]`);
-        console.log(`RAG 검색 결과 적용: { regulations: ${safetyRegulations.length}, incidents: ${chromaAccidents.length}, education: ${educationMaterials.length} }`);
       } catch (error) {
         console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
         // 기본값으로 초기화
@@ -1836,8 +1757,6 @@ ${specialNotes || "없음"}
           hybridScore = Math.max(0, hybridScore - penalty);
         }
         
-        console.log(`[incident] "${title}" 최종점수: ${hybridScore.toFixed(3)} (벡터: ${vectorScore.toFixed(3)}, 키워드: ${keywordScore}, 핵심키워드: ${criticalKeywordFound})`);
-        
         return {
           ...result,
           hybridScore,
@@ -1855,16 +1774,7 @@ ${specialNotes || "없음"}
     const isEducationType = results.some(r => r.metadata?.type === 'education');
     const threshold = isEducationType ? 0.05 : 0.05; // 0.25, 0.5에서 0.05로 완화
     
-    console.log(`[applyHybridScoring] 임계값: ${threshold}, 타입: ${isEducationType ? 'education' : 'incident'}`);
-    console.log(`[applyHybridScoring] 필터링 전 결과: ${sorted.length}개`);
-    
-    const filtered = sorted.filter(r => {
-      const pass = r.hybridScore > threshold;
-      if (!pass) console.log(`[필터링] "${r.metadata?.title}" 점수: ${r.hybridScore?.toFixed(3)} <= ${threshold} (제외)`);
-      return pass;
-    });
-    
-    console.log(`[applyHybridScoring] 필터링 후 결과: ${filtered.length}개`);
+    const filtered = sorted.filter(r => r.hybridScore > threshold);
     return filtered;
   }
 
@@ -1902,7 +1812,7 @@ ${specialNotes || "없음"}
         }
         
         if (matchedEducation) {
-          console.log(`✅ 교육자료 URL 매칭 성공: ${title} -> ${matchedEducation.url}`);
+
           return {
             ...result,
             url: matchedEducation.url,
@@ -1912,7 +1822,7 @@ ${specialNotes || "없음"}
             keywords: matchedEducation.keywords
           };
         } else {
-          console.log(`❌ 교육자료 URL 매칭 실패: ${title}`);
+
           return {
             ...result,
             url: '',
@@ -1930,44 +1840,6 @@ ${specialNotes || "없음"}
     }
   }
 
-  private buildTargetedSearchQuery(equipmentInfo: any, workType: any): string {
-    // 설비 특성 분석
-    const equipmentName = equipmentInfo.name || '';
-    const workTypeName = workType.name || '';
-    
-    // 170kV GIS 설비용 특화 검색어
-    if (equipmentName.includes('GIS') || equipmentName.includes('170kV')) {
-      if (workTypeName.includes('순시점검') || workTypeName.includes('점검')) {
-        return '170kV GIS 변전소 점검 감전 전기 안전 고전압 활선';
-      }
-      return 'GIS 170kV 고전압 변전소 감전 전기 SF6 절연';
-    }
-    
-    // 전기 설비용 검색어
-    if (equipmentName.includes('전기') || equipmentName.includes('변전') || equipmentName.includes('배전')) {
-      return `${equipmentName} 전기 감전 충전부 절연 안전작업`;
-    }
-    
-    // 컨베이어 벨트용 검색어
-    if (equipmentName.includes('컨베이어')) {
-      return '컨베이어 벨트 끼임 회전 기계 안전장치';
-    }
-    
-    // 크레인용 검색어
-    if (equipmentName.includes('크레인')) {
-      return '크레인 추락 충돌 중량물 권상 와이어로프';
-    }
-    
-    // 압력용기용 검색어
-    if (equipmentName.includes('압력') || equipmentName.includes('보일러')) {
-      return `${equipmentName} 압력 폭발 고온 증기 안전밸브`;
-    }
-    
-    // 기본 검색어 (작업 유형 + 설비명 + 위험요소)
-    const riskFactors = this.extractRiskFactors(equipmentInfo);
-    return `${equipmentName} ${workTypeName} ${riskFactors.join(' ')}`;
-  }
-
   private extractRiskFactors(equipmentInfo: any): string[] {
     const factors = [];
     if (equipmentInfo.highTemperature) factors.push("고온");
@@ -1979,19 +1851,7 @@ ${specialNotes || "없음"}
     return factors;
   }
 
-  private formatAccidentCases(accidents: AccidentCase[]): string {
-    if (accidents.length === 0) return "관련 사고사례 없음";
-    
-    return accidents.map((acc, index) => 
-      `사고사례 ${index + 1}:
-      - 제목: ${acc.title}
-      - 작업유형: ${acc.workType}
-      - 사고형태: ${acc.accidentType}
-      - 사고개요: ${acc.summary}
-      - 직접원인: ${acc.directCause}
-      - 예방대책: ${acc.prevention}`
-    ).join('\n\n');
-  }
+
 
   private mergeRegisteredAndAIItems(registeredItems: string[], aiItems: any[]): Array<{name: string; source: string}> {
     const result: Array<{name: string; source: string}> = [];
@@ -2023,46 +1883,15 @@ ${specialNotes || "없음"}
     return result;
   }
 
-  private formatChromaAccidentCases(chromaAccidents: any[]): string {
-    if (!chromaAccidents || chromaAccidents.length === 0) {
-      return "관련 사고사례가 없습니다.";
-    }
 
-    return chromaAccidents.map((accident, index) => `
-【사고사례 ${index + 1}】
-- 제목: ${accident.title}
-- 작업유형: ${accident.work_type}
-- 재해형태: ${accident.accident_type}  
-- 사고개요: ${accident.summary}
-- 직접원인: ${accident.direct_cause}
-- 근본원인: ${accident.root_cause}
-- 위험키워드: ${accident.risk_keywords}
-- 예방대책: ${accident.prevention}
-    `).join('\n');
-  }
 
-  private formatEducationMaterials(materials: any[]): string {
-    if (!materials || materials.length === 0) {
-      return "관련 교육자료가 없습니다.";
-    }
 
-    return materials.map((material, index) => `
-【교육자료 ${index + 1}】
-- 제목: ${material.title}
-- 유형: ${material.type}
-- 키워드: ${material.keywords}
-- 내용: ${material.content}
-${material.url ? `- 링크: ${material.url}` : ''}
-    `).join('\n');
-  }
 
   private async summarizeRegulation(content: string, articleTitle?: string): Promise<string> {
     try {
       if (!content || content.trim().length === 0) {
         return "해당 조문의 내용을 확인할 수 없습니다.";
       }
-
-      console.log(`AI 조문 요약 시작: ${articleTitle || '제목없음'}`);
 
       // AI를 사용한 실제 조문 내용 요약
       try {
@@ -2130,8 +1959,6 @@ ${content}
     }
   }
 
-
-
   private formatSafetyRegulations(regulations: any[]): string {
     if (!regulations || regulations.length === 0) {
       return "관련 안전규칙이 없습니다.";
@@ -2150,118 +1977,9 @@ ${regulation.articleNumber}${articleTitle}
     }).join('\n\n');
   }
 
-  private calculateRelevanceScore(result: any, equipmentInfo: any, workType: any): number {
-    const title = (result.metadata.title || '').toLowerCase();
-    const workTypeInData = (result.metadata.work_type || '').toLowerCase();
-    const riskKeywords = (result.metadata.risk_keywords || '').toLowerCase();
-    const content = (result.document || '').toLowerCase();
-    
-    const equipmentName = equipmentInfo.name.toLowerCase();
-    const workTypeName = workType.name.toLowerCase();
-    
-    let score = 0;
-    
-    // 1. 설비 특화 점수 (0-40점)
-    if (equipmentName.includes('gis') || equipmentName.includes('170kv')) {
-      // GIS 설비 특화 키워드
-      const gisKeywords = ['gis', '170kv', '154kv', '345kv', 'kv', '고전압', '변전소', 'sf6', '가스절연', '개폐기'];
-      const matchingGisKeywords = gisKeywords.filter(keyword => 
-        title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingGisKeywords.length * 8; // 키워드당 8점
-    } else if (equipmentName.includes('컨베이어')) {
-      const conveyorKeywords = ['컨베이어', '벨트', '회전', '구동', '모터'];
-      const matchingKeywords = conveyorKeywords.filter(keyword => 
-        title.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingKeywords.length * 8;
-    } else if (equipmentName.includes('크레인')) {
-      const craneKeywords = ['크레인', '권상', '와이어로프', '중량물', '인양'];
-      const matchingKeywords = craneKeywords.filter(keyword => 
-        title.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingKeywords.length * 8;
-    }
-    
-    // 2. 위험요소 매칭 (0-30점)
-    const electricalKeywords = ['감전', '전기', '전력', '배전', '송전', '충전부', '절연', '누전'];
-    const matchingElectricalKeywords = electricalKeywords.filter(keyword => 
-      title.includes(keyword) || riskKeywords.includes(keyword) || content.includes(keyword)
-    );
-    score += matchingElectricalKeywords.length * 5; // 키워드당 5점
-    
-    // 3. 작업 유형 매칭 (0-20점)
-    if (workTypeName.includes('점검') || workTypeName.includes('순시')) {
-      const inspectionKeywords = ['점검', '순시', '정기', '일상', '육안', '확인'];
-      const matchingInspectionKeywords = inspectionKeywords.filter(keyword => 
-        title.includes(keyword) || workTypeInData.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingInspectionKeywords.length * 4; // 키워드당 4점
-    }
-    
-    // 4. 사고 심각도 보너스 (0-10점)
-    const severityKeywords = ['사망', '중상', '화상', '감전사'];
-    const hasSeverity = severityKeywords.some(keyword => 
-      title.includes(keyword) || content.includes(keyword)
-    );
-    if (hasSeverity) score += 10;
-    
-    // 5. 부정 점수 (관련없는 키워드들)
-    const irrelevantKeywords = ['양망기', '롤러', '스크랩', '상차', '매몰', '비산재', '굴삭기', '덤프트럭'];
-    const hasIrrelevantKeyword = irrelevantKeywords.some(keyword => 
-      title.includes(keyword) || content.includes(keyword)
-    );
-    if (hasIrrelevantKeyword) score -= 50; // 큰 감점
-    
-    // 6. 벡터 거리 기반 점수 조정
-    const vectorScore = Math.max(0, (1 - (result.distance || 0.5)) * 10); // 0-10점
-    score += vectorScore;
-    
-    // 점수를 0-1 범위로 정규화
-    return Math.max(0, Math.min(1, score / 100));
-  }
 
-  private calculateEducationRelevance(result: any, equipmentInfo: any, workType: any): number {
-    const title = (result.metadata.title || '').toLowerCase();
-    const category = (result.metadata.category || '').toLowerCase();
-    const content = (result.document || '').toLowerCase();
-    
-    const equipmentName = equipmentInfo.name.toLowerCase();
-    const workTypeName = workType.name.toLowerCase();
-    
-    let score = 0;
-    
-    // 1. 설비 관련 점수
-    if (equipmentName.includes('gis') || equipmentName.includes('전기')) {
-      const electricalEducKeywords = ['전기', '절연', '보호구', '감전', '활선', '정전'];
-      const matchingKeywords = electricalEducKeywords.filter(keyword => 
-        title.includes(keyword) || category.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingKeywords.length * 10;
-    }
-    
-    // 2. 작업 관련 점수  
-    if (workTypeName.includes('점검')) {
-      const inspectionEducKeywords = ['점검', '안전', '작업', '수칙', '절차'];
-      const matchingKeywords = inspectionEducKeywords.filter(keyword => 
-        title.includes(keyword) || content.includes(keyword)
-      );
-      score += matchingKeywords.length * 8;
-    }
-    
-    // 3. 안전교육 키워드 보너스
-    const safetyEducKeywords = ['안전보건', '포스터', '스티커', '교육', '훈련'];
-    const hasSafetyKeyword = safetyEducKeywords.some(keyword => 
-      title.includes(keyword) || category.includes(keyword)
-    );
-    if (hasSafetyKeyword) score += 15;
-    
-    // 벡터 거리 기반 점수 조정
-    const vectorScore = Math.max(0, (1 - (result.distance || 0.5)) * 10);
-    score += vectorScore;
-    
-    return Math.max(0, Math.min(1, score / 60));
-  }
+
+
 
   private mapAccidentTypeToSeverity(accidentType: string | undefined): string {
     // 사고 유형에 따른 심각도 매핑
