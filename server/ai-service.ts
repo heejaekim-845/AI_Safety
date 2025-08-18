@@ -1851,6 +1851,22 @@ ${specialNotes || "없음"}
     return factors;
   }
 
+  private formatChromaAccidentCases(accidents: any[]): string {
+    if (!accidents || accidents.length === 0) {
+      return "관련 사고사례가 없습니다.";
+    }
+
+    return accidents.map((accident, index) => {
+      const metadata = accident.metadata || {};
+      const content = accident.content || accident.pageContent || "내용 없음";
+      
+      return `${index + 1}. ${metadata.title || `사고사례 ${index + 1}`}
+   - 발생일시: ${metadata.date || metadata.accident_date || '날짜 미상'}
+   - 피해정도: ${metadata.severity || metadata.damage_level || '미상'}
+   - 사고원인: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
+    }).join('\n\n');
+  }
+
 
 
   private mergeRegisteredAndAIItems(registeredItems: string[], aiItems: any[]): Array<{name: string; source: string}> {
