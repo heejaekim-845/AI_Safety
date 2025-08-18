@@ -1867,6 +1867,37 @@ ${specialNotes || "없음"}
     }).join('\n\n');
   }
 
+  private formatEducationMaterials(materials: any[]): string {
+    if (!materials || materials.length === 0) {
+      return "관련 교육자료가 없습니다.";
+    }
+
+    return materials.map((material, index) => {
+      const metadata = material.metadata || {};
+      const title = metadata.title || material.title || `교육자료 ${index + 1}`;
+      const url = material.url || metadata.url || '';
+      const type = metadata.type || material.type || '일반 교육자료';
+      
+      return `${index + 1}. ${title}
+   - 자료유형: ${type}
+   - 링크: ${url || '링크 없음'}
+   - 키워드: ${metadata.keywords || material.keywords || ''}`;
+    }).join('\n\n');
+  }
+
+  private formatAccidentCases(accidents: any[]): string {
+    if (!accidents || accidents.length === 0) {
+      return "관련 사고사례가 없습니다.";
+    }
+
+    return accidents.map((accident, index) => {
+      return `${index + 1}. ${accident.title || `사고사례 ${index + 1}`}
+   - 발생일시: ${accident.date || '날짜 미상'}
+   - 피해정도: ${accident.severity || '미상'}
+   - 사고원인: ${accident.cause || accident.description || '원인 미상'}`;
+    }).join('\n\n');
+  }
+
 
 
   private mergeRegisteredAndAIItems(registeredItems: string[], aiItems: any[]): Array<{name: string; source: string}> {
