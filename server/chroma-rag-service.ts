@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import OpenAI from 'openai';
-import { ChromaClient } from 'chromadb';
+// ChromaDB import 제거 - 벡터 DB는 ai-service.ts에서 처리
 
 interface AccidentCase {
   title: string;
@@ -39,7 +39,7 @@ interface SafetyRegulation {
 
 export class ChromaRAGService {
   private openai: OpenAI;
-  private chromaClient: ChromaClient;
+  private chromaClient: any; // ChromaDB 제거됨
   private accidentData: AccidentCase[] = [];
   private educationData: EducationData[] = [];
   private regulationData: SafetyRegulation[] = [];
@@ -186,20 +186,17 @@ export class ChromaRAGService {
   // This method is kept for potential future ChromaDB integration
 
   async searchRelevantAccidents(workType: string, equipmentName: string, riskFactors: string[], limit: number = 3): Promise<AccidentCase[]> {
-    console.log('사고사례 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    console.log('사고사례 검색은 벡터 DB에서 처리됩니다');
     return [];
   }
 
   async searchSafetyRegulations(equipmentName: string, workType: string, riskFactors: string[] = [], limit: number = 5): Promise<SafetyRegulation[]> {
-    await this.initialize();
-
-    // regulationData가 비어있으므로 빈 배열 반환
-    console.log('법규 데이터 없음 - 벡터 DB에서 검색 필요');
+    console.log('법규 검색은 벡터 DB에서 처리됩니다');
     return [];
   }
 
   async searchEducationMaterials(query: string, limit: number = 3): Promise<EducationData[]> {
-    console.log('교육자료 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    console.log('교육자료 검색은 벡터 DB에서 처리됩니다');
     return [];
   }
 
