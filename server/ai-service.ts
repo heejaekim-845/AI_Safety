@@ -650,9 +650,13 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
+    console.log(`\n🚀🚀🚀 generateEnhancedSafetyBriefing 함수 시작! 🚀🚀🚀`);
+    console.log(`📋 입력 데이터: 설비명="${equipmentInfo.name}", 작업="${workType.name}"`);
+    
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
+        console.log(`⏱️ timeit 블록 시작`);
         try {
       // Get relevant accident cases using both ChromaDB RAG and simple RAG
       let relevantAccidents: AccidentCase[] = [];
@@ -677,10 +681,23 @@ JSON 형식으로 응답:
           }
         };
         
+        console.log(`\n========== 프로파일 기반 검색 시작 ==========`);
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
-        console.log(`프로파일: ${resolvedProfile.id}`);
+        console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
+        console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
         
-        // 중복 제거된 키워드 통합
+        // 프로파일 기반 특화 검색 쿼리 생성 (buildTargetedSearchQuery 사용)
+        console.log(`🔍 프로파일 기반 특화 쿼리 생성 중...`);
+        const targetedQueries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
+        console.log(`✅ 특화 쿼리 생성 완료`);
+        
+        // 프로파일 특화 쿼리 사용
+        const incident = targetedQueries.accidents;
+        const regulation = targetedQueries.regulation;
+        const education = targetedQueries.education;
+        const all = targetedQueries.all;
+        
+        // 중복 제거된 키워드 통합 (프로파일 우선)
         const uniqueKeywords = new Set([
           // 1. 프로파일 키워드 (가장 특화된 키워드)
           ...(resolvedProfile.keywords || []),
@@ -693,24 +710,6 @@ JSON 형식으로 응답:
         // 중복 제거된 기본 키워드 배열
         const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
-        
-        // 카테고리별 특화 쿼리 개선: 짧은 키워드 난사 방지
-        const base = `${equipmentInfo.name} ${workType.name}`;
-        const k = baseKeywords.slice(0, 5); // 상위 5개만
-        
-        const incident = [
-          `${base} 사고사례`, `${base} 재해사례`, `${base} 안전사고`,
-          ...k.map(x => `${base} ${x} 사고사례`)
-        ];
-        const regulation = [
-          `${base} 안전규정`, `${base} 법령`, `${base} 조문`,
-          ...k.map(x => `${base} ${x} 규정`)
-        ];
-        const education = [
-          `${base} 안전교육`, `${base} 교육자료`, `${base} 훈련`,
-          ...k.map(x => `${base} ${x} 교육`)
-        ];
-        const all = [base, ...k];
         
         console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
         console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
