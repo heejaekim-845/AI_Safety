@@ -277,20 +277,49 @@ export function buildTargetedSearchQuery(
     risk.join(" ").trim()
   ].filter(Boolean);
 
+  // 더 구체적인 전기 설비 특화 쿼리 생성
+  const isElectricalEquipment = equipment?.name?.includes('kV') || 
+                                equipment?.name?.includes('GIS') ||
+                                equipment?.name?.includes('변압기') ||
+                                equipment?.name?.includes('배전') ||
+                                equipment?.name?.includes('전기');
+
   // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 동적 키워드 접합
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [`${dynamicHead.join(" ")} 사고`] : [])
+    ...(dynamicHead.length ? [
+      `${dynamicHead.join(" ")} 사고`,
+      // 전기 설비의 경우 더 구체적인 쿼리 추가
+      ...(isElectricalEquipment ? [
+        `${nameTokens.join(" ")} 감전 사고`,
+        `${nameTokens.join(" ")} 정전 사고`,
+        `고압 전기설비 ${wtTokens.join(" ")} 사고`
+      ] : [])
+    ] : [])
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [`${dynamicHead.join(" ")} 안전기준`] : [])
+    ...(dynamicHead.length ? [
+      `${dynamicHead.join(" ")} 안전기준`,
+      // 전기 설비의 경우 더 구체적인 규정 검색
+      ...(isElectricalEquipment ? [
+        `${nameTokens.join(" ")} 전기안전기준`,
+        `고압설비 ${wtTokens.join(" ")} 규정`
+      ] : [])
+    ] : [])
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [`${dynamicHead.join(" ")} 안전교육`] : [])
+    ...(dynamicHead.length ? [
+      `${dynamicHead.join(" ")} 안전교육`,
+      // 전기 설비의 경우 더 구체적인 교육자료 검색
+      ...(isElectricalEquipment ? [
+        `${nameTokens.join(" ")} 전기안전교육`,
+        `고압설비 안전작업 교육`
+      ] : [])
+    ] : [])
   ]);
 
   const all = uniq([...accidents, ...regulation, ...education]);
