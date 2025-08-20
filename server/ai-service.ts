@@ -253,7 +253,7 @@ export class AIService {
     });
   }
 
-  // 통합된 검색 함수 (벡터/키워드 통합)
+  // 통합된 검색 함수 (벡터/키워드 통합) - searchByCategory 사용으로 regulation 검색 개선
   private async runSearchQueries(queries: string[]): Promise<any[]> {
     console.log(`[DEBUG] runSearchQueries 호출됨, 쿼리 수: ${queries.length}`);
     console.log(`[DEBUG] 쿼리 목록: ${queries.slice(0,3).join(', ')}${queries.length > 3 ? '...' : ''}`);
@@ -262,9 +262,15 @@ export class AIService {
     for (const q of queries) {
       try {
         console.log(`[DEBUG] 검색 중: "${q}"`);
-        const res = await chromaDBService.searchRelevantData(q, 15);
-        console.log(`[DEBUG] 검색 결과: ${res.length}개`);
-        out.push(...(Array.isArray(res) ? res : []));
+        // searchByCategory 사용으로 regulation 결과 포함 보장
+        const categoryResults = await chromaDBService.searchByCategory(q, 5);
+        const allResults = [
+          ...categoryResults.incident,
+          ...categoryResults.education,
+          ...categoryResults.regulation  // regulation 결과 명시적 포함
+        ];
+        console.log(`[DEBUG] 검색 결과: 총 ${allResults.length}개 (사고:${categoryResults.incident.length}, 교육:${categoryResults.education.length}, 법규:${categoryResults.regulation.length})`);
+        out.push(...allResults);
       } catch (e) {
         console.warn('[search] query failed', q, e);
       }
