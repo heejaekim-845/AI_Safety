@@ -32,21 +32,10 @@ const SIMPLE_CONFIG = {
 // ---------- Type normalization ----------
 function normType(m: any) {
   const s = (m?.type || m?.sourceType || '').toLowerCase();
-  const title = (m?.title || '').toLowerCase();
   
-  // 제목 기반으로 법규 데이터 식별 (잘못 분류된 데이터 보정)
-  if (title.includes('[만화규칙]') || 
-      title.includes('규정') || 
-      title.includes('법규') || 
-      title.includes('기준에 관한 규칙') ||
-      title.includes('산업안전보건기준') ||
-      (title.includes('규칙') && title.includes('재해예방'))) {
-    return 'regulation';
-  }
-  
-  // 기존 타입 기반 분류
+  // 디버깅: 법규 데이터가 어떻게 분류되는지 확인
   if (s.includes('regulation') || s.includes('법규') || s.includes('기준') || s.includes('규정')) {
-    return 'regulation';
+    console.log(`[normType] 법규 관련 데이터 발견: type="${m?.type}", sourceType="${m?.sourceType}", 결과="${s}"`);
   }
   
   if (s === 'accident') return 'incident';
@@ -794,30 +783,7 @@ JSON 형식으로 응답:
         
         console.log(`🚨 [디버깅] candidatesRaw 생성 완료: ${candidatesRaw?.length || 0}개 항목`);
         
-        // 법규 검색을 위한 추가 쿼리 실행
-        console.log(`📜 [법규 강제 검색] 법규 전용 검색 수행...`);
-        const additionalRegulationQueries = [
-          "산업안전보건기준에 관한 규칙",
-          "전기설비 안전관리",
-          "감전 방지 규정",
-          "절연장갑 착용 기준",
-          "정전작업 절차",
-          "충전부 접근 금지"
-        ];
-        
-        const regulationCandidates = await timeit('regulation.search', () => this.runSearchQueries(additionalRegulationQueries));
-        console.log(`📜 [법규 강제 검색] ${regulationCandidates?.length || 0}개 검색됨`);
-        
-        // 법규 검색 결과를 전체 결과에 추가
-        const combinedCandidates = [...candidatesRaw, ...(regulationCandidates || [])];
-        const finalCandidatesRaw = dedupById(combinedCandidates);
-        
-        console.log(`📜 [법규 강제 검색] 최종 후보: ${finalCandidatesRaw?.length || 0}개 (기존: ${candidatesRaw?.length || 0}개 + 법규: ${regulationCandidates?.length || 0}개)`);
-        
-        // candidatesRaw 업데이트
-        const candidatesRawUpdated = finalCandidatesRaw;
-        
-        const chromaResults = candidatesRawUpdated;
+        const chromaResults = candidatesRaw;
 
         let filteredChromaResults = chromaResults;
         
@@ -828,46 +794,27 @@ JSON 형식으로 응답:
         console.log(`프로파일 기반 벡터 검색 결과 직접 활용 - 키워드 가중치 시스템 비활성화`);
         
         // 타입별 필터링 - 디버깅 정보 추가
-        console.log(`[카테고리 분류] 전체 candidatesRawUpdated: ${candidatesRawUpdated?.length || 0}개`);
+        console.log(`[카테고리 분류] 전체 candidatesRaw: ${candidatesRaw?.length || 0}개`);
         
         // 모든 데이터의 타입 확인
         const typeDistribution: { [key: string]: number } = {};
-        const rawTypeDistribution: { [key: string]: number } = {};
-        (candidatesRawUpdated || []).forEach(r => {
+        (candidatesRaw || []).forEach(r => {
           const normalizedType = normType(r.metadata);
-          const rawType = r.metadata?.type || r.metadata?.sourceType || 'unknown';
-          
           typeDistribution[normalizedType] = (typeDistribution[normalizedType] || 0) + 1;
-          rawTypeDistribution[rawType] = (rawTypeDistribution[rawType] || 0) + 1;
         });
-        console.log(`[카테고리 분류] 정규화된 타입별 분포:`, typeDistribution);
-        console.log(`[카테고리 분류] 원시 타입별 분포:`, rawTypeDistribution);
+        console.log(`[카테고리 분류] 타입별 분포:`, typeDistribution);
         
-        const preIncidents = (candidatesRawUpdated || []).filter(r => {
+        const preIncidents = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'incident';
         });
 
-        const preEducation = (candidatesRawUpdated || []).filter(r => {
+        const preEducation = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'education';
         });
 
-        const preRegulations = (candidatesRawUpdated || []).filter(r => {
-          const result = normType(r.metadata) === 'regulation';
-          if (result) {
-            console.log(`🎯 [법규 발견] 제목: "${r.metadata?.title}", 타입: "${r.metadata?.type}", sourceType: "${r.metadata?.sourceType}"`);
-          }
-          return result;
+        const preRegulations = (candidatesRaw || []).filter(r => {
+          return normType(r.metadata) === 'regulation';
         });
-        
-        // 법규가 0개인 경우 추가 디버깅
-        if (preRegulations.length === 0) {
-          console.log(`❌ [법규 0개] candidatesRawUpdated 샘플 5개의 타입 확인:`);
-          (candidatesRawUpdated || []).slice(0, 5).forEach((item, idx) => {
-            const rawType = item.metadata?.type || item.metadata?.sourceType;
-            const normalizedType = normType(item.metadata);
-            console.log(`  ${idx+1}. "${item.metadata?.title}" - 원시타입: "${rawType}", 정규화: "${normalizedType}"`);
-          });
-        }
         
         console.log(`[카테고리 분류 결과] incident: ${preIncidents.length}, education: ${preEducation.length}, regulation: ${preRegulations.length}`);
 
