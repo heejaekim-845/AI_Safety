@@ -174,57 +174,20 @@ export class ChromaRAGService {
   }
 
   private async loadInitialData(): Promise<void> {
-    try {
-      // 사고사례 데이터 로드
-      const accidentDataPath = path.join(process.cwd(), 'data', 'accident_cases_for_rag.json');
-      if (fs.existsSync(accidentDataPath)) {
-        this.accidentData = JSON.parse(fs.readFileSync(accidentDataPath, 'utf-8'));
-        console.log(`사고사례 ${this.accidentData.length}건 로드 완료`);
-      }
-
-      // 교육자료 데이터 로드 (attached_assets에서)
-      const educationDataPath = path.join(process.cwd(), 'attached_assets', 'education_data.json');
-      if (fs.existsSync(educationDataPath)) {
-        this.educationData = JSON.parse(fs.readFileSync(educationDataPath, 'utf-8'));
-        console.log(`교육자료 ${this.educationData.length}건 로드 완료`);
-      } else {
-        console.warn('교육자료 파일을 찾을 수 없습니다:', educationDataPath);
-      }
-
-      // 법규 데이터는 벡터 DB의 safety_rules.json에서 관리됨
-      this.regulationData = [];
-      console.log('법규 데이터는 벡터 DB에서 검색됩니다');
-
-    } catch (error) {
-      console.error('초기 데이터 로드 실패:', error);
-    }
+    // 모든 데이터는 벡터 DB(vectra-index)에서 관리됨
+    // JSON 파일 로드는 더 이상 필요하지 않음
+    this.accidentData = [];
+    this.educationData = [];
+    this.regulationData = [];
+    console.log('모든 데이터는 벡터 DB에서 검색됩니다');
   }
 
   // Simplified RAG uses keyword-based search instead of embeddings
   // This method is kept for potential future ChromaDB integration
 
   async searchRelevantAccidents(workType: string, equipmentName: string, riskFactors: string[], limit: number = 3): Promise<AccidentCase[]> {
-    await this.initialize();
-
-    try {
-      // 간단한 키워드 매칭
-      const searchTerms = [workType, equipmentName, ...riskFactors]
-        .filter(term => term && term.trim().length > 0)
-        .map(term => term.toLowerCase());
-
-      if (searchTerms.length === 0) return [];
-
-      const relevantAccidents = this.accidentData.filter(accident => {
-        const searchText = `${accident.title} ${accident.work_type} ${accident.accident_type} ${accident.summary} ${accident.risk_keywords}`.toLowerCase();
-        return searchTerms.some(term => searchText.includes(term));
-      });
-
-      return relevantAccidents.slice(0, limit);
-
-    } catch (error) {
-      console.error('사고사례 검색 실패:', error);
-      return [];
-    }
+    console.log('사고사례 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    return [];
   }
 
   async searchSafetyRegulations(equipmentName: string, workType: string, riskFactors: string[] = [], limit: number = 5): Promise<SafetyRegulation[]> {
@@ -236,27 +199,8 @@ export class ChromaRAGService {
   }
 
   async searchEducationMaterials(query: string, limit: number = 3): Promise<EducationData[]> {
-    await this.initialize();
-
-    try {
-      const queryTerms = query.toLowerCase().split(' ').filter(term => term.trim().length > 0);
-      if (queryTerms.length === 0) return [];
-
-      const relevantEducation = this.educationData.filter(edu => {
-        const searchText = `${edu.title} ${edu.keywords} ${edu.content} ${edu.type}`.toLowerCase();
-        return queryTerms.some(term => searchText.includes(term));
-      });
-
-      return relevantEducation.slice(0, limit).map(edu => ({
-        ...edu,
-        url: edu.url || '',
-        file_url: edu.file_url || ''
-      }));
-
-    } catch (error) {
-      console.error('교육자료 검색 실패:', error);
-      return [];
-    }
+    console.log('교육자료 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    return [];
   }
 
   private extractFromDocument(document: string, field: string): string {
@@ -266,22 +210,8 @@ export class ChromaRAGService {
   }
 
   async getAccidentsByWorkType(workType: string, limit: number = 5): Promise<AccidentCase[]> {
-    await this.initialize();
-
-    try {
-      const workTypeLower = workType.toLowerCase();
-      
-      const relevantAccidents = this.accidentData.filter(accident => {
-        return accident.work_type.toLowerCase().includes(workTypeLower) ||
-               accident.title.toLowerCase().includes(workTypeLower);
-      });
-
-      return relevantAccidents.slice(0, limit);
-
-    } catch (error) {
-      console.error('작업유형별 사고사례 검색 실패:', error);
-      return [];
-    }
+    console.log('작업유형별 사고사례 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    return [];
   }
 
   // ChromaDB 벡터 검색 메서드 (새로 추가)
@@ -341,28 +271,11 @@ export class ChromaRAGService {
     incidents: AccidentCase[];
     education: EducationData[];
   }> {
-    const searchKeywords = [equipment, workType, riskLevel]
-      .filter(term => term && term.trim().length > 0)
-      .map(term => term.toLowerCase());
-
-    // 사고사례 검색
-    const relevantIncidents = this.accidentData.filter(incident => {
-      const searchText = `${incident.title} ${incident.work_type} ${incident.accident_type} ${incident.risk_keywords}`.toLowerCase();
-      return searchKeywords.some(keyword => searchText.includes(keyword));
-    }).slice(0, 3);
-
-    // 교육자료 검색
-    const relevantEducation = this.educationData.filter(edu => {
-      const searchText = `${edu.title} ${edu.keywords} ${edu.content}`.toLowerCase();
-      return searchKeywords.some(keyword => searchText.includes(keyword));
-    }).slice(0, 2);
-
-    console.log(`키워드 기반 검색 결과: 사고사례 ${relevantIncidents.length}건, 교육자료 ${relevantEducation.length}건, 법규 0건`);
-
+    console.log('키워드 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
     return {
-      regulations: [], // 빈 배열
-      incidents: relevantIncidents,
-      education: relevantEducation
+      regulations: [],
+      incidents: [],
+      education: []
     };
   }
 
