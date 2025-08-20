@@ -69,6 +69,18 @@ function isRelevantContent(item: any, equipment: string, workType: string): bool
 }
 
 // ===== 단순화된 카테고리 처리 =====
+// 점수 정규화 함수들
+function normalizedScore(r: any): number {
+  if (typeof r.similarity === 'number') return clamp01(r.similarity);
+  if (typeof r.score === 'number') return clamp01(r.score);
+  if (typeof r.distance === 'number') return clamp01(1 - r.distance); // distance → similarity
+  return 0;
+}
+
+function clamp01(x: number) { 
+  return Math.max(0, Math.min(1, x)); 
+}
+
 function processCategory(
   items: any[], 
   category: 'incident'|'education'|'regulation',
@@ -82,10 +94,9 @@ function processCategory(
     return [];
   }
 
-  // 벡터 점수 계산 개선: distance 필드 고려
+  // 정규화된 점수 계산: 모든 점수를 [0,1] 범위로 통일
   const withScores = items.map(item => {
-    const vs = item.vectorScore ?? (typeof item.distance === 'number' ? (1 - item.distance) : undefined);
-    const finalScore = vs ?? item.score ?? item.similarity ?? 0.1;
+    const finalScore = normalizedScore(item);
     return { ...item, finalScore };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
@@ -575,8 +586,8 @@ JSON 형식으로 응답:
     const content = item.document || item.text || '';
     const searchText = `${title} ${content}`.toLowerCase();
     
-    // 기본 벡터 점수
-    const vectorScore = item.finalScore || item.vectorScore || (1 - (item.distance || 0));
+    // 정규화된 벡터 점수 사용
+    const vectorScore = item.finalScore || normalizedScore(item);
     
     // 단순 키워드 매칭
     let keywordHits = 0;
@@ -584,8 +595,9 @@ JSON 형식으로 응답:
       if (searchText.includes(token.toLowerCase())) keywordHits++;
     });
     
-    // 가중 조합 (벡터 우선, 키워드는 보조)
-    return (vectorScore * 0.8) + ((keywordHits / Math.max(queryTokens.length, 1)) * 0.2);
+    // 가중 조합 (벡터 우선, 키워드는 보조) - 결과도 [0,1] 범위
+    const hybridScore = (vectorScore * 0.8) + ((keywordHits / Math.max(queryTokens.length, 1)) * 0.2);
+    return clamp01(hybridScore);
   }
 
   async generateEnhancedSafetyBriefing(
@@ -743,14 +755,14 @@ JSON 형식으로 응답:
         
         // 프로파일 기반 강제 검색 제거 - 단일 통합 검색으로 충분함
         
-        // 하이브리드 점수 디버깅 로그 - processCategory가 매긴 finalScore 기반
+        // 하이브리드 점수 디버깅 로그 - 정규화된 finalScore 기반
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
         console.log('상위 사고사례 하이브리드 점수:');
         hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
-          // processCategory가 이미 정렬했으므로 그 점수를 존중
-          const vectorScore = acc.vectorScore ?? (typeof acc.distance === 'number' ? (1 - acc.distance) : undefined);
-          const finalScore = acc.finalScore ?? vectorScore ?? acc.score ?? acc.similarity ?? 0.1;
-          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${finalScore?.toFixed(3)}, 벡터: ${vectorScore?.toFixed(3)}, 키워드: undefined, 핵심키워드: undefined`);
+          // 정규화된 점수 사용 [0,1] 범위
+          const normalizedFinalScore = acc.finalScore ?? normalizedScore(acc);
+          const normalizedVectorScore = normalizedScore(acc);
+          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${normalizedFinalScore.toFixed(3)}, 벡터: ${normalizedVectorScore.toFixed(3)}, 키워드: undefined, 핵심키워드: undefined`);
         });
         
         // 교육자료 필터링 전후 비교
@@ -758,10 +770,10 @@ JSON 형식으로 응답:
         console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
         console.log('교육자료 하이브리드 점수:');
         rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          // processCategory가 매긴 finalScore 보존하도록 applyLegacyHybridScoring 호출 제거
-          const vectorScore = edu.vectorScore ?? (typeof edu.distance === 'number' ? (1 - edu.distance) : undefined);
-          const finalScore = vectorScore ?? edu.score ?? edu.similarity ?? 0.1;
-          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${finalScore.toFixed(3)} (벡터: ${vectorScore?.toFixed(3) || 'N/A'}, 키워드: 0, 불필요키워드: false)`);
+          // 정규화된 점수 사용 [0,1] 범위
+          const normalizedFinalScore = normalizedScore(edu);
+          const normalizedVectorScore = normalizedScore(edu);
+          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${normalizedFinalScore.toFixed(3)} (벡터: ${normalizedVectorScore.toFixed(3)}, 키워드: 0, 불필요키워드: false)`);
         });
         
         // 사고사례: 벡터DB 원본 데이터 직접 사용 (하드코딩 제거)
