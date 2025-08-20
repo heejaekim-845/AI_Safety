@@ -103,63 +103,20 @@ function processCategory(
     const equipmentLower = equipment.toLowerCase();
     const workTypeLower = workType.toLowerCase();
     
-    // 170kV GIS 순시점검에 특화된 엄격한 키워드 필터링
-    const electricalTerms = ['전기', '전력', '변전', 'kv', 'gis', '차단기', '개폐기', '변압기', '송전', '배전', '고압', '특고압'];
-    const unrelatedTerms = ['지게차', '굴착기', '크레인', '파쇄기', '프레스', '비계', '건설', '조선', '용접', '도장', '조경', '밀폐공간', '가스용접'];
+    // 범용 관련성 체크: 설비명 또는 작업명 포함
+    const hasEquipmentMatch = searchText.includes(equipmentLower);
+    const hasWorkMatch = searchText.includes(workTypeLower);
     
-    // 설비명과 작업명에서 주요 키워드 추출
-    const equipmentKeywords = equipmentLower.split(/\s+/).filter(k => k.length > 1);
-    const workKeywords = workTypeLower.split(/\s+/).filter(k => k.length > 1);
-    
-    // 관련성 체크
-    const hasElectricalMatch = electricalTerms.some(term => searchText.includes(term));
-    const hasEquipmentMatch = equipmentKeywords.some(keyword => searchText.includes(keyword));
-    const hasWorkMatch = workKeywords.some(keyword => searchText.includes(keyword));
-    const hasUnrelatedContent = unrelatedTerms.some(term => searchText.includes(term));
-    
-    // 관련성 판단: 전기 관련이면서 무관한 내용이 아니거나, 직접적인 키워드 매치
-    const isRelevant = (hasElectricalMatch && !hasUnrelatedContent) || hasEquipmentMatch || hasWorkMatch;
+    const isRelevant = hasEquipmentMatch || hasWorkMatch;
     
     if (!isRelevant) {
-      console.log(`[필터링됨] "${title}" - 관련성 부족 (키워드: ${equipmentKeywords.join(',')}, ${workKeywords.join(',')})`);
+      console.log(`[필터링됨] "${title}" - 관련성 부족`);
     }
     
     return isRelevant;
   });
 
-  console.log(`\n[${category} 필터링 과정] 원시항목: ${items.length}개 → 관련항목: ${relevantItems.length}개`);
-  
-  // 필터링된 항목들 로그 (상위 5개만)
-  const filteredOut = items.filter(item => {
-    const title = String(item?.metadata?.title || '').toLowerCase();
-    const content = String(item?.document || item?.text || '').toLowerCase();
-    const searchText = `${title} ${content}`;
-    const equipmentLower = equipment.toLowerCase();
-    const workTypeLower = workType.toLowerCase();
-    
-    const electricalTerms = ['전기', '전력', '변전', 'kv', 'gis', '차단기', '개폐기', '변압기', '송전', '배전', '고압', '특고압'];
-    const unrelatedTerms = ['지게차', '굴착기', '크레인', '파쇄기', '프레스', '비계', '건설', '조선', '용접', '도장', '조경', '밀폐공간', '가스용접'];
-    const equipmentKeywords = equipmentLower.split(/\s+/).filter(k => k.length > 1);
-    const workKeywords = workTypeLower.split(/\s+/).filter(k => k.length > 1);
-    
-    const hasElectricalMatch = electricalTerms.some(term => searchText.includes(term));
-    const hasEquipmentMatch = equipmentKeywords.some(keyword => searchText.includes(keyword));
-    const hasWorkMatch = workKeywords.some(keyword => searchText.includes(keyword));
-    const hasUnrelatedContent = unrelatedTerms.some(term => searchText.includes(term));
-    
-    return !((hasElectricalMatch && !hasUnrelatedContent) || hasEquipmentMatch || hasWorkMatch);
-  });
-  
-  console.log(`[${category} 필터링됨] ${filteredOut.length}개 항목:`);
-  filteredOut.slice(0, 5).forEach((item, idx) => {
-    console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}"`);
-  });
-  
-  console.log(`[${category} 통과됨] ${relevantItems.length}개 항목:`);
-  relevantItems.slice(0, 5).forEach((item, idx) => {
-    const score = normalizedScore(item);
-    console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}" - 점수: ${score.toFixed(3)}`);
-  });
+  console.log(`[processCategory] ${category}: 관련성 필터링 ${items.length} → ${relevantItems.length}개`);
 
   // 2단계: 정규화된 점수 계산
   const withScores = relevantItems.map(item => {
@@ -181,11 +138,7 @@ function processCategory(
   const limit = SIMPLE_CONFIG.limits[category];
   const result = withScores.slice(0, limit);
   
-  console.log(`\n[${category} 최종결과] ${result.length}개 선택됨 (최대 ${limit}개):`);
-  result.forEach((item, idx) => {
-    console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}" - 최종점수: ${item.finalScore.toFixed(3)}`);
-  });
-  
+  console.log(`[processCategory] ${category}: ${result.length}개 결과 반환 (최대 ${limit}개)`);
   return result;
 }
 
@@ -739,18 +692,19 @@ JSON 형식으로 응답:
         ];
         const all = [base, ...k];
         
-        console.log(`\n======== 벡터 검색 쿼리 및 결과 상세 분석 ========`);
-        console.log(`[설비정보] 장비명: "${equipmentInfo.name}", 작업명: "${workType.name}"`);
-        console.log(`[프로파일] ID: ${resolvedProfile.id}, 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
-        console.log(`[통합키워드] ${baseKeywords.length}개: [${baseKeywords.join(', ')}]`);
-        console.log(`\n[사고사례 쿼리] ${incident.length}개:`);
-        incident.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
-        console.log(`\n[교육자료 쿼리] ${education.length}개:`);
-        education.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
-        console.log(`\n[법령 쿼리] ${regulation.length}개:`);
-        regulation.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
-        console.log(`===============================================`);
-        console.log(`\n🔍 벡터 검색 시작 - 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 쿼리 실행`);
+        console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
+        console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
+        console.log(`[DEBUG] 작업명: "${workType.name}"`);
+        console.log(`[DEBUG] specificQuery: "${specificQuery}"`);
+        console.log(`[DEBUG] 프로파일 ID: ${resolvedProfile.id}`);
+        console.log(`[DEBUG] 프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
+        console.log(`[DEBUG] 작업 키워드: [${(workType.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,10).join(', ')}${baseKeywords.length > 10 ? '...' : ''}]`);
+        console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
+        console.log(`=====================================`);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
         
@@ -766,34 +720,8 @@ JSON 형식으로 응답:
         const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
         const candidatesRaw = dedupById(allCandidates || []);
         
-        console.log(`\n[벡터검색 원시결과] 총 ${candidatesRaw.length}개 검색됨`);
-        
-        // 카테고리별 원시 검색 결과 분석
-        const rawIncidents = candidatesRaw.filter(r => normType(r.metadata) === 'incident');
-        const rawEducation = candidatesRaw.filter(r => normType(r.metadata) === 'education');
-        const rawRegulations = candidatesRaw.filter(r => normType(r.metadata) === 'regulation');
-        
-        console.log(`[원시결과 분류] 사고사례: ${rawIncidents.length}개, 교육자료: ${rawEducation.length}개, 법령: ${rawRegulations.length}개`);
-        
-        console.log(`\n[사고사례 원시결과] 상위 10개:`);
-        rawIncidents.slice(0, 10).forEach((item, idx) => {
-          const score = normalizedScore(item);
-          console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}" - 점수: ${score.toFixed(3)}`);
-        });
-        
-        console.log(`\n[교육자료 원시결과] 상위 10개:`);
-        rawEducation.slice(0, 10).forEach((item, idx) => {
-          const score = normalizedScore(item);
-          console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}" - 점수: ${score.toFixed(3)}`);
-        });
-        
-        console.log(`\n[법령 원시결과] 상위 10개:`);
-        rawRegulations.slice(0, 10).forEach((item, idx) => {
-          const score = normalizedScore(item);
-          console.log(`  ${idx+1}. "${item.metadata?.title || 'No title'}" - 점수: ${score.toFixed(3)}`);
-        });
-        
         const chromaResults = candidatesRaw;
+
         let filteredChromaResults = chromaResults;
         
         // 카테고리별 특화 검색 완료 - 중복 교육자료 검색 로직 제거됨
