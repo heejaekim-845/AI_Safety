@@ -593,17 +593,21 @@ JSON 형식으로 응답:
         const equipmentKeywords = [...(equipmentInfoObj.tags || []), equipmentInfo.name];
         const workKeywords = [workType.name, ...(workType.keywords || [])];
         
-        // 더 구체적인 쿼리 생성 (설비명과 작업타입 우선), all은 fallback용
+        // 더 구체적인 쿼리 생성: 카테고리별 특화 키워드 + 추가 컨텍스트 키워드
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
-        const incident = [specificQuery, '사고사례', '재해사례', '안전사고'].filter(Boolean);
-        const regulation = [specificQuery, '안전규정', '법령', '조문'].filter(Boolean);
-        const education = [specificQuery, '안전교육', '교육자료', '훈련'].filter(Boolean);
-        const all = [specificQuery, ...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
+        
+        // 카테고리별 키워드에 프로파일/설비/작업 키워드 추가 포함
+        const baseKeywords = [...profileKeywords, ...equipmentKeywords, ...workKeywords];
+        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords].filter(Boolean);
+        const regulation = [specificQuery, '안전규정', '법령', '조문', ...baseKeywords].filter(Boolean);
+        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords].filter(Boolean);
+        const all = [specificQuery, ...baseKeywords].filter(Boolean);
         
         console.log(`검색 쿼리 - 설비: ${equipmentInfo.name}, 작업: ${workType.name}`);
-        console.log(`사고사례 쿼리: ${incident.slice(0,3).join(', ')}`);
-        console.log(`교육자료 쿼리: ${education.slice(0,3).join(', ')}`);
-        console.log(`법령 쿼리: ${regulation.slice(0,3).join(', ')}`);
+        console.log(`기본 키워드: [${baseKeywords.slice(0,5).join(', ')}...]`);
+        console.log(`사고사례 쿼리 (${incident.length}개): [${incident.slice(0,4).join(', ')}...]`);
+        console.log(`교육자료 쿼리 (${education.length}개): [${education.slice(0,4).join(', ')}...]`);
+        console.log(`법령 쿼리 (${regulation.length}개): [${regulation.slice(0,4).join(', ')}...]`);
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
