@@ -595,128 +595,40 @@ JSON 형식으로 응답:
         
         // 더 구체적인 쿼리 생성 (설비명과 작업타입 우선)
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
-        const all = [specificQuery, ...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
+        const incident = [specificQuery, '사고사례', '재해사례', '안전사고'].filter(Boolean);
         const regulation = [specificQuery, '안전규정', '법령', '조문'].filter(Boolean);
         const education = [specificQuery, '안전교육', '교육자료', '훈련'].filter(Boolean);
+        const all = [specificQuery, ...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
         
         console.log(`검색 쿼리 - 설비: ${equipmentInfo.name}, 작업: ${workType.name}`);
+        console.log(`사고사례 쿼리: ${incident.slice(0,3).join(', ')}`);
         console.log(`교육자료 쿼리: ${education.slice(0,3).join(', ')}`);
-        console.log(`사고사례 쿼리: ${all.slice(0,3).join(', ')}`);
+        console.log(`법령 쿼리: ${regulation.slice(0,3).join(', ')}`);
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
           .concat(['사출','성형기','소각','컨베이어','벨트','제조','생산라인','가공']);
         
-        // 검색 쿼리에 NOT 키워드 적용 (벡터 검색용)
-        const searchQueries = all.map((q: string) =>
-          negatives.reduce((s: string, n: string) => `${s} -${n}`, q)
-        );
-        const regulationQueries = regulation;
-        const educationQueries = education;
+        console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용`);
         
-
-
-        console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
-        
-        // 개선된 검색 쿼리: 벡터 검색에도 제외 키워드 적용
-        const queriesForVector = all.map((q: string) => applyNegatives(q, negatives)); // 제외 키워드 적용
-        const queriesForKeyword = all.map((q: string) => applyNegatives(q, negatives));
+        // 카테고리별 특화 검색 쿼리: 벡터 검색에도 제외 키워드 적용
+        const incidentQueries = incident.map((q: string) => applyNegatives(q, negatives));
+        const regulationQueries = regulation.map((q: string) => applyNegatives(q, negatives));
+        const educationQueries = education.map((q: string) => applyNegatives(q, negatives));
+        const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
 
         const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
         const where = buildRelaxedWhere(expectedTags);
 
-        // Run unified search queries
-        const allCandidates = await timeit('unified.search', () => this.runSearchQueries([...queriesForVector, ...queriesForKeyword]));
+        // Run unified search queries with category-specific terms
+        const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
         const candidatesRaw = dedupById(allCandidates || []);
         
         const chromaResults = candidatesRaw;
 
         let filteredChromaResults = chromaResults;
         
-        // 법령 검색 (단일 통합 검색으로 간소화)
-        console.log(`법령 통합 검색: "${regulation[0]}" 기반`);
-        const existingIds = new Set(filteredChromaResults.map(r => r.metadata?.id || r.document));
-        
-        // 단일 통합 법령 검색 (중복 제거)
-        const regulationResults = await timeit(
-          `regulation.unified.search "${regulation[0]?.substring(0, 20)}..."`, 
-          () => chromaDBService.searchByCategory(regulation[0] || `${equipmentInfo.name} ${workType.name} 안전규정`, 15)
-        );
-        
-        const relevantRegulations = (regulationResults.regulation || []).filter(r => {
-          const content = (r.document || '').toLowerCase();
-          const title = (r.metadata?.title || '').toLowerCase();
-          const type = r.metadata?.type;
-          
-          // 타입이 regulation인지 확인
-          if (type !== 'regulation') return false;
-          
-          // 중복 제거
-          if (existingIds.has(r.metadata?.id || r.document)) return false;
-          
-          // 프로파일 기반 관련성 확인
-          const searchItem: SearchItem = {
-            id: r.metadata?.id || r.document || 'unknown',
-            content,
-            title,
-            metadata: r.metadata || {}
-          };
-          
-          return shouldIncludeContent(searchItem, resolvedProfile);
-        });
-        
-        console.log(`법령 검색 완료: ${relevantRegulations.length}건 (전체 ${regulationResults.regulation?.length || 0}건 중)`);
-        filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
-        relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
-        
-        // 교육자료 검색 (설비별 특화, 구체적 쿼리)
-        for (const query of education) {
-          const eduResults = await timeit(
-            `education.search "${query.substring(0, 20)}..."`, 
-            () => chromaDBService.searchRelevantData(query, 8)
-          ); // 구체적 쿼리 사용
-          const relevantEducation = eduResults.filter(r => {
-            const content = (r.document || '').toLowerCase();
-            const title = (r.metadata?.title || '').toLowerCase();
-            const industry = (r.metadata?.industry || '').toLowerCase();
-            
-            // 프로파일 기반 관련성 확인
-            const searchItem: SearchItem = {
-              id: r.metadata?.id || r.document || 'unknown',
-              content,
-              title,
-              metadata: r.metadata
-            };
-            
-            // 1차: 프로파일 기반 관련성 확인
-            const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
-            
-            // 2차: 산업별 관련성 추가 확인 (전기설비용)
-            let industryRelevant = true;
-            if (resolvedProfile.id === 'electrical-hv-gis') {
-              // 전기 관련 산업만 허용, 제조업 제외
-              const electricalIndustries = ['전기', '전력', '에너지', '발전', '송전', '배전', '변전'];
-              const manufacturingKeywords = ['제조', '생산', '가공', '포장', '운반'];
-              
-              const hasElectricalContent = electricalIndustries.some(keyword => 
-                title.includes(keyword) || content.includes(keyword) || industry.includes(keyword)
-              );
-              
-              const hasManufacturingContent = manufacturingKeywords.some(keyword => 
-                title.includes(keyword) || content.includes(keyword) || industry.includes(keyword)
-              );
-              
-              industryRelevant = hasElectricalContent || !hasManufacturingContent;
-            }
-            
-            const isNotDuplicate = !existingIds.has(r.metadata?.id || r.document);
-            
-            return isRelevant && industryRelevant && isNotDuplicate;
-          });
-          filteredChromaResults = [...filteredChromaResults, ...relevantEducation];
-          
-          relevantEducation.forEach(r => existingIds.add(r.metadata?.id || r.document));
-        }
+        // 카테고리별 특화 검색 완료 - 중복 교육자료 검색 로직 제거됨
 
         // 하이브리드 검색: 프로파일 기반 벡터 유사도 + 키워드 점수 조합
         let keywordWeights: { [key: string]: number } = {};
