@@ -765,91 +765,9 @@ JSON 형식으로 응답:
         
         let regulations = regulationsOut;
 
-        // 전기설비 특화: safety_rules.json에서 직접 로드 (항상 실행)
-        
-        try {
-          const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
-          const safetyRulesData = JSON.parse(fs.readFileSync(safetyRulesPath, 'utf-8'));
-          
-          // 전기설비 관련 핵심 조문들 (170kV GIS 고압설비 작업 특화)
-          const electricalKeywords = [
-            '전기', '감전', '충전부', '절연', '접지', '정전', '활선',
-            '특별고압', '고압', '변전', '개폐기', '절연보호구', 
-            'GIS', '가스절연', 'SF6', '배전반', '차단기',
-            '전로', '전기기계', '전기기구', '누전차단기', '단로기'
-          ];
-          
-          // 키워드 기반으로 관련 법령 검색
-          const relevantArticles = safetyRulesData.articles.filter((article: any) => {
-            const title = article.article_korean_title?.toLowerCase() || '';
-            const body = article.body?.toLowerCase() || '';
-            const content = title + ' ' + body;
-            
-            // 전기설비 관련 키워드 매칭 점수 계산
-            const matchedKeywords = electricalKeywords.filter(keyword => 
-              content.includes(keyword)
-            );
-            const keywordMatches = matchedKeywords.length;
-            
-            // 최소 1개 이상의 키워드가 매칭되어야 선택 (조건 완화)
-            return keywordMatches >= 1;
-          })
-          .sort((a: any, b: any) => {
-            // 키워드 매칭 수로 정렬 (많은 것부터)
-            const aMatches = electricalKeywords.filter(keyword => 
-              (a.article_korean_title?.toLowerCase() + ' ' + a.body?.toLowerCase()).includes(keyword)
-            ).length;
-            const bMatches = electricalKeywords.filter(keyword => 
-              (b.article_korean_title?.toLowerCase() + ' ' + b.body?.toLowerCase()).includes(keyword)
-            ).length;
-            return bMatches - aMatches;
-          });
-          
-          const selectedArticles = relevantArticles
-            .slice(0, 5);
-          
-          const directRegulations = selectedArticles.map((article: any) => ({
-            lawName: '산업안전보건기준에 관한 규칙',
-            articleNumber: `제${article.article_number}조`,
-            articleTitle: article.article_korean_title,
-            fullContent: article.body,
-            distance: 0.1
-          }));
-          
-          regulations = [...regulations, ...directRegulations];
-          
-        } catch (error) {
-          console.error('전기설비 법령 직접 로드 실패:', error);
-        }
+        // 전기설비 특화 코드 제거됨
 
-        // 전기설비 특화: 조건부 추가 로드
-        if (resolvedProfile.id === 'electrical-hv-gis') {
-          
-          try {
-            const safetyRulesPath = path.join(process.cwd(), 'embed_data', 'safety_rules.json');
-            const safetyRulesData = JSON.parse(fs.readFileSync(safetyRulesPath, 'utf-8'));
-            
-            // 전기설비 관련 핵심 조문들
-            const electricalArticles = [319, 320, 321, 323, 162, 163, 164, 306, 315, 316];
-            
-            const selectedArticles = safetyRulesData.articles
-              .filter((article: any) => electricalArticles.includes(article.article_number))
-              .slice(0, 5);
-            
-            const directRegulations = selectedArticles.map((article: any) => ({
-              lawName: '산업안전보건기준에 관한 규칙',
-              articleNumber: `제${article.article_number}조`,
-              articleTitle: article.article_korean_title,
-              fullContent: article.body,
-              distance: 0.1
-            }));
-            
-            regulations = [...regulations, ...directRegulations];
-            
-          } catch (error) {
-            console.error('전기설비 법령 직접 로드 실패:', error);
-          }
-        }
+        // 전기설비 특화 조건부 로드 제거됨
         
         // 프로파일 기반 강제 검색 제거 - 단일 통합 검색으로 충분함
         
