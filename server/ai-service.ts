@@ -737,14 +737,20 @@ JSON 형식으로 응답:
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
         console.log(`프로파일: ${resolvedProfile.id}`);
         
-        // 프로파일 기반 검색 쿼리 생성
+        // 프로파일 기반 검색 쿼리 생성 (더 구체적)
         const profileKeywords = resolvedProfile.keywords || [];
         const equipmentKeywords = [...(equipmentInfoObj.tags || []), equipmentInfo.name];
         const workKeywords = [workType.name, ...(workType.keywords || [])];
         
-        const all = [...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
-        const regulation = [...profileKeywords, '안전규정', '법령', '조문'].filter(Boolean);
-        const education = [...profileKeywords, '교육', '안전교육', '훈련'].filter(Boolean);
+        // 더 구체적인 쿼리 생성 (설비명과 작업타입 우선)
+        const specificQuery = `${equipmentInfo.name} ${workType.name}`;
+        const all = [specificQuery, ...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
+        const regulation = [specificQuery, '안전규정', '법령', '조문'].filter(Boolean);
+        const education = [specificQuery, '안전교육', '교육자료', '훈련'].filter(Boolean);
+        
+        console.log(`검색 쿼리 - 설비: ${equipmentInfo.name}, 작업: ${workType.name}`);
+        console.log(`교육자료 쿼리: ${education.slice(0,3).join(', ')}`);
+        console.log(`사고사례 쿼리: ${all.slice(0,3).join(', ')}`);
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
@@ -761,8 +767,8 @@ JSON 형식으로 응답:
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
-        // NEW PATCHED SEARCH FLOW: Separate vector vs keyword queries
-        const queriesForVector = all; // NO negatives for vector search
+        // 개선된 검색 쿼리: 벡터 검색에도 제외 키워드 적용
+        const queriesForVector = all.map((q: string) => applyNegatives(q, negatives)); // 제외 키워드 적용
         const queriesForKeyword = all.map((q: string) => applyNegatives(q, negatives));
 
         const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
@@ -864,12 +870,12 @@ JSON 형식으로 응답:
           relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
         }
         
-        // 교육자료 검색 (설비별 특화, 더 많은 결과)
-        for (const query of educationQueries) {
+        // 교육자료 검색 (설비별 특화, 구체적 쿼리)
+        for (const query of education) {
           const eduResults = await timeit(
             `education.search "${query.substring(0, 20)}..."`, 
             () => chromaDBService.searchRelevantData(query, 8)
-          ); // 검색량 증가
+          ); // 구체적 쿼리 사용
           const relevantEducation = eduResults.filter(r => {
             const content = (r.document || '').toLowerCase();
             const title = (r.metadata?.title || '').toLowerCase();
