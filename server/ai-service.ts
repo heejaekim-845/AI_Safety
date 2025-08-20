@@ -103,10 +103,44 @@ function processCategory(
 
   console.log(`[processCategory] ${category}: 프로파일 기반 검색 결과 신뢰 - 필터링 없이 ${items.length}개 항목 유지`);
 
-  // 2단계: 정규화된 점수 계산
+  // 2단계: 프로파일 기반 관련성 가중치 적용
   const withScores = relevantItems.map(item => {
-    const finalScore = normalizedScore(item);
-    return { ...item, finalScore };
+    const baseScore = normalizedScore(item);
+    const title = String(item?.metadata?.title || '').toLowerCase();
+    const content = String(item?.document || '').toLowerCase();
+    const searchText = `${title} ${content}`;
+    
+    // 170kV GIS 특화 관련성 키워드 가중치
+    let relevanceBoost = 0;
+    
+    // 전기설비 관련 키워드 (높은 가중치)
+    const electricKeywords = ['전기', '감전', '충전', '고압', '변압기', '전로', '배전', '수배전', 'kv', '활선'];
+    const gisKeywords = ['gis', '가스절연', '개폐기', '차단기', '점검', '순시', '정비'];
+    const safetyKeywords = ['안전', '사고', '재해', '위험'];
+    
+    // 전기설비 키워드 매칭
+    electricKeywords.forEach(keyword => {
+      if (searchText.includes(keyword)) relevanceBoost += 0.15;
+    });
+    
+    // GIS/설비 키워드 매칭
+    gisKeywords.forEach(keyword => {
+      if (searchText.includes(keyword)) relevanceBoost += 0.10;
+    });
+    
+    // 안전 키워드 매칭
+    safetyKeywords.forEach(keyword => {
+      if (searchText.includes(keyword)) relevanceBoost += 0.05;
+    });
+    
+    // 관련성 없는 키워드 패널티
+    const irrelevantKeywords = ['도장', '용접', '철도', '선박', '물탱크', '저수조', '잠수', '발빠짐', '적재물'];
+    irrelevantKeywords.forEach(keyword => {
+      if (searchText.includes(keyword)) relevanceBoost -= 0.20;
+    });
+    
+    const finalScore = Math.max(0, Math.min(1, baseScore + relevanceBoost));
+    return { ...item, finalScore, baseScore, relevanceBoost };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
