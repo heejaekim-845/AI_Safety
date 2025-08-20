@@ -2243,54 +2243,7 @@ ${this.formatRisks(equipmentInfo)}
       };
     } catch (error) {
       console.error("AI 위험성평가 오류:", error);
-      
-      // Fallback risk assessment
-      return {
-        workTypeName,
-        riskFactors: [
-          {
-            factor: "고압 가스 노출",
-            probability: 3,
-            severity: 4,
-            score: 12,
-            measures: [
-              "작업 전 압력 완전 해제 확인",
-              "개인보호구 착용 의무화",
-              "안전작업절차서 숙지 및 준수"
-            ]
-          },
-          {
-            factor: "전기적 위험",
-            probability: 2,
-            severity: 4,
-            score: 8,
-            measures: [
-              "전원 차단 후 작업 실시",
-              "절연장갑 착용",
-              "전기 안전 점검 실시"
-            ]
-          },
-          {
-            factor: "회전체 접촉",
-            probability: 2,
-            severity: 3,
-            score: 6,
-            measures: [
-              "회전부 완전 정지 확인",
-              "안전덮개 설치 확인",
-              "느슨한 의복 착용 금지"
-            ]
-          }
-        ],
-        totalScore: 26,
-        overallRiskLevel: "HIGH",
-        complianceNotes: [
-          "산업안전보건법 제38조에 따른 위험성평가 실시",
-          "동법 제39조에 따른 안전보건조치 이행",
-          "개인보호구 지급 및 착용 의무 (동법 제32조)",
-          "안전작업절차서 작성 및 교육 실시 (동법 제31조)"
-        ]
-      };
+      throw new Error("위험성평가 분석 중 오류가 발생했습니다.");
     }
   }
 }
