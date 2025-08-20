@@ -872,16 +872,17 @@ JSON 형식으로 응답:
       let safetyRegulations: any[] = [];
 
       try {
-        // 프로파일 기반 설비 정보 해석 (태그 자동 추론)
+        // 실제 데이터베이스 데이터와 사용자 입력 기반 설비 정보 구성
+        const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
         const equipmentInfoObj: EquipmentInfo = {
           name: equipmentInfo.name,
-          tags: equipmentInfo.tags || inferEquipmentTags(equipmentInfo.name),
-          riskTags: equipmentInfo.riskTags || inferRiskTags(equipmentInfo.name),
+          tags: inferEquipmentTags(equipmentInfo.name), // 설비명 기반 기본 태그
+          riskTags: equipmentRisks, // 실제 DB의 위험 정보 기반
           metadata: {
-            type: equipmentInfo.type || 'unknown',
+            type: equipmentInfo.manufacturer || 'unknown',
             location: equipmentInfo.location || '',
             workType: workType.name || '',
-            specialNotes: specialNotes || '',
+            specialNotes: specialNotes || '', // 사용자 특이사항 입력
             riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
           }
         };
@@ -2245,6 +2246,58 @@ ${this.formatRisks(equipmentInfo)}
       console.error("AI 위험성평가 오류:", error);
       throw new Error("위험성평가 분석 중 오류가 발생했습니다.");
     }
+  }
+
+  // 실제 데이터베이스의 위험 정보를 추출하는 메서드
+  private extractEquipmentRisks(equipmentInfo: any): string[] {
+    const risks: string[] = [];
+    
+    // 실제 DB 필드에서 위험 정보 추출
+    if (equipmentInfo.highTemperatureRisk) {
+      risks.push('고온', '화재', '화상');
+      if (equipmentInfo.highTemperatureDetails) {
+        risks.push(...equipmentInfo.highTemperatureDetails.split(',').map((s: string) => s.trim()));
+      }
+    }
+    
+    if (equipmentInfo.highPressureRisk) {
+      risks.push('고압', '압력', '가스누출', '폭발');
+      if (equipmentInfo.highPressureDetails) {
+        risks.push(...equipmentInfo.highPressureDetails.split(',').map((s: string) => s.trim()));
+      }
+    }
+    
+    if (equipmentInfo.highVoltageRisk) {
+      risks.push('전기', '감전', '고압전기', 'Arc');
+      if (equipmentInfo.highVoltageDetails) {
+        risks.push(...equipmentInfo.highVoltageDetails.split(',').map((s: string) => s.trim()));
+      }
+    }
+    
+    if (equipmentInfo.heightRisk) {
+      risks.push('추락', '고소작업', '작업발판');
+      if (equipmentInfo.heightDetails) {
+        risks.push(...equipmentInfo.heightDetails.split(',').map((s: string) => s.trim()));
+      }
+    }
+    
+    if (equipmentInfo.heavyWeightRisk) {
+      risks.push('기계적', '끼임', '충돌', '중량물');
+      if (equipmentInfo.heavyWeightDetails) {
+        risks.push(...equipmentInfo.heavyWeightDetails.split(',').map((s: string) => s.trim()));
+      }
+    }
+    
+    // riskFactors JSONB 필드에서 추가 위험 정보
+    if (equipmentInfo.riskFactors) {
+      Object.entries(equipmentInfo.riskFactors).forEach(([key, value]) => {
+        if (value && key.includes('Detail') && typeof value === 'string') {
+          risks.push(...(value as string).split(',').map((s: string) => s.trim()));
+        }
+      });
+    }
+    
+    return Array.from(new Set(risks)); // 중복 제거
   }
 }
 
