@@ -782,93 +782,43 @@ JSON 형식으로 응답:
         
         const chromaResults = candidatesRaw;
 
-        // 별도 regulation 검색 추가 (확실히 법규 데이터를 포함시키기 위해)
-        console.log('별도 regulation 검색 실행...');
-        const regulationSearchResults = await timeit(
-          'regulation.direct.search',
-          async () => {
-            const regResults = await chromaDBService.searchByCategory(regulationQueries[0] || '전기 작업 안전규정', 10);
-            return regResults.regulation || [];
-          }
-        );
-        console.log(`별도 regulation 검색 결과: ${regulationSearchResults.length}건`);
-        regulationSearchResults.forEach((reg, idx) => {
-          console.log(`  별도검색 법규 ${idx+1}: "${reg.metadata?.title}" (거리: ${reg.distance})`);
-        });
+        let filteredChromaResults = chromaResults;
         
-        // 중복 제거 (기본 검색 결과 + 별도 regulation 검색 결과)
-        const uniqueResults = new Map();
-        chromaResults.forEach((r: any) => {
-          const key = r.metadata?.id || r.document;
-          if (!uniqueResults.has(key)) {
-            uniqueResults.set(key, r);
-          }
-        });
-        
-        // 별도 regulation 검색 결과 추가
-        regulationSearchResults.forEach((r: any) => {
-          const key = r.metadata?.id || r.document;
-          if (!uniqueResults.has(key)) {
-            uniqueResults.set(key, r);
-          }
-        });
-        
-        let filteredChromaResults = Array.from(uniqueResults.values());
-        
-        // 법령 검색 (설비별 특화)
-        console.log(`법령 특화 검색: ${regulationQueries.length}개 쿼리`);
+        // 법령 검색 (단일 통합 검색으로 간소화)
+        console.log(`법령 통합 검색: "${regulation[0]}" 기반`);
         const existingIds = new Set(filteredChromaResults.map(r => r.metadata?.id || r.document));
         
-        for (const query of regulationQueries) {
-          const additionalResults = await timeit(
-            `regulation.search "${query.substring(0, 20)}..."`, 
-            () => chromaDBService.searchRelevantData(query, 6)
-          );
-          // 170kV GIS 특화 법령 필터링 (매우 구체적)
-
-
+        // 단일 통합 법령 검색 (중복 제거)
+        const regulationResults = await timeit(
+          `regulation.unified.search "${regulation[0]?.substring(0, 20)}..."`, 
+          () => chromaDBService.searchByCategory(regulation[0] || `${equipmentInfo.name} ${workType.name} 안전규정`, 15)
+        );
+        
+        const relevantRegulations = (regulationResults.regulation || []).filter(r => {
+          const content = (r.document || '').toLowerCase();
+          const title = (r.metadata?.title || '').toLowerCase();
+          const type = r.metadata?.type;
           
-          const relevantRegulations = additionalResults.filter(r => {
-            const content = (r.document || '').toLowerCase();
-            const title = (r.metadata?.title || '').toLowerCase();
-            const type = r.metadata?.type;
-            
-            // 타입이 regulation인지 먼저 확인
-            if (type !== 'regulation') {
-              return false;
-            }
-
-            // 강화된 산업별 관련성 확인
-            const searchItem: SearchItem = {
-              id: r.metadata?.id || r.document || 'unknown',
-              content,
-              title,
-              metadata: r.metadata
-            };
-            
-            // 1차: 프로파일 기반 관련성 확인
-            const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
-            
-            // 2차: 설비 특화 키워드 매칭 (전기설비용)
-            let equipmentRelevant = false;
-            if (resolvedProfile.id === 'electrical-hv-gis') {
-              const electricalKeywords = ['전기', '절연', '고압', '특별고압', '변전', 'gis', '개폐기', '충전부', '활선'];
-              equipmentRelevant = electricalKeywords.some(keyword => 
-                title.includes(keyword) || content.includes(keyword)
-              );
-            } else {
-              equipmentRelevant = true; // 다른 프로파일은 기본 통과
-            }
-            
-            const notDuplicate = !existingIds.has(r.metadata?.id || r.document);
-            
-            return isRelevant && equipmentRelevant && notDuplicate;
-          });
-
-          filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
+          // 타입이 regulation인지 확인
+          if (type !== 'regulation') return false;
           
-          relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
-        }
+          // 중복 제거
+          if (existingIds.has(r.metadata?.id || r.document)) return false;
+          
+          // 프로파일 기반 관련성 확인
+          const searchItem: SearchItem = {
+            id: r.metadata?.id || r.document || 'unknown',
+            content,
+            title,
+            metadata: r.metadata || {}
+          };
+          
+          return shouldIncludeContent(searchItem, resolvedProfile);
+        });
+        
+        console.log(`법령 검색 완료: ${relevantRegulations.length}건 (전체 ${regulationResults.regulation?.length || 0}건 중)`);
+        filteredChromaResults = [...filteredChromaResults, ...relevantRegulations];
+        relevantRegulations.forEach(r => existingIds.add(r.metadata?.id || r.document));
         
         // 교육자료 검색 (설비별 특화, 구체적 쿼리)
         for (const query of education) {
@@ -1052,49 +1002,7 @@ JSON 형식으로 응답:
           }
         }
         
-        // 프로파일 기반 강제 검색 실행 (regulation 타입 부족 문제 해결)
-        try {
-            // 프로파일에서 법규 검색 쿼리 사용
-            const profileRegulationQueries = regulationQueries.slice(0, 5);
-            
-            let profileRegulations: any[] = [];
-            for (const query of profileRegulationQueries) {
-              const searchResult = await chromaDBService.searchByCategory(query, 3);
-              if (searchResult.regulation && searchResult.regulation.length > 0) {
-                profileRegulations = [...profileRegulations, ...searchResult.regulation];
-              }
-            }
-            
-            // 중복 제거 및 프로파일 기반 관련성 필터링
-            const uniqueProfileRegs = new Map();
-            profileRegulations.forEach(reg => {
-              const content = (reg.document || '').toLowerCase();
-              const title = (reg.metadata?.title || '').toLowerCase();
-              
-              // 프로파일 기반 관련성 확인
-              const searchItem: SearchItem = {
-                id: reg.metadata?.id || reg.document || 'unknown',
-                content,
-                title,
-                metadata: reg.metadata
-              };
-              
-              const isRelevant = shouldIncludeContent(searchItem, resolvedProfile);
-              
-              if (isRelevant) {
-                const key = reg.metadata?.id || reg.document;
-                if (!uniqueProfileRegs.has(key)) {
-                  uniqueProfileRegs.set(key, reg);
-                }
-              }
-            });
-            
-            const additionalRegulations = Array.from(uniqueProfileRegs.values()).slice(0, 5);
-            regulations = [...regulations, ...additionalRegulations].slice(0, 5);
-            
-        } catch (error) {
-          console.error('프로파일 기반 강제 법규 검색 실패:', error);
-        }
+        // 프로파일 기반 강제 검색 제거 - 단일 통합 검색으로 충분함
         
         // 하이브리드 점수 디버깅 로그
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
