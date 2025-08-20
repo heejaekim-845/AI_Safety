@@ -1,8 +1,7 @@
 // profiles.ts
 // 범용 프로파일 기반 쿼리 빌더 & 하이브리드 스코어러
 
-import * as fs from 'fs';
-import * as path from 'path';
+// TypeScript 통합 프로파일 시스템 - JSON 파일 의존성 제거
 
 export type WorkType = { id?: string; name: string };
 export type EquipmentInfo = {
@@ -76,51 +75,99 @@ export interface SearchProfilesConfig {
 
 let cachedProfiles: Profile[] | null = null;
 
-export function loadProfiles(): Profile[] {
-  // 개발 중에는 항상 재로드 (캐시 무효화)
-  if (process.env.NODE_ENV === 'development') {
-    cachedProfiles = null;
+// 프로파일 데이터 정의 (통합)
+const SEARCH_PROFILES: Profile[] = [
+  {
+    id: "electrical-hv-gis",
+    description: "전기 · 특별고압 · GIS/SF6/변전 설비",
+    match: {
+      equipment_name_regex: "(170\\s*kv|gis|sf6|변전|가스절연|전기)",
+      tags_any: ["electrical", "substation", "gis"]
+    },
+    keywords: [
+      "GIS", "SF6", "가스절연", "변전소", "개폐기", "고전압", "특별고압",
+      "절연", "충전부", "감전", "절연장갑", "활선", "전기"
+    ],
+    exclude_keywords: ["캄보디아", "베트남", "몽골"],
+    include_if_any_keywords: ["전기", "고압", "절연", "변전", "GIS", "170kV", "SF6", "가스절연", "충전부", "개폐기", "감전", "전력", "전압"],
+    exclude_if_any_keywords: ["식품가공", "농업용", "관광업"],
+    queries: {
+      accidents: [
+        "변전소 감전 사고", "개폐기 조작 감전", "특별고압 접촉 사고", "전기작업 감전"
+      ],
+      regulation: [
+        "전기설비 안전거리", "절연용 보호구 착용", "정전 및 접지 절차", "활선 작업 금지", "전기기계기구"
+      ],
+      education: [
+        "고압 전기 안전교육", "GIS 운영 교육", "SF6 취급 안전", "전기작업 안전"
+      ]
+    },
+    weights: {
+      vector: 0.55,
+      keyword: 0.15,
+      equipment: 0.10,
+      work_type: 0.08,
+      risk: 0.07,
+      regulation_hit: 0.03,
+      education_hit: 0.02
+    }
+  },
+  {
+    id: "mechanical-rotating",
+    description: "기계 · 회전체/축계/베어링",
+    match: { 
+      equipment_name_regex: "(회전|축|베어링|터빈|모터|펌프)",
+      tags_any: ["mechanical", "rotating"] 
+    },
+    keywords: [
+      "회전체", "커플링", "축정렬", "베어링", "윤활", "진동", "정비", "기계"
+    ],
+    exclude_keywords: [],
+    queries: {
+      accidents: ["회전체 끼임 사고", "정비 중 협착", "기계 사고"],
+      regulation: ["회전체 위험 방호", "가동부 방호덮개", "기계설비 안전"],
+      education: ["베어링 윤활 교육", "축정렬 실습", "기계 안전작업"]
+    },
+    weights: {
+      vector: 0.55,
+      keyword: 0.18,
+      equipment: 0.10,
+      work_type: 0.07,
+      risk: 0.07,
+      regulation_hit: 0.02,
+      education_hit: 0.01
+    }
+  },
+  {
+    id: "default",
+    description: "기본 프로파일",
+    keywords: ["안전", "점검", "정비", "위험성 평가"],
+    queries: {
+      accidents: ["안전사고", "작업사고"],
+      regulation: ["안전규정", "작업기준"],
+      education: ["안전교육", "작업안전"]
+    },
+    weights: {
+      vector: 0.60,
+      keyword: 0.15,
+      equipment: 0.10,
+      work_type: 0.07,
+      risk: 0.05,
+      regulation_hit: 0.02,
+      education_hit: 0.01
+    }
   }
-  
+];
+
+export function loadProfiles(): Profile[] {
   if (cachedProfiles) {
     console.log(`[profiles] cached: ${cachedProfiles.length} loaded`);
     return cachedProfiles;
   }
   
-  try {
-    const configPath = path.join(process.cwd(), 'config', 'search-profiles.json');
-    const json = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as SearchProfilesConfig;
-    
-    if (!json?.profiles?.length) {
-      throw new Error("profiles empty");
-    }
-    
-    cachedProfiles = json.profiles;
-    return cachedProfiles;
-  } catch (error) {
-    console.error('[profiles] 로딩 실패 → default 사용:', error);
-    // 기본 프로파일 반환
-    cachedProfiles = [{
-      id: "default",
-      description: "기본 프로파일",
-      keywords: ["안전", "점검", "정비", "위험성 평가"],
-      queries: {
-        accidents: ["안전사고", "작업사고"],
-        regulation: ["안전규정", "작업기준"],
-        education: ["안전교육", "작업안전"]
-      },
-      weights: {
-        vector: 0.60,
-        keyword: 0.15,
-        equipment: 0.10,
-        work_type: 0.07,
-        risk: 0.05,
-        regulation_hit: 0.02,
-        education_hit: 0.01
-      }
-    }];
-    return cachedProfiles;
-  }
+  cachedProfiles = SEARCH_PROFILES;
+  console.log(`[profiles] loaded: ${cachedProfiles.length} profiles from TypeScript`);
+  return cachedProfiles;
 }
 
 export function resolveProfile(
