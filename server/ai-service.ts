@@ -58,15 +58,8 @@ function dedupById<T extends { metadata?: any; document?: string }>(arr: T[]): T
 
 
 
-// ===== 단순화된 검색 헬퍼 =====
-function isRelevantContent(item: any, equipment: string, workType: string): boolean {
-  const text = [String(item?.metadata?.title || ''), String(item?.document || '')].join(' ').toLowerCase();
-  const equipmentName = equipment.toLowerCase();
-  const workTypeName = workType.toLowerCase();
-  
-  // 설비명 또는 작업타입이 포함되어 있으면 관련성 있음
-  return text.includes(equipmentName) || text.includes(workTypeName);
-}
+// ===== 프로파일 기반 벡터 검색 전용 헬퍼 =====
+// isRelevantContent 함수 제거됨 - 프로파일 특화 쿼리가 관련성 판단을 담당
 
 // ===== 단순화된 카테고리 처리 =====
 // 점수 정규화 함수들
@@ -104,39 +97,11 @@ function processCategory(
   console.log(`... 총 ${items.length}개 항목`);
   console.log(`===============================\n`);
 
-  // 1단계: 관련성 필터링 - 유연한 키워드 매칭
-  const relevantItems = items.filter(item => {
-    const title = String(item?.metadata?.title || '').toLowerCase();
-    const content = String(item?.document || item?.text || '').toLowerCase();
-    const searchText = `${title} ${content}`;
-    
-    const equipmentLower = equipment.toLowerCase();
-    const workTypeLower = workType.toLowerCase();
-    
-    // 설비명에서 주요 키워드 추출
-    const equipmentKeywords = equipmentLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
-    const workKeywords = workTypeLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
-    
-    // 유연한 매칭: 주요 키워드 중 하나라도 포함되면 관련성 있음
-    const hasEquipmentMatch = equipmentKeywords.some(keyword => searchText.includes(keyword)) ||
-                             searchText.includes(equipmentLower);
-    
-    const hasWorkMatch = workKeywords.some(keyword => searchText.includes(keyword)) ||
-                        searchText.includes(workTypeLower);
-    
-    // 벡터 점수가 높으면 (0.15 이상) 관련성 필터를 우회
-    const highVectorScore = normalizedScore(item) >= 0.15;
-    
-    const isRelevant = hasEquipmentMatch || hasWorkMatch || highVectorScore;
-    
-    if (!isRelevant) {
-      console.log(`[필터링됨] "${title}" - 관련성 부족 (설비: ${hasEquipmentMatch}, 작업: ${hasWorkMatch}, 벡터: ${normalizedScore(item).toFixed(3)})`);
-    }
-    
-    return isRelevant;
-  });
+  // 1단계: 프로파일 기반 벡터 검색 결과 신뢰 - 과도한 필터링 제거
+  // 프로파일 특화 쿼리로 이미 관련성 높은 결과를 가져왔으므로, 추가 필터링 최소화
+  const relevantItems = items; // 벡터 검색 결과를 그대로 신뢰
 
-  console.log(`[processCategory] ${category}: 관련성 필터링 ${items.length} → ${relevantItems.length}개`);
+  console.log(`[processCategory] ${category}: 프로파일 기반 검색 결과 신뢰 - 필터링 없이 ${items.length}개 항목 유지`);
 
   // 2단계: 정규화된 점수 계산
   const withScores = relevantItems.map(item => {
@@ -745,21 +710,9 @@ JSON 형식으로 응답:
         
         // 카테고리별 특화 검색 완료 - 중복 교육자료 검색 로직 제거됨
 
-        // 하이브리드 검색: 프로파일 기반 벡터 유사도 + 키워드 점수 조합
-        let keywordWeights: { [key: string]: number } = {};
-        try {
-          keywordWeights = this.getProfileKeywords(resolvedProfile);
-        } catch (error) {
-          console.log(`키워드 가중치 생성 실패, 기본값 사용`);
-          // 기본 키워드 가중치
-          keywordWeights = {
-            "안전": 5,
-            "점검": 4,
-            "정비": 4,
-            "위험": 6,
-            "사고": 6
-          };
-        }
+        // 프로파일 기반 벡터 검색 결과 활용 - 별도 키워드 가중치 시스템 제거
+        // 프로파일 특화 쿼리가 이미 최적화된 검색을 수행했으므로 추가 가중치 불필요
+        console.log(`프로파일 기반 벡터 검색 결과 직접 활용 - 키워드 가중치 시스템 비활성화`);
         
         // 타입별 필터링
         const preIncidents = (candidatesRaw || []).filter(r => {
