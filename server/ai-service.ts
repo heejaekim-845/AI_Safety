@@ -94,6 +94,16 @@ function processCategory(
     return [];
   }
 
+  // 원본 항목 목록 출력 (상위 10개)
+  console.log(`\n=== ${category.toUpperCase()} 검색 결과 (상위 10개) ===`);
+  items.slice(0, 10).forEach((item, idx) => {
+    const title = item?.metadata?.title || 'No title';
+    const score = normalizedScore(item).toFixed(3);
+    console.log(`${idx + 1}. "${title}" (점수: ${score})`);
+  });
+  console.log(`... 총 ${items.length}개 항목`);
+  console.log(`===============================\n`);
+
   // 1단계: 관련성 필터링 - 유연한 키워드 매칭
   const relevantItems = items.filter(item => {
     const title = String(item?.metadata?.title || '').toLowerCase();
