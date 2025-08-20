@@ -891,20 +891,22 @@ JSON 형식으로 응답:
         console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj).join(', ')}`);
         console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj).join(', ')}`);
         
-        // 프로파일 기반 쿼리 빌더 사용
-        const { accidents, regulation, education, all } = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
+        // 프로파일 기반 검색 쿼리 생성
+        const profileKeywords = resolvedProfile.keywords || [];
+        const equipmentKeywords = [...(equipmentInfoObj.tags || []), equipmentInfo.name];
+        const workKeywords = [workType.name, ...(workType.keywords || [])];
         
-        // 빠른 검증용 로그
-        console.log(`[profiles] match id=${resolvedProfile.id} name="${equipmentInfoObj.name}" tags=${JSON.stringify(equipmentInfoObj.tags)} work="${workType?.name}" risks=${JSON.stringify(equipmentInfoObj.riskTags)}`);
-        console.log(`[queries]`, { count: all.length, sample: all.slice(0,5) });
+        const all = [...profileKeywords, ...equipmentKeywords, ...workKeywords].filter(Boolean);
+        const regulation = [...profileKeywords, '안전규정', '법령', '조문'].filter(Boolean);
+        const education = [...profileKeywords, '교육', '안전교육', '훈련'].filter(Boolean);
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
           .concat(['사출','성형기','소각','컨베이어','벨트','제조','생산라인','가공']);
         
         // 검색 쿼리에 NOT 키워드 적용 (벡터 검색용)
-        const searchQueries = all.map(q =>
-          negatives.reduce((s, n) => `${s} -${n}`, q)
+        const searchQueries = all.map((q: string) =>
+          negatives.reduce((s: string, n: string) => `${s} -${n}`, q)
         );
         const regulationQueries = regulation;
         const educationQueries = education;
@@ -916,7 +918,7 @@ JSON 형식으로 응답:
         
         // NEW PATCHED SEARCH FLOW: Separate vector vs keyword queries
         const queriesForVector = all; // NO negatives for vector search
-        const queriesForKeyword = all.map(q => applyNegatives(q, negatives));
+        const queriesForKeyword = all.map((q: string) => applyNegatives(q, negatives));
 
         const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
         const where = buildRelaxedWhere(expectedTags);
