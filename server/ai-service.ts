@@ -830,30 +830,17 @@ JSON 형식으로 응답:
         // 각 카테고리별 프로파일 활용 검색
         const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
         const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
-        
-        console.log(`[디버깅] processCategory regulation 호출 전`);
-        let finalRegulations;
-        try {
-          finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
-          console.log(`[디버깅] processCategory regulation 호출 후: ${finalRegulations.length}건`);
-        } catch (error) {
-          console.error(`[에러] processCategory regulation 호출 중 예외 발생:`, error);
-          finalRegulations = [];
-        }
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
         const educationOut   = finalEducation;
         const regulationsOut = finalRegulations;
 
-        console.log(`[디버깅] finalRegulations: ${finalRegulations.length}건`);
-        console.log(`[디버깅] regulationsOut: ${regulationsOut.length}건`);
-
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
         
         let regulations = regulationsOut;
-        console.log(`[디버깅] regulations 초기 할당: ${regulations.length}건`);
 
         // 전기설비 특화 코드 제거됨
 
@@ -951,20 +938,12 @@ JSON 형식으로 응답:
         
         // 법령: 이미 처리된 regulations 배열을 사용
         console.log(`처리할 총 법령 수: ${regulations.length}건`);
-        console.log(`regulations 배열 샘플:`, regulations.slice(0, 2).map(r => ({
-          metadata: r.metadata,
-          documentStart: (r.document || '').substring(0, 100),
-          keys: Object.keys(r)
-        })));
         
         let processedRegulations = new Map();
         regulations.forEach((reg, index) => {
           let articleNumber = '';
           let articleTitle = '';
           let fullContent = '';
-          
-          console.log(`[regulation 파싱 ${index + 1}] 메타데이터:`, reg.metadata);
-          console.log(`[regulation 파싱 ${index + 1}] 첫 50자:`, (reg.document || '').substring(0, 50));
           
           if (reg.articleNumber && reg.articleTitle) {
             // 직접 로드된 전기설비 법령 사용
@@ -973,31 +952,14 @@ JSON 형식으로 응답:
             fullContent = reg.fullContent || '';
             console.log(`직접로드 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
           } else {
-            // 벡터 검색 법령은 메타데이터에서 정보 추출
-            const metadata = reg.metadata || {};
+            // 벡터 검색 법령은 기존 로직으로 처리
             const content = reg.document || '';
-            
-            // 메타데이터에서 조문 정보 추출 시도
-            if (metadata.title) {
-              articleNumber = metadata.title;
-              articleTitle = metadata.title;
+            const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+            if (articleMatch) {
+              articleNumber = `제${articleMatch[1]}조`;
+              articleTitle = articleMatch[2];
               fullContent = content;
-              console.log(`메타데이터 법령 ${index + 1}: ${articleNumber} - ${articleTitle}`);
-            } else {
-              // document에서 조문 정보 추출 시도
-              const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
-              if (articleMatch) {
-                articleNumber = `제${articleMatch[1]}조`;
-                articleTitle = articleMatch[2];
-                fullContent = content;
-                console.log(`파싱 법령 ${index + 1}: ${articleNumber} - ${articleTitle}`);
-              } else {
-                // 기본 포맷으로 처리
-                articleNumber = `법령 ${index + 1}`;
-                articleTitle = content.split('\n')[0] || '법령 내용';
-                fullContent = content;
-                console.log(`기본 법령 ${index + 1}: ${articleNumber} - ${articleTitle}`);
-              }
+
             }
           }
           
