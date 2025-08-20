@@ -701,20 +701,20 @@ export default function Briefing() {
                 </div>
 
                 {/* RAG-Based Related Accident Cases */}
-                {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <Zap className="w-5 h-5" />
-                        유사 사고사례
-                      </CardTitle>
-                      <CardDescription>
-                        AI가 분석한 현재 작업과 유사한 실제 사고사례입니다
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        {briefingData.relatedIncidents?.map((accident: any, index: number) => (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Zap className="w-5 h-5" />
+                      유사 사고사례
+                    </CardTitle>
+                    <CardDescription>
+                      AI가 분석한 현재 작업과 유사한 실제 사고사례입니다
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {briefingData.relatedIncidents && briefingData.relatedIncidents.length > 0 ? (
+                        briefingData.relatedIncidents.map((accident: any, index: number) => (
                           <div key={index} className="border border-orange-200 rounded-lg p-5 bg-white shadow-sm">
                             {/* Header with title and severity badge */}
                             <div className="flex items-start justify-between mb-4">
@@ -808,11 +808,16 @@ export default function Briefing() {
                               </div>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                        ))
+                      ) : (
+                        <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
+                          현재 작업과 관련된 사고사례가<br/>
+                          검색되지 않았습니다.
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Safety Quiz Section */}
                 {briefingData.quizQuestions.length > 0 && (

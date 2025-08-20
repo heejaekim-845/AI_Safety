@@ -155,22 +155,29 @@ function processCategory(
   equipment: string, 
   workType: string
 ) {
+  console.log(`[processCategory] ${category}: ${items.length}개 항목 처리 시작`);
+  
   if (!items || items.length === 0) {
+    console.log(`[processCategory] ${category}: 입력 데이터 없음`);
     return [];
   }
 
-  // 벡터 점수로 정렬
-  const sorted = items
-    .filter(item => item.vectorScore || item.score || item.similarity)
-    .sort((a, b) => {
-      const scoreA = a.vectorScore || a.score || a.similarity || 0;
-      const scoreB = b.vectorScore || b.score || b.similarity || 0;
-      return scoreB - scoreA;
-    });
+  // 벡터 점수가 있는 항목들을 우선 정렬 (더 관대한 필터링)
+  const withScores = items
+    .map(item => ({
+      ...item,
+      finalScore: item.vectorScore || item.score || item.similarity || 0.1 // 기본 점수 부여
+    }))
+    .sort((a, b) => b.finalScore - a.finalScore);
+
+  console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
 
   // 상위 N개 반환
   const limit = SIMPLE_CONFIG.limits[category];
-  return sorted.slice(0, limit);
+  const result = withScores.slice(0, limit);
+  
+  console.log(`[processCategory] ${category}: ${result.length}개 결과 반환 (최대 ${limit}개)`);
+  return result;
 }
 
 // Timing utilities for performance analysis
