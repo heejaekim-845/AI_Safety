@@ -603,11 +603,23 @@ JSON 형식으로 응답:
         const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
         
-        // 카테고리별 특화 쿼리 (중복 없이 구성) 
-        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords];
-        const regulation = [specificQuery, '안전규정', '법령', '조문', '보안규정', ...baseKeywords];
-        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords];
-        const all = [specificQuery, ...baseKeywords];
+        // 카테고리별 특화 쿼리 개선: 짧은 키워드 난사 방지
+        const base = `${equipmentInfo.name} ${workType.name}`;
+        const k = baseKeywords.slice(0, 5); // 상위 5개만
+        
+        const incident = [
+          `${base} 사고사례`, `${base} 재해사례`, `${base} 안전사고`,
+          ...k.map(x => `${base} ${x} 사고사례`)
+        ];
+        const regulation = [
+          `${base} 안전규정`, `${base} 법령`, `${base} 조문`,
+          ...k.map(x => `${base} ${x} 규정`)
+        ];
+        const education = [
+          `${base} 안전교육`, `${base} 교육자료`, `${base} 훈련`,
+          ...k.map(x => `${base} ${x} 교육`)
+        ];
+        const all = [base, ...k];
         
         console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
         console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
