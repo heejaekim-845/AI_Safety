@@ -57,3 +57,7 @@ Preferred communication style: Simple, everyday language.
 - **Deployment**: Replit autoscale deployment
 - **Database**: PostgreSQL with connection pooling
 - **Environment**: Node.js 20 runtime environment
+
+## Recent Development History
+
+- **Relevance Filtering Implementation (August 20, 2025)**: Added equipment and work-type based relevance filtering in processCategory function to eliminate unrelated content like "forklift", "diving", "painting" from 170kV GIS inspection results. Filtering reduced education materials from 52 to 14 items (73% noise reduction). Removed hardcoded electrical keywords to create universal filtering system based purely on equipment name and work type matching, making the system maintainable and extensible for all equipment types.

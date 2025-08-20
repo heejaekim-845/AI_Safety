@@ -103,19 +103,9 @@ function processCategory(
     const equipmentLower = equipment.toLowerCase();
     const workTypeLower = workType.toLowerCase();
     
-    // 170kV GIS 관련 키워드 확장
-    const electricalKeywords = ['전기', '고압', '특별고압', 'gis', 'sf6', '가스절연', '변전', '절연', '충전부', '감전', '개폐기', '차단기', '170kv', '점검', '순시'];
-    const workKeywords = ['점검', '순시', '정비', '보수', '검사', '운전', '조작'];
-    
-    // 관련성 체크: 설비명, 작업명, 또는 관련 키워드 포함
-    const hasEquipmentMatch = searchText.includes(equipmentLower) || 
-                             searchText.includes('gis') || 
-                             searchText.includes('170') ||
-                             searchText.includes('sf6') ||
-                             electricalKeywords.some(kw => searchText.includes(kw));
-    
-    const hasWorkMatch = searchText.includes(workTypeLower) ||
-                        workKeywords.some(kw => searchText.includes(kw));
+    // 범용 관련성 체크: 설비명 또는 작업명 포함
+    const hasEquipmentMatch = searchText.includes(equipmentLower);
+    const hasWorkMatch = searchText.includes(workTypeLower);
     
     const isRelevant = hasEquipmentMatch || hasWorkMatch;
     
