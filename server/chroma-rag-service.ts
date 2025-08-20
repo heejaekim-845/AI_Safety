@@ -207,48 +207,19 @@ export class ChromaRAGService {
     await this.initialize();
 
     try {
-      // 키워드 기반 검색으로 관련 사고사례 찾기
-      const searchTerms = [
-        workType.toLowerCase(),
-        equipmentName.toLowerCase(),
-        ...riskFactors.map(rf => rf.toLowerCase())
-      ].filter(term => term && term.trim().length > 0);
+      // 간단한 키워드 매칭
+      const searchTerms = [workType, equipmentName, ...riskFactors]
+        .filter(term => term && term.trim().length > 0)
+        .map(term => term.toLowerCase());
 
-      // 추가 키워드 확장
-      const expandedTerms = [...searchTerms];
-      if (equipmentName.toLowerCase().includes('gis')) {
-        expandedTerms.push('변전소', '전기', '고전압', '감전', '절연');
-      }
-      if (workType.toLowerCase().includes('정비') || workType.toLowerCase().includes('점검')) {
-        expandedTerms.push('정비', '점검', '수리', '보수');
-      }
-      if (workType.toLowerCase().includes('컨베이어')) {
-        expandedTerms.push('벨트', '끼임', '회전');
-      }
+      if (searchTerms.length === 0) return [];
 
       const relevantAccidents = this.accidentData.filter(accident => {
         const searchText = `${accident.title} ${accident.work_type} ${accident.accident_type} ${accident.summary} ${accident.risk_keywords}`.toLowerCase();
-        
-        return expandedTerms.some(term => 
-          term && searchText.includes(term)
-        );
+        return searchTerms.some(term => searchText.includes(term));
       });
 
-      // 관련도 점수 계산 (키워드 매칭 수 기준)
-      const scoredAccidents = relevantAccidents.map(accident => {
-        const searchText = `${accident.title} ${accident.work_type} ${accident.accident_type} ${accident.summary} ${accident.risk_keywords}`.toLowerCase();
-        const score = searchTerms.filter(term => 
-          term && searchText.includes(term)
-        ).length;
-        
-        return { accident, score };
-      });
-
-      // 점수순으로 정렬하고 limit만큼 반환
-      return scoredAccidents
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit)
-        .map(item => item.accident);
+      return relevantAccidents.slice(0, limit);
 
     } catch (error) {
       console.error('사고사례 검색 실패:', error);
@@ -259,142 +230,28 @@ export class ChromaRAGService {
   async searchSafetyRegulations(equipmentName: string, workType: string, riskFactors: string[] = [], limit: number = 5): Promise<SafetyRegulation[]> {
     await this.initialize();
 
-    try {
-      // 복합 검색어 구성
-      const queryTerms = [
-        equipmentName.toLowerCase(),
-        workType.toLowerCase(),
-        ...riskFactors.map(rf => rf.toLowerCase())
-      ].filter(term => term && term.trim().length > 0);
-      
-      // 장비별 특화 키워드 확장
-      const expandedTerms = [...queryTerms];
-      
-      // 170kV GIS, 변전설비, 전기설비 관련
-      if (equipmentName.toLowerCase().includes('gis') || 
-          equipmentName.toLowerCase().includes('변전') || 
-          equipmentName.toLowerCase().includes('전기') ||
-          equipmentName.toLowerCase().includes('kv') ||
-          riskFactors.some(rf => rf.toLowerCase().includes('전기') || rf.toLowerCase().includes('고전압'))) {
-        expandedTerms.push(
-          '전기', '감전', '절연', '정전', '충전', '전로', '접지', 
-          '누전', '과전류', '방호', '차단', '검전', '무전압',
-          '절연용', '보호구', '활선', '방호울타리', '감시인', '자격'
-        );
-      }
-      
-      // 정비/점검 작업 관련
-      if (workType.toLowerCase().includes('정비') || 
-          workType.toLowerCase().includes('점검') || 
-          workType.toLowerCase().includes('수리')) {
-        expandedTerms.push('정비', '점검', '수리', '보수', '작업자', '자격', '교육');
-      }
-      
-      // 고소작업 관련
-      if (workType.toLowerCase().includes('고소') || 
-          riskFactors.some(rf => rf.toLowerCase().includes('추락'))) {
-        expandedTerms.push('추락', '난간', '안전대', '발판');
-      }
-      
-      // 컨베이어/기계 관련
-      if (equipmentName.toLowerCase().includes('컨베이어') || 
-          equipmentName.toLowerCase().includes('기계')) {
-        expandedTerms.push('끼임', '방호', '전원', '차단', '기계');
-      }
-      
-      // 관련도 점수 계산으로 검색 개선
-      const scoredRegulations = this.regulationData.map(regulation => {
-        const searchText = `${regulation.title} ${regulation.content} ${regulation.category}`.toLowerCase();
-        
-        // 정확한 매칭에 높은 점수
-        let score = 0;
-        expandedTerms.forEach(term => {
-          if (term && searchText.includes(term)) {
-            // 제목에 포함된 경우 더 높은 점수
-            if (regulation.title.toLowerCase().includes(term)) {
-              score += 3;
-            }
-            // 카테고리에 포함된 경우 중간 점수
-            else if (regulation.category.toLowerCase().includes(term)) {
-              score += 2;
-            }
-            // 내용에 포함된 경우 기본 점수
-            else {
-              score += 1;
-            }
-          }
-        });
-        
-        return { regulation, score };
-      });
-      
-      // 점수순으로 정렬하고 최소 점수 1 이상인 것들만 반환
-      return scoredRegulations
-        .filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit)
-        .map(item => item.regulation);
-
-    } catch (error) {
-      console.error('법규 검색 실패:', error);
-      return [];
-    }
+    // regulationData가 비어있으므로 빈 배열 반환
+    console.log('법규 데이터 없음 - 벡터 DB에서 검색 필요');
+    return [];
   }
 
   async searchEducationMaterials(query: string, limit: number = 3): Promise<EducationData[]> {
     await this.initialize();
 
     try {
-      const queryLower = query.toLowerCase();
-      
-      // 키워드 확장
-      const expandedTerms = queryLower.split(' ').filter(term => term.trim().length > 0);
-      if (queryLower.includes('gis') || queryLower.includes('전기')) {
-        expandedTerms.push('전기안전', '감전방지', '절연');
-      }
-      if (queryLower.includes('안전교육') || queryLower.includes('교육')) {
-        expandedTerms.push('교육', '훈련', '안전', '예방');
-      }
-      
-      // 관련도 점수 계산으로 검색 개선
-      const scoredEducation = this.educationData.map(edu => {
-        const searchText = `${edu.title} ${edu.keywords} ${edu.content} ${edu.type}`.toLowerCase();
-        
-        let score = 0;
-        expandedTerms.forEach(term => {
-          if (term && searchText.includes(term)) {
-            // 제목에 포함된 경우 더 높은 점수
-            if (edu.title.toLowerCase().includes(term)) {
-              score += 3;
-            }
-            // 키워드에 포함된 경우 중간 점수
-            else if (edu.keywords.toLowerCase().includes(term)) {
-              score += 2;
-            }
-            // 내용이나 타입에 포함된 경우 기본 점수
-            else {
-              score += 1;
-            }
-          }
-        });
-        
-        return { education: edu, score };
-      });
-      
-      // 점수순으로 정렬하고 점수가 0보다 큰 것들만 반환 (URL 포함)
-      const results = scoredEducation
-        .filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit)
-        .map(item => ({
-          ...item.education,
-          // URL이 있으면 그대로, 없으면 공백으로 유지
-          url: item.education.url || '',
-          file_url: item.education.file_url || ''
-        }));
+      const queryTerms = query.toLowerCase().split(' ').filter(term => term.trim().length > 0);
+      if (queryTerms.length === 0) return [];
 
-      console.log(`교육자료 검색 결과: ${results.length}건 (URL 포함)`);
-      return results;
+      const relevantEducation = this.educationData.filter(edu => {
+        const searchText = `${edu.title} ${edu.keywords} ${edu.content} ${edu.type}`.toLowerCase();
+        return queryTerms.some(term => searchText.includes(term));
+      });
+
+      return relevantEducation.slice(0, limit).map(edu => ({
+        ...edu,
+        url: edu.url || '',
+        file_url: edu.file_url || ''
+      }));
 
     } catch (error) {
       console.error('교육자료 검색 실패:', error);
@@ -484,19 +341,9 @@ export class ChromaRAGService {
     incidents: AccidentCase[];
     education: EducationData[];
   }> {
-    const searchKeywords = [
-      equipment.toLowerCase(),
-      workType.toLowerCase(),
-      riskLevel.toLowerCase(),
-      '전기', 'gis', '고압', '특고압', '170kv'
-    ];
-
-    // 법규 검색 - 전기 관련 키워드 우선
-    const relevantRegulations = this.regulationData.filter(reg => {
-      const searchText = `${reg.title} ${reg.content} ${reg.category}`.toLowerCase();
-      return searchKeywords.some(keyword => searchText.includes(keyword)) ||
-             searchText.includes('전기') || searchText.includes('고압') || searchText.includes('특고압');
-    }).slice(0, 3);
+    const searchKeywords = [equipment, workType, riskLevel]
+      .filter(term => term && term.trim().length > 0)
+      .map(term => term.toLowerCase());
 
     // 사고사례 검색
     const relevantIncidents = this.accidentData.filter(incident => {
@@ -510,10 +357,10 @@ export class ChromaRAGService {
       return searchKeywords.some(keyword => searchText.includes(keyword));
     }).slice(0, 2);
 
-    console.log(`키워드 기반 검색 결과: 사고사례 ${relevantIncidents.length}건, 교육자료 ${relevantEducation.length}건, 법규 ${relevantRegulations.length}건`);
+    console.log(`키워드 기반 검색 결과: 사고사례 ${relevantIncidents.length}건, 교육자료 ${relevantEducation.length}건, 법규 0건`);
 
     return {
-      regulations: relevantRegulations,
+      regulations: [], // 빈 배열
       incidents: relevantIncidents,
       education: relevantEducation
     };
