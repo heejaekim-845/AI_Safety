@@ -602,11 +602,14 @@ JSON 형식으로 응답:
         const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
         
-        // 카테고리별 특화 쿼리 (중복 없이 구성)
-        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords];
-        const regulation = [specificQuery, '안전규정', '법령', '조문', ...baseKeywords];
-        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords];
-        const all = [specificQuery, ...baseKeywords];
+        // 카테고리별 특화 쿼리 (중복 없이 구성) + GIS 전용 키워드 강화
+        const gisSpecific = resolvedProfile.id === 'electrical-hv-gis' ? 
+          ['전기설비', '고압전기', '절연작업', '변전설비', '개폐기', '충전부', '활선작업'] : [];
+        
+        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords, ...gisSpecific];
+        const regulation = [specificQuery, '안전규정', '법령', '조문', '전기기계기구', '보안규정', ...baseKeywords, ...gisSpecific];
+        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords, ...gisSpecific];
+        const all = [specificQuery, ...baseKeywords, ...gisSpecific];
         
         console.log(`\n=== 중복 제거된 키워드 통합 ===`);
         console.log(`프로파일 ID: ${resolvedProfile.id}`);
@@ -630,6 +633,8 @@ JSON 형식으로 응답:
         const incidentQueries = incident.map((q: string) => applyNegatives(q, negatives));
         const regulationQueries = regulation.map((q: string) => applyNegatives(q, negatives));
         const educationQueries = education.map((q: string) => applyNegatives(q, negatives));
+        
+        console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
 
         const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);

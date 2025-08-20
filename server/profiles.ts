@@ -406,8 +406,8 @@ export function inferEquipmentTags(equipment: EquipmentInfo | string, profile?: 
 
   // 전기 관련
   if (/전기|gis|sf6|변전|고압|특별고압|170kv|절연|충전부/.test(name)) {
-    tags.push("electrical");
-    if (/gis|변전|sf6/.test(name)) tags.push("substation", "gis");
+    tags.push("전기작업","정전전로","충전전로(활선)","감전","차단·개로","단로기","잠금·표찰(LOTO)","접지","밀폐공간","추락방지","차단기","단로기","변류기","계기용변압기","SF6 가스","가스밀도 검출기","유압");
+    //if (/gis|변전|sf6/.test(name)) tags.push("substation", "gis");
   }
 
   // 기계 관련
