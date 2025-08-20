@@ -354,29 +354,7 @@ export class AIService {
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       
-      // 상세한 안전 중심 폴백 안내
-      const riskMessages = [];
-      if (equipmentInfo.highTemperature) riskMessages.push("고온 위험");
-      if (equipmentInfo.highPressure) riskMessages.push("고압 위험");
-      if (equipmentInfo.highVoltage) riskMessages.push("전기 위험");
-      if (equipmentInfo.height) riskMessages.push("추락 위험");
-      if (equipmentInfo.mechanical) riskMessages.push("기계적 위험");
-
-      return `${equipmentInfo.location}에 위치한 ${equipmentInfo.name}입니다. 설비 코드는 ${equipmentInfo.code}이며, 작업 시 다음 안전수칙을 반드시 준수하시기 바랍니다.
-
-이 설비는 ${riskMessages.length > 0 ? 
-  `${riskMessages.join(", ")}이 있어 특별한 주의가 필요합니다. 고온 위험이 있는 경우 내열 장갑과 보호복을 착용하고, 고압 위험이 있는 경우 압력 해제를 완전히 확인한 후 작업하세요. 전기 위험이 있는 경우 전원을 완전히 차단하고 검전기로 무전압 상태를 확인하세요. 추락 위험이 있는 경우 안전대를 착용하고 발판을 견고히 설치하세요. 기계적 위험이 있는 경우 모든 회전부와 가동부의 정지를 확인하세요.` : 
-  '일반적인 기계 안전수칙을 적용하지만, 예상치 못한 위험이 발생할 수 있으므로 항상 주의 깊게 작업하세요.'
-}
-
-${equipmentInfo.hazardousChemicalType ? 
-  `${equipmentInfo.hazardousChemicalType} 유해화학물질이 사용되므로 반드시 전용 보호장비를 착용하고 환기가 잘 되는 곳에서 작업하세요. 화학물질 누출 시 즉시 작업을 중단하고 대피하세요. ` : 
-  ''
-}
-
-작업 전 필수 점검사항입니다. 반드시 안전모, 안전화, 보안경을 착용하고 작업복을 정리하세요. 안전장비의 손상 여부를 확인하고, 불량 시 즉시 교체하세요. 전원 차단 및 압력 해제를 완전히 확인한 후 작업을 시작하세요. 작업 도구의 상태를 점검하고 주변 정리정돈을 실시하세요.
-
-작업 중에는 설비 주변에 다른 작업자가 있는지 확인하고, 위험 구역 표시를 명확히 설치하세요. 작업 중 이상 징후나 비정상적인 소음, 진동, 온도 상승 등을 발견할 시 즉시 작업을 중단하고 안전한 장소로 대피한 후 관제실에 연락하시기 바랍니다. 응급상황 시에는 비상벨을 누르고 주변 작업자에게 알리세요.`;
+      return "음성 안내 생성 중 오류가 발생했습니다. 안전관리자에게 문의하세요.";
     }
   }
 
