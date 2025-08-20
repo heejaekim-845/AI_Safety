@@ -588,26 +588,37 @@ JSON 형식으로 응답:
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
         console.log(`프로파일: ${resolvedProfile.id}`);
         
-        // 프로파일 기반 검색 쿼리 생성 (더 구체적)
-        const profileKeywords = resolvedProfile.keywords || [];
-        const equipmentKeywords = [...(equipmentInfoObj.tags || []), equipmentInfo.name];
-        const workKeywords = [workType.name, ...(workType.keywords || [])];
+        // 중복 제거된 키워드 통합
+        const uniqueKeywords = new Set([
+          // 1. 프로파일 키워드 (가장 특화된 키워드)
+          ...(resolvedProfile.keywords || []),
+          // 2. 설비 정보 (이름은 이미 specificQuery에 포함되므로 태그만)
+          ...(equipmentInfoObj.tags || []),
+          // 3. 작업 키워드 (작업명은 이미 specificQuery에 포함되므로 추가 키워드만)
+          ...(workType.keywords || [])
+        ]);
         
-        // 더 구체적인 쿼리 생성: 카테고리별 특화 키워드 + 추가 컨텍스트 키워드
+        // 중복 제거된 기본 키워드 배열
+        const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
         
-        // 카테고리별 키워드에 프로파일/설비/작업 키워드 추가 포함
-        const baseKeywords = [...profileKeywords, ...equipmentKeywords, ...workKeywords];
-        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords].filter(Boolean);
-        const regulation = [specificQuery, '안전규정', '법령', '조문', ...baseKeywords].filter(Boolean);
-        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords].filter(Boolean);
-        const all = [specificQuery, ...baseKeywords].filter(Boolean);
+        // 카테고리별 특화 쿼리 (중복 없이 구성)
+        const incident = [specificQuery, '사고사례', '재해사례', '안전사고', ...baseKeywords];
+        const regulation = [specificQuery, '안전규정', '법령', '조문', ...baseKeywords];
+        const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords];
+        const all = [specificQuery, ...baseKeywords];
         
-        console.log(`검색 쿼리 - 설비: ${equipmentInfo.name}, 작업: ${workType.name}`);
-        console.log(`기본 키워드: [${baseKeywords.slice(0,5).join(', ')}...]`);
-        console.log(`사고사례 쿼리 (${incident.length}개): [${incident.slice(0,4).join(', ')}...]`);
-        console.log(`교육자료 쿼리 (${education.length}개): [${education.slice(0,4).join(', ')}...]`);
-        console.log(`법령 쿼리 (${regulation.length}개): [${regulation.slice(0,4).join(', ')}...]`);
+        console.log(`\n=== 중복 제거된 키워드 통합 ===`);
+        console.log(`프로파일 ID: ${resolvedProfile.id}`);
+        console.log(`프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
+        console.log(`설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
+        console.log(`작업 키워드: [${(workType.keywords || []).join(', ')}]`);
+        console.log(`통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,8).join(', ')}${baseKeywords.length > 8 ? '...' : ''}]`);
+        console.log(`\n=== 카테고리별 쿼리 구성 ===`);
+        console.log(`specificQuery: "${specificQuery}"`);
+        console.log(`사고사례 (${incident.length}개): [${incident.slice(0,4).join(', ')}...]`);
+        console.log(`교육자료 (${education.length}개): [${education.slice(0,4).join(', ')}...]`);
+        console.log(`법령 (${regulation.length}개): [${regulation.slice(0,4).join(', ')}...]`);
         
         // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
