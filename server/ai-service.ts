@@ -78,7 +78,8 @@ function processCategory(
   items: any[], 
   category: 'incident'|'education'|'regulation',
   equipment: string, 
-  workType: string
+  workType: string,
+  resolvedProfile?: any
 ) {
   console.log(`[processCategory] ${category}: ${items.length}개 항목 처리 시작`);
   
@@ -110,33 +111,42 @@ function processCategory(
     const content = String(item?.document || '').toLowerCase();
     const searchText = `${title} ${content}`;
     
-    // 170kV GIS 특화 관련성 키워드 가중치
     let relevanceBoost = 0;
     
-    // 전기설비 관련 키워드 (높은 가중치)
-    const electricKeywords = ['전기', '감전', '충전', '고압', '변압기', '전로', '배전', '수배전', 'kv', '활선'];
-    const gisKeywords = ['gis', '가스절연', '개폐기', '차단기', '점검', '순시', '정비'];
-    const safetyKeywords = ['안전', '사고', '재해', '위험'];
+    if (resolvedProfile) {
+      // 프로파일 정의 키워드 활용
+      const includeKeywords = resolvedProfile.include_if_any_keywords || [];
+      const excludeKeywords = resolvedProfile.exclude_if_any_keywords || [];
+      const profileKeywords = resolvedProfile.keywords || [];
+      
+      // 프로파일 포함 키워드 가중치 (높은 가중치)
+      includeKeywords.forEach((keyword: string) => {
+        if (searchText.includes(keyword.toLowerCase())) {
+          relevanceBoost += 0.15;
+        }
+      });
+      
+      // 프로파일 키워드 가중치 (중간 가중치)
+      profileKeywords.forEach((keyword: string) => {
+        if (searchText.includes(keyword.toLowerCase())) {
+          relevanceBoost += 0.10;
+        }
+      });
+      
+      // 프로파일 제외 키워드 패널티
+      excludeKeywords.forEach((keyword: string) => {
+        if (searchText.includes(keyword.toLowerCase())) {
+          relevanceBoost -= 0.25;
+        }
+      });
+    }
     
-    // 전기설비 키워드 매칭
-    electricKeywords.forEach(keyword => {
-      if (searchText.includes(keyword)) relevanceBoost += 0.15;
-    });
-    
-    // GIS/설비 키워드 매칭
-    gisKeywords.forEach(keyword => {
-      if (searchText.includes(keyword)) relevanceBoost += 0.10;
-    });
-    
-    // 안전 키워드 매칭
-    safetyKeywords.forEach(keyword => {
-      if (searchText.includes(keyword)) relevanceBoost += 0.05;
-    });
-    
-    // 관련성 없는 키워드 패널티
-    const irrelevantKeywords = ['도장', '용접', '철도', '선박', '물탱크', '저수조', '잠수', '발빠짐', '적재물'];
+    // 관련성 없는 일반 키워드 패널티 (프로파일과 별개)
+    const irrelevantKeywords = ['도장공사', '철도건널목', '저수조', '잠수작업', '선박내부'];
     irrelevantKeywords.forEach(keyword => {
-      if (searchText.includes(keyword)) relevanceBoost -= 0.20;
+      if (searchText.includes(keyword)) {
+        relevanceBoost -= 0.20;
+      }
     });
     
     const finalScore = Math.max(0, Math.min(1, baseScore + relevanceBoost));
@@ -145,12 +155,26 @@ function processCategory(
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
   
-  // 상위 3개 점수 로그 출력
+  // 상위 3개 점수 로그 출력 (프로파일 키워드 적용 결과 포함)
   if (withScores.length > 0) {
-    console.log(`[processCategory] ${category} 상위 점수:`);
+    console.log(`[processCategory] ${category} 상위 점수 (프로파일 키워드 적용):`);
     withScores.slice(0, 3).forEach((item, idx) => {
-      console.log(`  ${idx + 1}. "${item.metadata?.title || 'No title'}" - finalScore: ${item.finalScore.toFixed(3)}, vectorScore: ${item.vectorScore || 'N/A'}, distance: ${item.distance || 'N/A'}`);
+      console.log(`  ${idx + 1}. "${item.metadata?.title || 'No title'}" - finalScore: ${item.finalScore.toFixed(3)}, baseScore: ${item.baseScore?.toFixed(3)}, boost: ${item.relevanceBoost?.toFixed(3)}, distance: ${item.distance || 'N/A'}`);
     });
+    
+    // 프로파일 키워드가 적용된 항목들 확인
+    const boostedItems = withScores.filter(item => item.relevanceBoost && item.relevanceBoost > 0);
+    if (boostedItems.length > 0) {
+      console.log(`[키워드 부스트] ${boostedItems.length}개 항목이 프로파일 키워드로 점수 상승:`);
+      boostedItems.slice(0, 3).forEach((item, idx) => {
+        console.log(`  - "${item.metadata?.title}" (+${item.relevanceBoost?.toFixed(3)})`);
+      });
+    } else {
+      console.log(`[키워드 부스트] 프로파일 키워드가 적용된 항목이 없습니다.`);
+      if (resolvedProfile) {
+        console.log(`[디버깅] 프로파일 정보: ID=${resolvedProfile.id}, 키워드=${(resolvedProfile.keywords || []).length}개, 포함키워드=${(resolvedProfile.include_if_any_keywords || []).length}개`);
+      }
+    }
   }
 
   // 상위 N개 반환
@@ -763,11 +787,11 @@ JSON 형식으로 응답:
 
         // Remove old scoring logic - now handled by adaptive system
 
-        // ===== 단순화된 벡터 검색 =====
-        // 각 카테고리별 단순 벡터 검색
-        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '');
-        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '');  
-        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '');
+        // ===== 프로파일 기반 벡터 검색 =====
+        // 각 카테고리별 프로파일 활용 검색
+        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
+        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
