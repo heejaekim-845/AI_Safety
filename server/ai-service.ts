@@ -746,21 +746,14 @@ JSON 형식으로 응답:
         console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
-        console.log(`[DEBUG] 프로파일 법령 쿼리: [${(resolvedProfile.queries?.regulation || []).join(', ')}]`);
         console.log(`=====================================`);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
         
         // 카테고리별 특화 검색 쿼리: 제외 키워드 없이 순수 검색
         const incidentQueries = incident;
-        // 법령 쿼리 강제 추가 (디버깅용)
-        const regulationQueries = regulation.length > 0 ? regulation : [
-          "전기설비 안전거리", "절연용 보호구 착용", "정전 및 접지 절차", "활선 작업 금지", 
-          "170kV 전기안전기준", "고압설비 안전규정"
-        ];
+        const regulationQueries = regulation;
         const educationQueries = education;
-        
-        console.log(`[강제 법령] regulation.length=${regulation.length}, 강제 추가된 쿼리: ${regulationQueries.length}개`);
         
         console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
@@ -791,37 +784,6 @@ JSON 형식으로 응답:
         const preRegulations = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'regulation';
         });
-        
-        console.log(`[DEBUG] 법령 필터링 결과: ${preRegulations.length}개 (전체 검색결과: ${candidatesRaw?.length}개)`);
-        
-        // 법령 데이터가 없으면 직접 법령 검색 수행
-        let supplementalRegulations: any[] = [];
-        if (preRegulations.length === 0) {
-          console.log(`[법령 보강] 벡터 검색에서 법령이 없어 직접 검색 수행`);
-          const electricRegulationQueries = [
-            "전기설비기술기준", "전기안전관리법", "산업안전보건기준에관한규칙 전기", 
-            "고압 전기설비 안전거리", "활선작업 금지", "절연용 보호구"
-          ];
-          
-          const directRegulationSearch = await timeit('direct.regulation.search', () => 
-            this.runSearchQueries(electricRegulationQueries)
-          );
-          
-          supplementalRegulations = (directRegulationSearch || []).filter(r => 
-            normType(r.metadata) === 'regulation'
-          );
-          
-          console.log(`[법령 보강] 직접 검색으로 ${supplementalRegulations.length}개 법령 확보`);
-        }
-        
-        const finalPreRegulations = preRegulations.length > 0 ? preRegulations : supplementalRegulations;
-        
-        if (finalPreRegulations.length > 0) {
-          console.log('[DEBUG] 최종 법령 3개:');
-          finalPreRegulations.slice(0, 3).forEach((reg, idx) => {
-            console.log(`  ${idx+1}. "${reg.metadata?.title}" (type: ${reg.metadata?.type})`);
-          });
-        }
 
         // Remove old scoring logic - now handled by adaptive system
 
@@ -829,7 +791,7 @@ JSON 형식으로 응답:
         // 각 카테고리별 프로파일 활용 검색
         const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
         const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
-        const finalRegulations = processCategory(finalPreRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
@@ -839,40 +801,7 @@ JSON 형식으로 응답:
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
         
-        // 법령 데이터 강제 보완 시스템
         let regulations = regulationsOut;
-        if (regulations.length === 0) {
-          console.log(`[법령 강제보완] 검색된 법령이 없어 기본 전기설비 법령 추가`);
-          regulations = [
-            {
-              metadata: {
-                title: "전기설비기술기준의 판단기준 - 특별고압 전기설비의 안전거리",
-                type: "regulation",
-                source: "한국전력공사"
-              },
-              document: "특별고압 전기설비는 충전부와 대지 또는 구조물 간 적정 안전거리를 확보해야 합니다. 170kV급 설비의 경우 최소 1.8m 이상의 거리를 유지하고, 작업자 접근 시에는 정전 후 접지를 실시해야 합니다.",
-              score: 0.95
-            },
-            {
-              metadata: {
-                title: "산업안전보건기준에 관한 규칙 - 전기기계기구 안전작업",
-                type: "regulation", 
-                source: "고용노동부"
-              },
-              document: "전기기계기구를 취급할 때는 절연용 보호구를 착용하고, 활선작업을 금지해야 합니다. 전기설비 점검 시에는 정전 확인 후 접지를 실시하고, 잠금표찰(LOTO) 절차를 준수해야 합니다.",
-              score: 0.92
-            },
-            {
-              metadata: {
-                title: "전기안전관리법 - 절연용 보호구 착용 기준",
-                type: "regulation",
-                source: "산업통상자원부" 
-              },
-              document: "고압 전기설비 작업 시에는 내전압용 절연장갑, 절연화, 절연모 등을 착용해야 합니다. 보호구는 정기적으로 내전압 시험을 실시하여 절연성능을 확인해야 합니다.",
-              score: 0.90
-            }
-          ];
-        }
 
         // 전기설비 특화 코드 제거됨
 
