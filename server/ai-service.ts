@@ -16,60 +16,14 @@ import {
   type WorkType
 } from './profiles';
 
-// ===== Adaptive Backoff Levels =====
-// strict → relax1 → relax2
-const BACKOFF = [
-  {
-    label: 'strict',
-    quantile: { incident: 0.85, education: 0.80, regulation: 0.80 },
-    cap:      { incident: 0.50, education: 0.35, regulation: 0.40 },
-    floor:    { incident: 0.10, education: 0.08, regulation: 0.08 },
-    gating: {
-      minSetsMatched: 3,
-      minKeywordHits: { incident: 3, education: 1, regulation: 1 },
-      minVectorScore: 0.18,
-      enforceTitleEquip: true,
-      recencyYears: 10
-    }
-  },
-  {
-    label: 'relax1',
-    quantile: { incident: 0.75, education: 0.70, regulation: 0.75 },
-    cap:      { incident: 0.45, education: 0.32, regulation: 0.38 },
-    floor:    { incident: 0.08, education: 0.06, regulation: 0.06 },
-    gating: {
-      minSetsMatched: 2,
-      minKeywordHits: { incident: 2, education: 1, regulation: 1 },
-      minVectorScore: 0.14,
-      enforceTitleEquip: false,
-      recencyYears: 20
-    }
-  },
-  {
-    label: 'relax2',
-    quantile: { incident: 0.60, education: 0.60, regulation: 0.65 },
-    cap:      { incident: 0.40, education: 0.30, regulation: 0.35 },
-    floor:    { incident: 0.05, education: 0.05, regulation: 0.05 },
-    gating: {
-      minSetsMatched: 1,
-      minKeywordHits: { incident: 1, education: 0, regulation: 0 },
-      minVectorScore: 0.10,
-      enforceTitleEquip: false,
-      recencyYears: 0 // 0 = disable
-    }
-  }
-] as const;
+// ===== 단순화된 설정 =====
 
-// Keep legacy TUNING for backward compatibility
-const TUNING = {
-  categoryTargets: {
-    incident:  { min: 3, max: 6 },   // 사고사례
-    education: { min: 2, max: 5 },   // 교육자료
-    regulation:{ min: 3, max: 6 }    // 법령
-  },
-  diversity: {
-    maxPerDoc: 1,                       // keep at most 1 chunk per doc
-    dedupKeys: ["docId", "url", "title"]
+// 단순화된 카테고리 설정
+const SIMPLE_CONFIG = {
+  limits: {
+    incident: 5,    // 사고사례
+    education: 5,   // 교육자료  
+    regulation: 5   // 법령
   }
 } as const;
 
@@ -131,18 +85,7 @@ function applyThresholdWithFallback(list: any[], kind: 'incident' | 'education' 
   return out;
 }
 
-// ---------- Non-empty safeguard ----------
-function ensureNonEmpty<T>(label: string, arr: T[], fallback: () => T[]): T[] {
-  if (arr.length > 0) return arr;
-  console.warn(`[warn] ${label} empty → fallback`);
-  return fallback();
-}
 
-// ---------- Debug counter ----------
-function dbgCount(cat: string, arr: any[]): any[] {
-  console.log(`[${cat}] Count: ${arr.length}`);
-  return arr;
-}
 
 // ---------- Precision Control Helpers ----------
 function quantile(sortedAsc: number[], q: number) {
@@ -188,149 +131,46 @@ function anyHit(text: string, needles: string[]) {
   return countHits(text, needles) > 0;
 }
 
-// Legacy gating function - now replaced by adaptive system
+// 단순화된 관련성 검사 (Legacy 대체)
 function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: any) {
-  // Use the most relaxed settings from BACKOFF for legacy compatibility
-  const relaxedLevel = BACKOFF[BACKOFF.length - 1];
-  return mustPassGatingWithLevel(r, equipmentInfoObj, workType, profile, relaxedLevel);
+  return isRelevantContent(r, equipmentInfoObj?.name || '', workType?.name || '');
 }
 
-function diversifyAndTrim(list: any[], maxPerDoc: number, keys: string[]) {
-  if (!Array.isArray(list) || !list.length) return [];
-  const buckets = new Map<string, any[]>();
-  for (const r of list) {
-    const m = r.metadata || {};
-    const key = keys.map(k => normalizeStr(m[k])).find(Boolean) || normalizeStr(r.id);
-    const arr = buckets.get(key) || [];
-    if (arr.length < maxPerDoc) arr.push(r);
-    buckets.set(key, arr);
-  }
-  // flatten preserving order
-  const out: any[] = [];
-  buckets.forEach(arr => out.push(...arr));
-  return out;
-}
 
-function computeStrictThreshold(scores: number[], kind: 'incident'|'education'|'regulation') {
-  if (!scores.length) return 0;
-  const sorted = [...scores].sort((a,b)=>a-b);
-  const q = 0.8;
-  const cap = kind === 'education' ? 0.35 : 0.4;
-  const floor = 0.1;
-  const p = quantile(sorted, q);
-  return Math.max(floor, Math.min(p, cap));
-}
 
-// ===== Adaptive Backoff Helpers =====
-function computeThresholdWithLevel(scores: number[], kind: 'incident'|'education'|'regulation', lvl: typeof BACKOFF[number]) {
-  if (!scores.length) return 0;
-  const sorted = [...scores].sort((a,b)=>a-b);
-  const q = (lvl.quantile as any)[kind];
-  const cap = (lvl.cap as any)[kind];
-  const floor = (lvl.floor as any)[kind];
-  const pos = Math.min(sorted.length - 1, Math.max(0, Math.floor(sorted.length * q)));
-  const p = sorted[pos] ?? 0;
-  return Math.max(floor, Math.min(p, cap));
-}
-
-function mustPassGatingWithLevel(r: any, equipmentInfoObj: any, workType: any, profile: any, lvl: typeof BACKOFF[number]) {
-  const text = [String(r?.metadata?.title || ''), String(r?.document || '')].join(' ').toLowerCase();
-  const eqTokens = (equipmentInfoObj?.name ? equipmentInfoObj.name.split(/\s+/) : [])
-    .concat(equipmentInfoObj?.tags || []).map((s: any)=>String(s).toLowerCase());
-  const wtTokens = (workType?.name ? workType.name.split(/\s+/) : []).map((s: any)=>String(s).toLowerCase());
-  const rkTokens = (equipmentInfoObj?.riskTags || []).map((s: any)=>String(s).toLowerCase());
-
-  const sets = {
-    equipment: eqTokens.some((t: string) => t && text.includes(t)) ? 1 : 0,
-    workType:  wtTokens.some((t: string) => t && text.includes(t)) ? 1 : 0,
-    risk:      rkTokens.some((t: string) => t && text.includes(t)) ? 1 : 0
-  };
-  const matchedSets = Object.values(sets).reduce((a,b)=>a+b,0);
-  if (matchedSets < lvl.gating.minSetsMatched) return false;
-
-  const kind = normType(r.metadata) as 'incident'|'education'|'regulation'|string;
-  const kwHits = (profile.keywords || []).reduce((n: number, k: string)=> n + (k && text.includes(k.toLowerCase()) ? 1 : 0), 0);
-  const minKw = (lvl.gating.minKeywordHits as any)[kind] ?? 0;
-  if (kwHits < minKw) return false;
-
-  const v = Number(r.vectorScore ?? r.score ?? r.similarity ?? 0);
-  if (v < lvl.gating.minVectorScore && matchedSets < (lvl.gating.minSetsMatched + 1)) return false;
-
-  if (lvl.gating.enforceTitleEquip) {
-    const title = String(r?.metadata?.title || '').toLowerCase();
-    if (title && !eqTokens.some((t: any) => t && title.includes(String(t)))) return false;
-  }
-
-  // recency: 0 disables
-  if (lvl.gating.recencyYears && !isRecentEnough(r, lvl.gating.recencyYears)) return false;
-
-  return true;
-}
-
-// ===== Adaptive Category Processor =====
-function processCategoryAdaptive(
-  preList: any[],
-  kind: 'incident'|'education'|'regulation',
-  resolvedProfile: Profile,
-  equipmentInfoObj: EquipmentInfo,
-  workType?: WorkType,
-  minOut = 2,
-  maxOut = 6
-) {
-  console.log(`[ADAPTIVE] Processing ${kind} with ${preList.length} candidates, targets: ${minOut}-${maxOut}`);
+// ===== 단순화된 검색 헬퍼 =====
+function isRelevantContent(item: any, equipment: string, workType: string): boolean {
+  const text = [String(item?.metadata?.title || ''), String(item?.document || '')].join(' ').toLowerCase();
+  const equipmentName = equipment.toLowerCase();
+  const workTypeName = workType.toLowerCase();
   
-  if (!preList || preList.length === 0) {
-    console.log(`[ADAPTIVE] ${kind} - No input candidates, returning empty`);
+  // 설비명 또는 작업타입이 포함되어 있으면 관련성 있음
+  return text.includes(equipmentName) || text.includes(workTypeName);
+}
+
+// ===== 단순화된 카테고리 처리 =====
+function processCategory(
+  items: any[], 
+  category: 'incident'|'education'|'regulation',
+  equipment: string, 
+  workType: string
+) {
+  if (!items || items.length === 0) {
     return [];
   }
 
-  // ENHANCED FALLBACK: Skip strict gating for better content recall
-  console.log(`[ADAPTIVE] ${kind} ENHANCED FALLBACK - applying relaxed filtering for better recall`);
-  
-  // Apply only basic scoring without strict gating
-  const scored = preList.map((r: any) => {
-    const base = applyHybridScoring({
-      id: r.metadata?.id || r.document || 'unknown',
-      title: r.metadata?.title,
-      text: r.document,
-      content: r.document,
-      metadata: r.metadata,
-      vectorScore: r.vectorScore ?? r.score ?? r.similarity
-    } as SearchItem, resolvedProfile, equipmentInfoObj, workType);
-    return { ...r, hybridScore: base };
-  });
-  
-  console.log(`[ADAPTIVE] ${kind} scored all ${scored.length} candidates`);
-  
-  // Sort by hybrid score
-  const sorted = scored.sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0));
-  
-  // For debugging, show score distribution
-  const scores = sorted.map(x => x.hybridScore ?? 0);
-  if (scores.length > 0) {
-    console.log(`[ADAPTIVE] ${kind} score range: ${Math.min(...scores).toFixed(3)}-${Math.max(...scores).toFixed(3)}`);
-  }
-  
-  // Apply very relaxed threshold - just take top candidates
-  const relaxedThreshold = 0.01; // Very low threshold to ensure content gets through
-  let top = sorted.filter(x => (x.hybridScore ?? 0) >= relaxedThreshold);
-  console.log(`[ADAPTIVE] ${kind} passed relaxed threshold (${relaxedThreshold}): ${top.length}`);
+  // 벡터 점수로 정렬
+  const sorted = items
+    .filter(item => item.vectorScore || item.score || item.similarity)
+    .sort((a, b) => {
+      const scoreA = a.vectorScore || a.score || a.similarity || 0;
+      const scoreB = b.vectorScore || b.score || b.similarity || 0;
+      return scoreB - scoreA;
+    });
 
-  // If still no results, take the top candidates regardless of score
-  if (top.length === 0 && sorted.length > 0) {
-    console.log(`[ADAPTIVE] ${kind} EMERGENCY FALLBACK - taking top candidates regardless of score`);
-    top = sorted.slice(0, Math.max(minOut, 3));
-  }
-
-  // diversity trimming - but more lenient
-  top = diversifyAndTrim(top, 2, ['docId','url','title']); // Allow 2 per document instead of 1
-  console.log(`[ADAPTIVE] ${kind} after diversity: ${top.length}`);
-
-  // cap and ensure we get something
-  const result = top.slice(0, maxOut);
-  console.log(`[ADAPTIVE] ${kind} ENHANCED FALLBACK returned ${result.length} results`);
-  
-  return result;
+  // 상위 N개 반환
+  const limit = SIMPLE_CONFIG.limits[category];
+  return sorted.slice(0, limit);
 }
 
 // Timing utilities for performance analysis
@@ -888,9 +728,7 @@ JSON 형식으로 응답:
         };
         
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
-        console.log(`[프로파일] 선택된 프로파일: ${resolvedProfile.id}`);
-        console.log(`[프로파일] 장비 태그: ${inferEquipmentTags(equipmentInfoObj).join(', ')}`);
-        console.log(`[프로파일] 위험 태그: ${inferRiskTags(equipmentInfoObj).join(', ')}`);
+        console.log(`프로파일: ${resolvedProfile.id}`);
         
         // 프로파일 기반 검색 쿼리 생성
         const profileKeywords = resolvedProfile.keywords || [];
@@ -912,8 +750,7 @@ JSON 형식으로 응답:
         const regulationQueries = regulation;
         const educationQueries = education;
         
-        console.log(`[프로파일] 법규 검색 키워드: ${regulationQueries.slice(0,3).join(', ')}...`);
-        console.log(`[프로파일] 교육자료 검색 키워드: ${educationQueries.slice(0,3).join(', ')}...`);
+
 
         console.log(`RAG 벡터 검색 - 특화 쿼리: ${searchQueries.length}개`);
         
@@ -928,7 +765,7 @@ JSON 형식으로 응답:
         const vecCandidates = await timeit('vector.search', () => this.runVectorQueries(queriesForVector, where));
         const kwCandidates = await timeit('keyword.search', () => this.runKeywordQueries(queriesForKeyword));
 
-        const candidatesRaw = dbgCount('candidates.raw', dedupById([...(vecCandidates || []), ...(kwCandidates || [])]));
+        const candidatesRaw = dedupById([...(vecCandidates || []), ...(kwCandidates || [])]);
         
         const chromaResults = candidatesRaw;
 
@@ -1074,7 +911,7 @@ JSON 형식으로 응답:
         try {
           keywordWeights = this.getProfileKeywords(resolvedProfile);
         } catch (error) {
-          console.log(`[프로파일] 키워드 가중치 생성 실패, 기본값 사용:`, error);
+          console.log(`키워드 가중치 생성 실패, 기본값 사용`);
           // 기본 키워드 가중치
           keywordWeights = {
             "안전": 5,
@@ -1085,36 +922,31 @@ JSON 형식으로 응답:
           };
         }
         
-        // RELAXED: Prefilter by type only (remove profile filtering to let adaptive system handle it)
-        const preIncidents = dbgCount('incidents.prefilter', (candidatesRaw || []).filter(r => {
+        // 타입별 필터링
+        const preIncidents = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'incident';
-        }));
+        });
 
-        const preEducation = dbgCount('education.prefilter', (candidatesRaw || []).filter(r => {
+        const preEducation = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'education';
-        }));
+        });
 
-        const preRegulations = dbgCount('regulations.prefilter', (candidatesRaw || []).filter(r => {
+        const preRegulations = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'regulation';
-        }));
+        });
 
         // Remove old scoring logic - now handled by adaptive system
 
-        // ===== ADAPTIVE BACKOFF SYSTEM APPLIED =====
-        // Use adaptive processing with enhanced fallback for better content recall
-        const finalIncidents   = processCategoryAdaptive(preIncidents,   'incident',  resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
-        const finalEducation   = processCategoryAdaptive(preEducation,   'education', resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/5);  
-        const finalRegulations = processCategoryAdaptive(preRegulations, 'regulation',resolvedProfile, equipmentInfoObj, workType, /*min*/1, /*max*/6);
+        // ===== 단순화된 벡터 검색 =====
+        // 각 카테고리별 단순 벡터 검색
+        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '');
+        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '');  
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '');
 
-        // Use adaptive results (already processed with backoff logic)
-        const adaptiveIncidents   = dbgCount('incidents.adaptive', finalIncidents);
-        const adaptiveEducation   = dbgCount('education.adaptive', finalEducation);
-        const adaptiveRegulations = dbgCount('regulations.adaptive', finalRegulations);
-
-        // Safety: guarantee some output if everything is empty (using adaptive results)
-        const incidentsOut   = ensureNonEmpty('incidents', adaptiveIncidents, () => finalIncidents.slice(0, Math.min(3, finalIncidents.length)));
-        const educationOut   = ensureNonEmpty('education', adaptiveEducation, () => finalEducation.slice(0, Math.min(2, finalEducation.length)));
-        const regulationsOut = ensureNonEmpty('regulations', adaptiveRegulations, () => finalRegulations.slice(0, Math.min(3, finalRegulations.length)));
+        // 결과 검증
+        const incidentsOut   = finalIncidents;
+        const educationOut   = finalEducation;
+        const regulationsOut = finalRegulations;
 
         const hybridFilteredAccidents = incidentsOut;
         const hybridFilteredEducation = educationOut;
@@ -1654,7 +1486,7 @@ ${specialNotes || "없음"}
       });
     }
     
-    console.log(`[프로파일] ${profile.id} 키워드 가중치 생성: ${Object.keys(keywordWeights).length}개`);
+
     return keywordWeights;
   }
 
@@ -1674,7 +1506,7 @@ ${specialNotes || "없음"}
       let criticalKeywordFound = false;
       let educationKeywordFound = false;
       
-      console.log(`[scoring] "${title}" - 타입: ${isEducation ? 'education' : 'incident'}, 벡터점수: ${vectorScore.toFixed(3)}, 거리: ${result.distance}`);
+
       
       Object.entries(keywordWeights).forEach(([keyword, weight]) => {
         if (searchText.includes(keyword.toLowerCase())) {
