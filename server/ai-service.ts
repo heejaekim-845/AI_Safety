@@ -37,9 +37,7 @@ function normType(m: any) {
 }
 
 // ---------- Negatives for keyword-only queries ----------
-function applyNegatives(query: string, negatives: string[]): string {
-  return negatives.reduce((s, n) => `${s} -${n}`, query);
-}
+
 
 // ---------- Upstream where (relaxed) ----------
 function buildRelaxedWhere(expectedTags: string[] | undefined) {
@@ -628,16 +626,12 @@ JSON 형식으로 응답:
         console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
         console.log(`=====================================`);
         
-        // 프로파일의 제외 키워드 + 구체적인 무관업종 차단용 반키워드
-        const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
-          .concat(['식품가공','농업용','관광업','양식어업','수산물가공','축산업','식료품제조','음식업']);
+        console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
         
-        console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용`);
-        
-        // 카테고리별 특화 검색 쿼리: 벡터 검색에도 제외 키워드 적용
-        const incidentQueries = incident.map((q: string) => applyNegatives(q, negatives));
-        const regulationQueries = regulation.map((q: string) => applyNegatives(q, negatives));
-        const educationQueries = education.map((q: string) => applyNegatives(q, negatives));
+        // 카테고리별 특화 검색 쿼리: 제외 키워드 없이 순수 검색
+        const incidentQueries = incident;
+        const regulationQueries = regulation;
+        const educationQueries = education;
         
         console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
