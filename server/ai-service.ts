@@ -82,15 +82,22 @@ function processCategory(
     return [];
   }
 
-  // 벡터 점수가 있는 항목들을 우선 정렬 (더 관대한 필터링)
-  const withScores = items
-    .map(item => ({
-      ...item,
-      finalScore: item.vectorScore || item.score || item.similarity || 0.1 // 기본 점수 부여
-    }))
-    .sort((a, b) => b.finalScore - a.finalScore);
+  // 벡터 점수 계산 개선: distance 필드 고려
+  const withScores = items.map(item => {
+    const vs = item.vectorScore ?? (typeof item.distance === 'number' ? (1 - item.distance) : undefined);
+    const finalScore = vs ?? item.score ?? item.similarity ?? 0.1;
+    return { ...item, finalScore };
+  }).sort((a,b) => b.finalScore - a.finalScore);
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
+  
+  // 상위 3개 점수 로그 출력
+  if (withScores.length > 0) {
+    console.log(`[processCategory] ${category} 상위 점수:`);
+    withScores.slice(0, 3).forEach((item, idx) => {
+      console.log(`  ${idx + 1}. "${item.metadata?.title || 'No title'}" - finalScore: ${item.finalScore.toFixed(3)}, vectorScore: ${item.vectorScore || 'N/A'}, distance: ${item.distance || 'N/A'}`);
+    });
+  }
 
   // 상위 N개 반환
   const limit = SIMPLE_CONFIG.limits[category];
