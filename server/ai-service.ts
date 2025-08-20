@@ -553,6 +553,41 @@ JSON 형식으로 응답:
     }
   }
 
+  // Tie-breaker 함수: processCategory가 매긴 finalScore 보존하면서 동점 상황에서만 미세 조정
+  private tieBreakByHybrid(items: any[], queryTokens: string[], eps = 0.02): any[] {
+    // processCategory가 매긴 finalScore 보존
+    const withHybrid = items.map(x => ({
+      ...x,
+      hybrid: this.computeSimpleHybrid(x, queryTokens) ?? 0
+    }));
+    
+    // finalScore 차이가 eps 이내인 것들만 hybrid로 2차 정렬
+    return withHybrid.sort((a,b) => {
+      const d = (b.finalScore - a.finalScore);
+      if (Math.abs(d) > eps) return d;
+      return (b.hybrid - a.hybrid);
+    });
+  }
+
+  // 간단한 하이브리드 점수 계산 (tie-breaking용)
+  private computeSimpleHybrid(item: any, queryTokens: string[]): number {
+    const title = item.metadata?.title || '';
+    const content = item.document || item.text || '';
+    const searchText = `${title} ${content}`.toLowerCase();
+    
+    // 기본 벡터 점수
+    const vectorScore = item.finalScore || item.vectorScore || (1 - (item.distance || 0));
+    
+    // 단순 키워드 매칭
+    let keywordHits = 0;
+    queryTokens.forEach(token => {
+      if (searchText.includes(token.toLowerCase())) keywordHits++;
+    });
+    
+    // 가중 조합 (벡터 우선, 키워드는 보조)
+    return (vectorScore * 0.8) + ((keywordHits / Math.max(queryTokens.length, 1)) * 0.2);
+  }
+
   async generateEnhancedSafetyBriefing(
     equipmentInfo: any,
     workType: any,
@@ -708,11 +743,14 @@ JSON 형식으로 응답:
         
         // 프로파일 기반 강제 검색 제거 - 단일 통합 검색으로 충분함
         
-        // 하이브리드 점수 디버깅 로그
+        // 하이브리드 점수 디버깅 로그 - processCategory가 매긴 finalScore 기반
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
         console.log('상위 사고사례 하이브리드 점수:');
         hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
-          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${acc.hybridScore?.toFixed(3)}, 벡터: ${acc.vectorScore?.toFixed(3)}, 키워드: ${acc.keywordScore}, 핵심키워드: ${acc.criticalKeywordFound}`);
+          // processCategory가 이미 정렬했으므로 그 점수를 존중
+          const vectorScore = acc.vectorScore ?? (typeof acc.distance === 'number' ? (1 - acc.distance) : undefined);
+          const finalScore = acc.finalScore ?? vectorScore ?? acc.score ?? acc.similarity ?? 0.1;
+          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${finalScore?.toFixed(3)}, 벡터: ${vectorScore?.toFixed(3)}, 키워드: undefined, 핵심키워드: undefined`);
         });
         
         // 교육자료 필터링 전후 비교
@@ -720,10 +758,10 @@ JSON 형식으로 응답:
         console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
         console.log('교육자료 하이브리드 점수:');
         rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          const scored = this.applyLegacyHybridScoring([edu], keywordWeights, resolvedProfile)[0];
-          if (scored) {
-            console.log(`  ${idx+1}. "${edu.metadata?.title}" - 종합점수: ${scored.hybridScore?.toFixed(3)}, 벡터: ${scored.vectorScore?.toFixed(3)}, 키워드: ${scored.keywordScore}, 핵심키워드: ${scored.criticalKeywordFound}`);
-          }
+          // processCategory가 매긴 finalScore 보존하도록 applyLegacyHybridScoring 호출 제거
+          const vectorScore = edu.vectorScore ?? (typeof edu.distance === 'number' ? (1 - edu.distance) : undefined);
+          const finalScore = vectorScore ?? edu.score ?? edu.similarity ?? 0.1;
+          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${finalScore.toFixed(3)} (벡터: ${vectorScore?.toFixed(3) || 'N/A'}, 키워드: 0, 불필요키워드: false)`);
         });
         
         // 사고사례: 벡터DB 원본 데이터 직접 사용 (하드코딩 제거)
