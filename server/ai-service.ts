@@ -42,7 +42,7 @@ function normType(m: any) {
 // ---------- Upstream where (relaxed) ----------
 // buildRelaxedWhere 함수 제거됨 - 벡터 검색에서 사용되지 않음
 
-// ---------- Dedup ----------
+// ---------- Dedup ----------중복제거역할
 function dedupById<T extends { metadata?: any; document?: string }>(arr: T[]): T[] {
   const m = new Map<string, T>();
   for (const x of arr) {
