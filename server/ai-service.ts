@@ -32,6 +32,12 @@ const SIMPLE_CONFIG = {
 // ---------- Type normalization ----------
 function normType(m: any) {
   const s = (m?.type || m?.sourceType || '').toLowerCase();
+  
+  // 디버깅: 법규 데이터가 어떻게 분류되는지 확인
+  if (s.includes('regulation') || s.includes('법규') || s.includes('기준') || s.includes('규정')) {
+    console.log(`[normType] 법규 관련 데이터 발견: type="${m?.type}", sourceType="${m?.sourceType}", 결과="${s}"`);
+  }
+  
   if (s === 'accident') return 'incident';
   return s;
 }
@@ -775,6 +781,8 @@ JSON 형식으로 응답:
         const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
         const candidatesRaw = dedupById(allCandidates || []);
         
+        console.log(`🚨 [디버깅] candidatesRaw 생성 완료: ${candidatesRaw?.length || 0}개 항목`);
+        
         const chromaResults = candidatesRaw;
 
         let filteredChromaResults = chromaResults;
@@ -785,7 +793,17 @@ JSON 형식으로 응답:
         // 프로파일 특화 쿼리가 이미 최적화된 검색을 수행했으므로 추가 가중치 불필요
         console.log(`프로파일 기반 벡터 검색 결과 직접 활용 - 키워드 가중치 시스템 비활성화`);
         
-        // 타입별 필터링
+        // 타입별 필터링 - 디버깅 정보 추가
+        console.log(`[카테고리 분류] 전체 candidatesRaw: ${candidatesRaw?.length || 0}개`);
+        
+        // 모든 데이터의 타입 확인
+        const typeDistribution: { [key: string]: number } = {};
+        (candidatesRaw || []).forEach(r => {
+          const normalizedType = normType(r.metadata);
+          typeDistribution[normalizedType] = (typeDistribution[normalizedType] || 0) + 1;
+        });
+        console.log(`[카테고리 분류] 타입별 분포:`, typeDistribution);
+        
         const preIncidents = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'incident';
         });
@@ -797,6 +815,8 @@ JSON 형식으로 응답:
         const preRegulations = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'regulation';
         });
+        
+        console.log(`[카테고리 분류 결과] incident: ${preIncidents.length}, education: ${preEducation.length}, regulation: ${preRegulations.length}`);
 
         // Remove old scoring logic - now handled by adaptive system
 
