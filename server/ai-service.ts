@@ -176,15 +176,21 @@ export class AIService {
 
   // 통합된 검색 함수 (벡터/키워드 통합)
   private async runSearchQueries(queries: string[]): Promise<any[]> {
+    console.log(`[DEBUG] runSearchQueries 호출됨, 쿼리 수: ${queries.length}`);
+    console.log(`[DEBUG] 쿼리 목록: ${queries.slice(0,3).join(', ')}${queries.length > 3 ? '...' : ''}`);
+    
     const out: any[] = [];
     for (const q of queries) {
       try {
+        console.log(`[DEBUG] 검색 중: "${q}"`);
         const res = await chromaDBService.searchRelevantData(q, 15);
+        console.log(`[DEBUG] 검색 결과: ${res.length}개`);
         out.push(...(Array.isArray(res) ? res : []));
       } catch (e) {
         console.warn('[search] query failed', q, e);
       }
     }
+    console.log(`[DEBUG] runSearchQueries 완료, 총 ${out.length}개 결과`);
     return out;
   }
 
@@ -608,21 +614,23 @@ JSON 형식으로 응답:
         const education = [specificQuery, '안전교육', '교육자료', '훈련', ...baseKeywords];
         const all = [specificQuery, ...baseKeywords];
         
-        console.log(`\n=== 중복 제거된 키워드 통합 ===`);
-        console.log(`프로파일 ID: ${resolvedProfile.id}`);
-        console.log(`프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
-        console.log(`설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
-        console.log(`작업 키워드: [${(workType.keywords || []).join(', ')}]`);
-        console.log(`통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,8).join(', ')}${baseKeywords.length > 8 ? '...' : ''}]`);
-        console.log(`\n=== 카테고리별 쿼리 구성 ===`);
-        console.log(`specificQuery: "${specificQuery}"`);
-        console.log(`사고사례 (${incident.length}개): [${incident.slice(0,4).join(', ')}...]`);
-        console.log(`교육자료 (${education.length}개): [${education.slice(0,4).join(', ')}...]`);
-        console.log(`법령 (${regulation.length}개): [${regulation.slice(0,4).join(', ')}...]`);
+        console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
+        console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
+        console.log(`[DEBUG] 작업명: "${workType.name}"`);
+        console.log(`[DEBUG] specificQuery: "${specificQuery}"`);
+        console.log(`[DEBUG] 프로파일 ID: ${resolvedProfile.id}`);
+        console.log(`[DEBUG] 프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
+        console.log(`[DEBUG] 작업 키워드: [${(workType.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,10).join(', ')}${baseKeywords.length > 10 ? '...' : ''}]`);
+        console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
+        console.log(`=====================================`);
         
-        // 프로파일의 제외 키워드 + 제조업 잡음 차단용 기본 반키워드
+        // 프로파일의 제외 키워드 + 구체적인 무관업종 차단용 반키워드
         const negatives = (resolvedProfile.exclude_if_any_keywords ?? [])
-          .concat(['사출','성형기','소각','컨베이어','벨트','제조','생산라인','가공']);
+          .concat(['식품가공','농업용','관광업','양식어업','수산물가공','축산업','식료품제조','음식업']);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용`);
         
