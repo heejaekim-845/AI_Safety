@@ -104,7 +104,7 @@ function processCategory(
   console.log(`... 총 ${items.length}개 항목`);
   console.log(`===============================\n`);
 
-  // 1단계: 관련성 필터링 - 유연한 키워드 매칭
+  // 1단계: 170kV GIS 전기설비 특화 관련성 필터링
   const relevantItems = items.filter(item => {
     const title = String(item?.metadata?.title || '').toLowerCase();
     const content = String(item?.document || item?.text || '').toLowerCase();
@@ -113,24 +113,43 @@ function processCategory(
     const equipmentLower = equipment.toLowerCase();
     const workTypeLower = workType.toLowerCase();
     
-    // 설비명에서 주요 키워드 추출
+    // 170kV GIS 전기설비 특화 키워드 매칭 강화
+    const electricalKeywords = ['전기', '전압', 'kv', 'gis', '개폐기', '차단기', '변전', '송전', '배전', '감전', '충전', '절연'];
+    const inspectionKeywords = ['점검', '순시', '정기', '정비', '검사', '진단', '유지보수'];
+    
+    // 설비명과 작업명에서 핵심 키워드 추출
     const equipmentKeywords = equipmentLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
     const workKeywords = workTypeLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
     
-    // 유연한 매칭: 주요 키워드 중 하나라도 포함되면 관련성 있음
+    // 전기설비 관련성 점수 계산
+    const hasElectricalContent = electricalKeywords.some(keyword => searchText.includes(keyword));
+    const hasInspectionContent = inspectionKeywords.some(keyword => searchText.includes(keyword));
+    
+    // 설비명/작업명 매칭 
     const hasEquipmentMatch = equipmentKeywords.some(keyword => searchText.includes(keyword)) ||
                              searchText.includes(equipmentLower);
-    
     const hasWorkMatch = workKeywords.some(keyword => searchText.includes(keyword)) ||
                         searchText.includes(workTypeLower);
     
-    // 벡터 점수가 높으면 (0.15 이상) 관련성 필터를 우회
-    const highVectorScore = normalizedScore(item) >= 0.15;
+    // 벡터 점수 기반 관련성 
+    const vectorScore = normalizedScore(item);
+    const highVectorScore = vectorScore >= 0.15;
     
-    const isRelevant = hasEquipmentMatch || hasWorkMatch || highVectorScore;
+    // 전기설비가 아닌 콘텐츠 명시적 제외
+    const excludeKeywords = ['도장', '페인트', '철도', '건널목', '저수조', '가스용접', '프레스', '공기압축기', 
+                            '자동차', '필리핀', '인도네시아', '집재장치', '압력용기', '화학설비', '쇄석', '포장공사'];
+    const hasExcludeContent = excludeKeywords.some(keyword => searchText.includes(keyword));
+    
+    // 관련성 판단: (전기 + 점검) 또는 (설비매칭 + 작업매칭) 또는 높은 벡터점수, 단 제외키워드 없어야 함
+    const isRelevant = !hasExcludeContent && 
+                      ((hasElectricalContent && hasInspectionContent) || 
+                       (hasEquipmentMatch && hasWorkMatch) || 
+                       highVectorScore);
     
     if (!isRelevant) {
-      console.log(`[필터링됨] "${title}" - 관련성 부족 (설비: ${hasEquipmentMatch}, 작업: ${hasWorkMatch}, 벡터: ${normalizedScore(item).toFixed(3)})`);
+      const reason = hasExcludeContent ? '제외키워드' : 
+                    (!hasElectricalContent && !hasInspectionContent) ? '전기설비 무관' : '관련성 부족';
+      console.log(`[필터링됨] "${title}" - ${reason} (전기: ${hasElectricalContent}, 점검: ${hasInspectionContent}, 설비: ${hasEquipmentMatch}, 작업: ${hasWorkMatch}, 벡터: ${vectorScore.toFixed(3)})`);
     }
     
     return isRelevant;
@@ -226,21 +245,32 @@ export class AIService {
 
   // 통합된 검색 함수 (벡터/키워드 통합)
   private async runSearchQueries(queries: string[]): Promise<any[]> {
-    console.log(`[DEBUG] runSearchQueries 호출됨, 쿼리 수: ${queries.length}`);
-    console.log(`[DEBUG] 쿼리 목록: ${queries.slice(0,3).join(', ')}${queries.length > 3 ? '...' : ''}`);
+    console.log(`\n🔍 runSearchQueries 시작 - 총 ${queries.length}개 쿼리 실행`);
     
     const out: any[] = [];
-    for (const q of queries) {
+    for (let i = 0; i < queries.length; i++) {
+      const q = queries[i];
       try {
-        console.log(`[DEBUG] 검색 중: "${q}"`);
+        console.log(`\n📝 [${i+1}/${queries.length}] 검색 쿼리: "${q}"`);
         const res = await chromaDBService.searchRelevantData(q, 15);
-        console.log(`[DEBUG] 검색 결과: ${res.length}개`);
+        console.log(`✅ 검색 결과: ${res.length}개 문서 발견`);
+        
+        if (res.length > 0) {
+          console.log(`   상위 3개 결과:`);
+          res.slice(0, 3).forEach((item, idx) => {
+            const title = item?.metadata?.title || 'No title';
+            const type = item?.metadata?.type || 'unknown';
+            const distance = item?.distance?.toFixed(3) || 'N/A';
+            console.log(`   ${idx+1}. [${type}] "${title}" (distance: ${distance})`);
+          });
+        }
+        
         out.push(...(Array.isArray(res) ? res : []));
       } catch (e) {
-        console.warn('[search] query failed', q, e);
+        console.warn(`❌ 쿼리 "${q}" 실행 실패:`, e);
       }
     }
-    console.log(`[DEBUG] runSearchQueries 완료, 총 ${out.length}개 결과`);
+    console.log(`\n🎯 runSearchQueries 완료: 총 ${out.length}개 문서 수집`);
     return out;
   }
 
@@ -650,14 +680,17 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    console.log(`\n🚀🚀🚀 generateEnhancedSafetyBriefing 함수 시작! 🚀🚀🚀`);
-    console.log(`📋 입력 데이터: 설비명="${equipmentInfo.name}", 작업="${workType.name}"`);
+    console.error(`🚀🚀🚀 FUNCTION START: generateEnhancedSafetyBriefing 🚀🚀🚀`);
+    console.error(`📋 입력: 설비="${equipmentInfo.name}", 작업="${workType.name}"`);
     
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
-        console.log(`⏱️ timeit 블록 시작`);
+        console.error(`⏱️ TIMEIT BLOCK START`);
         try {
+          console.error(`\n===== 함수 실행 시작점 =====`);
+          console.error(`입력: equipment="${equipmentInfo.name}", workType="${workType.name}"`);
+          console.error(`==========================`);
       // Get relevant accident cases using both ChromaDB RAG and simple RAG
       let relevantAccidents: AccidentCase[] = [];
       let workTypeAccidents: AccidentCase[] = [];
@@ -681,10 +714,10 @@ JSON 형식으로 응답:
           }
         };
         
-        console.log(`\n========== 프로파일 기반 검색 시작 ==========`);
+        console.error(`\n🔥🔥🔥 PROFILE SEARCH START 🔥🔥🔥`);
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
-        console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
-        console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
+        console.error(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
+        console.error(`✅ 프로파일 설명: ${resolvedProfile.description}`);
         
         // 프로파일 기반 특화 검색 쿼리 생성 (buildTargetedSearchQuery 사용)
         console.log(`🔍 프로파일 기반 특화 쿼리 생성 중...`);
@@ -696,6 +729,15 @@ JSON 형식으로 응답:
         const regulation = targetedQueries.regulation;
         const education = targetedQueries.education;
         const all = targetedQueries.all;
+        
+        console.log(`\n=== 생성된 검색 쿼리 목록 ===`);
+        console.log(`🚨 사고사례 쿼리 (${incident.length}개):`);
+        incident.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
+        console.log(`📚 교육자료 쿼리 (${education.length}개):`);
+        education.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
+        console.log(`⚖️  법령 쿼리 (${regulation.length}개):`);
+        regulation.forEach((q, i) => console.log(`  ${i+1}. "${q}"`));
+        console.log(`===============================\n`);
         
         // 중복 제거된 키워드 통합 (프로파일 우선)
         const uniqueKeywords = new Set([
@@ -732,11 +774,20 @@ JSON 형식으로 응답:
         const regulationQueries = regulation;
         const educationQueries = education;
         
-        console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
+        console.error(`\n🚀 실제 벡터 검색 쿼리 확인! 🚀`);
+        console.error(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
+        
+        console.error(`\n=== 실제 실행될 검색 쿼리들 ===`);
+        allQueries.forEach((query, i) => {
+          console.error(`${i+1}. "${query}"`);
+        });
+        console.error(`================================\n`);
 
         // Run unified search queries with category-specific terms
+        console.error(`🔍 runSearchQueries 호출 시작 (${allQueries.length}개 쿼리)`);
         const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
+        console.error(`✅ runSearchQueries 완료: ${allCandidates?.length || 0}개 결과`);
         const candidatesRaw = dedupById(allCandidates || []);
         
         const chromaResults = candidatesRaw;
@@ -776,11 +827,19 @@ JSON 형식으로 응답:
 
         // Remove old scoring logic - now handled by adaptive system
 
-        // ===== 단순화된 벡터 검색 =====
-        // 각 카테고리별 단순 벡터 검색
+        console.error(`\n🔥🔥🔥 실제 실행 중인 processCategory 호출! 🔥🔥🔥`);
+        console.error(`✅ 프로파일 기반 특화 검색 적용 중...`);
+        
+        // ===== 프로파일 기반 특화 검색으로 변경 =====
+        // 각 카테고리별 프로파일 기반 검색 - 특화 키워드 사용
+        console.error(`📝 사고사례 검색: ${equipmentInfoObj?.name || ''} + ${workType?.name || ''}`);
         const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '');
+        console.error(`📝 교육자료 검색: ${equipmentInfoObj?.name || ''} + ${workType?.name || ''}`);
         const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '');  
+        console.error(`📝 법령 검색: ${equipmentInfoObj?.name || ''} + ${workType?.name || ''}`);
         const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '');
+        
+        console.error(`🎯 processCategory 결과: incidents=${finalIncidents.length}, education=${finalEducation.length}, regulation=${finalRegulations.length}`);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
