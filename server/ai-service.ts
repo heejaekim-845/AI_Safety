@@ -94,7 +94,7 @@ function processCategory(
     return [];
   }
 
-  // 1단계: 관련성 필터링 - 설비명/작업명과 관련된 내용만
+  // 1단계: 관련성 필터링 - 유연한 키워드 매칭
   const relevantItems = items.filter(item => {
     const title = String(item?.metadata?.title || '').toLowerCase();
     const content = String(item?.document || item?.text || '').toLowerCase();
@@ -103,14 +103,24 @@ function processCategory(
     const equipmentLower = equipment.toLowerCase();
     const workTypeLower = workType.toLowerCase();
     
-    // 범용 관련성 체크: 설비명 또는 작업명 포함
-    const hasEquipmentMatch = searchText.includes(equipmentLower);
-    const hasWorkMatch = searchText.includes(workTypeLower);
+    // 설비명에서 주요 키워드 추출
+    const equipmentKeywords = equipmentLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
+    const workKeywords = workTypeLower.split(/[\s\-\/]+/).filter(k => k.length > 1);
     
-    const isRelevant = hasEquipmentMatch || hasWorkMatch;
+    // 유연한 매칭: 주요 키워드 중 하나라도 포함되면 관련성 있음
+    const hasEquipmentMatch = equipmentKeywords.some(keyword => searchText.includes(keyword)) ||
+                             searchText.includes(equipmentLower);
+    
+    const hasWorkMatch = workKeywords.some(keyword => searchText.includes(keyword)) ||
+                        searchText.includes(workTypeLower);
+    
+    // 벡터 점수가 높으면 (0.15 이상) 관련성 필터를 우회
+    const highVectorScore = normalizedScore(item) >= 0.15;
+    
+    const isRelevant = hasEquipmentMatch || hasWorkMatch || highVectorScore;
     
     if (!isRelevant) {
-      console.log(`[필터링됨] "${title}" - 관련성 부족`);
+      console.log(`[필터링됨] "${title}" - 관련성 부족 (설비: ${hasEquipmentMatch}, 작업: ${hasWorkMatch}, 벡터: ${normalizedScore(item).toFixed(3)})`);
     }
     
     return isRelevant;
