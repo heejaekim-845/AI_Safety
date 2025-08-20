@@ -40,17 +40,7 @@ function normType(m: any) {
 
 
 // ---------- Upstream where (relaxed) ----------
-function buildRelaxedWhere(expectedTags: string[] | undefined) {
-  const tags = (expectedTags || []).filter(Boolean);
-  if (!tags.length) return undefined; // no upstream filter when none
-  return {
-    $or: [
-      { tags: { $containsAny: tags } },
-      { tags: { $exists: false } },
-      { industry: { $exists: false } }
-    ]
-  };
-}
+// buildRelaxedWhere 함수 제거됨 - 벡터 검색에서 사용되지 않음
 
 // ---------- Dedup ----------
 function dedupById<T extends { metadata?: any; document?: string }>(arr: T[]): T[] {
@@ -635,9 +625,6 @@ JSON 형식으로 응답:
         
         console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
-
-        const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
-        const where = buildRelaxedWhere(expectedTags);
 
         // Run unified search queries with category-specific terms
         const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
