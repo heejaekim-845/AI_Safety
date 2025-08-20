@@ -593,7 +593,7 @@ JSON 형식으로 응답:
         const equipmentKeywords = [...(equipmentInfoObj.tags || []), equipmentInfo.name];
         const workKeywords = [workType.name, ...(workType.keywords || [])];
         
-        // 더 구체적인 쿼리 생성 (설비명과 작업타입 우선)
+        // 더 구체적인 쿼리 생성 (설비명과 작업타입 우선), all은 fallback용
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
         const incident = [specificQuery, '사고사례', '재해사례', '안전사고'].filter(Boolean);
         const regulation = [specificQuery, '안전규정', '법령', '조문'].filter(Boolean);
