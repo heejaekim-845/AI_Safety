@@ -709,9 +709,22 @@ JSON 형식으로 응답:
         console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
         console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
         
-        // 프로파일 기반 특화 검색 쿼리 생성 (buildTargetedSearchQuery 사용)
-        console.log(`🔍 프로파일 기반 특화 쿼리 생성 중...`);
-        const targetedQueries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType);
+        // 토큰화 작업을 한 번만 수행하여 성능 최적화
+        const cachedTokens = {
+          nameTokens: equipmentInfo.name.split(/[\s·,|/\\]+/).filter(Boolean),
+          wtTokens: workType.name.split(/[\s·,|/\\]+/).filter(Boolean),
+          eqTags: (equipmentInfoObj.tags ?? []).map((t: string) => t.toLowerCase()),
+          riskTags: (equipmentInfoObj.riskTags ?? []).map((t: string) => t.toLowerCase()),
+          isElectricalEquipment: equipmentInfo.name?.includes('kV') || 
+                                equipmentInfo.name?.includes('GIS') ||
+                                equipmentInfo.name?.includes('변압기') ||
+                                equipmentInfo.name?.includes('배전') ||
+                                equipmentInfo.name?.includes('전기')
+        };
+        
+        // 프로파일 기반 특화 검색 쿼리 생성 (중복 토큰화 제거)
+        console.log(`🔍 프로파일 기반 특화 쿼리 생성 중... (토큰화 최적화 적용)`);
+        const targetedQueries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType, cachedTokens);
         console.log(`✅ 특화 쿼리 생성 완료`);
         
         // 프로파일 특화 쿼리 사용

@@ -262,27 +262,35 @@ export function shouldIncludeContent(item: SearchItem, profile: Profile): boolea
 export function buildTargetedSearchQuery(
   profile: Profile,
   equipment: EquipmentInfo,
-  workType?: WorkType
+  workType?: WorkType,
+  cachedTokens?: {
+    nameTokens: string[];
+    wtTokens: string[];
+    eqTags: string[];
+    riskTags: string[];
+    isElectricalEquipment: boolean;
+  }
 ): BuiltQueries {
-  const nameTokens = tokenize(equipment?.name);
-  const wtTokens = tokenize(workType?.name);
-  const eqTags = (equipment?.tags ?? []).map((t) => t.toLowerCase());
-  const risk = (equipment?.riskTags ?? []).map((t) => t.toLowerCase());
+  // 캐시된 토큰이 있으면 재사용, 없으면 새로 생성
+  const { nameTokens, wtTokens, eqTags, riskTags, isElectricalEquipment } = cachedTokens || {
+    nameTokens: tokenize(equipment?.name),
+    wtTokens: tokenize(workType?.name),
+    eqTags: (equipment?.tags ?? []).map((t) => t.toLowerCase()),
+    riskTags: (equipment?.riskTags ?? []).map((t) => t.toLowerCase()),
+    isElectricalEquipment: equipment?.name?.includes('kV') || 
+                          equipment?.name?.includes('GIS') ||
+                          equipment?.name?.includes('변압기') ||
+                          equipment?.name?.includes('배전') ||
+                          equipment?.name?.includes('전기')
+  };
 
   const baseKeywords = profile.keywords ?? [];
 
   const dynamicHead = [
     [...nameTokens, ...eqTags].join(" ").trim(),
     wtTokens.join(" ").trim(),
-    risk.join(" ").trim()
+    riskTags.join(" ").trim()
   ].filter(Boolean);
-
-  // 더 구체적인 전기 설비 특화 쿼리 생성
-  const isElectricalEquipment = equipment?.name?.includes('kV') || 
-                                equipment?.name?.includes('GIS') ||
-                                equipment?.name?.includes('변압기') ||
-                                equipment?.name?.includes('배전') ||
-                                equipment?.name?.includes('전기');
 
   // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 동적 키워드 접합
   const accidents = uniq([
