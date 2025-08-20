@@ -66,75 +66,7 @@ function dedupById<T extends { metadata?: any; document?: string }>(arr: T[]): T
   return Array.from(m.values());
 }
 
-// ---------- Thresholds & fallbacks ----------
-function computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
-  if (!scores.length) return 0;
-  const sorted = [...scores].sort((a, b) => a - b);
-  const idx = Math.floor(sorted.length * 0.70); // pass top 30%
-  const p = sorted[idx] ?? 0;
-  const cap = kind === 'education' ? 0.25 : 0.35;
-  return Math.min(p, cap);
-}
-
-function applyThresholdWithFallback(list: any[], kind: 'incident' | 'education' | 'regulation') {
-  const scores = list.map(x => x.hybridScore ?? 0);
-  let th = computeThreshold(scores, kind);
-  let out = list.filter(x => (x.hybridScore ?? 0) >= th);
-  if (out.length === 0) out = list.filter(x => (x.hybridScore ?? 0) >= 0);
-  if (out.length === 0 && list.length) out = list.sort((a,b)=>(b.hybridScore??0)-(a.hybridScore??0)).slice(0, Math.min(5, list.length));
-  return out;
-}
-
-
-
-// ---------- Precision Control Helpers ----------
-function quantile(sortedAsc: number[], q: number) {
-  if (!sortedAsc.length) return 0;
-  const pos = Math.min(sortedAsc.length - 1, Math.max(0, Math.floor(sortedAsc.length * q)));
-  return sortedAsc[pos] ?? 0;
-}
-
-function normalizeStr(x?: string) { return (x || '').toLowerCase().trim(); }
-
-function getMetaStr(m: any, k: string) { return normalizeStr(m?.[k]); }
-
-function toTextBlobForGating(r: any) {
-  return [normalizeStr(r.metadata?.title), normalizeStr(r.document)].join(' ');
-}
-
-function parseYear(maybeDate: string): number | undefined {
-  if (!maybeDate) return undefined;
-  const m = maybeDate.match(/(19|20)\d{2}/);
-  return m ? Number(m[0]) : undefined;
-}
-
-function isRecentEnough(r: any, years: number): boolean {
-  if (!years) return true;
-  const y = parseYear(getMetaStr(r.metadata, 'date') || getMetaStr(r.metadata, 'year'));
-  if (!y) return true; // no date → keep
-  const now = new Date().getFullYear();
-  return (now - y) <= years;
-}
-
-function countHits(text: string, needles: string[]): number {
-  const s = text;
-  let hits = 0;
-  for (const n of (needles || [])) {
-    const t = normalizeStr(n);
-    if (!t) continue;
-    if (s.includes(t)) hits += 1;
-  }
-  return hits;
-}
-
-function anyHit(text: string, needles: string[]) {
-  return countHits(text, needles) > 0;
-}
-
-// 단순화된 관련성 검사 (Legacy 대체)
-function mustPassGating(r: any, equipmentInfoObj: any, workType: any, profile: any) {
-  return isRelevantContent(r, equipmentInfoObj?.name || '', workType?.name || '');
-}
+// ---------- 단순화된 헬퍼 함수들 ----------
 
 
 
@@ -242,29 +174,15 @@ export class AIService {
     });
   }
 
-  // Search adapters for vector and keyword queries
-  private async runVectorQueries(queries: string[], where?: any): Promise<any[]> {
+  // 통합된 검색 함수 (벡터/키워드 통합)
+  private async runSearchQueries(queries: string[]): Promise<any[]> {
     const out: any[] = [];
     for (const q of queries) {
       try {
         const res = await chromaDBService.searchRelevantData(q, 15);
         out.push(...(Array.isArray(res) ? res : []));
       } catch (e) {
-        console.warn('[vec] query failed', q, e);
-      }
-    }
-    return out;
-  }
-
-  private async runKeywordQueries(queries: string[]): Promise<any[]> {
-    const out: any[] = [];
-    for (const q of queries) {
-      try {
-        // For now, using the same chromaDB service but in future could use different keyword service
-        const res = await chromaDBService.searchRelevantData(q, 15);
-        out.push(...(Array.isArray(res) ? res : []));
-      } catch (e) {
-        console.warn('[kw] query failed', q, e);
+        console.warn('[search] query failed', q, e);
       }
     }
     return out;
@@ -280,52 +198,7 @@ export class AIService {
     return Math.min(p, cap);
   }
 
-  // 범용 사고사례 정보 매칭 (프로파일 기반)
-  private getKnownAccidentsByProfile(profile: Profile): Record<string, any> {
-    // 프로파일별 알려진 사고사례 매핑 (필요시 확장 가능)
-    return {
-      "비상발전기 정비 중 고압활선 감전": {
-        date: "2011.03.09.(수) 08:30경",
-        location: "경남 창원시 ○○○○ 공장 내 전기실",  
-        accident_type: "감전",
-        damage: "사망 1명",
-        direct_cause: "고압 활선 상태에서 작업",
-        root_cause: "정전 작업 미실시 및 절연용 보호구 미착용"
-      },
-      "고압변압기 청소작업 중 충전부 접촉 감전": {
-        date: "2012.08.15.(수) 14:20경",
-        location: "부산시 ○○구 ○○○○ 변전소",
-        accident_type: "감전", 
-        damage: "사망 1명",
-        direct_cause: "충전부 접촉",
-        root_cause: "안전교육 미실시 및 작업 절차 미준수"
-      },
-      "이동식 사다리를 들어올리다 고압선(22.9kV)에 감전": {
-        date: "2015.5.29(금) 13:00경",
-        location: "전북 진안군, ○○○○ 폭기조 증설공사 현장",
-        accident_type: "감전",
-        damage: "사망 1명, 부상 1명", 
-        direct_cause: "이동식 사다리의 고압선 접촉 감전",
-        root_cause: "작업 장소와 인접한 특고압 전선로에 절연용 방호구 미설치 또는 이설 미흡. 위험 요인에 대한 안전 교육 및 관리 감독 미흡."
-      },
-      "배수펌프 전기판넬 접촉 감전": {
-        date: "2018.06.22.(금) 09:45경",
-        location: "전남 ○○시 하수처리장",
-        accident_type: "감전",
-        damage: "부상 1명",
-        direct_cause: "전기판넬 충전부 접촉",
-        root_cause: "정전 작업 미실시 및 절연장갑 미착용"
-      },
-      "통신케이블 포설 작업 중 감전": {
-        date: "2020.04.10.(금) 15:30경", 
-        location: "서울시 ○○구 지하 통신구",
-        accident_type: "감전",
-        damage: "부상 2명",
-        direct_cause: "전력케이블과 통신케이블 혼재로 인한 감전",
-        root_cause: "작업 전 위험성 평가 미실시 및 안전거리 확보 실패"
-      }
-    };
-  }
+  // 하드코딩 사고사례 제거 - 벡터DB에서 실제 데이터 사용
 
   async analyzeSafetyConditions(
     equipmentInfo: any,
@@ -774,11 +647,9 @@ JSON 형식으로 응답:
         const expectedTags = resolvedProfile.match?.tags_any ?? (equipmentInfoObj.tags ?? []);
         const where = buildRelaxedWhere(expectedTags);
 
-        // Run searches (vector + keyword) and combine
-        const vecCandidates = await timeit('vector.search', () => this.runVectorQueries(queriesForVector, where));
-        const kwCandidates = await timeit('keyword.search', () => this.runKeywordQueries(queriesForKeyword));
-
-        const candidatesRaw = dedupById([...(vecCandidates || []), ...(kwCandidates || [])]);
+        // Run unified search queries
+        const allCandidates = await timeit('unified.search', () => this.runSearchQueries([...queriesForVector, ...queriesForKeyword]));
+        const candidatesRaw = dedupById(allCandidates || []);
         
         const chromaResults = candidatesRaw;
 
@@ -1022,68 +893,34 @@ JSON 형식으로 응답:
           }
         });
         
-        // 사고사례: 벡터 유사도 상위 5건 (알려진 사고사례 정보와 매칭)
-        const knownAccidents = this.getKnownAccidentsByProfile(resolvedProfile);
-        
+        // 사고사례: 벡터DB 원본 데이터 직접 사용 (하드코딩 제거)
         chromaAccidents = hybridFilteredAccidents
           .map((r) => {
               const metadata = r.metadata;
               const title = metadata.title || '';
+              const document = r.document;
+              const lines = document.split('\n');
               
-              // 알려진 전기 사고사례에서 완전한 정보 찾기 (정확 매칭 및 정규화 매칭)
-              const normalizedTitle = title.replace(/[!?.,\s]+$/, '').trim(); // 끝의 특수문자와 공백 제거
-              let knownData = knownAccidents[title] || knownAccidents[normalizedTitle];
+              const extractField = (pattern: string, fallback = '') => {
+                const line = lines.find((l: string) => l.includes(pattern));
+                return line ? line.split(':')[1]?.trim() || fallback : fallback;
+              };
               
-              // 부분 매칭도 시도
-              if (!knownData) {
-                for (const [knownTitle, data] of Object.entries(knownAccidents)) {
-                  if (title.includes(knownTitle) || knownTitle.includes(title.replace(/[!?.,\s]+$/, ''))) {
-                    knownData = data;
-                    break;
-                  }
-                }
-              }
-              
-              if (knownData) {
-                return {
-                  title: title,
-                  date: knownData.date,
-                  location: knownData.location,
-                  accident_type: knownData.accident_type,
-                  damage: knownData.damage,
-                  summary: r.document.split('\n')[1] || `${knownData.accident_type} 사고로 ${knownData.damage} 발생`,
-                  direct_cause: knownData.direct_cause,
-                  root_cause: knownData.root_cause,
-                  prevention: r.document.split('예방대책: ')[1] || "안전교육 실시, 보호구 착용, 정전작업 원칙 준수",
-                  work_type: metadata.work_type || (workType?.name ?? '일반작업'),
-                  industry: metadata.industry || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
-                  risk_keywords: metadata.risk_keywords || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
-                  relevanceScore: (1 - r.distance).toFixed(3)
-                };
-              } else {
-                const document = r.document;
-                const lines = document.split('\n');
-                const extractField = (pattern: string, fallback = '') => {
-                  const line = lines.find((l: string) => l.includes(pattern));
-                  return line ? line.split(':')[1]?.trim() || fallback : fallback;
-                };
-                
-                return {
-                  title: title,
-                  date: extractField('날짜') || metadata.date || '날짜 미상',
-                  location: extractField('장소') || '장소 미상',
-                  accident_type: extractField('사고형태') || '감전',
-                  damage: extractField('피해규모') || '피해 미상',
-                  summary: extractField('개요') || lines[1] || '사고 상세 정보 없음',
-                  direct_cause: extractField('직접원인') || '직접원인 미상',
-                  root_cause: extractField('근본원인') || '근본원인 미상', 
-                  prevention: extractField('예방대책') || document.split('예방대책: ')[1] || '예방대책 미상',
-                  work_type: metadata.work_type || extractField('작업종류') || (workType?.name ?? '일반작업'),
-                  industry: metadata.industry || extractField('업종') || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
-                  risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
-                  relevanceScore: (1 - r.distance).toFixed(3)
-                };
-              }
+              return {
+                title: title,
+                date: extractField('날짜') || metadata.date || '날짜 미상',
+                location: extractField('장소') || '장소 미상',
+                accident_type: extractField('사고형태') || '감전',
+                damage: extractField('피해규모') || '피해 미상',
+                summary: extractField('개요') || lines[1] || '사고 상세 정보 없음',
+                direct_cause: extractField('직접원인') || '직접원인 미상',
+                root_cause: extractField('근본원인') || '근본원인 미상',
+                prevention: extractField('예방대책') || document.split('예방대책: ')[1] || '예방대책 미상',
+                work_type: metadata.work_type || extractField('작업종류') || (workType?.name ?? '일반작업'),
+                industry: metadata.industry || extractField('업종') || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
+                risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
+                relevanceScore: (1 - (r.distance || 0)).toFixed(3)
+              };
             });
         
         // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
