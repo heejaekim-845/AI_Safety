@@ -256,20 +256,8 @@ export class AIService {
     for (const q of queries) {
       try {
         console.log(`[DEBUG] 검색 중: "${q}"`);
-        // regulation 검색을 위해 더 많은 결과를 가져옴 (15 → 50)
-        const res = await chromaDBService.searchRelevantData(q, 50);
+        const res = await chromaDBService.searchRelevantData(q, 15);
         console.log(`[DEBUG] 검색 결과: ${res.length}개`);
-        
-        // 타입별 분포 확인
-        if (res.length > 0) {
-          const typeDistribution = res.reduce((acc, r) => {
-            const type = r.metadata?.type || 'unknown';
-            acc[type] = (acc[type] || 0) + 1;
-            return acc;
-          }, {});
-          console.log(`[DEBUG] "${q}" 검색 결과 타입 분포:`, typeDistribution);
-        }
-        
         out.push(...(Array.isArray(res) ? res : []));
       } catch (e) {
         console.warn('[search] query failed', q, e);
@@ -758,17 +746,29 @@ JSON 형식으로 응답:
         // 중복 제거된 기본 키워드 배열
         const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
-            
+        
+        console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
+        console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
+        console.log(`[DEBUG] 작업명: "${workType.name}"`);
+        console.log(`[DEBUG] specificQuery: "${specificQuery}"`);
+        console.log(`[DEBUG] 프로파일 ID: ${resolvedProfile.id}`);
+        console.log(`[DEBUG] 프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
+        console.log(`[DEBUG] 작업 키워드: [${(workType.keywords || []).join(', ')}]`);
+        console.log(`[DEBUG] 통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,10).join(', ')}${baseKeywords.length > 10 ? '...' : ''}]`);
+        console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
+        console.log(`=====================================`);
+        
+        console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
+        
         // 카테고리별 특화 검색 쿼리: 제외 키워드 없이 순수 검색
         const incidentQueries = incident;
         const regulationQueries = regulation;
         const educationQueries = education;
         
         console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
-        console.log(`\n=== 전기 규정 검색 디버깅 ===`);
-        console.log(`규정 검색 쿼리 수: ${regulationQueries.length}개`);
-        console.log(`규정 검색 쿼리들:`, regulationQueries);
-        console.log(`============================`);
         const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
 
         // Run unified search queries with category-specific terms
@@ -797,27 +797,6 @@ JSON 형식으로 응답:
         const preRegulations = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'regulation';
         });
-
-        // 규정 검색 결과 디버깅
-        console.log(`\n=== 규정 검색 결과 분석 ===`);
-        console.log(`전체 벡터 검색 결과: ${candidatesRaw.length}개`);
-        console.log(`regulation 타입 필터링 결과: ${preRegulations.length}개`);
-        
-        // 전체 결과에서 타입별 분포 확인
-        const typeDistribution = candidatesRaw.reduce((acc, r) => {
-          const type = normType(r.metadata);
-          acc[type] = (acc[type] || 0) + 1;
-          return acc;
-        }, {});
-        console.log(`검색 결과 타입 분포:`, typeDistribution);
-        
-        if (preRegulations.length > 0) {
-          console.log(`규정 검색 결과 상위 3개:`);
-          preRegulations.slice(0, 3).forEach((reg, idx) => {
-            console.log(`  ${idx+1}. "${reg.metadata?.title || 'No title'}" (타입: ${reg.metadata?.type})`);
-          });
-        }
-        console.log(`===============================`);
 
         // Remove old scoring logic - now handled by adaptive system
 
