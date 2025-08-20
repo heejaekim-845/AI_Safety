@@ -94,8 +94,42 @@ function processCategory(
     return [];
   }
 
-  // 정규화된 점수 계산: 모든 점수를 [0,1] 범위로 통일
-  const withScores = items.map(item => {
+  // 1단계: 관련성 필터링 - 설비명/작업명과 관련된 내용만
+  const relevantItems = items.filter(item => {
+    const title = String(item?.metadata?.title || '').toLowerCase();
+    const content = String(item?.document || item?.text || '').toLowerCase();
+    const searchText = `${title} ${content}`;
+    
+    const equipmentLower = equipment.toLowerCase();
+    const workTypeLower = workType.toLowerCase();
+    
+    // 170kV GIS 관련 키워드 확장
+    const electricalKeywords = ['전기', '고압', '특별고압', 'gis', 'sf6', '가스절연', '변전', '절연', '충전부', '감전', '개폐기', '차단기', '170kv', '점검', '순시'];
+    const workKeywords = ['점검', '순시', '정비', '보수', '검사', '운전', '조작'];
+    
+    // 관련성 체크: 설비명, 작업명, 또는 관련 키워드 포함
+    const hasEquipmentMatch = searchText.includes(equipmentLower) || 
+                             searchText.includes('gis') || 
+                             searchText.includes('170') ||
+                             searchText.includes('sf6') ||
+                             electricalKeywords.some(kw => searchText.includes(kw));
+    
+    const hasWorkMatch = searchText.includes(workTypeLower) ||
+                        workKeywords.some(kw => searchText.includes(kw));
+    
+    const isRelevant = hasEquipmentMatch || hasWorkMatch;
+    
+    if (!isRelevant) {
+      console.log(`[필터링됨] "${title}" - 관련성 부족`);
+    }
+    
+    return isRelevant;
+  });
+
+  console.log(`[processCategory] ${category}: 관련성 필터링 ${items.length} → ${relevantItems.length}개`);
+
+  // 2단계: 정규화된 점수 계산
+  const withScores = relevantItems.map(item => {
     const finalScore = normalizedScore(item);
     return { ...item, finalScore };
   }).sort((a,b) => b.finalScore - a.finalScore);
