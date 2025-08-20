@@ -76,16 +76,35 @@ function processCategory(
   workType: string
 ) {
   console.log(`[processCategory] ${category}: ${items.length}개 항목 처리 시작`);
+  console.log(`[processCategory] equipment="${equipment}", workType="${workType}"`);
   
   if (!items || items.length === 0) {
     console.log(`[processCategory] ${category}: 입력 데이터 없음`);
     return [];
   }
 
-  // 벡터 점수 계산 개선: distance 필드 고려
+  // 벡터 점수 계산 개선: distance 필드 고려 + 전기 키워드 보너스
   const withScores = items.map(item => {
     const vs = item.vectorScore ?? (typeof item.distance === 'number' ? (1 - item.distance) : undefined);
-    const finalScore = vs ?? item.score ?? item.similarity ?? 0.1;
+    let finalScore = vs ?? item.score ?? item.similarity ?? 0.1;
+    
+    // 전기 관련 키워드 강력 보너스 (모든 설비에 적용)
+    const title = (item.metadata?.title || '').toLowerCase();
+    const content = (item.document || '').toLowerCase();
+    const text = `${title} ${content}`;
+    
+    const electricKeywords = ['특별고압', '수배전반', '감전', '전기화상', '충전부', '전로점검', '변압기', '접지', '절연', 'gis', '개폐기', '변전'];
+    const keywordMatches = electricKeywords.filter(kw => text.includes(kw)).length;
+    
+    if (keywordMatches > 0) {
+      const bonus = keywordMatches * 0.15; // 키워드 당 15% 강력 보너스
+      const oldScore = finalScore;
+      finalScore = finalScore + bonus;
+      
+      // 전기 키워드 보너스 디버깅 (모든 전기 관련 항목)
+      console.log(`[전기보너스] "${item.metadata?.title}" - 원래점수: ${oldScore.toFixed(3)}, 키워드: ${keywordMatches}개, 보너스: +${bonus.toFixed(3)}, 최종점수: ${finalScore.toFixed(3)}`);
+    }
+    
     return { ...item, finalScore };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
@@ -671,17 +690,31 @@ JSON 형식으로 응답:
           };
         }
         
-        // 타입별 필터링
+        // 타입별 필터링 (디버깅 강화)
+        console.log(`[DEBUG] 타입 필터링 전 총 후보: ${candidatesRaw.length}개`);
+        
         const preIncidents = (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'incident';
+          const isIncident = normType(r.metadata) === 'incident';
+          return isIncident;
         });
 
         const preEducation = (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'education';
+          const isEducation = normType(r.metadata) === 'education';
+          return isEducation;
         });
 
         const preRegulations = (candidatesRaw || []).filter(r => {
-          return normType(r.metadata) === 'regulation';
+          const isRegulation = normType(r.metadata) === 'regulation';
+          return isRegulation;
+        });
+        
+        console.log(`[DEBUG] 타입별 필터링 결과: incident=${preIncidents.length}, education=${preEducation.length}, regulation=${preRegulations.length}`);
+        
+        // 사고사례 상위 5개 확인 (타입 필터링 직후)
+        console.log(`[DEBUG] preIncidents 상위 5개:`);
+        preIncidents.slice(0, 5).forEach((item, idx) => {
+          const score = 1 - (item.distance || 0);
+          console.log(`  ${idx+1}. "${item.metadata?.title}" - 타입: "${item.metadata?.type}", distance: ${item.distance?.toFixed(3)}, score: ${score.toFixed(3)}`);
         });
 
         // Remove old scoring logic - now handled by adaptive system
@@ -708,22 +741,15 @@ JSON 형식으로 응답:
         
         // 프로파일 기반 강제 검색 제거 - 단일 통합 검색으로 충분함
         
-        // 하이브리드 점수 디버깅 로그
-        console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
-        console.log('상위 사고사례 하이브리드 점수:');
+        // 최종 검색 결과 확인
+        console.log(`최종 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
+        console.log('상위 사고사례 (processCategory 결과):');
         hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
-          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${acc.hybridScore?.toFixed(3)}, 벡터: ${acc.vectorScore?.toFixed(3)}, 키워드: ${acc.keywordScore}, 핵심키워드: ${acc.criticalKeywordFound}`);
+          console.log(`  ${idx+1}. "${acc.metadata?.title}" - finalScore: ${acc.finalScore?.toFixed(3)}, distance: ${acc.distance?.toFixed(3)}`);
         });
-        
-        // 교육자료 필터링 전후 비교
-        const rawEducationResults = filteredChromaResults.filter(r => r.metadata.type === 'education');
-        console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
-        console.log('교육자료 하이브리드 점수:');
-        rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          const scored = this.applyLegacyHybridScoring([edu], keywordWeights, resolvedProfile)[0];
-          if (scored) {
-            console.log(`  ${idx+1}. "${edu.metadata?.title}" - 종합점수: ${scored.hybridScore?.toFixed(3)}, 벡터: ${scored.vectorScore?.toFixed(3)}, 키워드: ${scored.keywordScore}, 핵심키워드: ${scored.criticalKeywordFound}`);
-          }
+        console.log('상위 교육자료 (processCategory 결과):');
+        hybridFilteredEducation.slice(0, 3).forEach((edu, idx) => {
+          console.log(`  ${idx+1}. "${edu.metadata?.title}" - finalScore: ${edu.finalScore?.toFixed(3)}, distance: ${edu.distance?.toFixed(3)}`);
         });
         
         // 사고사례: 벡터DB 원본 데이터 직접 사용 (하드코딩 제거)
