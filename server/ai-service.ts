@@ -920,29 +920,29 @@ JSON 형식으로 응답:
           console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${normalizedFinalScore.toFixed(3)} (벡터: ${normalizedVectorScore.toFixed(3)}, 키워드: 0, 불필요키워드: false)`);
         });
         
-        // 사고사례: 벡터DB 원본 데이터 직접 사용 (하드코딩 제거)
+        // 사고사례: 벡터DB 메타데이터에서 직접 추출 (텍스트 파싱 제거)
         chromaAccidents = hybridFilteredAccidents
           .map((r) => {
               const metadata = r.metadata;
-              const title = metadata.title || '';
               const document = r.document;
               const lines = document.split('\n');
               
+              // 텍스트 파싱은 메타데이터가 없을 때만 폴백으로 사용
               const extractField = (pattern: string, fallback = '') => {
                 const line = lines.find((l: string) => l.includes(pattern));
                 return line ? line.split(':')[1]?.trim() || fallback : fallback;
               };
               
               return {
-                title: title,
-                date: extractField('날짜') || metadata.date || '날짜 미상',
-                location: extractField('장소') || '장소 미상',
-                accident_type: extractField('사고형태') || '감전',
-                damage: extractField('피해규모') || '피해 미상',
-                summary: extractField('개요') || lines[1] || '사고 상세 정보 없음',
-                direct_cause: extractField('직접원인') || '직접원인 미상',
-                root_cause: extractField('근본원인') || '근본원인 미상',
-                prevention: extractField('예방대책') || document.split('예방대책: ')[1] || '예방대책 미상',
+                title: metadata.title || '',
+                date: metadata.date || extractField('날짜') || '날짜 미상',
+                location: metadata.location || extractField('장소') || '장소 미상',
+                accident_type: metadata.accident_type || extractField('사고형태') || '감전',
+                damage: metadata.damage || extractField('피해규모') || '피해 미상',
+                summary: metadata.summary || extractField('개요') || lines[1] || '사고 상세 정보 없음',
+                direct_cause: metadata.direct_cause || extractField('직접원인') || '직접원인 미상',
+                root_cause: metadata.root_cause || extractField('근본원인') || '근본원인 미상',
+                prevention: metadata.prevention || extractField('예방대책') || document.split('예방대책: ')[1] || '예방대책 미상',
                 work_type: metadata.work_type || extractField('작업종류') || (workType?.name ?? '일반작업'),
                 industry: metadata.industry || extractField('업종') || ((resolvedProfile.match?.tags_any ?? [])[0] ?? '미상'),
                 risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
