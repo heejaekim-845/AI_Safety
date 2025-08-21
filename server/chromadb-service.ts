@@ -638,21 +638,19 @@ export class ChromaDBService {
       // 백업 생성
       await this.createBackup();
       
-      // 누락된 데이터만 처리
+      // 사고사례만 처리 (사용자 요청)
       if (categoryCount.incident < accidentCases.length) {
-        console.log(`사고사례 ${categoryCount.incident}/${accidentCases.length}에서 재개`);
+        console.log(`🚨 사고사례 임베딩 재개: ${categoryCount.incident}/${accidentCases.length}에서 시작`);
         await this.processIncidents(accidentCases, categoryCount.incident);
+        console.log(`✅ 사고사례 임베딩 완료! 총 ${accidentCases.length}건 처리됨`);
+      } else {
+        console.log(`✅ 사고사례 임베딩이 이미 완료되어 있습니다 (${categoryCount.incident}/${accidentCases.length})`);
       }
       
-      if (categoryCount.education < educationData.length) {
-        console.log(`교육자료 ${categoryCount.education}/${educationData.length}에서 재개`);
-        await this.processEducation(educationData, categoryCount.education);
-      }
+      // 교육자료와 법규는 건너뜀 (사용자가 사고사례만 요청)
+      console.log(`⏭️ 교육자료 및 법규 임베딩은 건너뜁니다 (사용자 요청)`);
+      console.log(`📊 현재 상태: 교육자료 ${categoryCount.education}/${educationData.length}, 법규 ${categoryCount.regulation}/${pdfRegulations.length}`);
       
-      if (categoryCount.regulation < pdfRegulations.length) {
-        console.log(`안전법규 ${categoryCount.regulation}/${pdfRegulations.length}에서 재개`);
-        await this.processRegulations(pdfRegulations, categoryCount.regulation);
-      }
       
       console.log('부분 재구축 완료');
       

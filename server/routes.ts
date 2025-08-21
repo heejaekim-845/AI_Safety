@@ -1208,6 +1208,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 사고사례만 임베딩 완료
+  app.post('/api/chromadb/resume-incidents-only', async (req, res) => {
+    try {
+      console.log('🚨 사고사례만 임베딩 완료 요청 받음...');
+      await chromaDBService.resumeIncompleteEmbedding();
+      res.json({ 
+        success: true,
+        message: '사고사례 임베딩 완료' 
+      });
+    } catch (error: any) {
+      console.error('사고사례 임베딩 실패:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // 안전법규 데이터만 삭제
   app.post('/api/delete-regulations', async (req, res) => {
     try {
