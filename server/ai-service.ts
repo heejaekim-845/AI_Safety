@@ -771,8 +771,6 @@ JSON 형식으로 응답:
         console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
-        console.log(`🔍 [법령검색문제분석] 전체 법령 쿼리 목록:`);
-        regulation.forEach((q, idx) => console.log(`  법령쿼리${idx+1}: "${q}"`));
         console.log(`=====================================`);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
@@ -843,56 +841,6 @@ JSON 형식으로 응답:
         const hybridFilteredEducation = educationOut;
         
         let regulations = regulationsOut;
-        
-        // 전기설비 작업을 위한 법령 관련성 향상 - 디버깅 강화
-        console.log(`🔧 [전기설비 조건 확인] 장비명: "${equipmentInfo.name}"`);
-        console.log(`🔧 [조건 검사] kV 포함: ${equipmentInfo.name.includes('kV')}, GIS 포함: ${equipmentInfo.name.includes('GIS')}, 전기 포함: ${equipmentInfo.name.includes('전기')}`);
-        if (equipmentInfo.name.includes('kV') || equipmentInfo.name.includes('GIS') || equipmentInfo.name.includes('전기')) {
-          console.log(`[전기설비 법령 최적화] ${equipmentInfo.name} 전기설비를 위한 법령 관련성 재정렬`);
-          
-          // 전기 관련 키워드로 법령 재정렬 (정확한 키워드 매칭)
-          const electricalKeywords = ['전기기계기구', '감전', '절연', '접지', '특별고압', '충전부', '정전작업', '활선', '안전거리', '전압', '전력설비'];
-          
-          regulations = regulations.map(reg => {
-            const title = reg.metadata?.title || '';
-            const document = reg.document || '';
-            const text = `${title} ${document}`.toLowerCase();
-            
-            // 전기 관련성 점수 계산
-            let electricalScore = 0;
-            electricalKeywords.forEach(keyword => {
-              if (text.includes(keyword.toLowerCase())) {
-                electricalScore += 1;
-              }
-            });
-            
-            // 기존 점수에 전기 관련성 보너스 추가
-            const originalScore = reg.finalScore || reg.score || reg.distance || 0;
-            const enhancedScore = originalScore + (electricalScore * 0.1); // 전기 키워드당 0.1 보너스
-            
-            console.log(`  법령: "${title}" 전기점수:${electricalScore} 기존:${originalScore.toFixed(3)} 향상:${enhancedScore.toFixed(3)}`);
-            if (electricalScore > 0) {
-              console.log(`    [키워드분석] "${title}" 내용 샘플: "${text.substring(0, 100)}..."`);
-              electricalKeywords.forEach(keyword => {
-                if (text.includes(keyword.toLowerCase())) {
-                  console.log(`      ✓ 매칭된 키워드: "${keyword}"`);
-                }
-              });
-            }
-            
-            return {
-              ...reg,
-              electricalScore,
-              enhancedScore,
-              finalScore: enhancedScore
-            };
-          }).sort((a, b) => (b.enhancedScore || 0) - (a.enhancedScore || 0)); // 향상된 점수로 재정렬
-          
-          console.log(`[전기설비 법령 최적화 완료] 상위 5개 법령:`);
-          regulations.slice(0, 5).forEach((reg, idx) => {
-            console.log(`  ${idx+1}. "${reg.metadata?.title}" (전기점수: ${reg.electricalScore}, 최종점수: ${(reg.enhancedScore || 0).toFixed(3)})`);
-          });
-        }
 
         // 전기설비 특화 코드 제거됨
 
