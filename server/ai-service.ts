@@ -255,8 +255,13 @@ export class AIService {
 
   // 통합된 검색 함수 (벡터/키워드 통합) - searchByCategory 사용으로 regulation 검색 개선
   private async runSearchQueries(queries: string[]): Promise<any[]> {
-    console.log(`[DEBUG] runSearchQueries 호출됨, 쿼리 수: ${queries.length}`);
-    console.log(`[DEBUG] 쿼리 목록: ${queries.slice(0,3).join(', ')}${queries.length > 3 ? '...' : ''}`);
+    console.log(`\n🔍🔍🔍 [CRITICAL SEARCH DEBUG] runSearchQueries 호출됨 🔍🔍🔍`);
+    console.log(`🔍 총 쿼리 수: ${queries.length}`);
+    console.log(`🔍 전체 쿼리 목록:`);
+    queries.forEach((q, idx) => {
+      console.log(`  ${idx + 1}. "${q}"`);
+    });
+    console.log(`🔍🔍🔍 검색 시작 🔍🔍🔍\n`);
     
     const out: any[] = [];
     for (let i = 0; i < queries.length; i++) {
@@ -693,15 +698,16 @@ JSON 형식으로 응답:
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
         console.log(`⏱️ timeit 블록 시작`);
+        console.log(`🔥🔥🔥 [EMERGENCY DEBUG] 이 로그가 보이면 코드가 실행되고 있습니다! 🔥🔥🔥`);
         try {
-      // Get relevant accident cases using both ChromaDB RAG and simple RAG
-      let relevantAccidents: AccidentCase[] = [];
-      let workTypeAccidents: AccidentCase[] = [];
-      let chromaAccidents: any[] = [];
-      let educationMaterials: any[] = [];
-      let safetyRegulations: any[] = [];
+          // Get relevant accident cases using both ChromaDB RAG and simple RAG
+          let relevantAccidents: AccidentCase[] = [];
+          let workTypeAccidents: AccidentCase[] = [];
+          let chromaAccidents: any[] = [];
+          let educationMaterials: any[] = [];
+          let safetyRegulations: any[] = [];
 
-      try {
+          try {
         // 실제 데이터베이스 데이터와 사용자 입력 기반 설비 정보 구성
         const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
         const equipmentInfoObj: EquipmentInfo & {riskFactors?: any} = {
@@ -1040,7 +1046,11 @@ JSON 형식으로 응답:
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
       } catch (error) {
-        console.log('ChromaDB 검색 실패, 기본 RAG 사용:', error);
+        console.log('🚨🚨🚨 ChromaDB 검색 실패, 상세 오류 정보:');
+        console.log('🚨 오류 타입:', typeof error);
+        console.log('🚨 오류 메시지:', (error as any)?.message || error);
+        console.log('🚨 오류 스택:', (error as any)?.stack || 'No stack trace');
+        console.log('기본 RAG 사용으로 전환');
         // 기본값으로 초기화
         chromaAccidents = [];
         educationMaterials = [];
