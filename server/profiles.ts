@@ -286,24 +286,10 @@ export function buildTargetedSearchQuery(
 
   const baseKeywords = profile.keywords ?? [];
 
-  // 핵심 키워드만 선별하여 dynamicHead 생성 (219자 문제 해결)
-  const coreEqTags = eqTags.filter(tag => 
-    // 전기설비: 핵심 안전 키워드만
-    isElectricalEquipment ? 
-      ['감전', '절연장갑', '충전부', '개폐기', 'sf6'].includes(tag.toLowerCase()) :
-      // 일반설비: 첫 3개 태그만
-      true
-  ).slice(0, 3);
-  
-  const coreRiskTags = riskTags.filter(tag => 
-    // 핵심 위험 키워드만 (1글자 단어, 접속사 제외)
-    tag.length > 1 && !['및', '시', '의', '에서', '까지', '위험'].includes(tag)
-  ).slice(0, 3);
-
   const dynamicHead = [
-    [...nameTokens, ...coreEqTags].join(" ").trim(),
+    [...nameTokens, ...eqTags].join(" ").trim(),
     wtTokens.join(" ").trim(),
-    coreRiskTags.join(" ").trim()
+    riskTags.join(" ").trim()
   ].filter(Boolean);
 
   // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 동적 키워드 접합

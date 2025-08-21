@@ -1863,102 +1863,52 @@ ${this.formatRisks(equipmentInfo)}
   private extractEquipmentRisks(equipmentInfo: any): string[] {
     const risks: string[] = [];
     
-    // 170kV GIS 특별 처리: 설비명 기반으로 위험 요소 분류
-    if (equipmentInfo.name?.includes('170kV') || equipmentInfo.name?.includes('GIS')) {
-      // 1. 전기적 위험 (고전압)
-      risks.push('감전', '절연파괴', '아크방전');
-      
-      // 2. 압력 위험 (SF6 가스)
-      risks.push('SF6누출', '가스압력');
-      
-      // 3. 고온 위험 (아크열)
-      risks.push('아크열', '화상');
-      
-      // 4. 추락 위험 (고소작업)
-      risks.push('추락', '고소작업');
-      
-      // 5. 기계적 위험 (중량물 취급)
-      risks.push('중량물', '끼임');
-      
-      return risks;
-    }
-    
-    // 일반 설비용 DB 필드 기반 위험 정보 추출
-    
-    // 고온 위험
-    if (equipmentInfo.high_temperature || equipmentInfo.highTemperatureRisk) {
+    // 실제 DB 필드에서 위험 정보 추출
+    if (equipmentInfo.highTemperatureRisk) {
       risks.push('고온', '화재', '화상');
-      const details = equipmentInfo.high_temperature_details || equipmentInfo.highTemperatureDetails;
-      if (details) {
-        // 핵심 키워드만 추출 (온도 수치, 접속사 제외)
-        const coreKeywords = details.split(/[,\s]+/)
-          .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|까지|°C|도)$/.test(s.trim()))
-          .slice(0, 3); // 최대 3개만
-        risks.push(...coreKeywords);
+      if (equipmentInfo.highTemperatureDetails) {
+        risks.push(...equipmentInfo.highTemperatureDetails.split(',').map((s: string) => s.trim()));
       }
     }
     
-    // 압력 위험
-    if (equipmentInfo.high_pressure || equipmentInfo.highPressureRisk) {
-      risks.push('고압', '압력', '가스누출');
-      const details = equipmentInfo.high_pressure_details || equipmentInfo.highPressureDetails;
-      if (details) {
-        const coreKeywords = details.split(/[,\s]+/)
-          .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|까지|bar|MPa)$/.test(s.trim()))
-          .slice(0, 3);
-        risks.push(...coreKeywords);
+    if (equipmentInfo.highPressureRisk) {
+      risks.push('고압', '압력', '가스누출', '폭발');
+      if (equipmentInfo.highPressureDetails) {
+        risks.push(...equipmentInfo.highPressureDetails.split(',').map((s: string) => s.trim()));
       }
     }
     
-    // 전기 위험
-    if (equipmentInfo.electrical || equipmentInfo.highVoltageRisk) {
-      risks.push('감전', '전기화재');
-      const details = equipmentInfo.electrical_details || equipmentInfo.highVoltageDetails;
-      if (details) {
-        const coreKeywords = details.split(/[,\s]+/)
-          .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|V|kV|A)$/.test(s.trim()))
-          .slice(0, 3);
-        risks.push(...coreKeywords);
+    if (equipmentInfo.highVoltageRisk) {
+      risks.push('전기', '감전', '고압전기', 'Arc');
+      if (equipmentInfo.highVoltageDetails) {
+        risks.push(...equipmentInfo.highVoltageDetails.split(',').map((s: string) => s.trim()));
       }
     }
     
-    // 추락 위험
-    if (equipmentInfo.fall_risk || equipmentInfo.heightRisk) {
-      risks.push('추락', '고소작업');
-      const details = equipmentInfo.fall_risk_details || equipmentInfo.heightDetails;
-      if (details) {
-        const coreKeywords = details.split(/[,\s]+/)
-          .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|m|미터)$/.test(s.trim()))
-          .slice(0, 3);
-        risks.push(...coreKeywords);
+    if (equipmentInfo.heightRisk) {
+      risks.push('추락', '고소작업', '작업발판');
+      if (equipmentInfo.heightDetails) {
+        risks.push(...equipmentInfo.heightDetails.split(',').map((s: string) => s.trim()));
       }
     }
     
-    // 기계적 위험
-    if (equipmentInfo.mechanical || equipmentInfo.heavyWeightRisk) {
-      risks.push('끼임', '충돌', '중량물');
-      const details = equipmentInfo.mechanical_details || equipmentInfo.heavyWeightDetails;
-      if (details) {
-        const coreKeywords = details.split(/[,\s]+/)
-          .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|kg|ton)$/.test(s.trim()))
-          .slice(0, 3);
-        risks.push(...coreKeywords);
+    if (equipmentInfo.heavyWeightRisk) {
+      risks.push('기계적', '끼임', '충돌', '중량물');
+      if (equipmentInfo.heavyWeightDetails) {
+        risks.push(...equipmentInfo.heavyWeightDetails.split(',').map((s: string) => s.trim()));
       }
     }
     
-    // riskFactors JSONB 필드에서 추가 위험 정보 (핵심만)
+    // riskFactors JSONB 필드에서 추가 위험 정보
     if (equipmentInfo.riskFactors) {
       Object.entries(equipmentInfo.riskFactors).forEach(([key, value]) => {
         if (value && key.includes('Detail') && typeof value === 'string') {
-          const coreKeywords = (value as string).split(/[,\s]+/)
-            .filter((s: string) => s.trim().length > 1 && !/^(및|시|의|에서|까지)$/.test(s.trim()))
-            .slice(0, 2); // 각 카테고리당 최대 2개
-          risks.push(...coreKeywords);
+          risks.push(...(value as string).split(',').map((s: string) => s.trim()));
         }
       });
     }
     
-    return Array.from(new Set(risks.filter(r => r.length > 1))); // 중복 제거 + 1글자 키워드 제외
+    return Array.from(new Set(risks)); // 중복 제거
   }
 }
 
