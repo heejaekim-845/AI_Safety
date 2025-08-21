@@ -691,11 +691,10 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    console.log(`\n🚀🚀🚀 generateEnhancedSafetyBriefing 함수 시작! 🚀🚀🚀`);
-    console.log(`📋 입력 데이터: 설비명="${equipmentInfo.name}", 작업="${workType.name}"`);
-    
-    // 🔥🔥🔥 EMERGENCY: 실제 함수 진입 확인
-    console.log(`🔥🔥🔥 ACTUAL FUNCTION ENTRY 🔥🔥🔥`);
+    console.error(`\n🚨🚨🚨🚨🚨 CRITICAL ENTRY POINT 🚨🚨🚨🚨🚨`);
+    console.error(`🚨 generateEnhancedSafetyBriefing 함수 호출됨!`);
+    console.error(`🚨 설비: ${equipmentInfo?.name}, 작업: ${workType?.name}`);
+    console.error(`🚨🚨🚨🚨🚨 ENTRY CONFIRMED 🚨🚨🚨🚨🚨\n`);
     
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
