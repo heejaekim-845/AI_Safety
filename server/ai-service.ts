@@ -719,6 +719,7 @@ JSON 형식으로 응답:
         };
         
         console.log(`\n========== 프로파일 기반 검색 시작 ==========`);
+        console.log(`⚠️ [CRITICAL DEBUG] equipmentInfoObj 확인:`, JSON.stringify(equipmentInfoObj, null, 2));
         const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
         console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
         console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
@@ -733,8 +734,9 @@ JSON 형식으로 응답:
         
         // 프로파일 기반 특화 검색 쿼리 생성 (중복 토큰화 제거)
         console.log(`🔍 프로파일 기반 특화 쿼리 생성 중... (토큰화 최적화 적용)`);
+        console.log(`🔍 [CRITICAL] buildTargetedSearchQuery 호출 전 - equipmentInfoObj:`, equipmentInfoObj);
         const targetedQueries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType, cachedTokens);
-        console.log(`✅ 특화 쿼리 생성 완료`);
+        console.log(`✅ 특화 쿼리 생성 완료 - targetedQueries:`, targetedQueries);
         
         // 프로파일 특화 쿼리 사용
         const incident = targetedQueries.accidents;
