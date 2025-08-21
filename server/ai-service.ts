@@ -268,14 +268,37 @@ export class AIService {
       const q = queries[i];
       try {
         console.log(`\n[QUERY ${i + 1}/${queries.length}] 벡터검색 쿼리: "${q}"`);
-        // searchByCategory 사용으로 regulation 결과 포함 보장
         const categoryResults = await chromaDBService.searchByCategory(q, 5);
+        
+        // 각 카테고리별 상위 결과 출력
+        console.log(`  📊 검색 결과: 사고 ${categoryResults.incident.length}개, 교육 ${categoryResults.education.length}개, 법규 ${categoryResults.regulation.length}개`);
+        
+        if (categoryResults.incident.length > 0) {
+          console.log(`  🚨 상위 사고사례:`);
+          categoryResults.incident.slice(0, 2).forEach((item, idx) => {
+            console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+          });
+        }
+        
+        if (categoryResults.education.length > 0) {
+          console.log(`  📚 상위 교육자료:`);
+          categoryResults.education.slice(0, 2).forEach((item, idx) => {
+            console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+          });
+        }
+        
+        if (categoryResults.regulation.length > 0) {
+          console.log(`  📋 상위 법규:`);
+          categoryResults.regulation.slice(0, 2).forEach((item, idx) => {
+            console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+          });
+        }
+
         const allResults = [
           ...categoryResults.incident,
           ...categoryResults.education,
-          ...categoryResults.regulation  // regulation 결과 명시적 포함
+          ...categoryResults.regulation
         ];
-        console.log(`[DEBUG] 검색 결과: 총 ${allResults.length}개 (사고:${categoryResults.incident.length}, 교육:${categoryResults.education.length}, 법규:${categoryResults.regulation.length})`);
         out.push(...allResults);
       } catch (e) {
         console.warn('[search] query failed', q, e);
