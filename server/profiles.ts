@@ -268,20 +268,14 @@ export function buildTargetedSearchQuery(
     wtTokens: string[];
     eqTags: string[];
     riskTags: string[];
-    isElectricalEquipment: boolean;
   }
 ): BuiltQueries {
   // 캐시된 토큰이 있으면 재사용, 없으면 새로 생성
-  const { nameTokens, wtTokens, eqTags, riskTags, isElectricalEquipment } = cachedTokens || {
+  const { nameTokens, wtTokens, eqTags, riskTags } = cachedTokens || {
     nameTokens: tokenize(equipment?.name),
     wtTokens: tokenize(workType?.name),
     eqTags: (equipment?.tags ?? []).map((t) => t.toLowerCase()),
-    riskTags: (equipment?.riskTags ?? []).map((t) => t.toLowerCase()),
-    isElectricalEquipment: equipment?.name?.includes('kV') || 
-                          equipment?.name?.includes('GIS') ||
-                          equipment?.name?.includes('변압기') ||
-                          equipment?.name?.includes('배전') ||
-                          equipment?.name?.includes('전기')
+    riskTags: (equipment?.riskTags ?? []).map((t) => t.toLowerCase())
   };
 
   const baseKeywords = profile.keywords ?? [];
@@ -296,37 +290,21 @@ export function buildTargetedSearchQuery(
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
     ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 사고`,
-      // 전기 설비의 경우 더 구체적인 쿼리 추가
-      ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 감전 사고`,
-        `${nameTokens.join(" ")} 정전 사고`,
-        `고압 전기설비 ${wtTokens.join(" ")} 사고`
-      ] : [])
+      `${dynamicHead.join(" ")} 사고`
     ] : [])
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
     ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 안전기준`,
-      // 전기 설비의 경우 더 구체적인 규정 검색
-      ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 전기안전기준`,
-        `고압설비 ${wtTokens.join(" ")} 규정`
-      ] : [])
+      `${dynamicHead.join(" ")} 안전기준`
     ] : [])
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
     ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 안전교육`,
-      // 전기 설비의 경우 더 구체적인 교육자료 검색
-      ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 전기안전교육`,
-        `고압설비 안전작업 교육`
-      ] : [])
+      `${dynamicHead.join(" ")} 안전교육`
     ] : [])
   ]);
 

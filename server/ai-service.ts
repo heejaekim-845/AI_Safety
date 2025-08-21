@@ -727,12 +727,7 @@ JSON 형식으로 응답:
           nameTokens: equipmentInfo.name.split(/[\s·,|/\\]+/).filter(Boolean),
           wtTokens: workType.name.split(/[\s·,|/\\]+/).filter(Boolean),
           eqTags: (equipmentInfoObj.tags ?? []).map((t: string) => t.toLowerCase()),
-          riskTags: (equipmentInfoObj.riskTags ?? []).map((t: string) => t.toLowerCase()),
-          isElectricalEquipment: equipmentInfo.name?.includes('kV') || 
-                                equipmentInfo.name?.includes('GIS') ||
-                                equipmentInfo.name?.includes('변압기') ||
-                                equipmentInfo.name?.includes('배전') ||
-                                equipmentInfo.name?.includes('전기')
+          riskTags: (equipmentInfoObj.riskTags ?? []).map((t: string) => t.toLowerCase())
         };
         
         // 프로파일 기반 특화 검색 쿼리 생성 (중복 토큰화 제거)
