@@ -691,18 +691,20 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    console.error(`\n🚨🚨🚨🚨🚨 CRITICAL ENTRY POINT 🚨🚨🚨🚨🚨`);
-    console.error(`🚨 generateEnhancedSafetyBriefing 함수 호출됨!`);
-    console.error(`🚨 설비: ${equipmentInfo?.name}, 작업: ${workType?.name}`);
-    console.error(`🚨🚨🚨🚨🚨 ENTRY CONFIRMED 🚨🚨🚨🚨🚨\n`);
+    console.log(`\n🚨🚨🚨🚨🚨 CRITICAL ENTRY POINT 🚨🚨🚨🚨🚨`);
+    console.log(`🚨 generateEnhancedSafetyBriefing 함수 호출됨!`);
+    console.log(`🚨 설비: ${equipmentInfo?.name}, 작업: ${workType?.name}`);
+    console.log(`🚨🚨🚨🚨🚨 ENTRY CONFIRMED 🚨🚨🚨🚨🚨\n`);
+    
+    console.log(`🚨 timeit 호출 직전`);
     
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
-        console.error(`🚨 timeit 블록 시작`);
-        console.error(`🚨 이 로그가 보이면 코드가 실행되고 있습니다!`);
+        console.log(`🚨 timeit 블록 시작`);
+        console.log(`🚨 이 로그가 보이면 코드가 실행되고 있습니다!`);
         try {
-          console.error(`🚨 TRY 블록 진입`);
+          console.log(`🚨 TRY 블록 진입`);
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
           let workTypeAccidents: AccidentCase[] = [];

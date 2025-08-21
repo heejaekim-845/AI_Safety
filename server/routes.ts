@@ -739,6 +739,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🎯 설비 정보:`, equipment?.name);
       console.log(`🎯 작업 정보:`, workType?.name);
       
+      // 🔍 실제 호출되는 함수 확인
+      console.log(`🔍 aiService 객체 타입:`, typeof aiService);
+      console.log(`🔍 generateEnhancedSafetyBriefing 함수 존재:`, typeof aiService.generateEnhancedSafetyBriefing);
+      
       const aiAnalysis = await aiService.generateEnhancedSafetyBriefing(
         equipment,
         workType,
