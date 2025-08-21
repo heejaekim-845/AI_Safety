@@ -771,6 +771,7 @@ JSON 형식으로 응답:
         console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
+        console.log(`[DEBUG] 전체 법령 쿼리:`, regulation);
         console.log(`=====================================`);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
@@ -822,6 +823,13 @@ JSON 형식으로 응답:
           return normType(r.metadata) === 'regulation';
         });
         
+        console.log(`\n=== 법령 RAW 데이터 분석 ===`);
+        console.log(`총 ${preRegulations.length}개 법령 검색됨:`);
+        preRegulations.forEach((reg, idx) => {
+          console.log(`${idx + 1}. "${reg.metadata?.title}" (점수: ${reg.distance || reg.score || reg.vectorScore})`);
+        });
+        console.log(`===============================`);
+        
         console.log(`[카테고리 분류 결과] incident: ${preIncidents.length}, education: ${preEducation.length}, regulation: ${preRegulations.length}`);
 
         // Remove old scoring logic - now handled by adaptive system
@@ -830,7 +838,15 @@ JSON 형식으로 응답:
         // 각 카테고리별 프로파일 활용 검색
         const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
         const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
+        console.log(`\n=== 법령 필터링 전후 비교 ===`);
+        console.log(`필터링 전: ${preRegulations.length}개`);
         const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
+        console.log(`필터링 후: ${finalRegulations.length}개`);
+        console.log(`필터링된 최종 법령:`);
+        finalRegulations.slice(0, 10).forEach((reg, idx) => {
+          console.log(`${idx + 1}. "${reg.metadata?.title}" (최종점수: ${reg.finalScore || reg.hybridScore || 'N/A'})`);
+        });
+        console.log(`===============================`);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
