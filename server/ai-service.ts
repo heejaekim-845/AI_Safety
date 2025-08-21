@@ -1393,12 +1393,39 @@ ${specialNotes || "없음"}
           criticalKeywordFound: criticalKeywordFound || educationKeywordFound
         };
       } else {
-        // 사고사례는 기존 로직 유지
+        // 사고사례와 법규 처리
+        const isRegulation = result.metadata?.type === 'regulation';
+        
+        // 법규에 대한 프로파일 기반 필터링 추가
+        let hasIrrelevantKeyword = false;
+        if (isRegulation && profile) {
+          const searchItem: SearchItem = {
+            id: result.metadata?.id || result.document || 'unknown',
+            content: searchText,
+            title: title,
+            metadata: result.metadata
+          };
+          
+          const isRelevant = shouldIncludeContent(searchItem, profile);
+          hasIrrelevantKeyword = !isRelevant;
+          
+          // 부적절한 법규는 점수 대폭 감소
+          if (hasIrrelevantKeyword) {
+            console.log(`❌ [REGULATION FILTERED] "${title}" - 부적절한 법규로 점수 감소`);
+            keywordScore = keywordScore * 0.01; // 거의 제거
+          }
+        }
+        
         if (!criticalKeywordFound && Object.keys(keywordWeights).length > 0) {
           keywordScore = keywordScore * 0.1;
         }
         
         let hybridScore = (vectorScore * 0.3) + (keywordScore * 0.7);
+        
+        // 부적절한 법규는 전체 점수도 대폭 감소
+        if (isRegulation && hasIrrelevantKeyword) {
+          hybridScore = hybridScore * 0.01; // 거의 제거
+        }
         
         // 산업/설비 불일치 패널티 (사고/법규는 더 강하게)
         const tags = (result.metadata?.tags || []).map((x: string) => x.toLowerCase());
