@@ -284,48 +284,70 @@ export function buildTargetedSearchQuery(
                           equipment?.name?.includes('전기')
   };
 
-  const baseKeywords = profile.keywords ?? [];
+  // 프로파일 키워드 활용: 핵심 기술 키워드 선별
+  const profileKeywords = profile.keywords ?? [];
+  const coreKeywords = profileKeywords.slice(0, 6); // 상위 6개 핵심 키워드 사용
+  
+  // 설비별 컨텍스트 키워드 생성
+  const contextKeywords = [
+    ...nameTokens,
+    ...wtTokens, 
+    ...riskTags,
+    ...coreKeywords
+  ].filter(Boolean);
 
+  // 전기설비 특화 키워드 보강
+  const electricalContext = isElectricalEquipment ? [
+    "전기", "절연", "충전부", "감전", "고압", "특별고압"
+  ] : [];
+
+  // 종합 컨텍스트 구성
+  const enrichedContext = [...contextKeywords, ...electricalContext];
+  
+  // 동적 쿼리 헤드 - 프로파일 키워드 포함
   const dynamicHead = [
     [...nameTokens, ...eqTags].join(" ").trim(),
     wtTokens.join(" ").trim(),
-    riskTags.join(" ").trim()
+    riskTags.join(" ").trim(),
+    coreKeywords.slice(0, 3).join(" ").trim() // 핵심 키워드 3개 추가
   ].filter(Boolean);
 
-  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 동적 키워드 접합
+  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 키워드 강화된 동적 쿼리
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
+    ...(enrichedContext.length ? [
       `${dynamicHead.join(" ")} 사고`,
-      // 전기 설비의 경우 더 구체적인 쿼리 추가
+      // 키워드 강화된 전기설비 쿼리
       ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 감전 사고`,
-        `${nameTokens.join(" ")} 정전 사고`,
-        `고압 전기설비 ${wtTokens.join(" ")} 사고`
+        `${nameTokens.join(" ")} ${coreKeywords.slice(0, 2).join(" ")} 감전 사고`,
+        `${nameTokens.join(" ")} ${wtTokens.join(" ")} 정전 사고`,
+        `고압 전기설비 ${coreKeywords.slice(2, 4).join(" ")} ${wtTokens.join(" ")} 사고`
       ] : [])
     ] : [])
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
+    ...(enrichedContext.length ? [
       `${dynamicHead.join(" ")} 안전기준`,
-      // 전기 설비의 경우 더 구체적인 규정 검색
+      // 키워드 강화된 전기설비 규정 검색
       ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 전기안전기준`,
-        `고압설비 ${wtTokens.join(" ")} 규정`
+        `${nameTokens.join(" ")} ${coreKeywords.slice(0, 3).join(" ")} 전기안전기준`,
+        `고압설비 ${coreKeywords.slice(1, 3).join(" ")} ${wtTokens.join(" ")} 규정`,
+        `${coreKeywords.slice(0, 2).join(" ")} 전기작업 안전기준`
       ] : [])
     ] : [])
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
+    ...(enrichedContext.length ? [
       `${dynamicHead.join(" ")} 안전교육`,
-      // 전기 설비의 경우 더 구체적인 교육자료 검색
+      // 키워드 강화된 전기설비 교육자료 검색
       ...(isElectricalEquipment ? [
-        `${nameTokens.join(" ")} 전기안전교육`,
-        `고압설비 안전작업 교육`
+        `${nameTokens.join(" ")} ${coreKeywords.slice(0, 2).join(" ")} 전기안전교육`,
+        `고압설비 ${coreKeywords.slice(1, 3).join(" ")} 안전작업 교육`,
+        `${coreKeywords.slice(0, 3).join(" ")} ${wtTokens.join(" ")} 교육`
       ] : [])
     ] : [])
   ]);
@@ -333,9 +355,12 @@ export function buildTargetedSearchQuery(
   const all = uniq([...accidents, ...regulation, ...education]);
 
   console.log(`[쿼리 빌드] 프로파일: ${profile.id}`);
+  console.log(`  핵심키워드: [${coreKeywords.slice(0, 6).join(', ')}]`);
+  console.log(`  전기설비여부: ${isElectricalEquipment}`);
   console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 3));
   console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 3));
   console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 3));
+  console.log(`[전체 법규쿼리] ${regulation.length}개:`, regulation);
 
   return { accidents, regulation, education, all };
 }
