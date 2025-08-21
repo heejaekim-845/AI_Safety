@@ -1282,7 +1282,10 @@ export class ChromaDBService {
       }
 
       // 쿼리 임베딩 생성
+      console.log(`\n[VECTRA 검색] 실행 쿼리: "${query}"`);
+      console.log(`[VECTRA 검색] 쿼리 길이: ${query.length}자`);
       const queryEmbedding = await this.generateQueryEmbedding(query);
+      console.log(`[VECTRA 검색] 임베딩 차원: ${queryEmbedding.length}`);
 
       // 모든 결과 가져오기
       const results = await this.index.queryItems(queryEmbedding, 10000);

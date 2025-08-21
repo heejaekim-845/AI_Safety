@@ -259,9 +259,10 @@ export class AIService {
     console.log(`[DEBUG] 쿼리 목록: ${queries.slice(0,3).join(', ')}${queries.length > 3 ? '...' : ''}`);
     
     const out: any[] = [];
-    for (const q of queries) {
+    for (let i = 0; i < queries.length; i++) {
+      const q = queries[i];
       try {
-        console.log(`[DEBUG] 검색 중: "${q}"`);
+        console.log(`\n[QUERY ${i + 1}/${queries.length}] 벡터검색 쿼리: "${q}"`);
         // searchByCategory 사용으로 regulation 결과 포함 보장
         const categoryResults = await chromaDBService.searchByCategory(q, 5);
         const allResults = [
