@@ -699,9 +699,10 @@ JSON 형식으로 응답:
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
-        console.log(`⏱️ timeit 블록 시작`);
-        console.log(`🔥🔥🔥 [EMERGENCY DEBUG] 이 로그가 보이면 코드가 실행되고 있습니다! 🔥🔥🔥`);
+        console.error(`🚨 timeit 블록 시작`);
+        console.error(`🚨 이 로그가 보이면 코드가 실행되고 있습니다!`);
         try {
+          console.error(`🚨 TRY 블록 진입`);
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
           let workTypeAccidents: AccidentCase[] = [];
