@@ -938,12 +938,25 @@ JSON 형식으로 응답:
         
         // 법령: 이미 처리된 regulations 배열을 사용
         console.log(`처리할 총 법령 수: ${regulations.length}건`);
+        console.log(`법령 샘플:`, regulations.slice(0,2).map(r => ({
+          hasDocument: !!r.document,
+          documentStart: r.document?.substring(0,50),
+          metadataTitle: r.metadata?.title,
+          metadataType: r.metadata?.type
+        })));
         
         let processedRegulations = new Map();
         regulations.forEach((reg, index) => {
           let articleNumber = '';
           let articleTitle = '';
           let fullContent = '';
+          
+          console.log(`[법령처리 ${index + 1}] 검사 중:`, {
+            hasArticleNumber: !!reg.articleNumber,
+            hasDocument: !!reg.document,
+            metadataTitle: reg.metadata?.title,
+            metadataType: reg.metadata?.type
+          });
           
           if (reg.articleNumber && reg.articleTitle) {
             // 직접 로드된 전기설비 법령 사용
@@ -952,14 +965,29 @@ JSON 형식으로 응답:
             fullContent = reg.fullContent || '';
             console.log(`직접로드 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
           } else {
-            // 벡터 검색 법령은 기존 로직으로 처리
+            // 벡터 검색 법령은 metadata.title과 document 사용
             const content = reg.document || '';
-            const articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+            const title = reg.metadata?.title || '';
+            
+            // metadata.title에서 조문 정보 추출 시도
+            let articleMatch = title.match(/제(\d+)조\s*(.+)/);
+            if (!articleMatch) {
+              // document에서 조문 정보 추출 시도  
+              articleMatch = content.match(/제(\d+)조\s*\(([^)]+)\)/);
+              if (!articleMatch) {
+                // content의 첫 줄에서 조문 정보 추출 시도
+                const firstLine = content.split('\n')[0];
+                articleMatch = firstLine.match(/제(\d+)조\s*(.+)/);
+              }
+            }
+            
             if (articleMatch) {
               articleNumber = `제${articleMatch[1]}조`;
-              articleTitle = articleMatch[2];
+              articleTitle = articleMatch[2].replace(/^\(|\)$/g, ''); // 괄호 제거
               fullContent = content;
-
+              console.log(`벡터검색 법령 ${index + 1}: ${articleNumber}(${articleTitle})`);
+            } else {
+              console.log(`법령 파싱 실패 ${index + 1}: title="${title}", content_start="${content.substring(0,100)}..."`);
             }
           }
           
