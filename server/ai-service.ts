@@ -1399,6 +1399,7 @@ ${specialNotes || "없음"}
         // 법규에 대한 프로파일 기반 필터링 추가
         let hasIrrelevantKeyword = false;
         if (isRegulation && profile) {
+          console.log(`🔍 [DEBUG] 법규 필터링 체크: "${title}"`);
           const searchItem: SearchItem = {
             id: result.metadata?.id || result.document || 'unknown',
             content: searchText,
@@ -1406,13 +1407,17 @@ ${specialNotes || "없음"}
             metadata: result.metadata
           };
           
+          console.log(`🔍 [DEBUG] shouldIncludeContent 호출 전`);
           const isRelevant = shouldIncludeContent(searchItem, profile);
+          console.log(`🔍 [DEBUG] shouldIncludeContent 결과: ${isRelevant}`);
           hasIrrelevantKeyword = !isRelevant;
           
           // 부적절한 법규는 점수 대폭 감소
           if (hasIrrelevantKeyword) {
             console.log(`❌ [REGULATION FILTERED] "${title}" - 부적절한 법규로 점수 감소`);
             keywordScore = keywordScore * 0.01; // 거의 제거
+          } else {
+            console.log(`✅ [REGULATION PASSED] "${title}" - 적절한 법규로 통과`);
           }
         }
         
