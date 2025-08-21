@@ -280,32 +280,57 @@ export function buildTargetedSearchQuery(
 
   const baseKeywords = profile.keywords ?? [];
 
-  const dynamicHead = [
-    [...nameTokens, ...eqTags].join(" ").trim(),
-    wtTokens.join(" ").trim(),
-    riskTags.join(" ").trim()
-  ].filter(Boolean);
+  // 기본 설비 + 작업 정보
+  const baseContext = [...nameTokens, ...eqTags, ...wtTokens].filter(Boolean).join(" ").trim();
 
-  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 동적 키워드 접합
+  // 위험요소별 개별 쿼리 생성
+  const riskQueries: string[] = [];
+  
+  // equipment에 risk_factors 정보가 있는 경우에만 처리 (DB 실제 데이터에서 가져온 경우)
+  const equipmentData = equipment as any;
+  if (equipmentData?.riskFactors) {
+    const riskFactors = equipmentData.riskFactors;
+    
+    if (riskFactors.highVoltageDetail) {
+      const detail = tokenize(riskFactors.highVoltageDetail).slice(0, 3).join(" ");
+      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    }
+    
+    if (riskFactors.highPressureDetail) {
+      const detail = tokenize(riskFactors.highPressureDetail).slice(0, 3).join(" ");
+      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    }
+    
+    if (riskFactors.highTemperatureDetail) {
+      const detail = tokenize(riskFactors.highTemperatureDetail).slice(0, 3).join(" ");
+      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    }
+    
+    if (riskFactors.heightDetail) {
+      const detail = tokenize(riskFactors.heightDetail).slice(0, 3).join(" ");
+      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    }
+    
+    if (riskFactors.mechanicalDetail) {
+      const detail = tokenize(riskFactors.mechanicalDetail).slice(0, 3).join(" ");
+      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    }
+  }
+
+  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 사고`
-    ] : [])
+    ...riskQueries.map(rq => `${rq} 사고`)
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 안전기준`
-    ] : [])
+    ...riskQueries.map(rq => `${rq} 안전기준`)
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...(dynamicHead.length ? [
-      `${dynamicHead.join(" ")} 안전교육`
-    ] : [])
+    ...riskQueries.map(rq => `${rq} 안전교육`)
   ]);
 
   const all = uniq([...accidents, ...regulation, ...education]);
