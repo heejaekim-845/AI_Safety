@@ -288,8 +288,11 @@ export function buildTargetedSearchQuery(
   
   // equipment에 risk_factors 정보가 있는 경우에만 처리 (DB 실제 데이터에서 가져온 경우)
   const equipmentData = equipment as any;
+  console.log(`[디버깅] equipmentData.riskFactors:`, equipmentData?.riskFactors);
+  
   if (equipmentData?.riskFactors) {
     const riskFactors = equipmentData.riskFactors;
+    console.log(`[디버깅] riskFactors 처리 시작:`, riskFactors);
     
     if (riskFactors.highVoltageDetail) {
       const detail = tokenize(riskFactors.highVoltageDetail).slice(0, 3).join(" ");
@@ -336,9 +339,12 @@ export function buildTargetedSearchQuery(
   const all = uniq([...accidents, ...regulation, ...education]);
 
   console.log(`[쿼리 빌드] 프로파일: ${profile.id}`);
+  console.log(`  baseContext: "${baseContext}"`);
+  console.log(`  riskQueries 생성됨 (${riskQueries.length}개):`, riskQueries);
   console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 3));
   console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 3));
   console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 3));
+  console.log(`  전체 법규쿼리:`, regulation);
 
   return { accidents, regulation, education, all };
 }
