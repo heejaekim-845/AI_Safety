@@ -333,8 +333,24 @@ export class ChromaDBService {
     return { accidentCases, educationData, pdfRegulations };
   }
 
+  private async checkStopFlag(): Promise<boolean> {
+    try {
+      await fs.access('./data/stop-embedding.flag');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async processIncidents(accidentCases: any[], startIndex: number): Promise<void> {
     for (let i = startIndex; i < accidentCases.length; i++) {
+      // 중단 플래그 확인
+      if (await this.checkStopFlag()) {
+        console.log(`❌ 임베딩 중단 요청 감지됨! 현재 진행: ${i}/${accidentCases.length}`);
+        console.log(`📋 현재까지 ${i}건의 사고사례가 임베딩 완료되었습니다.`);
+        return;
+      }
+      
       try {
         const incident = accidentCases[i];
         const content = `${incident.title}\n${incident.summary}\n위험요소: ${incident.risk_keywords}\n예방대책: ${incident.prevention}`;
