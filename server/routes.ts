@@ -735,12 +735,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate comprehensive AI briefing with RAG integration
+      console.log(`🎯🎯🎯 [ROUTE DEBUG] generateEnhancedSafetyBriefing 호출 시작 🎯🎯🎯`);
+      console.log(`🎯 설비 정보:`, equipment?.name);
+      console.log(`🎯 작업 정보:`, workType?.name);
+      
       const aiAnalysis = await aiService.generateEnhancedSafetyBriefing(
         equipment,
         workType,
         weatherInfo,
         workSchedule.specialNotes || undefined
       );
+      
+      console.log(`🎯🎯🎯 [ROUTE DEBUG] generateEnhancedSafetyBriefing 완료 🎯🎯🎯`);
 
       // Create complete briefing data
       const briefingData = {

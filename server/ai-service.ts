@@ -694,6 +694,9 @@ JSON 형식으로 응답:
     console.log(`\n🚀🚀🚀 generateEnhancedSafetyBriefing 함수 시작! 🚀🚀🚀`);
     console.log(`📋 입력 데이터: 설비명="${equipmentInfo.name}", 작업="${workType.name}"`);
     
+    // 🔥🔥🔥 EMERGENCY: 실제 함수 진입 확인
+    console.log(`🔥🔥🔥 ACTUAL FUNCTION ENTRY 🔥🔥🔥`);
+    
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
