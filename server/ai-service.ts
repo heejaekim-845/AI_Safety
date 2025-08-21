@@ -704,10 +704,11 @@ JSON 형식으로 응답:
       try {
         // 실제 데이터베이스 데이터와 사용자 입력 기반 설비 정보 구성
         const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
-        const equipmentInfoObj: EquipmentInfo = {
+        const equipmentInfoObj: EquipmentInfo & {riskFactors?: any} = {
           name: equipmentInfo.name,
           tags: inferEquipmentTags(equipmentInfo.name), // 설비명 기반 기본 태그
           riskTags: equipmentRisks, // 실제 DB의 위험 정보 기반
+          riskFactors: equipmentInfo.riskFactors, // 실제 DB의 risk_factors JSONB 데이터 포함
           metadata: {
             type: equipmentInfo.manufacturer || 'unknown',
             location: equipmentInfo.location || '',
@@ -768,6 +769,8 @@ JSON 형식으로 응답:
         console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
         console.log(`[DEBUG] 전체 법령 쿼리:`, regulation);
+        console.log(`[DEBUG] 실제 DB risk_factors:`, equipmentInfo.riskFactors);
+        console.log(`[DEBUG] equipmentInfoObj.riskFactors:`, equipmentInfoObj.riskFactors);
         console.log(`=====================================`);
         
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
