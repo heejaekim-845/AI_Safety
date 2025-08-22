@@ -774,12 +774,14 @@ JSON 형식으로 응답:
           priorityWeights: {} 
         };
         
-        console.log(`\n🔍 [동적 키워드 추출 디버깅] workType 정보 확인:`);
+        console.log(`\n========== 동적 키워드 추출 디버깅 시작 ==========`);
+        console.log(`🔍 [동적 키워드 추출 디버깅] workType 정보 확인:`);
         console.log(`  - workType.id: ${workType.id}`);
         console.log(`  - workType.name: "${workType.name}"`);
         console.log(`  - workType.description 존재: ${!!workType.description}`);
         console.log(`  - workType.description 길이: ${workType.description?.length || 0}`);
         console.log(`  - workType.description 내용: "${workType.description}"`);
+        console.log(`=============================`);
         
         if (workType.description && workType.description.trim().length > 0) {
           console.log(`\n🔍 [동적 키워드 추출] 작업 설명 분석 시작`);
