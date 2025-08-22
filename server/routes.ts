@@ -735,24 +735,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate comprehensive AI briefing with RAG integration
-      console.log(`🎯🎯🎯 [ROUTE DEBUG] generateEnhancedSafetyBriefing 호출 시작 🎯🎯🎯`);
-      console.log(`🎯 설비 정보:`, equipment?.name);
-      console.log(`🎯 작업 정보:`, workType?.name);
+      console.error(`🚨🚨🚨 ROUTE DEBUG START 🚨🚨🚨`);
+      console.error(`🚨 설비 정보:`, equipment?.name);
+      console.error(`🚨 작업 정보:`, workType?.name);
+      console.error(`🚨 workType.description:`, workType?.description?.substring(0, 100));
       
-      // 🔍 실제 호출되는 함수 확인
-      console.log(`🔍 aiService 객체 타입:`, typeof aiService);
-      console.log(`🔍 generateEnhancedSafetyBriefing 함수 존재:`, typeof aiService.generateEnhancedSafetyBriefing);
-      console.log(`🔍 함수 소스코드 시작:`, aiService.generateEnhancedSafetyBriefing.toString().substring(0, 200));
-      
-      // 함수 래핑으로 호출 확인
-      console.log(`🎯 [WRAPPER] generateEnhancedSafetyBriefing 호출 시작!`);
+      // 함수 호출
+      console.error(`🚨 [WRAPPER] generateEnhancedSafetyBriefing 호출 시작!`);
       const aiAnalysis = await aiService.generateEnhancedSafetyBriefing(
         equipment,
         workType,
         weatherInfo,
         workSchedule.specialNotes || undefined
       );
-      console.log(`🎯 [WRAPPER] generateEnhancedSafetyBriefing 호출 완료!`);
+      console.error(`🚨 [WRAPPER] generateEnhancedSafetyBriefing 호출 완료!`);
       
       console.log(`🎯🎯🎯 [ROUTE DEBUG] generateEnhancedSafetyBriefing 완료 🎯🎯🎯`);
 
