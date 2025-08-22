@@ -762,7 +762,13 @@ JSON 형식으로 응답:
         // 🔥 CRITICAL TEST: 동적 키워드 추출 테스트
         console.log(`\n🔥🔥🔥 DYNAMIC KEYWORD TEST START 🔥🔥🔥`);
         console.log(`🔥 workType.description: "${workType.description}"`);
-        const testKeywords = extractSafetyKeywordsFromWorkType(workType);
+        console.log(`🔥 workType.description 타입: ${typeof workType.description}`);
+        
+        // 안전한 문자열 변환 후 함수 호출
+        const safeDescription = String(workType.description || '');
+        console.log(`🔥 변환된 설명: "${safeDescription}"`);
+        
+        const testKeywords = extractSafetyKeywordsFromWorkType(safeDescription);
         console.log(`🔥 추출된 키워드 수: ${Object.keys(testKeywords.priorityWeights).length}`);
         console.log(`🔥 주요 키워드들:`, Object.keys(testKeywords.priorityWeights).slice(0, 10));
         console.log(`🔥🔥🔥 DYNAMIC KEYWORD TEST END 🔥🔥🔥\n`);
