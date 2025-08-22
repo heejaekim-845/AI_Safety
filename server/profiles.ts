@@ -64,6 +64,7 @@ export interface Profile {
   exclude_if_any_keywords?: string[];
   queries?: ProfileQueries;
   weights: ProfileWeights;
+  priority_keywords?: { [keyword: string]: number }; // 키워드별 추가 부스팅 점수
 }
 
 export interface SearchProfilesConfig {
@@ -110,6 +111,14 @@ const SEARCH_PROFILES: Profile[] = [
       risk: 0.07,
       regulation_hit: 0.03,
       education_hit: 0.02
+    },
+    priority_keywords: {
+      "감전": 0.20,        // 감전 키워드 발견시 +20% 부스팅
+      "충전부": 0.15,      // 충전부 키워드 발견시 +15% 부스팅
+      "절연장갑": 0.15,    // 절연장갑 키워드 발견시 +15% 부스팅
+      "활선": 0.15,        // 활선 키워드 발견시 +15% 부스팅
+      "GIS": 0.10,         // GIS 키워드 발견시 +10% 부스팅
+      "170kV": 0.10        // 170kV 키워드 발견시 +10% 부스팅
     }
   },
   {
@@ -136,6 +145,49 @@ const SEARCH_PROFILES: Profile[] = [
       risk: 0.07,
       regulation_hit: 0.02,
       education_hit: 0.01
+    }
+  },
+  {
+    id: "turbine-hydro",
+    description: "수차 · 수력발전 · 회전기계",
+    match: {
+      equipment_name_regex: "(수차|turbine|발전기|터빈|회전)",
+      tags_any: ["turbine", "hydro", "rotating", "mechanical"]
+    },
+    keywords: [
+      "수차", "터빈", "회전체", "발전기", "베어링", "축정렬", "진동", "윤활",
+      "회전기계", "RPM", "축", "커플링", "정비", "점검", "기계"
+    ],
+    exclude_keywords: ["전기", "변압기", "송전", "배전", "고압"],
+    include_if_any_keywords: ["수차", "터빈", "회전", "발전기", "기계", "베어링", "윤활", "진동", "축"],
+    exclude_if_any_keywords: ["전기작업", "송전선", "변압기", "개폐기"],
+    queries: {
+      accidents: [
+        "수차 정비 중 끼임", "회전체 끼임 사고", "터빈 점검 중 사고", "발전기 정비 사고"
+      ],
+      regulation: [
+        "회전체 위험 방호", "가동부 방호덮개", "기계설비 안전", "회전기계 점검"
+      ],
+      education: [
+        "수차 안전교육", "회전기계 안전작업", "베어링 정비 교육", "터빈 점검 안전"
+      ]
+    },
+    weights: {
+      vector: 0.50,      // 벡터 유사도 (50%)
+      keyword: 0.25,     // 키워드 매칭 (25%) - 높음!
+      equipment: 0.15,   // 설비 매칭 (15%) - 높음!
+      work_type: 0.05,   // 작업유형 (5%)
+      risk: 0.03,        // 위험요소 (3%)
+      regulation_hit: 0.01,  // 법규 적중 (1%)
+      education_hit: 0.01    // 교육 적중 (1%)
+    },
+    priority_keywords: {
+      "끼임": 0.25,        // 끼임 사고 발견시 +25% 부스팅 (수차의 최대 위험)
+      "회전체": 0.20,      // 회전체 키워드 발견시 +20% 부스팅
+      "베어링": 0.15,      // 베어링 키워드 발견시 +15% 부스팅
+      "진동": 0.15,        // 진동 키워드 발견시 +15% 부스팅
+      "축정렬": 0.10,      // 축정렬 키워드 발견시 +10% 부스팅
+      "윤활": 0.10         // 윤활 키워드 발견시 +10% 부스팅
     }
   },
   {
@@ -474,6 +526,17 @@ export function applyHybridScoring(
 
   let bonus = 0;
   if (includeAny.length && containsAny(text, includeAny) > 0) bonus += (o.bonusForIncludedAny || 0.1);
+  
+  // 우선순위 키워드 부스팅 적용
+  let priorityBonus = 0;
+  if (profile.priority_keywords) {
+    for (const [keyword, boost] of Object.entries(profile.priority_keywords)) {
+      if (text.includes(keyword.toLowerCase())) {
+        priorityBonus += boost;
+      }
+    }
+  }
+  
   let penalty = 0;
   if (exclude.length && containsAny(text, exclude) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
   if (exclAny.length && containsAny(text, exclAny) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
@@ -499,6 +562,7 @@ export function applyHybridScoring(
   score += w.education_hit * eduHit;
 
   score += bonus;
+  score += priorityBonus;  // 우선순위 키워드 부스팅 추가
   score -= penalty;
 
   return Math.max(0, Math.min(1, score));
