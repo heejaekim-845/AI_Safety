@@ -759,6 +759,14 @@ JSON 형식으로 응답:
         console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
         console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
         
+        // 🔥 CRITICAL TEST: 동적 키워드 추출 테스트
+        console.log(`\n🔥🔥🔥 DYNAMIC KEYWORD TEST START 🔥🔥🔥`);
+        console.log(`🔥 workType.description: "${workType.description}"`);
+        const testKeywords = extractSafetyKeywordsFromWorkType(workType);
+        console.log(`🔥 추출된 키워드 수: ${Object.keys(testKeywords.priorityWeights).length}`);
+        console.log(`🔥 주요 키워드들:`, Object.keys(testKeywords.priorityWeights).slice(0, 10));
+        console.log(`🔥🔥🔥 DYNAMIC KEYWORD TEST END 🔥🔥🔥\n`);
+        
         // 작업유형 설명에서 동적 키워드 추출
         let dynamicKeywords: {
           primaryKeywords: string[];
