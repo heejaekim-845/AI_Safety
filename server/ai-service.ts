@@ -774,12 +774,22 @@ JSON 형식으로 응답:
           priorityWeights: {} 
         };
         
+        console.log(`\n🔍 [동적 키워드 추출 디버깅] workType 정보 확인:`);
+        console.log(`  - workType.id: ${workType.id}`);
+        console.log(`  - workType.name: "${workType.name}"`);
+        console.log(`  - workType.description 존재: ${!!workType.description}`);
+        console.log(`  - workType.description 길이: ${workType.description?.length || 0}`);
+        console.log(`  - workType.description 내용: "${workType.description}"`);
+        
         if (workType.description && workType.description.trim().length > 0) {
           console.log(`\n🔍 [동적 키워드 추출] 작업 설명 분석 시작`);
+          console.log(`분석할 설명: "${workType.description}"`);
           dynamicKeywords = extractSafetyKeywordsFromWorkType(workType.description);
           console.log(`✅ [동적 키워드 추출] 완료 - 총 ${Object.keys(dynamicKeywords.priorityWeights).length}개 키워드 추출`);
+          console.log(`추출된 주요 키워드:`, dynamicKeywords.primaryKeywords);
         } else {
           console.log(`⚠️ [동적 키워드 추출] 작업 설명이 없어 기본 프로파일만 사용`);
+          console.log(`workType 전체 객체:`, JSON.stringify(workType, null, 2));
         }
         
         // 토큰화 작업을 한 번만 수행하여 성능 최적화
