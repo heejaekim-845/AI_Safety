@@ -568,6 +568,123 @@ export function applyHybridScoring(
   return Math.max(0, Math.min(1, score));
 }
 
+// ------------------ Dynamic Safety Keyword Extraction ------------------
+
+export function extractSafetyKeywordsFromWorkType(workTypeDescription: string): {
+  primaryKeywords: string[];
+  riskKeywords: string[];
+  equipmentKeywords: string[];
+  procedureKeywords: string[];
+  priorityWeights: { [keyword: string]: number };
+} {
+  const text = workTypeDescription.toLowerCase();
+  
+  // 1. 위험/사고 관련 키워드 (높은 우선순위)
+  const riskPatterns = [
+    { pattern: /끼임|협착|말림|끼이/g, keywords: ["끼임", "협착"], weight: 0.30 },
+    { pattern: /감전|전기.*사고|충전부|활선/g, keywords: ["감전", "충전부", "활선"], weight: 0.25 },
+    { pattern: /추락|떨어짐|고소.*작업|추락방지/g, keywords: ["추락", "고소작업"], weight: 0.25 },
+    { pattern: /화재|폭발|인화성|가연성/g, keywords: ["화재", "폭발"], weight: 0.23 },
+    { pattern: /화학.*물질|독성|유해.*물질|중독/g, keywords: ["화학물질", "독성"], weight: 0.20 },
+    { pattern: /질식|산소.*결핍|밀폐.*공간/g, keywords: ["질식", "밀폐공간"], weight: 0.20 },
+    { pattern: /압력|고압|압축|압력용기/g, keywords: ["고압", "압력"], weight: 0.18 },
+    { pattern: /온도|고온|화상|열상/g, keywords: ["고온", "화상"], weight: 0.15 },
+    { pattern: /진동|소음|분진/g, keywords: ["진동", "소음", "분진"], weight: 0.12 }
+  ];
+
+  // 2. 설비/장비 관련 키워드 (중간 우선순위)
+  const equipmentPatterns = [
+    { pattern: /회전체|회전.*기계|터빈|모터/g, keywords: ["회전체", "터빈"], weight: 0.15 },
+    { pattern: /크레인|호이스트|리프트|승강/g, keywords: ["크레인", "호이스트"], weight: 0.15 },
+    { pattern: /배관|밸브|파이프|유압/g, keywords: ["배관", "밸브", "유압"], weight: 0.12 },
+    { pattern: /전기.*설비|변압기|개폐기|gis/g, keywords: ["전기설비", "변압기", "개폐기"], weight: 0.12 },
+    { pattern: /용접|절단|가스.*용접|아크.*용접/g, keywords: ["용접", "절단"], weight: 0.12 },
+    { pattern: /컨베이어|벨트|이송.*장치/g, keywords: ["컨베이어", "벨트"], weight: 0.10 }
+  ];
+
+  // 3. 작업절차 관련 키워드 (기본 우선순위)
+  const procedurePatterns = [
+    { pattern: /점검|검사|정비|수리/g, keywords: ["점검", "정비"], weight: 0.10 },
+    { pattern: /청소|세척|제거/g, keywords: ["청소", "세척"], weight: 0.08 },
+    { pattern: /설치|해체|분해|조립/g, keywords: ["설치", "해체"], weight: 0.08 },
+    { pattern: /운반|이동|운송/g, keywords: ["운반", "이동"], weight: 0.08 },
+    { pattern: /측정|계측|감시|모니터링/g, keywords: ["측정", "감시"], weight: 0.06 }
+  ];
+
+  // 4. 보호구/안전조치 관련 키워드
+  const safetyMeasurePatterns = [
+    { pattern: /안전모|헬멧|보호구/g, keywords: ["안전모", "보호구"], weight: 0.12 },
+    { pattern: /안전대|안전벨트|추락방지/g, keywords: ["안전대", "추락방지"], weight: 0.12 },
+    { pattern: /절연.*장갑|절연.*신발|절연.*용품/g, keywords: ["절연장갑", "절연용품"], weight: 0.15 },
+    { pattern: /호흡.*보호구|방독면|마스크/g, keywords: ["호흡보호구", "방독면"], weight: 0.12 },
+    { pattern: /보호안경|안전안경|고글/g, keywords: ["보호안경", "안전안경"], weight: 0.08 }
+  ];
+
+  // 키워드 추출 및 가중치 계산
+  const extractedKeywords = new Map<string, number>();
+  const primaryKeywords: string[] = [];
+  const riskKeywords: string[] = [];
+  const equipmentKeywords: string[] = [];
+  const procedureKeywords: string[] = [];
+
+  // 위험 키워드 추출 (최고 우선순위)
+  riskPatterns.forEach(({ pattern, keywords, weight }) => {
+    if (pattern.test(text)) {
+      keywords.forEach(keyword => {
+        riskKeywords.push(keyword);
+        primaryKeywords.push(keyword);
+        extractedKeywords.set(keyword, Math.max(extractedKeywords.get(keyword) || 0, weight));
+      });
+    }
+  });
+
+  // 설비 키워드 추출
+  equipmentPatterns.forEach(({ pattern, keywords, weight }) => {
+    if (pattern.test(text)) {
+      keywords.forEach(keyword => {
+        equipmentKeywords.push(keyword);
+        extractedKeywords.set(keyword, Math.max(extractedKeywords.get(keyword) || 0, weight));
+      });
+    }
+  });
+
+  // 작업절차 키워드 추출
+  procedurePatterns.forEach(({ pattern, keywords, weight }) => {
+    if (pattern.test(text)) {
+      keywords.forEach(keyword => {
+        procedureKeywords.push(keyword);
+        extractedKeywords.set(keyword, Math.max(extractedKeywords.get(keyword) || 0, weight));
+      });
+    }
+  });
+
+  // 안전조치 키워드 추출
+  safetyMeasurePatterns.forEach(({ pattern, keywords, weight }) => {
+    if (pattern.test(text)) {
+      keywords.forEach(keyword => {
+        primaryKeywords.push(keyword);
+        extractedKeywords.set(keyword, Math.max(extractedKeywords.get(keyword) || 0, weight));
+      });
+    }
+  });
+
+  const priorityWeights = Object.fromEntries(extractedKeywords);
+
+  console.log(`[키워드 추출] 작업설명: "${workTypeDescription.substring(0, 50)}..."`);
+  console.log(`[키워드 추출] 위험키워드: [${riskKeywords.join(', ')}]`);
+  console.log(`[키워드 추출] 설비키워드: [${equipmentKeywords.join(', ')}]`);
+  console.log(`[키워드 추출] 절차키워드: [${procedureKeywords.join(', ')}]`);
+  console.log(`[키워드 추출] 우선순위 가중치:`, priorityWeights);
+
+  return {
+    primaryKeywords: Array.from(new Set(primaryKeywords)),
+    riskKeywords: Array.from(new Set(riskKeywords)),
+    equipmentKeywords: Array.from(new Set(equipmentKeywords)),
+    procedureKeywords: Array.from(new Set(procedureKeywords)),
+    priorityWeights
+  };
+}
+
 // ------------------ Equipment Tag Inference ------------------
 
 export function inferEquipmentTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {

@@ -10,6 +10,7 @@ import {
   applyHybridScoring,
   inferEquipmentTags,
   inferRiskTags,
+  extractSafetyKeywordsFromWorkType,
   type EquipmentInfo,
   type SearchItem,
   type Profile,
@@ -758,6 +759,29 @@ JSON 형식으로 응답:
         console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
         console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
         
+        // 작업유형 설명에서 동적 키워드 추출
+        let dynamicKeywords: {
+          primaryKeywords: string[];
+          riskKeywords: string[];
+          equipmentKeywords: string[];
+          procedureKeywords: string[];
+          priorityWeights: { [keyword: string]: number };
+        } = { 
+          primaryKeywords: [], 
+          riskKeywords: [], 
+          equipmentKeywords: [], 
+          procedureKeywords: [], 
+          priorityWeights: {} 
+        };
+        
+        if (workType.description && workType.description.trim().length > 0) {
+          console.log(`\n🔍 [동적 키워드 추출] 작업 설명 분석 시작`);
+          dynamicKeywords = extractSafetyKeywordsFromWorkType(workType.description);
+          console.log(`✅ [동적 키워드 추출] 완료 - 총 ${Object.keys(dynamicKeywords.priorityWeights).length}개 키워드 추출`);
+        } else {
+          console.log(`⚠️ [동적 키워드 추출] 작업 설명이 없어 기본 프로파일만 사용`);
+        }
+        
         // 토큰화 작업을 한 번만 수행하여 성능 최적화
         const cachedTokens = {
           nameTokens: equipmentInfo.name.split(/[\s·,|/\\]+/).filter(Boolean),
@@ -869,13 +893,31 @@ JSON 형식으로 응답:
 
         // Remove old scoring logic - now handled by adaptive system
 
-        // ===== 프로파일 기반 벡터 검색 =====
-        // 각 카테고리별 프로파일 활용 검색
-        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
-        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
+        // ===== 프로파일 + 동적 키워드 기반 벡터 검색 =====
+        // 동적 키워드를 프로파일에 통합한 향상된 스코어링
+        const enhancedProfile = {
+          ...resolvedProfile,
+          priority_keywords: {
+            ...resolvedProfile.priority_keywords,
+            ...dynamicKeywords.priorityWeights
+          },
+          keywords: [
+            ...(resolvedProfile.keywords || []),
+            ...dynamicKeywords.primaryKeywords
+          ]
+        };
+        
+        console.log(`\n🔥 [향상된 스코어링] 동적 키워드 통합 완료`);
+        console.log(`📊 기존 프로파일 키워드: ${(resolvedProfile.keywords || []).length}개`);
+        console.log(`📊 동적 추출 키워드: ${dynamicKeywords.primaryKeywords.length}개`);
+        console.log(`📊 통합 우선순위 키워드: ${Object.keys(enhancedProfile.priority_keywords || {}).length}개`);
+        
+        // 각 카테고리별 향상된 프로파일 활용 검색
+        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', enhancedProfile);
+        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', enhancedProfile);  
         console.log(`\n=== 법령 필터링 전후 비교 ===`);
         console.log(`필터링 전: ${preRegulations.length}개`);
-        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', enhancedProfile);
         console.log(`필터링 후: ${finalRegulations.length}개`);
         console.log(`필터링된 최종 법령:`);
         finalRegulations.slice(0, 10).forEach((reg, idx) => {
