@@ -715,20 +715,20 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    console.log(`\n🚨🚨🚨🚨🚨 CRITICAL ENTRY POINT 🚨🚨🚨🚨🚨`);
-    console.log(`🚨 generateEnhancedSafetyBriefing 함수 호출됨!`);
-    console.log(`🚨 설비: ${equipmentInfo?.name}, 작업: ${workType?.name}`);
-    console.log(`🚨🚨🚨🚨🚨 ENTRY CONFIRMED 🚨🚨🚨🚨🚨\n`);
-    
-    console.log(`🚨 timeit 호출 직전`);
+    // ===== 강제 로그 출력 테스트 =====
+    console.error("=".repeat(50));
+    console.error("🔥 FORCED LOG TEST - 이 로그가 보이나요?");
+    console.error("🔥 equipmentInfo.name:", equipmentInfo?.name);
+    console.error("🔥 workType.name:", workType?.name);
+    console.error("🔥 workType.description:", workType?.description?.substring(0, 100));
+    console.error("=".repeat(50));
     
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
       async () => {
-        console.log(`🚨 timeit 블록 시작`);
-        console.log(`🚨 이 로그가 보이면 코드가 실행되고 있습니다!`);
+        // 더 강한 로그
+        console.error("🔥🔥🔥 INSIDE TIMEIT BLOCK 🔥🔥🔥");
         try {
-          console.log(`🚨 TRY 블록 진입`);
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
           let workTypeAccidents: AccidentCase[] = [];
