@@ -875,7 +875,24 @@ JSON 형식으로 응답:
         
         console.log(`🚨 [디버깅] candidatesRaw 생성 완료: ${candidatesRaw?.length || 0}개 항목`);
         
-        const chromaResults = candidatesRaw;
+        // 🔥 하이브리드 점수 적용 및 재정렬
+        console.log(`\n🔥 하이브리드 점수 적용 시작 🔥`);
+        const candidatesWithHybridScore = this.applyHybridScoringWithPenalty(
+          candidatesRaw, 
+          resolvedProfile, 
+          equipmentInfoObj, 
+          workType, 
+          false // isEducation: false (혼합 결과)
+        );
+        
+        // 하이브리드 점수로 재정렬
+        const chromaResults = candidatesWithHybridScore.sort((a, b) => (b.hybridScore || 0) - (a.hybridScore || 0));
+        
+        console.log(`🔥 하이브리드 점수 재정렬 완료: ${chromaResults.length}개 항목`);
+        console.log(`🔥 상위 3개 재정렬 결과:`);
+        chromaResults.slice(0, 3).forEach((item, idx) => {
+          console.log(`  ${idx + 1}. "${item.metadata?.title || '제목없음'}" (하이브리드: ${(item.hybridScore || 0).toFixed(3)}, 벡터: ${(1 - (item.distance || 0)).toFixed(3)})`);
+        });
 
         let filteredChromaResults = chromaResults;
         
@@ -974,7 +991,17 @@ JSON 형식으로 응답:
           // 정규화된 점수 사용 [0,1] 범위
           const normalizedFinalScore = acc.finalScore ?? normalizedScore(acc);
           const normalizedVectorScore = normalizedScore(acc);
-          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${normalizedFinalScore.toFixed(3)}, 벡터: ${normalizedVectorScore.toFixed(3)}, 키워드: undefined, 핵심키워드: undefined`);
+          // 실제 키워드 점수 계산을 위해 하이브리드 스코어링 재실행
+          const accFullScore = applyHybridScoring({
+            id: acc.id,
+            title: acc.metadata?.title,
+            text: acc.document,
+            content: acc.document,
+            metadata: acc.metadata,
+            vectorScore: acc.vectorScore ?? acc.score ?? acc.similarity
+          }, resolvedProfile, equipmentInfoObj, workType);
+          
+          console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${normalizedFinalScore.toFixed(3)}, 벡터: ${normalizedVectorScore.toFixed(3)}, 하이브리드계산: ${accFullScore.toFixed(3)}`);
         });
         
         // 교육자료 필터링 전후 비교
@@ -985,7 +1012,18 @@ JSON 형식으로 응답:
           // 정규화된 점수 사용 [0,1] 범위
           const normalizedFinalScore = normalizedScore(edu);
           const normalizedVectorScore = normalizedScore(edu);
-          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${normalizedFinalScore.toFixed(3)} (벡터: ${normalizedVectorScore.toFixed(3)}, 키워드: 0, 불필요키워드: false)`);
+          
+          // 실제 키워드 점수 계산을 위해 하이브리드 스코어링 재실행
+          const fullScoreBreakdown = applyHybridScoring({
+            id: edu.id,
+            title: edu.metadata?.title,
+            text: edu.document,
+            content: edu.document,
+            metadata: edu.metadata,
+            vectorScore: edu.vectorScore ?? edu.score ?? edu.similarity
+          }, resolvedProfile, equipmentInfoObj, workType);
+          
+          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${normalizedFinalScore.toFixed(3)} (벡터: ${normalizedVectorScore.toFixed(3)}, 하이브리드계산: ${fullScoreBreakdown.toFixed(3)})`);
         });
         
         // 사고사례: 벡터DB 메타데이터에서 직접 추출 (텍스트 파싱 제거)

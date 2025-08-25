@@ -527,13 +527,20 @@ export function applyHybridScoring(
   let bonus = 0;
   if (includeAny.length && containsAny(text, includeAny) > 0) bonus += (o.bonusForIncludedAny || 0.1);
   
-  // 우선순위 키워드 부스팅 적용
+  // 우선순위 키워드 부스팅 적용 (대소문자 구분 없이)
   let priorityBonus = 0;
+  const debugKeywords: string[] = [];
   if (profile.priority_keywords) {
+    const lowerText = text.toLowerCase();
     for (const [keyword, boost] of Object.entries(profile.priority_keywords)) {
-      if (text.includes(keyword.toLowerCase())) {
+      const lowerKeyword = keyword.toLowerCase();
+      if (lowerText.includes(lowerKeyword)) {
         priorityBonus += boost;
+        debugKeywords.push(`${keyword}(+${boost})`);
       }
+    }
+    if (debugKeywords.length > 0) {
+      console.log(`⚡ 우선순위 키워드 매칭: [${debugKeywords.join(', ')}] 총 부스팅: +${priorityBonus.toFixed(3)}`);
     }
   }
   
