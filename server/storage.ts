@@ -634,19 +634,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Create storage instance with fallback mechanism
-// Primary: DatabaseStorage, Fallback: MemStorage
-let storage: IStorage;
-
-try {
-  console.log('🔄 Attempting to connect to database...');
-  const { DatabaseStorage } = require('./database-storage-simple');
-  storage = new DatabaseStorage();
-  console.log('✅ Database storage initialized');
-} catch (error) {
-  console.log('⚠️  Database connection failed, falling back to memory storage');
-  console.log('📝 Note: Data will not persist between server restarts');
-  storage = new MemStorage();
-}
-
-export { storage };
+// Create storage instance
+// Use database storage for persistent data
+import { DatabaseStorage } from "./database-storage-simple";
+export const storage = new DatabaseStorage();
