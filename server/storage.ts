@@ -356,11 +356,11 @@ export class MemStorage implements IStorage {
       heightDetails: equipmentData.heightDetails ?? null,
       heavyWeightRisk: equipmentData.heavyWeightRisk ?? false,
       heavyWeightDetails: equipmentData.heavyWeightDetails ?? null,
-      riskFactors: equipmentData.riskFactors ?? null,
+      riskFactors: equipmentData.riskFactors as any ?? null,
       lotoPoints: equipmentData.lotoPoints ?? null,
       safetyFacilityLocations: equipmentData.safetyFacilityLocations ?? null,
       emergencyContacts: equipmentData.emergencyContacts ?? null,
-      requiredSafetyEquipment: equipmentData.requiredSafetyEquipment ?? null,
+      requiredSafetyEquipment: (equipmentData.requiredSafetyEquipment as string[]) ?? null,
       safetyDeviceImages: equipmentData.safetyDeviceImages ?? null,
       hazardousChemicalType: equipmentData.hazardousChemicalType ?? null,
       hazardousChemicalName: equipmentData.hazardousChemicalName ?? null,
@@ -397,11 +397,11 @@ export class MemStorage implements IStorage {
       ...(equipmentData.heightDetails !== undefined && { heightDetails: equipmentData.heightDetails }),
       ...(equipmentData.heavyWeightRisk !== undefined && { heavyWeightRisk: equipmentData.heavyWeightRisk }),
       ...(equipmentData.heavyWeightDetails !== undefined && { heavyWeightDetails: equipmentData.heavyWeightDetails }),
-      ...(equipmentData.riskFactors !== undefined && { riskFactors: equipmentData.riskFactors }),
+      ...(equipmentData.riskFactors !== undefined && { riskFactors: equipmentData.riskFactors as any }),
       ...(equipmentData.lotoPoints !== undefined && { lotoPoints: equipmentData.lotoPoints }),
       ...(equipmentData.safetyFacilityLocations !== undefined && { safetyFacilityLocations: equipmentData.safetyFacilityLocations }),
       ...(equipmentData.emergencyContacts !== undefined && { emergencyContacts: equipmentData.emergencyContacts }),
-      ...(equipmentData.requiredSafetyEquipment !== undefined && { requiredSafetyEquipment: equipmentData.requiredSafetyEquipment }),
+      ...(equipmentData.requiredSafetyEquipment !== undefined && { requiredSafetyEquipment: equipmentData.requiredSafetyEquipment as string[] }),
       ...(equipmentData.safetyDeviceImages !== undefined && { safetyDeviceImages: equipmentData.safetyDeviceImages }),
       ...(equipmentData.hazardousChemicalType !== undefined && { hazardousChemicalType: equipmentData.hazardousChemicalType }),
       ...(equipmentData.hazardousChemicalName !== undefined && { hazardousChemicalName: equipmentData.hazardousChemicalName }),
@@ -430,8 +430,7 @@ export class MemStorage implements IStorage {
     const newWorkType: WorkType = {
       id,
       ...workTypeData,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
     this.workTypes.set(id, newWorkType);
     return newWorkType;
@@ -461,7 +460,13 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newProcedure: WorkProcedure = {
       id,
-      ...procedureData,
+      workTypeId: procedureData.workTypeId ?? null,
+      stepNumber: procedureData.stepNumber,
+      category: procedureData.category,
+      title: procedureData.title,
+      description: procedureData.description,
+      checklistItems: (procedureData.checklistItems as string[]) ?? null,
+      safetyNotes: procedureData.safetyNotes ?? null,
       createdAt: new Date()
     };
     this.workProcedures.set(id, newProcedure);
@@ -494,7 +499,13 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newIncident: Incident = {
       id,
-      ...incidentData,
+      equipmentId: incidentData.equipmentId ?? null,
+      workTypeId: incidentData.workTypeId ?? null,
+      description: incidentData.description,
+      severity: incidentData.severity,
+      reporterName: incidentData.reporterName,
+      incidentDate: incidentData.incidentDate ?? null,
+      actionsTaken: incidentData.actionsTaken ?? null,
       createdAt: new Date()
     };
     this.incidents.set(id, newIncident);
@@ -519,7 +530,16 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newSession: WorkSession = {
       id,
-      ...sessionData,
+      equipmentId: sessionData.equipmentId ?? null,
+      workTypeId: sessionData.workTypeId ?? null,
+      workerName: sessionData.workerName,
+      status: sessionData.status ?? null,
+      startedAt: sessionData.startedAt ?? null,
+      completedAt: sessionData.completedAt ?? null,
+      weatherConditions: sessionData.weatherConditions ?? null,
+      specialNotes: sessionData.specialNotes as any,
+      workLocation: sessionData.workLocation ?? null,
+      riskLevel: sessionData.riskLevel ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -543,7 +563,11 @@ export class MemStorage implements IStorage {
   async getActiveWorkSessions(): Promise<WorkSession[]> {
     return Array.from(this.workSessions.values())
       .filter(ws => !ws.completedAt)
-      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
+      .sort((a, b) => {
+        const aTime = a.startedAt ? a.startedAt.getTime() : 0;
+        const bTime = b.startedAt ? b.startedAt.getTime() : 0;
+        return bTime - aTime;
+      });
   }
 
   // Risk reports operations
@@ -551,7 +575,14 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newReport: RiskReport = {
       id,
-      ...reportData,
+      equipmentId: reportData.equipmentId ?? null,
+      description: reportData.description,
+      severity: reportData.severity,
+      reporterName: reportData.reporterName,
+      riskType: reportData.riskType,
+      likelihood: reportData.likelihood,
+      status: reportData.status ?? null,
+      mitigationActions: (reportData.mitigationActions as string[]) ?? null,
       createdAt: new Date()
     };
     this.riskReports.set(id, newReport);
@@ -573,7 +604,14 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newSchedule: WorkSchedule = {
       id,
-      ...scheduleData,
+      equipmentId: scheduleData.equipmentId ?? null,
+      workTypeId: scheduleData.workTypeId ?? null,
+      workerName: scheduleData.workerName,
+      scheduledDate: scheduleData.scheduledDate,
+      status: scheduleData.status ?? null,
+      specialNotes: scheduleData.specialNotes ?? null,
+      briefingTime: scheduleData.briefingTime ?? null,
+      workLocation: scheduleData.workLocation ?? null,
       createdAt: new Date()
     };
     this.workSchedules.set(id, newSchedule);
@@ -612,7 +650,17 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const newBriefing: SafetyBriefing = {
       id,
-      ...briefingData,
+      workScheduleId: briefingData.workScheduleId ?? null,
+      riskFactors: briefingData.riskFactors as any,
+      requiredSafetyEquipment: (briefingData.requiredSafetyEquipment as string[]) ?? null,
+      requiredTools: (briefingData.requiredTools as string[]) ?? null,
+      weatherInfo: briefingData.weatherInfo as any,
+      workSummary: briefingData.workSummary ?? null,
+      keyRisks: briefingData.keyRisks ?? null,
+      emergencyProcedures: briefingData.emergencyProcedures ?? null,
+      additionalPrecautions: briefingData.additionalPrecautions ?? null,
+      safetyCheckpoints: briefingData.safetyCheckpoints ?? null,
+      safetySlogan: briefingData.safetySlogan ?? null,
       createdAt: new Date()
     };
     this.safetyBriefings.set(id, newBriefing);
