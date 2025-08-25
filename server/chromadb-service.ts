@@ -1266,8 +1266,14 @@ export class ChromaDBService {
   }
 
   async searchByCategory(query: string, limitPerCategory: number = 5): Promise<CategorizedSearchResult> {
+    console.error('🔥🔥🔥 [SEARCH START] searchByCategory 호출됨! 🔥🔥🔥');
+    console.error('🔥 Query:', query);
+    console.error('🔥 LimitPerCategory:', limitPerCategory);
+    console.error('🔥 IsInitialized:', this.isInitialized);
+    
     try {
       if (!this.isInitialized) {
+        console.error('🔥 초기화되지 않음 - initialize() 호출');
         await this.initialize();
       }
 
@@ -1339,7 +1345,14 @@ export class ChromaDBService {
       };
 
     } catch (error: any) {
-      console.log('카테고리별 벡터 검색 실패:', error.message);
+      console.error('🔥🔥🔥 [CRITICAL ERROR] searchByCategory 오류 🔥🔥🔥');
+      console.error('🔥 Error Type:', typeof error);
+      console.error('🔥 Error Message:', error?.message);
+      console.error('🔥 Error Stack:', error?.stack);
+      console.error('🔥 Query:', query);
+      console.error('🔥 IsInitialized:', this.isInitialized);
+      console.error('🔥 Full Error:', error);
+      console.error('🔥🔥🔥 END CRITICAL ERROR 🔥🔥🔥');
       return {
         education: [],
         incident: [],
