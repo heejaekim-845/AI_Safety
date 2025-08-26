@@ -362,6 +362,11 @@ export default function Briefing() {
                   </h2>
                   <p className="text-center text-blue-100 mt-1 text-sm">
                     {selectedWorkSchedule?.scheduledDate && format(new Date(selectedWorkSchedule.scheduledDate), 'yyyy년 MM월 dd일 (E)', { locale: ko })}
+                    {selectedWorkSchedule?.briefingTime && (
+                      <span className="ml-2">
+                        • {selectedWorkSchedule.briefingTime}
+                      </span>
+                    )}
                   </p>
                 </div>
               </DialogHeader>
