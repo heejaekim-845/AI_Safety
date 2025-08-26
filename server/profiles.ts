@@ -410,9 +410,9 @@ export function buildTargetedSearchQuery(
   console.log(`  baseContextWithSuffix: "${baseContextWithSuffix}"`);
   console.log(`  riskQueries 생성됨 (${riskQueries.length}개):`, riskQueries);
   console.log(`  safetyPrecautionQueries 생성됨 (${safetyPrecautionQueries.length}개):`, safetyPrecautionQueries);
-  console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 5));
-  console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 5));
-  console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 5));
+  console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 6));
+  console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 6));
+  console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 6));
 
   return { accidents, regulation, education, all };
 }
