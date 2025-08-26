@@ -269,7 +269,7 @@ export class AIService {
         const results = await chromaDBService.searchBySpecificCategory(q, 'incident', 5);
         console.log(`  🚨 사고사례 검색 결과: ${results.length}개`);
         
-        results.slice(0, 2).forEach((item, idx) => {
+        results.slice(0, 5).forEach((item, idx) => {
           console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
         });
         
@@ -287,7 +287,7 @@ export class AIService {
         const results = await chromaDBService.searchBySpecificCategory(q, 'regulation', 5);
         console.log(`  📋 법규 검색 결과: ${results.length}개`);
         
-        results.slice(0, 2).forEach((item, idx) => {
+        results.slice(0, 5).forEach((item, idx) => {
           console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
         });
         
@@ -305,7 +305,7 @@ export class AIService {
         const results = await chromaDBService.searchBySpecificCategory(q, 'education', 5);
         console.log(`  📚 교육자료 검색 결과: ${results.length}개`);
         
-        results.slice(0, 2).forEach((item, idx) => {
+        results.slice(0, 5).forEach((item, idx) => {
           console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
         });
         
