@@ -59,6 +59,8 @@ export default function Briefing() {
   const [briefingData, setBriefingData] = useState<SafetyBriefingData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<{[key: number]: number}>({});
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState("");
   const queryClient = useQueryClient();
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
@@ -104,7 +106,51 @@ export default function Briefing() {
     );
   };
 
-  // Generate safety briefing mutation
+  // Generate safety briefing with streaming
+  const generateBriefingStream = async (workScheduleId: number) => {
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    setCurrentStep("브리핑 생성 시작...");
+
+    try {
+      const eventSource = new EventSource(`/api/generate-safety-briefing-stream/${workScheduleId}`);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          setCurrentStep(data.step);
+          setGenerationProgress(data.progress);
+          
+          if (data.progress === 100 && data.data) {
+            setBriefingData(data.data);
+            setQuizAnswers({});
+            setIsGenerating(false);
+            eventSource.close();
+          }
+          
+          if (data.data?.error) {
+            console.error('브리핑 생성 오류:', data.data.error);
+            setIsGenerating(false);
+            eventSource.close();
+          }
+        } catch (error) {
+          console.error('스트림 데이터 파싱 오류:', error);
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error('스트림 연결 오류:', error);
+        setIsGenerating(false);
+        eventSource.close();
+      };
+
+    } catch (error) {
+      console.error('스트리밍 브리핑 생성 오류:', error);
+      setIsGenerating(false);
+    }
+  };
+
+  // Fallback: Generate safety briefing mutation (non-streaming)
   const generateBriefingMutation = useMutation({
     mutationFn: async (workScheduleId: number) => {
       const response = await apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
@@ -137,8 +183,8 @@ export default function Briefing() {
 
   const handleGenerateBriefing = async (workSchedule: WorkSchedule) => {
     setSelectedWorkSchedule(workSchedule);
-    setIsGenerating(true);
-    generateBriefingMutation.mutate(workSchedule.id);
+    // Use streaming by default, fallback to regular mutation if needed
+    await generateBriefingStream(workSchedule.id);
   };
 
   const handleDeleteSchedule = async (scheduleId: number) => {
@@ -958,11 +1004,30 @@ export default function Briefing() {
         {/* Loading State */}
         {isGenerating && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
                 <h3 className="text-lg font-semibold mb-2">AI 안전 브리핑 생성 중...</h3>
-                <p className="text-gray-600">
+                
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${generationProgress}%` }}
+                  ></div>
+                </div>
+                
+                {/* Current Step */}
+                <div className="mb-3">
+                  <p className="text-blue-600 font-medium text-sm">
+                    {currentStep || "브리핑 생성을 준비하고 있습니다..."}
+                  </p>
+                  <p className="text-gray-500 text-xs mt-1">
+                    {generationProgress}% 완료
+                  </p>
+                </div>
+                
+                <p className="text-gray-600 text-sm">
                   종합적인 안전 분석을 수행하고 있습니다. 잠시만 기다려주세요.
                 </p>
               </div>
