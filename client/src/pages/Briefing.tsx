@@ -774,61 +774,52 @@ export default function Briefing() {
                               </div>
                             </div>
                             
-                            {/* Basic information in boxes */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                              {accident.date && (
-                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                                  <div className="text-xs font-semibold text-gray-600 mb-1">사고일시</div>
-                                  <div className="text-xs text-gray-900">{accident.date}</div>
+                            {/* 5x2 Grid Layout for Accident Information */}
+                            <div className="grid grid-cols-5 gap-2 mb-3">
+                              {/* Row 1 */}
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                                <div className="text-xs font-semibold text-gray-600 mb-1">사고일시</div>
+                              </div>
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4">
+                                <div className="text-xs text-gray-900">{accident.date || '미기재'}</div>
+                              </div>
+                              
+                              {/* Row 2 */}
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                                <div className="text-xs font-semibold text-gray-600 mb-1">사고장소</div>
+                              </div>
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4">
+                                <div className="text-xs text-gray-900">{accident.location || '미기재'}</div>
+                              </div>
+                              
+                              {/* Row 3 */}
+                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1">
+                                <div className="text-xs font-semibold text-red-600 mb-1">피해규모</div>
+                              </div>
+                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1 col-span-4">
+                                <div className="text-xs text-red-900 font-medium">{accident.damage || '미기재'}</div>
+                              </div>
+                              
+                              {/* Row 4 */}
+                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1">
+                                <div className="text-xs font-semibold text-blue-600 mb-1">사고내용</div>
+                              </div>
+                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1 col-span-4">
+                                <div className="text-xs text-blue-900 leading-relaxed">
+                                  {accident.summary ? (accident.summary.length > 100 ? `${accident.summary.substring(0, 100)}...` : accident.summary) : '미기재'}
                                 </div>
-                              )}
-                              {accident.location && (
-                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                                  <div className="text-xs font-semibold text-gray-600 mb-1">사고장소</div>
-                                  <div className="text-xs text-gray-900">{accident.location}</div>
+                              </div>
+                              
+                              {/* Row 5 */}
+                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1">
+                                <div className="text-xs font-semibold text-green-600 mb-1">예방대책</div>
+                              </div>
+                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1 col-span-4">
+                                <div className="text-xs text-green-900 font-medium leading-relaxed">
+                                  {accident.prevention ? (accident.prevention.length > 100 ? `${accident.prevention.substring(0, 100)}...` : accident.prevention) : '미기재'}
                                 </div>
-                              )}
-                              {accident.damage && (
-                                <div className="bg-red-50 border border-red-300 rounded px-2 py-1">
-                                  <div className="text-xs font-semibold text-red-600 mb-1">피해규모</div>
-                                  <div className="text-xs text-red-900 font-medium">{accident.damage}</div>
-                                </div>
-                              )}
-                              {accident.work_type && (
-                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                                  <div className="text-xs font-semibold text-gray-600 mb-1">작업유형</div>
-                                  <div className="text-xs text-gray-900">{accident.work_type}</div>
-                                </div>
-                              )}
+                              </div>
                             </div>
-
-                            {/* Summary in white box with label */}
-                            {accident.summary && (
-                              <div className="mb-3">
-                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 mb-2 inline-block">
-                                  <div className="text-xs font-semibold text-gray-600">사고내용</div>
-                                </div>
-                                <div className="text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100">
-                                  {accident.summary}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Prevention measures - highlighted */}
-                            {accident.prevention && (
-                              <div className="mt-3 mb-3">
-                                <div className="bg-green-100 border-2 border-green-400 rounded-lg p-4">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                      예방대책
-                                    </div>
-                                  </div>
-                                  <div className="text-green-800 text-sm font-medium leading-relaxed">
-                                    {accident.prevention}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
 
                             {/* Additional details at bottom */}
                             {(accident.accident_type || accident.direct_cause || accident.root_cause || accident.risk_keywords) && (
