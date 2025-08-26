@@ -258,9 +258,6 @@ export function WorkScheduleForm({ trigger, onSuccess, editData }: WorkScheduleF
                     <FormControl>
                       <Input type="time" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      안전 브리핑이 자동으로 표출될 시간
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
