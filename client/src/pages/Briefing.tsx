@@ -774,26 +774,65 @@ export default function Briefing() {
                               </div>
                             </div>
                             
-                            {/* Basic information - subtitle style */}
-                            <div className="font-semibold text-blue-800 text-sm mb-3">
-                              {accident.date && `${accident.date} | `}
-                              {accident.location && `${accident.location} | `}
-                              {accident.damage && `피해규모: ${accident.damage}`}
+                            {/* Basic information in boxes */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                              {accident.date && (
+                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                                  <div className="text-xs font-semibold text-gray-600 mb-1">사고일시</div>
+                                  <div className="text-xs text-gray-900">{accident.date}</div>
+                                </div>
+                              )}
+                              {accident.location && (
+                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                                  <div className="text-xs font-semibold text-gray-600 mb-1">사고장소</div>
+                                  <div className="text-xs text-gray-900">{accident.location}</div>
+                                </div>
+                              )}
+                              {accident.damage && (
+                                <div className="bg-red-50 border border-red-300 rounded px-2 py-1">
+                                  <div className="text-xs font-semibold text-red-600 mb-1">피해규모</div>
+                                  <div className="text-xs text-red-900 font-medium">{accident.damage}</div>
+                                </div>
+                              )}
+                              {accident.work_type && (
+                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                                  <div className="text-xs font-semibold text-gray-600 mb-1">작업유형</div>
+                                  <div className="text-xs text-gray-900">{accident.work_type}</div>
+                                </div>
+                              )}
                             </div>
 
-                            {/* Summary in white box */}
+                            {/* Summary in white box with label */}
                             {accident.summary && (
-                              <div className="text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100 mb-3">
-                                {accident.summary}
+                              <div className="mb-3">
+                                <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 mb-2 inline-block">
+                                  <div className="text-xs font-semibold text-gray-600">사고내용</div>
+                                </div>
+                                <div className="text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100">
+                                  {accident.summary}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Prevention measures - highlighted */}
+                            {accident.prevention && (
+                              <div className="mt-3 mb-3">
+                                <div className="bg-green-100 border-2 border-green-400 rounded-lg p-4">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                      예방대책
+                                    </div>
+                                  </div>
+                                  <div className="text-green-800 text-sm font-medium leading-relaxed">
+                                    {accident.prevention}
+                                  </div>
+                                </div>
                               </div>
                             )}
 
                             {/* Additional details at bottom */}
-                            {(accident.work_type || accident.accident_type || accident.direct_cause || accident.root_cause || accident.prevention || accident.risk_keywords) && (
+                            {(accident.accident_type || accident.direct_cause || accident.root_cause || accident.risk_keywords) && (
                               <div className="mt-3 pt-3 border-t border-blue-200 space-y-2">
-                                {accident.work_type && (
-                                  <div className="text-blue-600 text-xs">작업유형: {accident.work_type}</div>
-                                )}
                                 {accident.accident_type && (
                                   <div className="text-blue-600 text-xs">사고형태: {accident.accident_type}</div>
                                 )}
@@ -802,9 +841,6 @@ export default function Briefing() {
                                 )}
                                 {accident.root_cause && (
                                   <div className="text-blue-600 text-xs">근본원인: {accident.root_cause}</div>
-                                )}
-                                {accident.prevention && (
-                                  <div className="text-blue-600 text-xs">예방대책: {accident.prevention}</div>
                                 )}
                                 {accident.risk_keywords && (
                                   <div className="text-blue-500 text-xs">위험키워드: {accident.risk_keywords}</div>
