@@ -223,6 +223,7 @@ export class MemStorage implements IStorage {
       requiredTools: null,
       environmentalRequirements: null,
       legalRequirements: null,
+      safetyPrecautions: null,
       createdAt: new Date()
     };
 
@@ -238,6 +239,7 @@ export class MemStorage implements IStorage {
       requiredTools: null,
       environmentalRequirements: null,
       legalRequirements: null,
+      safetyPrecautions: null,
       createdAt: new Date()
     };
 
@@ -253,6 +255,7 @@ export class MemStorage implements IStorage {
       requiredTools: null,
       environmentalRequirements: null,
       legalRequirements: null,
+      safetyPrecautions: null,
       createdAt: new Date()
     };
 
@@ -268,6 +271,7 @@ export class MemStorage implements IStorage {
       requiredTools: null,
       environmentalRequirements: null,
       legalRequirements: null,
+      safetyPrecautions: null,
       createdAt: new Date()
     };
 

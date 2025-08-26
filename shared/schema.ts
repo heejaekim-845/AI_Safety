@@ -61,6 +61,7 @@ export const workTypes = pgTable("work_types", {
   requiredTools: text("required_tools").array(),
   environmentalRequirements: text("environmental_requirements").array(),
   legalRequirements: text("legal_requirements").array(),
+  safetyPrecautions: text("safety_precautions").array(), // 안전유의사항
   createdAt: timestamp("created_at").defaultNow(),
 });
 

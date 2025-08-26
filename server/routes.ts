@@ -220,6 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requiredTools: z.array(z.string()).optional(),
         environmentalRequirements: z.array(z.string()).optional(),
         legalRequirements: z.array(z.string()).optional(),
+        safetyPrecautions: z.array(z.string()).optional(), // 안전유의사항 추가
       });
       
       const checklistData = checklistSchema.parse(req.body);

@@ -58,11 +58,13 @@ export default function WorkManagement() {
   const [requiredTools, setRequiredTools] = useState<string[]>([]);
   const [environmentalRequirements, setEnvironmentalRequirements] = useState<string[]>([]);
   const [legalRequirements, setLegalRequirements] = useState<string[]>([]);
+  const [safetyPrecautions, setSafetyPrecautions] = useState<string[]>([]); // 안전유의사항
   const [newQualification, setNewQualification] = useState("");
   const [newSafetyEquipment, setNewSafetyEquipment] = useState("");
   const [newTool, setNewTool] = useState("");
   const [newEnvironmentalReq, setNewEnvironmentalReq] = useState("");
   const [newLegalReq, setNewLegalReq] = useState("");
+  const [newSafetyPrecaution, setNewSafetyPrecaution] = useState(""); // 새 안전유의사항
 
   // Fetch equipment data
   const { data: equipment, isLoading: equipmentLoading } = useQuery<Equipment>({
@@ -166,6 +168,7 @@ export default function WorkManagement() {
         requiredTools?: string[];
         environmentalRequirements?: string[];
         legalRequirements?: string[];
+        safetyPrecautions?: string[]; // 안전유의사항 추가
       } 
     }) => {
       return apiRequest("PATCH", `/api/work-types/${id}/checklist`, data);
@@ -200,11 +203,13 @@ export default function WorkManagement() {
     setRequiredTools([]);
     setEnvironmentalRequirements([]);
     setLegalRequirements([]);
+    setSafetyPrecautions([]);
     setNewQualification("");
     setNewSafetyEquipment("");
     setNewTool("");
     setNewEnvironmentalReq("");
     setNewLegalReq("");
+    setNewSafetyPrecaution("");
   };
 
   // Checklist editing functions
@@ -215,6 +220,7 @@ export default function WorkManagement() {
     setRequiredTools(workType.requiredTools || []);
     setEnvironmentalRequirements(workType.environmentalRequirements || []);
     setLegalRequirements(workType.legalRequirements || []);
+    setSafetyPrecautions(workType.safetyPrecautions || []);
     setIsEditingChecklist(true);
   };
 
@@ -229,6 +235,7 @@ export default function WorkManagement() {
         requiredTools,
         environmentalRequirements,
         legalRequirements,
+        safetyPrecautions,
       },
     });
   };
@@ -293,6 +300,18 @@ export default function WorkManagement() {
 
   const removeLegalReq = (index: number) => {
     setLegalRequirements(legalRequirements.filter((_, i) => i !== index));
+  };
+
+  // 안전유의사항 관련 함수들
+  const addSafetyPrecaution = () => {
+    if (newSafetyPrecaution.trim()) {
+      setSafetyPrecautions([...safetyPrecautions, newSafetyPrecaution.trim()]);
+      setNewSafetyPrecaution("");
+    }
+  };
+
+  const removeSafetyPrecaution = (index: number) => {
+    setSafetyPrecautions(safetyPrecautions.filter((_, i) => i !== index));
   };
 
   // Form handlers
@@ -931,6 +950,48 @@ export default function WorkManagement() {
                       onKeyPress={(e) => e.key === 'Enter' && addLegalReq()}
                     />
                     <Button onClick={addLegalReq} disabled={!newLegalReq.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Safety Precautions */}
+              <div>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                  <AlertTriangle className="h-4 w-4" />
+                  안전유의사항
+                </Label>
+                <div className="space-y-2">
+                  {safetyPrecautions.map((precaution, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input 
+                        value={precaution} 
+                        onChange={(e) => {
+                          const updated = [...safetyPrecautions];
+                          updated[index] = e.target.value;
+                          setSafetyPrecautions(updated);
+                        }}
+                        className="flex-1" 
+                        placeholder="예: 절연장갑 착용, 안전모 필수"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeSafetyPrecaution(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="새 안전유의사항 추가"
+                      value={newSafetyPrecaution}
+                      onChange={(e) => setNewSafetyPrecaution(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addSafetyPrecaution()}
+                    />
+                    <Button onClick={addSafetyPrecaution} disabled={!newSafetyPrecaution.trim()}>
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
