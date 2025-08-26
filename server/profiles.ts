@@ -312,6 +312,7 @@ export function buildTargetedSearchQuery(
 
   // 기본 설비 + 작업 정보
   const baseContext = [...nameTokens, ...eqTags, ...wtTokens].filter(Boolean).join(" ").trim();
+  const baseContextWithSuffix = baseContext ? `${baseContext} 을(를) 수행예정이고` : "";
 
   // 위험요소별 개별 쿼리 생성
   const riskQueries: string[] = [];
@@ -327,35 +328,35 @@ export function buildTargetedSearchQuery(
     // 각 위험 유형별 상세 내용을 완전히 활용하고 특정 문구 추가
     if (riskFactors.highVoltageDetail && riskFactors.highVoltageDetail.trim()) {
       const fullDetail = riskFactors.highVoltageDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 고전압을 사용하는 발전소, 변전소 또는 공장에서 차단기, 단로기와 같은 전기설비의 충전전로 작업(활선작업) 또는 정전작업과 관련된`;
+      const enhancedQuery = `${baseContextWithSuffix} ${fullDetail} 처럼 고전압을 사용하는 발전소, 변전소 또는 공장에서 차단기, 단로기와 같은 전기설비의 충전전로 작업(활선작업) 또는 정전작업과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고압전기] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.highPressureDetail && riskFactors.highPressureDetail.trim()) {
       const fullDetail = riskFactors.highPressureDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 고압의 가스 또는 오일을 이용하는 발전소, 변전소 또는 공장에서 압축공기나 압력오일의 폭팔 또는 가스누기로 인한 질식과 관련된`;
+      const enhancedQuery = `${baseContextWithSuffix} ${fullDetail} 처럼 고압의 가스 또는 오일을 이용하는 발전소, 변전소 또는 공장에서 압축공기나 압력오일의 폭팔 또는 가스누기로 인한 질식과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고압압력] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.highTemperatureDetail && riskFactors.highTemperatureDetail.trim()) {
       const fullDetail = riskFactors.highTemperatureDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 설비로부터 발생한 고온으로 인한 화재 또는 화상 등과 관련된`;
+      const enhancedQuery = `${baseContextWithSuffix} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 설비로부터 발생한 고온으로 인한 화재 또는 화상 등과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고온] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.heightDetail && riskFactors.heightDetail.trim()) {
       const fullDetail = riskFactors.heightDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계썰비를 이용하는 발전소, 변전소 또는 공장에서 작업자가 높은곳에서 작업함으로써 발생하는 추락 등과 관련된`;
+      const enhancedQuery = `${baseContextWithSuffix} ${fullDetail} 처럼 전기설비 및 기계썰비를 이용하는 발전소, 변전소 또는 공장에서 작업자가 높은곳에서 작업함으로써 발생하는 추락 등과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고소작업] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.mechanicalDetail && riskFactors.mechanicalDetail.trim()) {
       const fullDetail = riskFactors.mechanicalDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 안전사고와 관련된`;
+      const enhancedQuery = `${baseContextWithSuffix} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 안전사고와 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[기계적위험] 전체 내용 활용: "${fullDetail}"`);
     }
@@ -381,6 +382,7 @@ export function buildTargetedSearchQuery(
 
   console.log(`[쿼리 빌드] 프로파일: ${profile.id}`);
   console.log(`  baseContext: "${baseContext}"`);
+  console.log(`  baseContextWithSuffix: "${baseContextWithSuffix}"`);
   console.log(`  riskQueries 생성됨 (${riskQueries.length}개):`, riskQueries);
   console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 5));
   console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 5));
