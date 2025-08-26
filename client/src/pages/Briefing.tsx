@@ -63,6 +63,15 @@ export default function Briefing() {
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
 
+  // Fetch all work schedules to show dots on calendar
+  const { data: allWorkSchedules = [] } = useQuery({
+    queryKey: ['/api/work-schedules'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/work-schedules');
+      return response.json();
+    },
+  });
+
   // Fetch work schedules for selected date
   const { data: workSchedules = [], isLoading: schedulesLoading } = useQuery({
     queryKey: ['/api/work-schedules', dateString],
@@ -71,6 +80,29 @@ export default function Briefing() {
       return response.json();
     },
   });
+
+  // Create a set of dates that have work schedules
+  const datesWithWork = new Set(
+    allWorkSchedules.map((schedule: WorkSchedule) => {
+      const scheduleDate = new Date(schedule.scheduledDate);
+      return format(scheduleDate, 'yyyy-MM-dd');
+    })
+  );
+
+  // Custom day renderer for calendar
+  const renderDay = (day: Date) => {
+    const dayString = format(day, 'yyyy-MM-dd');
+    const hasWork = datesWithWork.has(dayString);
+    
+    return (
+      <div className="relative w-full h-full flex flex-col items-center justify-center">
+        <span>{format(day, 'd')}</span>
+        {hasWork && (
+          <div className="absolute bottom-1 w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+        )}
+      </div>
+    );
+  };
 
   // Generate safety briefing mutation
   const generateBriefingMutation = useMutation({
@@ -219,6 +251,15 @@ export default function Briefing() {
                   onSelect={(date) => date && setSelectedDate(date)}
                   locale={ko}
                   className="w-full"
+                  modifiers={{
+                    hasWork: (date) => {
+                      const dayString = format(date, 'yyyy-MM-dd');
+                      return datesWithWork.has(dayString);
+                    }
+                  }}
+                  modifiersClassNames={{
+                    hasWork: 'work-indicator'
+                  }}
                   classNames={{
                     months: "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                     month: "space-y-4 w-full",
@@ -233,7 +274,7 @@ export default function Briefing() {
                     head_cell: "text-muted-foreground rounded-md font-normal text-[0.8rem] flex-1 text-center py-2",
                     row: "flex w-full mt-1",
                     cell: "text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                    day: "h-8 sm:h-10 w-full p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground text-center flex items-center justify-center rounded-md",
+                    day: "h-8 sm:h-10 w-full p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground text-center flex items-center justify-center rounded-md relative",
                     day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                     day_today: "bg-accent text-accent-foreground font-semibold",
                     day_outside: "text-muted-foreground opacity-50",

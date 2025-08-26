@@ -67,6 +67,7 @@ export interface IStorage {
 
   // Work schedules operations
   createWorkSchedule(schedule: InsertWorkSchedule): Promise<WorkSchedule>;
+  getAllWorkSchedules(): Promise<WorkSchedule[]>;
   getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]>;
   getWorkScheduleById(id: number): Promise<WorkSchedule | undefined>;
   updateWorkSchedule(id: number, schedule: Partial<WorkSchedule>): Promise<WorkSchedule>;
@@ -643,6 +644,11 @@ export class MemStorage implements IStorage {
     };
     this.workSchedules.set(id, newSchedule);
     return newSchedule;
+  }
+
+  async getAllWorkSchedules(): Promise<WorkSchedule[]> {
+    return Array.from(this.workSchedules.values())
+      .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime());
   }
 
   async getWorkSchedulesByDate(date: string): Promise<WorkSchedule[]> {

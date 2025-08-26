@@ -607,11 +607,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/work-schedules", async (req, res) => {
     try {
       const date = req.query.date as string;
-      if (!date) {
-        return res.status(400).json({ message: "날짜가 필요합니다." });
+      if (date) {
+        // 특정 날짜의 일정 조회
+        const schedules = await storage.getWorkSchedulesByDate(date);
+        res.json(schedules);
+      } else {
+        // 모든 일정 조회 (달력 점 표시용)
+        const schedules = await storage.getAllWorkSchedules();
+        res.json(schedules);
       }
-      const schedules = await storage.getWorkSchedulesByDate(date);
-      res.json(schedules);
     } catch (error) {
       console.error("작업 일정 조회 오류:", error);
       res.status(500).json({ message: "작업 일정을 불러올 수 없습니다." });
@@ -730,7 +734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         // 작업 일정에 따른 스마트 날씨 정보 수집 (과거/현재/미래, 시간 포함)
-        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime);
+        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime || undefined);
         console.log(`스마트 날씨 정보 수집 완료 - 위치: ${weatherLocation}, 작업일: ${workSchedule.scheduledDate}, 시간: ${workSchedule.briefingTime}, 타입: ${weatherInfo.weatherType}`);
       } catch (error) {
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);

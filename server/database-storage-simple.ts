@@ -310,6 +310,34 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async getAllWorkSchedules() {
+    try {
+      const result = await db
+        .select({
+          id: workSchedules.id,
+          equipmentId: workSchedules.equipmentId,
+          workTypeId: workSchedules.workTypeId,
+          scheduledDate: workSchedules.scheduledDate,
+          briefingTime: workSchedules.briefingTime,
+          workerName: workSchedules.workerName,
+          workLocation: workSchedules.workLocation,
+          specialNotes: workSchedules.specialNotes,
+          status: workSchedules.status,
+          createdAt: workSchedules.createdAt,
+          equipmentName: equipment.name,
+          workTypeName: workTypes.name,
+        })
+        .from(workSchedules)
+        .leftJoin(equipment, eq(workSchedules.equipmentId, equipment.id))
+        .leftJoin(workTypes, eq(workSchedules.workTypeId, workTypes.id));
+      
+      return result;
+    } catch (error) {
+      console.error('Database error in getAllWorkSchedules:', error);
+      return [];
+    }
+  }
+
   async getWorkSchedulesByDate(date: string) {
     try {
       // Parse the date string to ensure we filter by the exact date
