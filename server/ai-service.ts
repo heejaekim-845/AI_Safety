@@ -1011,6 +1011,10 @@ JSON 형식으로 응답:
         }));
         
         console.log(`교육자료 최종 필터링: ${educationDataWithUrls.length}건 → ${filteredEducationData.length}건`);
+        console.log('최종 선택된 교육자료:');
+        filteredEducationData.slice(0, 5).forEach((edu, idx) => {
+          console.log(`  ${idx + 1}. "${edu.metadata?.title}" (벡터점수: ${normalizedScore(edu).toFixed(3)})`);
+        });
         
         // 법령: 이미 처리된 regulations 배열을 사용
         console.log(`처리할 총 법령 수: ${regulations.length}건`);
