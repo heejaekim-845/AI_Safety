@@ -76,8 +76,9 @@ export interface SearchProfilesConfig {
 
 let cachedProfiles: Profile[] | null = null;
 
-// 프로파일 데이터 정의 (통합)
+// 프로파일 데이터 정의 (통합) - 특정 프로파일 주석처리하여 default만 사용
 const SEARCH_PROFILES: Profile[] = [
+  /*
   {
     id: "electrical-hv-gis",
     description: "전기 · 특별고압 · GIS/SF6/변전 설비",
@@ -174,14 +175,16 @@ const SEARCH_PROFILES: Profile[] = [
       education_hit: 0.01    // 교육 적중 (1%)
     }
   },
+  */
+  // 모든 설비에 default 프로파일만 적용
   {
     id: "default",
-    description: "기본 프로파일",
-    keywords: ["안전", "점검", "정비", "위험성 평가"],
+    description: "기본 프로파일 (모든 설비 통합)",
+    keywords: ["안전", "점검", "정비", "위험성 평가", "사고", "예방"],
     queries: {
-      accidents: ["안전사고", "작업사고"],
-      regulation: ["안전규정", "작업기준"],
-      education: ["안전교육", "작업안전"]
+      accidents: ["사고사례", "안전사고", "작업사고"],
+      regulation: ["안전규정", "법규", "안전기준"],
+      education: ["안전교육", "교육자료", "안전훈련"]
     },
     weights: {
       vector: 0.60,
@@ -218,36 +221,14 @@ export function resolveProfile(
 
   console.log(`[프로파일 해석] 설비: "${name}", 작업: "${work}", 태그: [${Array.from(tags).join(', ')}]`);
 
-  for (const p of profiles) {
-    const m = p.match;
-    if (!m) continue;
-
-    const nameOk = m.equipment_name_regex
-      ? new RegExp(m.equipment_name_regex, 'i').test(name)
-      : true;
-
-    const tagsOk = m.tags_any?.length
-      ? m.tags_any.some((t) => tags.has(t.toLowerCase()))
-      : true;
-
-    const workOk = m.work_types_any?.length
-      ? m.work_types_any.some((w) => work.includes(w.toLowerCase()))
-      : true;
-
-    const riskOk = m.risk_tags_any?.length
-      ? m.risk_tags_any.some((r) => riskTags.has(r.toLowerCase()))
-      : true;
-
-    if (nameOk && tagsOk && workOk && riskOk) {
-      console.log(`[프로파일 매칭] "${p.id}" (${p.description}) 선택됨`);
-      return p;
-    }
+  // 모든 특정 프로파일이 주석처리되었으므로 항상 default 프로파일 사용
+  const defaultProfile = profiles.find((p) => p.id === "default");
+  if (!defaultProfile) {
+    throw new Error("Default profile not found");
   }
 
-  // fallback: id === 'default' or 첫 프로파일
-  const fallback = profiles.find((p) => p.id === "default") ?? profiles[0];
-  console.log(`[프로파일 폴백] "${fallback.id}" 사용`);
-  return fallback;
+  console.log(`✅ 기본 프로파일 사용: "${defaultProfile.id}" (${defaultProfile.description})`);
+  return defaultProfile;
 }
 
 // ------------------ Query Builder ------------------
@@ -346,35 +327,35 @@ export function buildTargetedSearchQuery(
     // 각 위험 유형별 상세 내용을 완전히 활용하고 특정 문구 추가
     if (riskFactors.highVoltageDetail && riskFactors.highVoltageDetail.trim()) {
       const fullDetail = riskFactors.highVoltageDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 고압 전기 안전`;
+      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 고전압을 사용하는 발전소, 변전소 또는 공장에서 차단기, 단로기와 같은 전기설비의 충전전로 작업(활선작업) 또는 정전작업과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고압전기] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.highPressureDetail && riskFactors.highPressureDetail.trim()) {
       const fullDetail = riskFactors.highPressureDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 고압 압력 안전`;
+      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 고압의 가스 또는 오일을 이용하는 발전소, 변전소 또는 공장에서 압축공기나 압력오일의 폭팔 또는 가스누기로 인한 질식과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고압압력] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.highTemperatureDetail && riskFactors.highTemperatureDetail.trim()) {
       const fullDetail = riskFactors.highTemperatureDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 고온 화상 안전`;
+      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 설비로부터 발생한 고온으로 인한 화재 또는 화상 등과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고온] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.heightDetail && riskFactors.heightDetail.trim()) {
       const fullDetail = riskFactors.heightDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 고소작업 추락 안전`;
+      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계썰비를 이용하는 발전소, 변전소 또는 공장에서 작업자가 높은곳에서 작업함으로써 발생하는 추락 등과 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[고소작업] 전체 내용 활용: "${fullDetail}"`);
     }
     
     if (riskFactors.mechanicalDetail && riskFactors.mechanicalDetail.trim()) {
       const fullDetail = riskFactors.mechanicalDetail.trim();
-      const enhancedQuery = `${baseContext} ${fullDetail} 기계적 끼임 안전`;
+      const enhancedQuery = `${baseContext} ${fullDetail} 처럼 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 안전사고와 관련된`;
       riskQueries.push(enhancedQuery);
       console.log(`[기계적위험] 전체 내용 활용: "${fullDetail}"`);
     }
