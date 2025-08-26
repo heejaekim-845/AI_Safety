@@ -706,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate comprehensive safety briefing with streaming progress
+  // Generate comprehensive safety briefing
   app.post("/api/generate-safety-briefing/:workScheduleId", async (req, res) => {
     try {
       const workScheduleId = parseInt(req.params.workScheduleId);
@@ -799,137 +799,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("안전 브리핑 생성 오류:", error);
       res.status(500).json({ message: "안전 브리핑을 생성할 수 없습니다." });
-    }
-  });
-
-  // SSE endpoint for real-time briefing generation progress
-  app.get("/api/generate-safety-briefing-stream/:workScheduleId", async (req, res) => {
-    try {
-      const workScheduleId = parseInt(req.params.workScheduleId);
-      
-      // Set up SSE headers
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
-      });
-
-      // Helper function to send SSE data
-      const sendProgress = (step: string, progress: number, data?: any) => {
-        const message = {
-          step,
-          progress,
-          timestamp: new Date().toISOString(),
-          data
-        };
-        res.write(`data: ${JSON.stringify(message)}\n\n`);
-      };
-
-      // Start the briefing generation process
-      sendProgress("작업 일정 조회 중...", 5);
-      
-      const workSchedule = await storage.getWorkScheduleById(workScheduleId);
-      if (!workSchedule) {
-        sendProgress("오류", 0, { error: "작업 일정을 찾을 수 없습니다." });
-        res.end();
-        return;
-      }
-
-      sendProgress("설비 및 작업 정보 수집 중...", 15);
-      const equipment = await storage.getEquipmentById(workSchedule.equipmentId!);
-      const workType = await storage.getWorkTypeById(workSchedule.workTypeId!);
-      const registeredIncidents = await storage.getIncidentsByEquipmentId(workSchedule.equipmentId!);
-      
-      if (!equipment || !workType) {
-        sendProgress("오류", 0, { error: "설비 또는 작업 유형을 찾을 수 없습니다." });
-        res.end();
-        return;
-      }
-
-      sendProgress("날씨 정보 수집 중...", 25);
-      const weatherLocation = workSchedule.workLocation || equipment.location;
-      let weatherInfo = null;
-      
-      try {
-        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime || undefined);
-        sendProgress("날씨 정보 수집 완료", 35, { weatherType: weatherInfo.weatherType });
-      } catch (error) {
-        sendProgress("날씨 정보 수집 실패 (계속 진행)", 35, { warning: "날씨 정보를 가져올 수 없습니다" });
-      }
-
-      sendProgress("RAG 시스템 초기화 중...", 40);
-      
-      // Create a progress callback for AI service
-      const progressCallback = (step: string, progress: number) => {
-        sendProgress(step, 40 + (progress * 0.4)); // Scale to 40-80%
-      };
-      
-      const aiAnalysis = await aiService.generateEnhancedSafetyBriefing(
-        equipment,
-        workType,
-        weatherInfo,
-        workSchedule.specialNotes || undefined,
-        progressCallback
-      );
-
-      sendProgress("브리핑 데이터 저장 중...", 90);
-      
-      // Create complete briefing data
-      const briefingData = {
-        workScheduleId,
-        weatherInfo,
-        workSummary: aiAnalysis.workSummary,
-        riskFactors: aiAnalysis.riskFactors,
-        riskAssessment: aiAnalysis.riskAssessment,
-        requiredTools: aiAnalysis.requiredTools,
-        requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
-        regulations: aiAnalysis.regulations || [],
-        relatedIncidents: aiAnalysis.relatedIncidents || [],
-        educationMaterials: aiAnalysis.educationMaterials || [],
-        quizQuestions: aiAnalysis.quizQuestions || [],
-        safetySlogan: aiAnalysis.safetySlogan || "안전이 최우선입니다"
-      };
-
-      // Save to database
-      const briefing = await storage.createSafetyBriefing(briefingData);
-
-      const finalResult = {
-        briefing,
-        weatherInfo,
-        workSummary: aiAnalysis.workSummary,
-        riskFactors: aiAnalysis.riskFactors,
-        riskAssessment: aiAnalysis.riskAssessment,
-        requiredTools: aiAnalysis.requiredTools,
-        requiredSafetyEquipment: aiAnalysis.requiredSafetyEquipment,
-        weatherConsiderations: aiAnalysis.weatherConsiderations || [],
-        safetyRecommendations: aiAnalysis.safetyRecommendations || [],
-        regulations: aiAnalysis.regulations || [],
-        relatedIncidents: aiAnalysis.relatedIncidents || [],
-        registeredIncidents: registeredIncidents || [],
-        educationMaterials: aiAnalysis.educationMaterials || [],
-        quizQuestions: aiAnalysis.quizQuestions || [],
-        safetySlogan: aiAnalysis.safetySlogan || "안전이 최우선입니다",
-        relatedAccidentCases: aiAnalysis.relatedAccidentCases || []
-      };
-
-      console.log('🎯 최종 결과 전송:', Object.keys(finalResult));
-      console.log('🎯 briefing 존재:', !!finalResult.briefing);
-      console.log('🎯 weatherInfo 존재:', !!finalResult.weatherInfo);
-      sendProgress("브리핑 생성 완료!", 100, finalResult);
-      res.end();
-      
-    } catch (error) {
-      console.error("스트리밍 브리핑 생성 오류:", error);
-      const errorMessage = {
-        step: "오류 발생",
-        progress: 0,
-        timestamp: new Date().toISOString(),
-        data: { error: "브리핑을 생성할 수 없습니다." }
-      };
-      res.write(`data: ${JSON.stringify(errorMessage)}\n\n`);
-      res.end();
     }
   });
 

@@ -701,8 +701,7 @@ JSON 형식으로 응답:
     equipmentInfo: any,
     workType: any,
     weatherData: any,
-    specialNotes?: string,
-    progressCallback?: (step: string, progress: number) => void
+    specialNotes?: string
   ): Promise<any> {
     // ===== 강제 로그 출력 테스트 =====
     console.error("=".repeat(50));
@@ -796,15 +795,10 @@ JSON 형식으로 응답:
         console.log(`- 법규 쿼리: ${regulationQueries.length}개`);
         console.log(`- 교육자료 쿼리: ${educationQueries.length}개`);
 
-        // Progress callback for RAG search
-        progressCallback?.("관련 사고사례 검색 중...", 10);
-        
         // 카테고리별 특화 검색 실행 (분리된 검색)
         const allCandidates = await timeit('category-specific.search', () => 
           this.runCategorySpecificSearchQueries(incidentQueries, regulationQueries, educationQueries)
         );
-        
-        progressCallback?.("교육자료 및 법규 검색 중...", 30);
         const candidatesRaw = dedupById(allCandidates || []);
         
         // === 벡터 DB 검색 결과 분석 ===
@@ -1118,7 +1112,6 @@ JSON 형식으로 응답:
           )
         );
 
-        progressCallback?.("데이터 수집 완료, AI 분석 시작...", 60);
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
       } catch (error) {
         console.log('🚨🚨🚨 ChromaDB 검색 실패, 상세 오류 정보:');
@@ -1223,8 +1216,6 @@ ${specialNotes || "없음"}
   "safetySlogan": "오늘의 안전 슬로건"
 }`;
 
-      progressCallback?.("AI 안전 분석 수행 중...", 80);
-      
       const response = await timeit(
         "gemini.generateContent(briefing)",
         () => genai.models.generateContent({
@@ -1236,8 +1227,6 @@ ${specialNotes || "없음"}
           contents: prompt
         })
       );
-
-      progressCallback?.("브리핑 데이터 처리 중...", 95);
 
       const result = JSON.parse(response.text || "{}");
       
