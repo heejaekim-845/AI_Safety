@@ -17,6 +17,7 @@ import {
   CheckCircle, 
   Clock, 
   AlertTriangleIcon,
+  AlertTriangle,
   ChevronRight,
   X,
   BarChart3
@@ -404,6 +405,29 @@ export default function WorkTypeSelection() {
                           }
                         />
                         <span className="text-sm">{legal}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Safety Precautions */}
+              {selectedWorkType.safetyPrecautions && selectedWorkType.safetyPrecautions.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <AlertTriangle className="mr-2 h-4 w-4 text-primary" />
+                    안전유의사항
+                  </h4>
+                  <div className="space-y-2 ml-8">
+                    {selectedWorkType.safetyPrecautions.map((precaution, index) => (
+                      <label key={index} className="flex items-center space-x-3">
+                        <Checkbox
+                          checked={checklistItems[`safety_${precaution}`] || false}
+                          onCheckedChange={(checked) => 
+                            setChecklistItems(prev => ({ ...prev, [`safety_${precaution}`]: !!checked }))
+                          }
+                        />
+                        <span className="text-sm">{precaution}</span>
                       </label>
                     ))}
                   </div>

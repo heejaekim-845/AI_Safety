@@ -275,10 +275,33 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
 
+    // 170kV GIS 작업 유형 추가
+    const workType7: WorkType = {
+      id: 7,
+      name: "절연점검",
+      equipmentId: 5, // 170kV GIS
+      description: "170kV GIS 절연점검 작업",
+      requiresPermit: true,
+      estimatedDuration: 120,
+      requiredQualifications: ["전기기능사", "고압전기안전교육"],
+      requiredEquipment: ["절연장갑", "절연화", "검전기"],
+      requiredTools: ["절연봉", "측정기", "안전모"],
+      environmentalRequirements: ["날씨 양호", "바람 세기 10m/s 이하"],
+      legalRequirements: ["전력설비 안전관리 규정"],
+      safetyPrecautions: [
+        "절연장갑 착용",
+        "안전모 필수",
+        "충전부 접근 금지",
+        "2인 1조 작업"
+      ],
+      createdAt: new Date()
+    };
+
     this.workTypes.set(1, workType1);
     this.workTypes.set(2, workType2);
     this.workTypes.set(3, workType3);
     this.workTypes.set(4, workType4);
+    this.workTypes.set(7, workType7);
 
     // Sample work procedures
     const procedure1: WorkProcedure = {
