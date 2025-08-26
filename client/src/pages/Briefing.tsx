@@ -127,8 +127,13 @@ export default function Briefing() {
     let currentStepIndex = 0;
     let stepStartTime = Date.now();
 
-    // Start the API call
-    const apiPromise = apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
+    // Start the API call with timeout
+    const apiPromise = Promise.race([
+      apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('브리핑 생성 시간이 초과되었습니다.')), 120000) // 2분 타임아웃
+      )
+    ]);
 
     // Progress simulation that syncs with actual API timing
     const progressInterval = setInterval(() => {
@@ -148,7 +153,7 @@ export default function Briefing() {
           // Smooth progress within current step
           const prevProgress = currentStepIndex > 0 ? progressSteps[currentStepIndex - 1].progress : 0;
           const stepProgress = (elapsed / step.duration) * (step.progress - prevProgress);
-          setGenerationProgress(prevProgress + stepProgress);
+          setGenerationProgress(Math.floor(prevProgress + stepProgress));
         }
       }
     }, 200); // More frequent updates for smoother animation
@@ -174,9 +179,16 @@ export default function Briefing() {
     } catch (error) {
       clearInterval(progressInterval);
       console.error('브리핑 생성 오류:', error);
-      setIsGenerating(false);
+      
+      // Show error state
       setGenerationProgress(0);
-      setCurrentStep('');
+      setCurrentStep('브리핑 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+      
+      // Clear error state after 3 seconds
+      setTimeout(() => {
+        setIsGenerating(false);
+        setCurrentStep('');
+      }, 3000);
     }
   };
 
@@ -457,11 +469,11 @@ export default function Briefing() {
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
                     <div 
                       className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
-                      style={{ width: `${generationProgress}%` }}
+                      style={{ width: `${Math.floor(generationProgress)}%` }}
                     />
                   </div>
                   <div className="text-lg font-bold text-blue-600">
-                    {generationProgress}%
+                    {Math.floor(generationProgress)}%
                   </div>
                 </div>
                 <div className="flex justify-center">
