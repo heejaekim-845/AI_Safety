@@ -362,20 +362,37 @@ export function buildTargetedSearchQuery(
     }
   }
 
-  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리 (더 구체적인 문구 추가)
+  // 작업유형 안전유의사항 쿼리 추가
+  const safetyPrecautionQueries: string[] = [];
+  
+  // workType에 safetyPrecautions가 있는 경우 처리
+  const workTypeData = workType as any;
+  console.log(`[디버깅] workType.safetyPrecautions:`, workTypeData?.safetyPrecautions);
+  
+  if (workTypeData?.safetyPrecautions && workTypeData.safetyPrecautions.trim()) {
+    const safetyPrecautions = workTypeData.safetyPrecautions.trim();
+    const enhancedSafetyQuery = `${baseContextWithSuffix} 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 ${safetyPrecautions} 와 관련된`;
+    safetyPrecautionQueries.push(enhancedSafetyQuery);
+    console.log(`[안전유의사항] 전체 내용 활용: "${safetyPrecautions}"`);
+  }
+
+  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리 + 안전유의사항 쿼리
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 사고사례`)
+    ...riskQueries.map(rq => `${rq} 사고사례`),
+    ...safetyPrecautionQueries.map(sq => `${sq} 사고사례`)
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 규정`)
+    ...riskQueries.map(rq => `${rq} 규정`),
+    ...safetyPrecautionQueries.map(sq => `${sq} 규정`)
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 교육자료`)
+    ...riskQueries.map(rq => `${rq} 교육자료`),
+    ...safetyPrecautionQueries.map(sq => `${sq} 교육자료`)
   ]);
 
   const all = uniq([...accidents, ...regulation, ...education]);
@@ -384,6 +401,7 @@ export function buildTargetedSearchQuery(
   console.log(`  baseContext: "${baseContext}"`);
   console.log(`  baseContextWithSuffix: "${baseContextWithSuffix}"`);
   console.log(`  riskQueries 생성됨 (${riskQueries.length}개):`, riskQueries);
+  console.log(`  safetyPrecautionQueries 생성됨 (${safetyPrecautionQueries.length}개):`, safetyPrecautionQueries);
   console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 5));
   console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 5));
   console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 5));
