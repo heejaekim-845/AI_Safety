@@ -692,43 +692,7 @@ export function extractSafetyKeywordsFromWorkType(workTypeDescription: string): 
   };
 }
 
-// ------------------ Equipment Tag Inference ------------------
-
-export function inferEquipmentTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {
-  const name = typeof equipment === 'string' ? equipment.toLowerCase() : equipment.name.toLowerCase();
-  const tags: string[] = [];
-
-  // 전기 관련
-  if (/전기|gis|sf6|변전|고압|특별고압|170kv|절연|충전부/.test(name)) {
-    tags.push("전기작업","정전전로","충전전로(활선)","감전","차단·개로","단로기","잠금·표찰(LOTO)","접지","밀폐공간","추락방지","차단기","단로기","변류기","계기용변압기","SF6 가스","가스밀도 검출기","유압");
-    // 영어 태그 추가 (프로파일 매칭용)
-    tags.push("electrical");
-    if (/gis|변전|sf6/.test(name)) tags.push("substation", "gis");
-  }
-
-  // 기계 관련
-  if (/회전|축|베어링|터빈|모터|펌프|기계/.test(name)) {
-    tags.push("mechanical");
-    if (/회전|축/.test(name)) tags.push("rotating");
-  }
-
-  // 유압/압력 관련
-  if (/유압|압력|배관|밸브|탱크/.test(name)) {
-    tags.push("hydraulic", "pressure");
-  }
-
-  // 컨베이어 관련
-  if (/컨베이어|벨트|이송/.test(name)) {
-    tags.push("conveyor", "transport");
-  }
-
-  // 고소작업 관련
-  if (/크레인|높이|고소/.test(name)) {
-    tags.push("height", "crane");
-  }
-
-  return tags;
-}
+// inferEquipmentTags 함수 제거됨 - 프로파일 기반 키워드 시스템으로 대체됨
 
 export function inferRiskTags(equipment: EquipmentInfo | string, profile?: Profile): string[] {
   const name = typeof equipment === 'string' ? equipment.toLowerCase() : equipment.name.toLowerCase();

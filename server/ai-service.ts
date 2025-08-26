@@ -8,7 +8,6 @@ import {
   buildTargetedSearchQuery,
   shouldIncludeContent,
   applyHybridScoring,
-  inferEquipmentTags,
   inferRiskTags,
   extractSafetyKeywordsFromWorkType,
   type EquipmentInfo,
@@ -741,7 +740,7 @@ JSON 형식으로 응답:
         const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
         const equipmentInfoObj: EquipmentInfo & {riskFactors?: any} = {
           name: equipmentInfo.name,
-          tags: inferEquipmentTags(equipmentInfo.name), // 설비명 기반 기본 태그
+          tags: [], // inferEquipmentTags 제거됨 - 프로파일 기반 키워드 시스템 사용
           riskTags: equipmentRisks, // 실제 DB의 위험 정보 기반
           riskFactors: equipmentInfo.riskFactors, // 실제 DB의 risk_factors JSONB 데이터 포함
           metadata: {
