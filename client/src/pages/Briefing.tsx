@@ -184,6 +184,9 @@ export default function Briefing() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               AI 기반 안전 브리핑 시스템
             </h1>
+            <div className="text-lg font-semibold text-gray-700 mb-2">
+              {format(new Date(), 'yyyy년 MM월 dd일 (EEEE) HH:mm', { locale: ko })}
+            </div>
             <p className="text-gray-600 mb-6">
               일일 작업 안전 브리핑을 AI 기술로 자동 생성하고 관리합니다
             </p>
