@@ -187,13 +187,13 @@ const SEARCH_PROFILES: Profile[] = [
       education: []
     },
     weights: {
-      vector: 0.60,
-      keyword: 0.15,
-      equipment: 0.10,
-      work_type: 0.07,
-      risk: 0.05,
-      regulation_hit: 0.02,
-      education_hit: 0.01
+      vector: 0.55,
+      keyword: 0.25,
+      equipment: 0.20,
+      work_type: 0.00,
+      risk: 0.00,
+      regulation_hit: 0.00,
+      education_hit: 0.00
     }
   }
 ];
@@ -513,37 +513,14 @@ export function applyHybridScoring(
   const text = toTextBlob(item);
 
   const eqTokens = tokenize(equipment?.name).concat((equipment?.tags ?? []));
-  const wtTokens = tokenize(workType?.name);
-  const riskTokens = (equipment?.riskTags ?? []);
 
   const vec = Math.max(0, Math.min(1, item.vectorScore ?? 0));
 
   const kwHits = containsAny(text, profile.keywords ?? []);
   const eqHits = containsAny(text, eqTokens);
-  const wtHits = containsAny(text, wtTokens);
-  const riskHits = containsAny(text, riskTokens);
-
-  const includeAny = profile.include_if_any_keywords ?? [];
-  const exclude = profile.exclude_keywords ?? [];
-  const exclAny = profile.exclude_if_any_keywords ?? [];
-
-  let bonus = 0;
-  if (includeAny.length && containsAny(text, includeAny) > 0) bonus += (o.bonusForIncludedAny || 0.1);
-  
-  // 우선순위 키워드 부스팅 제거됨
-  
-  let penalty = 0;
-  if (exclude.length && containsAny(text, exclude) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
-  if (exclAny.length && containsAny(text, exclAny) > 0) penalty += Math.abs(o.penaltyForExcluded || 0.2);
-
-  const st = item.metadata?.sourceType;
-  const regHit = st === "regulation" ? 1 : 0;
-  const eduHit = st === "education" ? 1 : 0;
 
   const s_kw = normalize(kwHits, 8);
   const s_eq = normalize(eqHits, 6);
-  const s_wt = normalize(wtHits, 4);
-  const s_rk = normalize(riskHits, 4);
 
   const w = profile.weights;
 
@@ -551,14 +528,6 @@ export function applyHybridScoring(
   score += w.vector * vec;
   score += w.keyword * s_kw;
   score += w.equipment * s_eq;
-  score += w.work_type * s_wt;
-  score += w.risk * s_rk;
-  score += w.regulation_hit * regHit;
-  score += w.education_hit * eduHit;
-
-  score += bonus;
-  // priorityBonus 제거됨
-  score -= penalty;
 
   return Math.max(0, Math.min(1, score));
 }
