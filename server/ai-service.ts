@@ -793,24 +793,7 @@ JSON 형식으로 응답:
         // 중복 제거된 기본 키워드 배열
         const baseKeywords = Array.from(uniqueKeywords).filter(Boolean);
         const specificQuery = `${equipmentInfo.name} ${workType.name}`;
-        
-        console.log(`\n======== 170kV GIS 검색 디버깅 ========`);
-        console.log(`[DEBUG] 장비명: "${equipmentInfo.name}"`);
-        console.log(`[DEBUG] 작업명: "${workType.name}"`);
-        console.log(`[DEBUG] specificQuery: "${specificQuery}"`);
-        console.log(`[DEBUG] 프로파일 ID: ${resolvedProfile.id}`);
-        console.log(`[DEBUG] 프로파일 키워드: [${(resolvedProfile.keywords || []).join(', ')}]`);
-        console.log(`[DEBUG] 설비 태그: [${(equipmentInfoObj.tags || []).join(', ')}]`);
-        console.log(`[DEBUG] 작업 키워드: [${(workType.keywords || []).join(', ')}]`);
-        console.log(`[DEBUG] 통합 키워드 (${baseKeywords.length}개): [${baseKeywords.slice(0,10).join(', ')}${baseKeywords.length > 10 ? '...' : ''}]`);
-        console.log(`[DEBUG] 사고사례 쿼리 (${incident.length}개): [${incident.slice(0,3).join(', ')}...]`);
-        console.log(`[DEBUG] 교육자료 쿼리 (${education.length}개): [${education.slice(0,3).join(', ')}...]`);
-        console.log(`[DEBUG] 법령 쿼리 (${regulation.length}개): [${regulation.slice(0,3).join(', ')}...]`);
-        console.log(`[DEBUG] 전체 법령 쿼리:`, regulation);
-        console.log(`[DEBUG] 실제 DB risk_factors:`, equipmentInfo.riskFactors);
-        console.log(`[DEBUG] equipmentInfoObj.riskFactors:`, equipmentInfoObj.riskFactors);
-        console.log(`=====================================`);
-        
+                
         console.log(`RAG 벡터 검색 - 카테고리별 특화 쿼리 적용 (키워드 제외 기능 비활성화)`);
         
         // 카테고리별 특화 검색 쿼리: 제외 키워드 없이 순수 검색

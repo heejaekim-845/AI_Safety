@@ -290,7 +290,7 @@ export function shouldIncludeContent(item: SearchItem, profile: Profile): boolea
 }
 
 export function buildTargetedSearchQuery(
-  profile: Profile,
+  profile: Profile,targetqueries
   equipment: EquipmentInfo,
   workType?: WorkType,
   cachedTokens?: {
