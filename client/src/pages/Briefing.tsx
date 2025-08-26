@@ -114,43 +114,62 @@ export default function Briefing() {
     
     // Progress simulation steps
     const progressSteps = [
-      { progress: 15, step: '설비 위험 요소 분석 중...' },
-      { progress: 25, step: '기상 정보 수집 중...' },
-      { progress: 35, step: 'RAG 데이터베이스 검색 중...' },
-      { progress: 50, step: '유사 사고사례 검색 중...' },
-      { progress: 65, step: '관련 법규 검색 중...' },
-      { progress: 75, step: '안전 교육자료 검색 중...' },
-      { progress: 85, step: 'AI 안전 분석 수행 중...' },
-      { progress: 95, step: '브리핑 문서 생성 중...' },
-      { progress: 100, step: '브리핑 생성 완료!' }
+      { progress: 15, step: '설비 위험 요소 분석 중...', duration: 3000 },
+      { progress: 25, step: '기상 정보 수집 중...', duration: 2000 },
+      { progress: 35, step: 'RAG 데이터베이스 검색 중...', duration: 4000 },
+      { progress: 50, step: '유사 사고사례 검색 중...', duration: 6000 },
+      { progress: 65, step: '관련 법규 검색 중...', duration: 5000 },
+      { progress: 75, step: '안전 교육자료 검색 중...', duration: 4000 },
+      { progress: 85, step: 'AI 안전 분석 수행 중...', duration: 8000 },
+      { progress: 95, step: '브리핑 문서 생성 중...', duration: 3000 }
     ];
 
-    // Start progress simulation with dynamic timing
-    let stepIndex = 0;
+    let currentStepIndex = 0;
+    let stepStartTime = Date.now();
+
+    // Start the API call
+    const apiPromise = apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
+
+    // Progress simulation that syncs with actual API timing
     const progressInterval = setInterval(() => {
-      if (stepIndex < progressSteps.length) {
-        const step = progressSteps[stepIndex];
-        setGenerationProgress(step.progress);
-        setCurrentStep(step.step);
-        stepIndex++;
+      const now = Date.now();
+      const elapsed = now - stepStartTime;
+      
+      if (currentStepIndex < progressSteps.length) {
+        const step = progressSteps[currentStepIndex];
+        
+        // Move to next step if duration has passed
+        if (elapsed >= step.duration) {
+          setGenerationProgress(step.progress);
+          setCurrentStep(step.step);
+          currentStepIndex++;
+          stepStartTime = now;
+        } else {
+          // Smooth progress within current step
+          const prevProgress = currentStepIndex > 0 ? progressSteps[currentStepIndex - 1].progress : 0;
+          const stepProgress = (elapsed / step.duration) * (step.progress - prevProgress);
+          setGenerationProgress(prevProgress + stepProgress);
+        }
       }
-    }, 4000); // Slower progression for better UX
+    }, 200); // More frequent updates for smoother animation
 
     try {
-      const response = await apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
+      const response = await apiPromise;
       const data = await response.json();
       
+      // Immediately complete progress when API finishes
       clearInterval(progressInterval);
       setGenerationProgress(100);
       setCurrentStep('브리핑 생성 완료!');
       
+      // Short delay before showing results
       setTimeout(() => {
         setBriefingData(data);
         setQuizAnswers({});
         setIsGenerating(false);
         setGenerationProgress(0);
         setCurrentStep('');
-      }, 1000);
+      }, 500);
       
     } catch (error) {
       clearInterval(progressInterval);
