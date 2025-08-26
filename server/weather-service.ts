@@ -9,6 +9,7 @@ interface WeatherData {
   description: string;
   safetyWarnings: string[];
   weatherDate: string;
+  weatherTime?: string;
   weatherType: 'historical' | 'current' | 'forecast';
 }
 
@@ -39,25 +40,39 @@ export class WeatherService {
     '제주': { lat: 33.4996, lon: 126.5312 }
   };
 
-  // 작업 일정에 따른 날씨 정보 수집 (새로운 메인 메서드)
-  async getWeatherForWorkDate(location: string, workDate?: string | Date): Promise<WeatherData> {
+  // 작업 일정에 따른 날씨 정보 수집 (시간 포함)
+  async getWeatherForWorkDate(location: string, workDate?: string | Date, workTime?: string): Promise<WeatherData> {
     if (!workDate) {
       return this.getCurrentWeather(location);
     }
 
-    const targetDate = new Date(workDate);
-    const today = new Date();
-    const daysDiff = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    let targetDate = new Date(workDate);
+    
+    // 시간 정보가 있으면 정확한 작업 시간 설정
+    if (workTime) {
+      const [hours, minutes] = workTime.split(':').map(Number);
+      if (!isNaN(hours) && !isNaN(minutes)) {
+        targetDate.setHours(hours, minutes, 0, 0);
+        console.log(`작업 시간 반영: ${workTime} → ${targetDate.toLocaleString('ko-KR')}`);
+      }
+    }
+
+    const now = new Date();
+    const daysDiff = Math.ceil((targetDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    const hoursDiff = (targetDate.getTime() - now.getTime()) / (1000 * 3600);
 
     if (daysDiff < -1) {
       // 과거 날씨 (1일 전 이상)
-      return this.getHistoricalWeather(location, targetDate);
+      return this.getHistoricalWeather(location, targetDate, workTime);
+    } else if (Math.abs(hoursDiff) <= 48) {
+      // 48시간 이내 (현재 또는 가까운 미래/과거)
+      return this.getForecastWeather(location, targetDate, workTime);
     } else if (daysDiff <= 7) {
-      // 현재 또는 7일 이내 예보
-      return this.getForecastWeather(location, targetDate);
+      // 7일 이내 예보
+      return this.getForecastWeather(location, targetDate, workTime);
     } else {
       // 7일 초과 미래 (현재 날씨로 대체)
-      console.warn(`작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate}`);
+      console.warn(`작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate} ${workTime || ''}`);
       return this.getCurrentWeather(location);
     }
   }
@@ -99,6 +114,7 @@ export class WeatherService {
       const result = this.parseOpenWeatherResponse(weatherData);
       result.weatherType = 'current';
       result.weatherDate = new Date().toISOString().split('T')[0];
+      result.weatherTime = new Date().toTimeString().slice(0, 5);
       
       console.log(`현재 날씨 조회 완료: ${location}`, result);
       return result;
@@ -110,7 +126,7 @@ export class WeatherService {
   }
 
   // 과거 날씨 정보
-  async getHistoricalWeather(location: string, targetDate: Date): Promise<WeatherData> {
+  async getHistoricalWeather(location: string, targetDate: Date, workTime?: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
         throw new Error('OpenWeather API key not configured');
@@ -139,6 +155,7 @@ export class WeatherService {
       const result = this.parseHistoricalResponse(weatherData, location);
       result.weatherType = 'historical';
       result.weatherDate = targetDate.toISOString().split('T')[0];
+      result.weatherTime = workTime || targetDate.toTimeString().slice(0, 5);
       
       console.log(`과거 날씨 조회 완료: ${location}`, result);
       return result;
@@ -149,8 +166,8 @@ export class WeatherService {
     }
   }
 
-  // 예보 날씨 정보
-  async getForecastWeather(location: string, targetDate: Date): Promise<WeatherData> {
+  // 예보 날씨 정보  
+  async getForecastWeather(location: string, targetDate: Date, workTime?: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
         throw new Error('OpenWeather API key not configured');
@@ -201,6 +218,7 @@ export class WeatherService {
       const result = this.parseForecastResponse(weatherToUse, location);
       result.weatherType = 'forecast';
       result.weatherDate = targetDate.toISOString().split('T')[0];
+      result.weatherTime = workTime || targetDate.toTimeString().slice(0, 5);
       
       console.log(`예보 날씨 조회 완료: ${location}`, result);
       return result;
@@ -307,6 +325,7 @@ export class WeatherService {
       description: this.getWeatherDescription(condition, temperature),
       safetyWarnings,
       weatherDate: new Date().toISOString().split('T')[0],
+      weatherTime: new Date().toTimeString().slice(0, 5),
       weatherType: 'current'
     };
   }
@@ -347,6 +366,7 @@ export class WeatherService {
       description: this.getWeatherDescription(condition, temperature),
       safetyWarnings,
       weatherDate: new Date().toISOString().split('T')[0],
+      weatherTime: new Date().toTimeString().slice(0, 5),
       weatherType: 'current'
     };
   }
@@ -391,8 +411,20 @@ export class WeatherService {
     return warnings;
   }
 
-  private getWeatherDescription(condition: string, temperature: number): string {
-    let desc = `현재 날씨는 ${condition}입니다.`;
+  private getWeatherDescription(condition: string, temperature: number, weatherType: string = 'current'): string {
+    let prefix = '';
+    switch (weatherType) {
+      case 'historical':
+        prefix = '해당 일자의 날씨는 ';
+        break;
+      case 'forecast':
+        prefix = '예상 날씨는 ';
+        break;
+      default:
+        prefix = '현재 날씨는 ';
+    }
+
+    let desc = `${prefix}${condition}입니다.`;
     
     if (temperature < 5) {
       desc += ' 추운 날씨로 방한 대책이 필요합니다.';
@@ -423,6 +455,7 @@ export class WeatherService {
       description: this.getWeatherDescription(condition, temperature, 'historical'),
       safetyWarnings,
       weatherDate: '',
+      weatherTime: '',
       weatherType: 'historical'
     };
   }
@@ -459,36 +492,12 @@ export class WeatherService {
       description: this.getWeatherDescription(condition, temperature, 'forecast'),
       safetyWarnings,
       weatherDate: '',
+      weatherTime: '',
       weatherType: 'forecast'
     };
   }
 
-  // 날씨 설명 업데이트 (날씨 타입 포함)
-  private getWeatherDescription(condition: string, temperature: number, weatherType: string = 'current'): string {
-    let prefix = '';
-    switch (weatherType) {
-      case 'historical':
-        prefix = '해당 일자의 날씨는 ';
-        break;
-      case 'forecast':
-        prefix = '예상 날씨는 ';
-        break;
-      default:
-        prefix = '현재 날씨는 ';
-    }
 
-    let desc = `${prefix}${condition}입니다.`;
-    
-    if (temperature < 5) {
-      desc += ' 추운 날씨로 방한 대책이 필요합니다.';
-    } else if (temperature > 25) {
-      desc += ' 더운 날씨로 열중증 예방이 필요합니다.';
-    } else {
-      desc += ' 작업하기 적당한 기온입니다.';
-    }
-
-    return desc;
-  }
 
   // Remove fallback weather method - no mock data when API fails
 }

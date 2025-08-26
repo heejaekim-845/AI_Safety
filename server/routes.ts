@@ -729,9 +729,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let weatherInfo = null;
       
       try {
-        // 작업 일정에 따른 스마트 날씨 정보 수집 (과거/현재/미래)
-        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate);
-        console.log(`스마트 날씨 정보 수집 완료 - 위치: ${weatherLocation}, 작업일: ${workSchedule.scheduledDate}, 타입: ${weatherInfo.weatherType}`);
+        // 작업 일정에 따른 스마트 날씨 정보 수집 (과거/현재/미래, 시간 포함)
+        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime);
+        console.log(`스마트 날씨 정보 수집 완료 - 위치: ${weatherLocation}, 작업일: ${workSchedule.scheduledDate}, 시간: ${workSchedule.briefingTime}, 타입: ${weatherInfo.weatherType}`);
       } catch (error) {
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);
         // weatherInfo remains null - no mock data will be used
@@ -797,6 +797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "안전 브리핑을 생성할 수 없습니다." });
     }
   });
+
 
   // ChromaDB 임베디드 모드 테스트 엔드포인트
   app.get("/api/test-vector-db", async (req, res) => {
