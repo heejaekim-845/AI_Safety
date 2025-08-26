@@ -122,10 +122,14 @@ export default function Briefing() {
           setGenerationProgress(data.progress);
           
           if (data.progress === 100 && data.data) {
+            console.log('스트리밍 완료 - 받은 데이터:', data.data);
+            console.log('브리핑 데이터 설정 전 상태:', briefingData);
             setBriefingData(data.data);
             setQuizAnswers({});
+            console.log('스트리밍 완료 - isGenerating false 설정');
             setIsGenerating(false);
             eventSource.close();
+            console.log('EventSource 종료됨');
           }
           
           if (data.data?.error) {
@@ -391,7 +395,10 @@ export default function Briefing() {
                           </div>
                           <div className="flex flex-col gap-2 ml-4">
                             <Button
-                              onClick={() => handleGenerateBriefing(schedule)}
+                              onClick={() => {
+                                setSelectedWorkSchedule(schedule);
+                                generateBriefingStream(schedule.id);
+                              }}
                               disabled={isGenerating}
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700"

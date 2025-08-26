@@ -914,6 +914,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         relatedAccidentCases: aiAnalysis.relatedAccidentCases || []
       };
 
+      console.log('🎯 최종 결과 전송:', Object.keys(finalResult));
+      console.log('🎯 briefing 존재:', !!finalResult.briefing);
+      console.log('🎯 weatherInfo 존재:', !!finalResult.weatherInfo);
       sendProgress("브리핑 생성 완료!", 100, finalResult);
       res.end();
       
