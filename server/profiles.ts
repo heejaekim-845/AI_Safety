@@ -270,19 +270,13 @@ export function shouldIncludeContent(item: SearchItem, profile: Profile): boolea
   const incAny = (profile.include_if_any_keywords ?? []).map((x) => x.toLowerCase());
 
   // 디버깅: 제외 키워드 필터링 확인
-  const title = item.metadata?.title || '제목없음';
-  
   if (ex.length && ex.some((k) => hay.includes(k))) {
-    console.log(`❌ [EXCLUDE] "${title}" - 제외키워드 "${ex.find(k => hay.includes(k))}" 발견`);
     return false;
   }
   if (exAny.length && exAny.some((k) => hay.includes(k))) {
-    console.log(`❌ [EXCLUDE_ANY] "${title}" - 제외키워드 "${exAny.find(k => hay.includes(k))}" 발견`);
     return false;
   }
   if (incAny.length && incAny.some((k) => hay.includes(k))) {
-    const matchedKeyword = incAny.find(k => hay.includes(k));
-    console.log(`✅ [INCLUDE] "${title}" - 포함키워드 "${matchedKeyword}" 발견`);
     return true;
   }
   // include_if_any가 없으면 보수적으로 true를 반환하고, 스코어 단계에서 걸러짐

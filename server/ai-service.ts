@@ -254,25 +254,12 @@ export class AIService {
     regulationQueries: string[],
     educationQueries: string[]
   ): Promise<any[]> {
-    console.log(`\n🔍🔍🔍 [카테고리별 특화 검색] 시작 🔍🔍🔍`);
-    console.log(`🔍 사고사례 쿼리: ${incidentQueries.length}개`);
-    console.log(`🔍 법규 쿼리: ${regulationQueries.length}개`);
-    console.log(`🔍 교육자료 쿼리: ${educationQueries.length}개`);
-    
     const out: any[] = [];
     
     // 사고사례 검색
-    for (let i = 0; i < incidentQueries.length; i++) {
-      const q = incidentQueries[i];
+    for (const q of incidentQueries) {
       try {
-        console.log(`\n[사고사례 ${i + 1}/${incidentQueries.length}] 벡터검색 쿼리: "${q}"`);
         const results = await chromaDBService.searchBySpecificCategory(q, 'incident', 5);
-        console.log(`  🚨 사고사례 검색 결과: ${results.length}개`);
-        
-        results.slice(0, 5).forEach((item, idx) => {
-          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
-        });
-        
         out.push(...results);
       } catch (e) {
         console.warn('[incident search] query failed', q, e);
@@ -280,17 +267,9 @@ export class AIService {
     }
     
     // 법규 검색
-    for (let i = 0; i < regulationQueries.length; i++) {
-      const q = regulationQueries[i];
+    for (const q of regulationQueries) {
       try {
-        console.log(`\n[법규 ${i + 1}/${regulationQueries.length}] 벡터검색 쿼리: "${q}"`);
         const results = await chromaDBService.searchBySpecificCategory(q, 'regulation', 5);
-        console.log(`  📋 법규 검색 결과: ${results.length}개`);
-        
-        results.slice(0, 5).forEach((item, idx) => {
-          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
-        });
-        
         out.push(...results);
       } catch (e) {
         console.warn('[regulation search] query failed', q, e);
@@ -298,24 +277,14 @@ export class AIService {
     }
     
     // 교육자료 검색
-    for (let i = 0; i < educationQueries.length; i++) {
-      const q = educationQueries[i];
+    for (const q of educationQueries) {
       try {
-        console.log(`\n[교육자료 ${i + 1}/${educationQueries.length}] 벡터검색 쿼리: "${q}"`);
         const results = await chromaDBService.searchBySpecificCategory(q, 'education', 5);
-        console.log(`  📚 교육자료 검색 결과: ${results.length}개`);
-        
-        results.slice(0, 5).forEach((item, idx) => {
-          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
-        });
-        
         out.push(...results);
       } catch (e) {
         console.warn('[education search] query failed', q, e);
       }
     }
-    
-    console.log(`[DEBUG] runCategorySpecificSearchQueries 완료, 총 ${out.length}개 결과`);
     return out;
   }
 
@@ -878,10 +847,19 @@ JSON 형식으로 응답:
         );
         const candidatesRaw = dedupById(allCandidates || []);
         
-        console.log(`🚨 [디버깅] candidatesRaw 생성 완료: ${candidatesRaw?.length || 0}개 항목`);
+        // === 벡터 DB 검색 결과 분석 ===
+        console.log(`\n========== 벡터 DB 검색 결과 분석 ==========`);
+        console.log(`전체 검색 결과: ${candidatesRaw?.length || 0}개 항목`);
         
-        // 🔥 하이브리드 점수 적용 및 재정렬
-        console.log(`\n🔥 하이브리드 점수 적용 시작 🔥`);
+        // 카테고리별 분포 확인
+        const categoryDistribution: { [key: string]: number } = {};
+        (candidatesRaw || []).forEach(r => {
+          const type = r.metadata?.type || 'unknown';
+          categoryDistribution[type] = (categoryDistribution[type] || 0) + 1;
+        });
+        console.log(`카테고리별 분포:`, categoryDistribution);
+        
+        // 하이브리드 점수 적용
         const candidatesWithHybridScore = this.applyHybridScoringWithPenalty(
           candidatesRaw, 
           resolvedProfile, 
@@ -893,11 +871,17 @@ JSON 형식으로 응답:
         // 하이브리드 점수로 재정렬
         const chromaResults = candidatesWithHybridScore.sort((a, b) => (b.hybridScore || 0) - (a.hybridScore || 0));
         
-        console.log(`🔥 하이브리드 점수 재정렬 완료: ${chromaResults.length}개 항목`);
-        console.log(`🔥 상위 3개 재정렬 결과:`);
-        chromaResults.slice(0, 3).forEach((item, idx) => {
-          console.log(`  ${idx + 1}. "${item.metadata?.title || '제목없음'}" (하이브리드: ${(item.hybridScore || 0).toFixed(3)}, 벡터: ${(1 - (item.distance || 0)).toFixed(3)})`);
+        console.log(`\n========== 하이브리드 점수 계산 완료 ==========`);
+        console.log(`점수 계산 완료: ${chromaResults.length}개 항목`);
+        console.log(`상위 10개 결과 (하이브리드 점수 기준):`);
+        chromaResults.slice(0, 10).forEach((item, idx) => {
+          const title = item.metadata?.title || '제목없음';
+          const type = item.metadata?.type || '미분류';
+          const hybridScore = (item.hybridScore || 0).toFixed(3);
+          const vectorScore = (1 - (item.distance || 0)).toFixed(3);
+          console.log(`  ${idx + 1}. [${type}] "${title}" (하이브리드: ${hybridScore}, 벡터: ${vectorScore})`);
         });
+        console.log(`==========================================`);
 
         let filteredChromaResults = chromaResults;
         
@@ -907,17 +891,7 @@ JSON 형식으로 응답:
         // 프로파일 특화 쿼리가 이미 최적화된 검색을 수행했으므로 추가 가중치 불필요
         console.log(`프로파일 기반 벡터 검색 결과 직접 활용 - 키워드 가중치 시스템 비활성화`);
         
-        // 타입별 필터링 - 디버깅 정보 추가
-        console.log(`[카테고리 분류] 전체 candidatesRaw: ${candidatesRaw?.length || 0}개`);
-        
-        // 모든 데이터의 타입 확인
-        const typeDistribution: { [key: string]: number } = {};
-        (candidatesRaw || []).forEach(r => {
-          const normalizedType = normType(r.metadata);
-          typeDistribution[normalizedType] = (typeDistribution[normalizedType] || 0) + 1;
-        });
-        console.log(`[카테고리 분류] 타입별 분포:`, typeDistribution);
-        
+        // 카테고리별 분류
         const preIncidents = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'incident';
         });
@@ -929,15 +903,6 @@ JSON 형식으로 응답:
         const preRegulations = (candidatesRaw || []).filter(r => {
           return normType(r.metadata) === 'regulation';
         });
-        
-        console.log(`\n=== 법령 RAW 데이터 분석 ===`);
-        console.log(`총 ${preRegulations.length}개 법령 검색됨:`);
-        preRegulations.forEach((reg, idx) => {
-          console.log(`${idx + 1}. "${reg.metadata?.title}" (점수: ${reg.distance || reg.score || reg.vectorScore})`);
-        });
-        console.log(`===============================`);
-        
-        console.log(`[카테고리 분류 결과] incident: ${preIncidents.length}, education: ${preEducation.length}, regulation: ${preRegulations.length}`);
 
         // Remove old scoring logic - now handled by adaptive system
 
@@ -946,15 +911,41 @@ JSON 형식으로 응답:
         // 각 카테고리별 프로파일 활용 검색
         const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
         const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
-        console.log(`\n=== 법령 필터링 전후 비교 ===`);
-        console.log(`필터링 전: ${preRegulations.length}개`);
         const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
-        console.log(`필터링 후: ${finalRegulations.length}개`);
-        console.log(`필터링된 최종 법령:`);
-        finalRegulations.slice(0, 10).forEach((reg, idx) => {
-          console.log(`${idx + 1}. "${reg.metadata?.title}" (최종점수: ${reg.finalScore || reg.hybridScore || 'N/A'})`);
-        });
-        console.log(`===============================`);
+
+        // === 최종 선정 결과 로그 ===
+        console.log(`\n========== 최종 선정 결과 ==========`);
+        console.log(`사고사례: ${preIncidents.length}개 검색 → ${finalIncidents.length}개 선정`);
+        console.log(`교육자료: ${preEducation.length}개 검색 → ${finalEducation.length}개 선정`);
+        console.log(`관련규정: ${preRegulations.length}개 검색 → ${finalRegulations.length}개 선정`);
+        
+        if (finalIncidents.length > 0) {
+          console.log(`\n[선정된 사고사례]`);
+          finalIncidents.slice(0, 5).forEach((item, idx) => {
+            const title = item.metadata?.title || '제목없음';
+            const score = (item.finalScore || item.hybridScore || 0).toFixed(3);
+            console.log(`  ${idx + 1}. "${title}" (점수: ${score})`);
+          });
+        }
+        
+        if (finalEducation.length > 0) {
+          console.log(`\n[선정된 교육자료]`);
+          finalEducation.slice(0, 5).forEach((item, idx) => {
+            const title = item.metadata?.title || '제목없음';
+            const score = (item.finalScore || item.hybridScore || 0).toFixed(3);
+            console.log(`  ${idx + 1}. "${title}" (점수: ${score})`);
+          });
+        }
+        
+        if (finalRegulations.length > 0) {
+          console.log(`\n[선정된 관련규정]`);
+          finalRegulations.slice(0, 5).forEach((item, idx) => {
+            const title = item.metadata?.title || '제목없음';
+            const score = (item.finalScore || item.hybridScore || 0).toFixed(3);
+            console.log(`  ${idx + 1}. "${title}" (점수: ${score})`);
+          });
+        }
+        console.log(`====================================`);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
