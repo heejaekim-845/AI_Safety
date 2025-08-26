@@ -58,6 +58,8 @@ export default function Briefing() {
   const [selectedWorkSchedule, setSelectedWorkSchedule] = useState<WorkSchedule | null>(null);
   const [briefingData, setBriefingData] = useState<SafetyBriefingData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState('');
   const [quizAnswers, setQuizAnswers] = useState<{[key: number]: number}>({});
   const queryClient = useQueryClient();
 
@@ -104,22 +106,60 @@ export default function Briefing() {
     );
   };
 
-  // Generate safety briefing mutation
-  const generateBriefingMutation = useMutation({
-    mutationFn: async (workScheduleId: number) => {
+  // Generate safety briefing with progress tracking
+  const generateBriefingWithProgress = async (workScheduleId: number) => {
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    setCurrentStep('작업 정보 분석 중...');
+    
+    // Progress simulation steps
+    const progressSteps = [
+      { progress: 15, step: '설비 위험 요소 분석 중...' },
+      { progress: 25, step: '기상 정보 수집 중...' },
+      { progress: 35, step: 'RAG 데이터베이스 검색 중...' },
+      { progress: 50, step: '유사 사고사례 검색 중...' },
+      { progress: 65, step: '관련 법규 검색 중...' },
+      { progress: 75, step: '안전 교육자료 검색 중...' },
+      { progress: 85, step: 'AI 안전 분석 수행 중...' },
+      { progress: 95, step: '브리핑 문서 생성 중...' },
+      { progress: 100, step: '브리핑 생성 완료!' }
+    ];
+
+    // Start progress simulation with dynamic timing
+    let stepIndex = 0;
+    const progressInterval = setInterval(() => {
+      if (stepIndex < progressSteps.length) {
+        const step = progressSteps[stepIndex];
+        setGenerationProgress(step.progress);
+        setCurrentStep(step.step);
+        stepIndex++;
+      }
+    }, 4000); // Slower progression for better UX
+
+    try {
       const response = await apiRequest('POST', `/api/generate-safety-briefing/${workScheduleId}`);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setBriefingData(data);
-      setQuizAnswers({}); // Reset quiz answers for new briefing
-      setIsGenerating(false);
-    },
-    onError: (error) => {
+      const data = await response.json();
+      
+      clearInterval(progressInterval);
+      setGenerationProgress(100);
+      setCurrentStep('브리핑 생성 완료!');
+      
+      setTimeout(() => {
+        setBriefingData(data);
+        setQuizAnswers({});
+        setIsGenerating(false);
+        setGenerationProgress(0);
+        setCurrentStep('');
+      }, 1000);
+      
+    } catch (error) {
+      clearInterval(progressInterval);
       console.error('브리핑 생성 오류:', error);
       setIsGenerating(false);
+      setGenerationProgress(0);
+      setCurrentStep('');
     }
-  });
+  };
 
   // Delete work schedule mutation
   const deleteScheduleMutation = useMutation({
@@ -137,8 +177,7 @@ export default function Briefing() {
 
   const handleGenerateBriefing = async (workSchedule: WorkSchedule) => {
     setSelectedWorkSchedule(workSchedule);
-    setIsGenerating(true);
-    generateBriefingMutation.mutate(workSchedule.id);
+    await generateBriefingWithProgress(workSchedule.id);
   };
 
   const handleDeleteSchedule = async (scheduleId: number) => {
@@ -381,6 +420,38 @@ export default function Briefing() {
             </Card>
           </div>
         </div>
+
+        {/* Briefing Generation Progress Dialog */}
+        {isGenerating && (
+          <Dialog open={isGenerating} onOpenChange={() => {}}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-center text-xl mb-4">
+                  AI 안전 브리핑 생성중...
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-sm font-medium text-gray-700 mb-3">
+                    {currentStep}
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${generationProgress}%` }}
+                    />
+                  </div>
+                  <div className="text-lg font-bold text-blue-600">
+                    {generationProgress}%
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
 
         {/* Safety Briefing Dialog */}
         {briefingData && (
