@@ -99,58 +99,10 @@ function processCategory(
   console.log(`... 총 ${items.length}개 항목`);
   console.log(`===============================\n`);
 
-  // 1단계: 프로파일 기반 벡터 검색 결과 신뢰 - 과도한 필터링 제거
-  // 프로파일 특화 쿼리로 이미 관련성 높은 결과를 가져왔으므로, 추가 필터링 최소화
-  const relevantItems = items; // 벡터 검색 결과를 그대로 신뢰
-
-
-  // 2단계: 프로파일 기반 관련성 가중치 적용
-  const withScores = relevantItems.map(item => {
+  // 벡터 검색 결과를 그대로 사용 - applyHybridScoring에서 키워드 가중치 처리
+  const withScores = items.map(item => {
     const baseScore = normalizedScore(item);
-    const title = String(item?.metadata?.title || '').toLowerCase();
-    const content = String(item?.document || '').toLowerCase();
-    const searchText = `${title} ${content}`;
-    
-    let relevanceBoost = 0;
-    
-    if (resolvedProfile) {
-      // 프로파일 정의 키워드 활용
-      const includeKeywords = resolvedProfile.include_if_any_keywords || [];
-      const excludeKeywords = resolvedProfile.exclude_if_any_keywords || [];
-      const profileKeywords = resolvedProfile.keywords || [];
-      
-      // 프로파일 포함 키워드 가중치 (높은 가중치)
-      includeKeywords.forEach((keyword: string) => {
-        if (searchText.includes(keyword.toLowerCase())) {
-          relevanceBoost += 0.15;
-        }
-      });
-      
-      // 프로파일 키워드 가중치 (중간 가중치)
-      profileKeywords.forEach((keyword: string) => {
-        if (searchText.includes(keyword.toLowerCase())) {
-          relevanceBoost += 0.10;
-        }
-      });
-      
-      // 프로파일 제외 키워드 패널티
-      excludeKeywords.forEach((keyword: string) => {
-        if (searchText.includes(keyword.toLowerCase())) {
-          relevanceBoost -= 0.25;
-        }
-      });
-    }
-    
-    // 관련성 없는 일반 키워드 패널티 (프로파일과 별개)
-    const irrelevantKeywords = ['도장공사', '철도건널목', '저수조', '잠수작업', '선박내부'];
-    irrelevantKeywords.forEach(keyword => {
-      if (searchText.includes(keyword)) {
-        relevanceBoost -= 0.20;
-      }
-    });
-    
-    const finalScore = Math.max(0, Math.min(1, baseScore + relevanceBoost));
-    return { ...item, finalScore, baseScore, relevanceBoost };
+    return { ...item, finalScore: baseScore, baseScore, relevanceBoost: 0 };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
@@ -342,15 +294,7 @@ export class AIService {
     return out;
   }
 
-  // 임계값 계산: 상위 30% + 상한
-  private computeThreshold(scores: number[], kind: 'incident' | 'education' | 'regulation') {
-    if (!scores.length) return 0;
-    const sorted = [...scores].sort((a,b)=>a-b);
-    const idx = Math.floor(sorted.length * 0.70);
-    const p = sorted[idx];
-    const cap = kind === 'education' ? 0.25 : 0.35;
-    return Math.min(p, cap);
-  }
+
 
   // 하드코딩 사고사례 제거 - 벡터DB에서 실제 데이터 사용
 
