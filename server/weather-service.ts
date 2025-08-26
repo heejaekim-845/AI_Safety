@@ -8,11 +8,15 @@ interface WeatherData {
   condition: string;
   description: string;
   safetyWarnings: string[];
+  weatherDate: string;
+  weatherType: 'historical' | 'current' | 'forecast';
 }
 
 export class WeatherService {
   private readonly API_KEY = process.env.OPENWEATHER_API_KEY;
-  private readonly BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+  private readonly CURRENT_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+  private readonly ONE_CALL_URL = 'https://api.openweathermap.org/data/3.0/onecall';
+  private readonly HISTORY_URL = 'https://api.openweathermap.org/data/3.0/onecall/timemachine';
 
   // Korean city coordinates mapping for reliable weather data
   private readonly KOREAN_CITIES: { [key: string]: { lat: number; lon: number } } = {
@@ -35,6 +39,179 @@ export class WeatherService {
     '제주': { lat: 33.4996, lon: 126.5312 }
   };
 
+  // 작업 일정에 따른 날씨 정보 수집 (새로운 메인 메서드)
+  async getWeatherForWorkDate(location: string, workDate?: string | Date): Promise<WeatherData> {
+    if (!workDate) {
+      return this.getCurrentWeather(location);
+    }
+
+    const targetDate = new Date(workDate);
+    const today = new Date();
+    const daysDiff = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+
+    if (daysDiff < -1) {
+      // 과거 날씨 (1일 전 이상)
+      return this.getHistoricalWeather(location, targetDate);
+    } else if (daysDiff <= 7) {
+      // 현재 또는 7일 이내 예보
+      return this.getForecastWeather(location, targetDate);
+    } else {
+      // 7일 초과 미래 (현재 날씨로 대체)
+      console.warn(`작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate}`);
+      return this.getCurrentWeather(location);
+    }
+  }
+
+  // 현재 날씨 정보
+  async getCurrentWeather(location: string): Promise<WeatherData> {
+    try {
+      if (!this.API_KEY) {
+        throw new Error('OpenWeather API key not configured');
+      }
+
+      const coords = this.getCoordinatesForLocation(location);
+      let response;
+
+      console.log(`현재 날씨 조회: "${location}"`);
+
+      if (coords) {
+        response = await axios.get(this.CURRENT_WEATHER_URL, {
+          params: {
+            lat: coords.lat,
+            lon: coords.lon,
+            appid: this.API_KEY,
+            units: 'metric',
+            lang: 'ko'
+          }
+        });
+      } else {
+        response = await axios.get(this.CURRENT_WEATHER_URL, {
+          params: {
+            q: `${location},KR`,
+            appid: this.API_KEY,
+            units: 'metric',
+            lang: 'ko'
+          }
+        });
+      }
+
+      const weatherData = response.data;
+      const result = this.parseOpenWeatherResponse(weatherData);
+      result.weatherType = 'current';
+      result.weatherDate = new Date().toISOString().split('T')[0];
+      
+      console.log(`현재 날씨 조회 완료: ${location}`, result);
+      return result;
+      
+    } catch (error: any) {
+      console.error('현재 날씨 조회 오류:', error.response?.data || error.message);
+      throw new Error(`현재 날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
+    }
+  }
+
+  // 과거 날씨 정보
+  async getHistoricalWeather(location: string, targetDate: Date): Promise<WeatherData> {
+    try {
+      if (!this.API_KEY) {
+        throw new Error('OpenWeather API key not configured');
+      }
+
+      const coords = this.getCoordinatesForLocation(location);
+      if (!coords) {
+        throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
+      }
+
+      const timestamp = Math.floor(targetDate.getTime() / 1000);
+      console.log(`과거 날씨 조회: ${location}, 날짜: ${targetDate.toDateString()}`);
+
+      const response = await axios.get(this.HISTORY_URL, {
+        params: {
+          lat: coords.lat,
+          lon: coords.lon,
+          dt: timestamp,
+          appid: this.API_KEY,
+          units: 'metric',
+          lang: 'ko'
+        }
+      });
+
+      const weatherData = response.data.data[0] || response.data.current;
+      const result = this.parseHistoricalResponse(weatherData, location);
+      result.weatherType = 'historical';
+      result.weatherDate = targetDate.toISOString().split('T')[0];
+      
+      console.log(`과거 날씨 조회 완료: ${location}`, result);
+      return result;
+      
+    } catch (error: any) {
+      console.error('과거 날씨 조회 오류:', error.response?.data || error.message);
+      throw new Error(`과거 날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
+    }
+  }
+
+  // 예보 날씨 정보
+  async getForecastWeather(location: string, targetDate: Date): Promise<WeatherData> {
+    try {
+      if (!this.API_KEY) {
+        throw new Error('OpenWeather API key not configured');
+      }
+
+      const coords = this.getCoordinatesForLocation(location);
+      if (!coords) {
+        throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
+      }
+
+      console.log(`예보 날씨 조회: ${location}, 날짜: ${targetDate.toDateString()}`);
+
+      const response = await axios.get(this.ONE_CALL_URL, {
+        params: {
+          lat: coords.lat,
+          lon: coords.lon,
+          appid: this.API_KEY,
+          units: 'metric',
+          lang: 'ko',
+          exclude: 'minutely,alerts'
+        }
+      });
+
+      const forecastData = response.data;
+      const targetTimestamp = Math.floor(targetDate.getTime() / 1000);
+      
+      // 일별 예보에서 해당 날짜 찾기
+      const dailyForecast = forecastData.daily.find((day: any) => {
+        const dayStart = new Date(day.dt * 1000);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dayStart);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        return targetDate >= dayStart && targetDate <= dayEnd;
+      });
+
+      let weatherToUse;
+      if (dailyForecast) {
+        weatherToUse = dailyForecast;
+      } else if (Math.abs(targetDate.getTime() - new Date().getTime()) < 24 * 60 * 60 * 1000) {
+        // 오늘이면 현재 날씨 사용
+        weatherToUse = forecastData.current;
+      } else {
+        // 가장 가까운 예보 사용
+        weatherToUse = forecastData.daily[0];
+      }
+
+      const result = this.parseForecastResponse(weatherToUse, location);
+      result.weatherType = 'forecast';
+      result.weatherDate = targetDate.toISOString().split('T')[0];
+      
+      console.log(`예보 날씨 조회 완료: ${location}`, result);
+      return result;
+      
+    } catch (error: any) {
+      console.error('예보 날씨 조회 오류:', error.response?.data || error.message);
+      throw new Error(`예보 날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
+    }
+  }
+
+  // 기존 메서드 (하위 호환성)
   async getWeatherForLocation(location: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
@@ -51,7 +228,7 @@ export class WeatherService {
       if (coords) {
         // Use coordinate-based API call for reliability
         console.log(`Using coordinates for ${location}: lat=${coords.lat}, lon=${coords.lon}`);
-        response = await axios.get(this.BASE_URL, {
+        response = await axios.get(this.CURRENT_WEATHER_URL, {
           params: {
             lat: coords.lat,
             lon: coords.lon,
@@ -63,7 +240,7 @@ export class WeatherService {
       } else {
         // Fallback to city name search
         console.log(`No coordinates found for "${location}", trying city name search`);
-        response = await axios.get(this.BASE_URL, {
+        response = await axios.get(this.CURRENT_WEATHER_URL, {
           params: {
             q: `${location},KR`, // Assuming Korean locations
             appid: this.API_KEY,
@@ -75,6 +252,8 @@ export class WeatherService {
 
       const weatherData = response.data;
       const realWeatherData = this.parseOpenWeatherResponse(weatherData);
+      realWeatherData.weatherType = 'current';
+      realWeatherData.weatherDate = new Date().toISOString().split('T')[0];
       
       console.log(`Real weather data fetched for ${location}:`, realWeatherData);
       return realWeatherData;
@@ -126,7 +305,9 @@ export class WeatherService {
       windSpeed,
       condition,
       description: this.getWeatherDescription(condition, temperature),
-      safetyWarnings
+      safetyWarnings,
+      weatherDate: new Date().toISOString().split('T')[0],
+      weatherType: 'current'
     };
   }
 
@@ -164,7 +345,9 @@ export class WeatherService {
       windSpeed,
       condition,
       description: this.getWeatherDescription(condition, temperature),
-      safetyWarnings
+      safetyWarnings,
+      weatherDate: new Date().toISOString().split('T')[0],
+      weatherType: 'current'
     };
   }
 
@@ -210,6 +393,91 @@ export class WeatherService {
 
   private getWeatherDescription(condition: string, temperature: number): string {
     let desc = `현재 날씨는 ${condition}입니다.`;
+    
+    if (temperature < 5) {
+      desc += ' 추운 날씨로 방한 대책이 필요합니다.';
+    } else if (temperature > 25) {
+      desc += ' 더운 날씨로 열중증 예방이 필요합니다.';
+    } else {
+      desc += ' 작업하기 적당한 기온입니다.';
+    }
+
+    return desc;
+  }
+
+  // 과거 날씨 응답 파싱
+  private parseHistoricalResponse(data: any, location: string): WeatherData {
+    const temperature = Math.round(data.temp || data.main?.temp || 15);
+    const humidity = data.humidity || data.main?.humidity || 60;
+    const windSpeed = Math.round(data.wind_speed || data.wind?.speed || 3);
+    const condition = this.translateWeatherCondition(data.weather?.[0]?.main || 'Clear');
+
+    const safetyWarnings = this.generateSafetyWarnings(condition, temperature, humidity, windSpeed);
+
+    return {
+      location,
+      temperature,
+      humidity,
+      windSpeed,
+      condition,
+      description: this.getWeatherDescription(condition, temperature, 'historical'),
+      safetyWarnings,
+      weatherDate: '',
+      weatherType: 'historical'
+    };
+  }
+
+  // 예보 날씨 응답 파싱
+  private parseForecastResponse(data: any, location: string): WeatherData {
+    let temperature: number;
+    let humidity: number;
+    let windSpeed: number;
+    let condition: string;
+
+    if (data.temp) {
+      // 일별 예보 데이터
+      temperature = Math.round((data.temp.max + data.temp.min) / 2);
+      humidity = data.humidity || 60;
+      windSpeed = Math.round(data.wind_speed || 3);
+      condition = this.translateWeatherCondition(data.weather?.[0]?.main || 'Clear');
+    } else {
+      // 현재 날씨 데이터
+      temperature = Math.round(data.temp || data.main?.temp || 15);
+      humidity = data.humidity || data.main?.humidity || 60;
+      windSpeed = Math.round(data.wind_speed || data.wind?.speed || 3);
+      condition = this.translateWeatherCondition(data.weather?.[0]?.main || 'Clear');
+    }
+
+    const safetyWarnings = this.generateSafetyWarnings(condition, temperature, humidity, windSpeed);
+
+    return {
+      location,
+      temperature,
+      humidity,
+      windSpeed,
+      condition,
+      description: this.getWeatherDescription(condition, temperature, 'forecast'),
+      safetyWarnings,
+      weatherDate: '',
+      weatherType: 'forecast'
+    };
+  }
+
+  // 날씨 설명 업데이트 (날씨 타입 포함)
+  private getWeatherDescription(condition: string, temperature: number, weatherType: string = 'current'): string {
+    let prefix = '';
+    switch (weatherType) {
+      case 'historical':
+        prefix = '해당 일자의 날씨는 ';
+        break;
+      case 'forecast':
+        prefix = '예상 날씨는 ';
+        break;
+      default:
+        prefix = '현재 날씨는 ';
+    }
+
+    let desc = `${prefix}${condition}입니다.`;
     
     if (temperature < 5) {
       desc += ' 추운 날씨로 방한 대책이 필요합니다.';

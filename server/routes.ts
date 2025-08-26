@@ -729,9 +729,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let weatherInfo = null;
       
       try {
-        weatherInfo = await weatherService.getWeatherForLocation(weatherLocation);
+        // 작업 일정에 따른 스마트 날씨 정보 수집 (과거/현재/미래)
+        weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate);
+        console.log(`스마트 날씨 정보 수집 완료 - 위치: ${weatherLocation}, 작업일: ${workSchedule.scheduledDate}, 타입: ${weatherInfo.weatherType}`);
       } catch (error) {
-        console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}): ${String(error)}`);
+        console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);
         // weatherInfo remains null - no mock data will be used
       }
 
