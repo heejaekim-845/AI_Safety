@@ -182,9 +182,9 @@ const SEARCH_PROFILES: Profile[] = [
     description: "기본 프로파일 (모든 설비 통합)",
     keywords: ["안전", "점검", "정비", "위험성 평가", "사고", "예방"],
     queries: {
-      accidents: ["사고사례"],
-      regulation: ["규정 또는 기준"],
-      education: ["교육자료"]
+      accidents: [],
+      regulation: [],
+      education: []
     },
     weights: {
       vector: 0.60,
@@ -364,17 +364,17 @@ export function buildTargetedSearchQuery(
   // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리 (더 구체적인 문구 추가)
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 사고사례 예방`)
+    ...riskQueries.map(rq => `${rq} 사고사례`)
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 법규 안전기준`)
+    ...riskQueries.map(rq => `${rq} 규정`)
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 안전교육 훈련`)
+    ...riskQueries.map(rq => `${rq} 교육자료`)
   ]);
 
   const all = uniq([...accidents, ...regulation, ...education]);
@@ -382,10 +382,9 @@ export function buildTargetedSearchQuery(
   console.log(`[쿼리 빌드] 프로파일: ${profile.id}`);
   console.log(`  baseContext: "${baseContext}"`);
   console.log(`  riskQueries 생성됨 (${riskQueries.length}개):`, riskQueries);
-  console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 3));
-  console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 3));
-  console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 3));
-  console.log(`  전체 법규쿼리:`, regulation);
+  console.log(`  사고쿼리 ${accidents.length}건:`, accidents.slice(0, 5));
+  console.log(`  법규쿼리 ${regulation.length}건:`, regulation.slice(0, 5));
+  console.log(`  교육쿼리 ${education.length}건:`, education.slice(0, 5));
 
   return { accidents, regulation, education, all };
 }
