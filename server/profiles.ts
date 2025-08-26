@@ -182,9 +182,9 @@ const SEARCH_PROFILES: Profile[] = [
     description: "기본 프로파일 (모든 설비 통합)",
     keywords: ["안전", "점검", "정비", "위험성 평가", "사고", "예방"],
     queries: {
-      accidents: ["사고사례", "안전사고", "작업사고"],
-      regulation: ["안전규정", "법규", "안전기준"],
-      education: ["안전교육", "교육자료", "안전훈련"]
+      accidents: ["사고사례"],
+      regulation: ["규정 또는 기준"],
+      education: ["교육자료"]
     },
     weights: {
       vector: 0.60,
