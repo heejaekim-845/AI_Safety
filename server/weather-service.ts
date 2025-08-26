@@ -39,27 +39,32 @@ export class WeatherService {
     '제주': { lat: 33.4996, lon: 126.5312 }
   };
 
-  // 작업 일정에 따른 날씨 정보 수집 (새로운 메인 메서드)
+  // 작업 일정에 따른 날씨 정보 수집 (무료 API 버전)
   async getWeatherForWorkDate(location: string, workDate?: string | Date): Promise<WeatherData> {
-    if (!workDate) {
-      return this.getCurrentWeather(location);
+    // 무료 계정에서는 현재 날씨만 사용 가능하므로 현재 날씨로 대체
+    const weatherData = await this.getCurrentWeather(location);
+    
+    if (workDate) {
+      const targetDate = new Date(workDate);
+      const today = new Date();
+      const daysDiff = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+      
+      // 날씨 타입과 설명을 작업 일정에 맞게 조정
+      if (daysDiff < -1) {
+        weatherData.weatherType = 'historical';
+        weatherData.description = weatherData.description.replace('현재 날씨는', '참고용 날씨는');
+        weatherData.description += ' (과거 날씨 데이터는 유료 구독 필요)';
+      } else if (daysDiff > 0) {
+        weatherData.weatherType = 'forecast';
+        weatherData.description = weatherData.description.replace('현재 날씨는', '참고용 날씨는');
+        weatherData.description += ' (예보 데이터는 유료 구독 필요)';
+      }
+      
+      weatherData.weatherDate = targetDate.toISOString().split('T')[0];
+      console.log(`현재 날씨를 작업 일정용으로 조정 - 위치: ${location}, 작업일: ${workDate}, 타입: ${weatherData.weatherType}`);
     }
-
-    const targetDate = new Date(workDate);
-    const today = new Date();
-    const daysDiff = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-
-    if (daysDiff < -1) {
-      // 과거 날씨 (1일 전 이상)
-      return this.getHistoricalWeather(location, targetDate);
-    } else if (daysDiff <= 7) {
-      // 현재 또는 7일 이내 예보
-      return this.getForecastWeather(location, targetDate);
-    } else {
-      // 7일 초과 미래 (현재 날씨로 대체)
-      console.warn(`작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate}`);
-      return this.getCurrentWeather(location);
-    }
+    
+    return weatherData;
   }
 
   // 현재 날씨 정보
