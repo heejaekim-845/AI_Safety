@@ -369,11 +369,25 @@ export function buildTargetedSearchQuery(
   const workTypeData = workType as any;
   console.log(`[디버깅] workType.safetyPrecautions:`, workTypeData?.safetyPrecautions);
   
-  if (workTypeData?.safetyPrecautions && workTypeData.safetyPrecautions.trim()) {
-    const safetyPrecautions = workTypeData.safetyPrecautions.trim();
-    const enhancedSafetyQuery = `${baseContextWithSuffix} 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 ${safetyPrecautions} 와 관련된`;
-    safetyPrecautionQueries.push(enhancedSafetyQuery);
-    console.log(`[안전유의사항] 전체 내용 활용: "${safetyPrecautions}"`);
+  if (workTypeData?.safetyPrecautions) {
+    // safetyPrecautions가 배열인지 문자열인지 확인하고 처리
+    let safetyPrecautionsList: string[] = [];
+    
+    if (Array.isArray(workTypeData.safetyPrecautions)) {
+      safetyPrecautionsList = workTypeData.safetyPrecautions.filter((item: any) => item && typeof item === 'string' && item.trim());
+    } else if (typeof workTypeData.safetyPrecautions === 'string' && workTypeData.safetyPrecautions.trim()) {
+      safetyPrecautionsList = [workTypeData.safetyPrecautions.trim()];
+    }
+    
+    // 각 안전유의사항에 대해 쿼리 생성
+    for (const safetyPrecaution of safetyPrecautionsList) {
+      const cleanedPrecaution = safetyPrecaution.trim();
+      if (cleanedPrecaution) {
+        const enhancedSafetyQuery = `${baseContextWithSuffix} 전기설비 및 기계설비를 이용하는 발전소, 변전소 또는 공장에서 발생가능한 ${cleanedPrecaution} 와 관련된`;
+        safetyPrecautionQueries.push(enhancedSafetyQuery);
+        console.log(`[안전유의사항] 전체 내용 활용: "${cleanedPrecaution}"`);
+      }
+    }
   }
 
   // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리 + 안전유의사항 쿼리
