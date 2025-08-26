@@ -248,6 +248,77 @@ export class AIService {
     });
   }
 
+  // 카테고리별 특화 검색 함수 (새로 추가)
+  private async runCategorySpecificSearchQueries(
+    incidentQueries: string[],
+    regulationQueries: string[],
+    educationQueries: string[]
+  ): Promise<any[]> {
+    console.log(`\n🔍🔍🔍 [카테고리별 특화 검색] 시작 🔍🔍🔍`);
+    console.log(`🔍 사고사례 쿼리: ${incidentQueries.length}개`);
+    console.log(`🔍 법규 쿼리: ${regulationQueries.length}개`);
+    console.log(`🔍 교육자료 쿼리: ${educationQueries.length}개`);
+    
+    const out: any[] = [];
+    
+    // 사고사례 검색
+    for (let i = 0; i < incidentQueries.length; i++) {
+      const q = incidentQueries[i];
+      try {
+        console.log(`\n[사고사례 ${i + 1}/${incidentQueries.length}] 벡터검색 쿼리: "${q}"`);
+        const results = await chromaDBService.searchBySpecificCategory(q, 'incident', 5);
+        console.log(`  🚨 사고사례 검색 결과: ${results.length}개`);
+        
+        results.slice(0, 2).forEach((item, idx) => {
+          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+        });
+        
+        out.push(...results);
+      } catch (e) {
+        console.warn('[incident search] query failed', q, e);
+      }
+    }
+    
+    // 법규 검색
+    for (let i = 0; i < regulationQueries.length; i++) {
+      const q = regulationQueries[i];
+      try {
+        console.log(`\n[법규 ${i + 1}/${regulationQueries.length}] 벡터검색 쿼리: "${q}"`);
+        const results = await chromaDBService.searchBySpecificCategory(q, 'regulation', 5);
+        console.log(`  📋 법규 검색 결과: ${results.length}개`);
+        
+        results.slice(0, 2).forEach((item, idx) => {
+          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+        });
+        
+        out.push(...results);
+      } catch (e) {
+        console.warn('[regulation search] query failed', q, e);
+      }
+    }
+    
+    // 교육자료 검색
+    for (let i = 0; i < educationQueries.length; i++) {
+      const q = educationQueries[i];
+      try {
+        console.log(`\n[교육자료 ${i + 1}/${educationQueries.length}] 벡터검색 쿼리: "${q}"`);
+        const results = await chromaDBService.searchBySpecificCategory(q, 'education', 5);
+        console.log(`  📚 교육자료 검색 결과: ${results.length}개`);
+        
+        results.slice(0, 2).forEach((item, idx) => {
+          console.log(`    ${idx + 1}. "${item.metadata?.title || '제목없음'}" (점수: ${(1 - item.distance).toFixed(3)})`);
+        });
+        
+        out.push(...results);
+      } catch (e) {
+        console.warn('[education search] query failed', q, e);
+      }
+    }
+    
+    console.log(`[DEBUG] runCategorySpecificSearchQueries 완료, 총 ${out.length}개 결과`);
+    return out;
+  }
+
   // 통합된 검색 함수 (벡터/키워드 통합) - searchByCategory 사용으로 regulation 검색 개선
   private async runSearchQueries(queries: string[]): Promise<any[]> {
     console.log(`\n🔍🔍🔍 [CRITICAL SEARCH DEBUG] runSearchQueries 호출됨 🔍🔍🔍`);
@@ -796,11 +867,15 @@ JSON 형식으로 응답:
         const regulationQueries = regulation;
         const educationQueries = education;
         
-        console.log(`통합 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
-        const allQueries = [...incidentQueries, ...regulationQueries, ...educationQueries];
+        console.log(`카테고리별 특화 쿼리 총 ${incidentQueries.length + regulationQueries.length + educationQueries.length}개 생성`);
+        console.log(`- 사고사례 쿼리: ${incidentQueries.length}개`);
+        console.log(`- 법규 쿼리: ${regulationQueries.length}개`);
+        console.log(`- 교육자료 쿼리: ${educationQueries.length}개`);
 
-        // Run unified search queries with category-specific terms
-        const allCandidates = await timeit('unified.search', () => this.runSearchQueries(allQueries));
+        // 카테고리별 특화 검색 실행 (분리된 검색)
+        const allCandidates = await timeit('category-specific.search', () => 
+          this.runCategorySpecificSearchQueries(incidentQueries, regulationQueries, educationQueries)
+        );
         const candidatesRaw = dedupById(allCandidates || []);
         
         console.log(`🚨 [디버깅] candidatesRaw 생성 완료: ${candidatesRaw?.length || 0}개 항목`);

@@ -1265,6 +1265,53 @@ export class ChromaDBService {
     }
   }
 
+  // 특정 카테고리만 검색하는 함수 (새로 추가)
+  async searchBySpecificCategory(query: string, category: 'education' | 'incident' | 'regulation', limit: number = 5): Promise<SearchResult[]> {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      // OpenAI API 할당량 문제가 있으면 빈 결과 반환
+      if (!process.env.OPENAI_API_KEY) {
+        return [];
+      }
+
+      // 쿼리 임베딩 생성
+      console.log(`\n[특정 카테고리 검색] 카테고리: ${category}, 쿼리: "${query}"`);
+      const queryEmbedding = await this.generateQueryEmbedding(query);
+
+      // 모든 결과 가져오기
+      const results = await this.index.queryItems(queryEmbedding, 10000);
+      const sortedResults = results.sort((a, b) => b.score - a.score);
+
+      // 해당 카테고리만 필터링
+      const categoryResults: SearchResult[] = [];
+      for (const result of sortedResults) {
+        const type = result.item.metadata?.type;
+        if (type === category && categoryResults.length < limit) {
+          categoryResults.push({
+            document: (result.item.metadata?.content as string) || '',
+            metadata: result.item.metadata || {},
+            distance: result.score
+          });
+        }
+        
+        // 원하는 개수만큼 찾으면 중단
+        if (categoryResults.length >= limit) {
+          break;
+        }
+      }
+
+      console.log(`[특정 카테고리 검색] ${category} 검색 완료: ${categoryResults.length}개 결과`);
+      return categoryResults;
+
+    } catch (error: any) {
+      console.log(`특정 카테고리(${category}) 벡터 검색 실패:`, error.message);
+      return [];
+    }
+  }
+
   async searchByCategory(query: string, limitPerCategory: number = 5): Promise<CategorizedSearchResult> {
     try {
       if (!this.isInitialized) {
