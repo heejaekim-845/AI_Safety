@@ -105,7 +105,7 @@ function processCategory(
 
   console.log(`[processCategory] ${category}: 프로파일 기반 검색 결과 신뢰 - 필터링 없이 ${items.length}개 항목 유지`);
 
-  // 2단계: 카테고리별 특화 점수 산정 적용
+  // 2단계: 프로파일 기반 관련성 가중치 적용
   const withScores = relevantItems.map(item => {
     const baseScore = normalizedScore(item);
     const title = String(item?.metadata?.title || '').toLowerCase();
@@ -114,54 +114,30 @@ function processCategory(
     
     let relevanceBoost = 0;
     
-    // 카테고리별 특화 점수 가중치 적용
-    if (category === 'incident') {
-      // 사고사례: 실제 사고 경험과 현실적 위험에 더 높은 가중치
-      if (searchText.includes('사고') || searchText.includes('재해')) relevanceBoost += 0.20;
-      if (searchText.includes('끼임') || searchText.includes('협착')) relevanceBoost += 0.15;
-      if (searchText.includes('감전') || searchText.includes('전기')) relevanceBoost += 0.15;
-      if (searchText.includes('추락') || searchText.includes('낙하')) relevanceBoost += 0.15;
-    } else if (category === 'regulation') {
-      // 법규: 조문 번호, 법정 용어, 의무 사항에 더 높은 가중치
-      if (searchText.includes('조') && searchText.includes('항')) relevanceBoost += 0.20;
-      if (searchText.includes('사업주는') || searchText.includes('근로자는')) relevanceBoost += 0.15;
-      if (searchText.includes('금지') || searchText.includes('의무')) relevanceBoost += 0.15;
-      if (searchText.includes('안전조치') || searchText.includes('보호구')) relevanceBoost += 0.10;
-    } else if (category === 'education') {
-      // 교육자료: 교육 내용, 실습, 학습에 더 높은 가중치
-      if (searchText.includes('교육') || searchText.includes('훈련')) relevanceBoost += 0.20;
-      if (searchText.includes('실습') || searchText.includes('학습')) relevanceBoost += 0.15;
-      if (searchText.includes('안전보건') || searchText.includes('예방')) relevanceBoost += 0.10;
-      if (searchText.includes('절차') || searchText.includes('방법')) relevanceBoost += 0.10;
-    }
-    
     if (resolvedProfile) {
       // 프로파일 정의 키워드 활용
       const includeKeywords = resolvedProfile.include_if_any_keywords || [];
       const excludeKeywords = resolvedProfile.exclude_if_any_keywords || [];
       const profileKeywords = resolvedProfile.keywords || [];
       
-      // 프로파일 포함 키워드 가중치 (카테고리별 차등 적용)
+      // 프로파일 포함 키워드 가중치 (높은 가중치)
       includeKeywords.forEach((keyword: string) => {
         if (searchText.includes(keyword.toLowerCase())) {
-          const categoryMultiplier = category === 'incident' ? 0.18 : category === 'regulation' ? 0.12 : 0.15;
-          relevanceBoost += categoryMultiplier;
+          relevanceBoost += 0.15;
         }
       });
       
-      // 프로파일 키워드 가중치 (카테고리별 차등 적용)
+      // 프로파일 키워드 가중치 (중간 가중치)
       profileKeywords.forEach((keyword: string) => {
         if (searchText.includes(keyword.toLowerCase())) {
-          const categoryMultiplier = category === 'incident' ? 0.12 : category === 'regulation' ? 0.08 : 0.10;
-          relevanceBoost += categoryMultiplier;
+          relevanceBoost += 0.10;
         }
       });
       
-      // 프로파일 제외 키워드 패널티 (카테고리별 차등 적용)
+      // 프로파일 제외 키워드 패널티
       excludeKeywords.forEach((keyword: string) => {
         if (searchText.includes(keyword.toLowerCase())) {
-          const categoryPenalty = category === 'regulation' ? 0.30 : 0.25;
-          relevanceBoost -= categoryPenalty;
+          relevanceBoost -= 0.25;
         }
       });
     }
@@ -175,19 +151,16 @@ function processCategory(
     });
     
     const finalScore = Math.max(0, Math.min(1, baseScore + relevanceBoost));
-    return { ...item, finalScore, baseScore, relevanceBoost, category };
+    return { ...item, finalScore, baseScore, relevanceBoost };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
   
-  // 카테고리별 점수 산정 결과 상세 출력
+  // 상위 3개 점수 로그 출력 (프로파일 키워드 적용 결과 포함)
   if (withScores.length > 0) {
-    console.log(`\n=== ${category.toUpperCase()} 카테고리별 점수 산정 결과 ===`);
-    console.log(`[processCategory] ${category} 상위 점수 (카테고리별 특화 가중치 적용):`);
+    console.log(`[processCategory] ${category} 상위 점수 (프로파일 키워드 적용):`);
     withScores.slice(0, 3).forEach((item, idx) => {
-      const vectorScore = (1 - (item.distance || 0)).toFixed(3);
-      const hybridScore = (item.hybridScore || item.finalScore || 0).toFixed(3);
-      console.log(`[${category}] ${idx + 1}. "${item.metadata?.title || 'No title'}" 최종점수: ${item.finalScore.toFixed(3)} (벡터: ${vectorScore}, 하이브리드계산: ${hybridScore})`);
+      console.log(`  ${idx + 1}. "${item.metadata?.title || 'No title'}" - finalScore: ${item.finalScore.toFixed(3)}, baseScore: ${item.baseScore?.toFixed(3)}, boost: ${item.relevanceBoost?.toFixed(3)}, distance: ${item.distance || 'N/A'}`);
     });
     
     // 프로파일 키워드가 적용된 항목들 확인
