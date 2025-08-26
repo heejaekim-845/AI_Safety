@@ -777,44 +777,44 @@ export default function Briefing() {
                             {/* 5x2 Grid Layout for Accident Information */}
                             <div className="grid grid-cols-5 gap-2 mb-3">
                               {/* Row 1 */}
-                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                                <div className="text-xs font-semibold text-gray-600 mb-1">사고일시</div>
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="text-xs font-semibold text-gray-600 text-center">사고일시</div>
                               </div>
-                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4">
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4 flex items-center">
                                 <div className="text-xs text-gray-900">{accident.date || '미기재'}</div>
                               </div>
                               
                               {/* Row 2 */}
-                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                                <div className="text-xs font-semibold text-gray-600 mb-1">사고장소</div>
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="text-xs font-semibold text-gray-600 text-center">사고장소</div>
                               </div>
-                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4">
+                              <div className="bg-gray-100 border border-gray-300 rounded px-2 py-1 col-span-4 flex items-center">
                                 <div className="text-xs text-gray-900">{accident.location || '미기재'}</div>
                               </div>
                               
                               {/* Row 3 */}
-                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1">
-                                <div className="text-xs font-semibold text-red-600 mb-1">피해규모</div>
+                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="text-xs font-semibold text-red-600 text-center">피해규모</div>
                               </div>
-                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1 col-span-4">
+                              <div className="bg-red-50 border border-red-300 rounded px-2 py-1 col-span-4 flex items-center">
                                 <div className="text-xs text-red-900 font-medium">{accident.damage || '미기재'}</div>
                               </div>
                               
                               {/* Row 4 */}
-                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1">
-                                <div className="text-xs font-semibold text-blue-600 mb-1">사고내용</div>
+                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="text-xs font-semibold text-blue-600 text-center">사고내용</div>
                               </div>
-                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1 col-span-4">
+                              <div className="bg-blue-50 border border-blue-300 rounded px-2 py-1 col-span-4 flex items-center">
                                 <div className="text-xs text-blue-900 leading-relaxed">
                                   {accident.summary ? (accident.summary.length > 100 ? `${accident.summary.substring(0, 100)}...` : accident.summary) : '미기재'}
                                 </div>
                               </div>
                               
                               {/* Row 5 */}
-                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1">
-                                <div className="text-xs font-semibold text-green-600 mb-1">예방대책</div>
+                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="text-xs font-semibold text-green-600 text-center">예방대책</div>
                               </div>
-                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1 col-span-4">
+                              <div className="bg-green-50 border border-green-300 rounded px-2 py-1 col-span-4 flex items-center">
                                 <div className="text-xs text-green-900 font-medium leading-relaxed">
                                   {accident.prevention ? (accident.prevention.length > 100 ? `${accident.prevention.substring(0, 100)}...` : accident.prevention) : '미기재'}
                                 </div>
