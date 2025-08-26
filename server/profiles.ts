@@ -343,46 +343,57 @@ export function buildTargetedSearchQuery(
     const riskFactors = equipmentData.riskFactors;
     console.log(`[디버깅] riskFactors 처리 시작:`, riskFactors);
     
-    if (riskFactors.highVoltageDetail) {
-      const detail = tokenize(riskFactors.highVoltageDetail).slice(0, 3).join(" ");
-      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    // 각 위험 유형별 상세 내용을 완전히 활용하고 특정 문구 추가
+    if (riskFactors.highVoltageDetail && riskFactors.highVoltageDetail.trim()) {
+      const fullDetail = riskFactors.highVoltageDetail.trim();
+      const enhancedQuery = `${baseContext} ${fullDetail} 고압 전기 안전`;
+      riskQueries.push(enhancedQuery);
+      console.log(`[고압전기] 전체 내용 활용: "${fullDetail}"`);
     }
     
-    if (riskFactors.highPressureDetail) {
-      const detail = tokenize(riskFactors.highPressureDetail).slice(0, 3).join(" ");
-      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    if (riskFactors.highPressureDetail && riskFactors.highPressureDetail.trim()) {
+      const fullDetail = riskFactors.highPressureDetail.trim();
+      const enhancedQuery = `${baseContext} ${fullDetail} 고압 압력 안전`;
+      riskQueries.push(enhancedQuery);
+      console.log(`[고압압력] 전체 내용 활용: "${fullDetail}"`);
     }
     
-    if (riskFactors.highTemperatureDetail) {
-      const detail = tokenize(riskFactors.highTemperatureDetail).slice(0, 3).join(" ");
-      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    if (riskFactors.highTemperatureDetail && riskFactors.highTemperatureDetail.trim()) {
+      const fullDetail = riskFactors.highTemperatureDetail.trim();
+      const enhancedQuery = `${baseContext} ${fullDetail} 고온 화상 안전`;
+      riskQueries.push(enhancedQuery);
+      console.log(`[고온] 전체 내용 활용: "${fullDetail}"`);
     }
     
-    if (riskFactors.heightDetail) {
-      const detail = tokenize(riskFactors.heightDetail).slice(0, 3).join(" ");
-      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    if (riskFactors.heightDetail && riskFactors.heightDetail.trim()) {
+      const fullDetail = riskFactors.heightDetail.trim();
+      const enhancedQuery = `${baseContext} ${fullDetail} 고소작업 추락 안전`;
+      riskQueries.push(enhancedQuery);
+      console.log(`[고소작업] 전체 내용 활용: "${fullDetail}"`);
     }
     
-    if (riskFactors.mechanicalDetail) {
-      const detail = tokenize(riskFactors.mechanicalDetail).slice(0, 3).join(" ");
-      if (detail) riskQueries.push(`${baseContext} ${detail}`);
+    if (riskFactors.mechanicalDetail && riskFactors.mechanicalDetail.trim()) {
+      const fullDetail = riskFactors.mechanicalDetail.trim();
+      const enhancedQuery = `${baseContext} ${fullDetail} 기계적 끼임 안전`;
+      riskQueries.push(enhancedQuery);
+      console.log(`[기계적위험] 전체 내용 활용: "${fullDetail}"`);
     }
   }
 
-  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리
+  // 규정/교육/사고 쿼리 구성: 프로파일 기본 + 위험요소별 개별 쿼리 (더 구체적인 문구 추가)
   const accidents = uniq([
     ...((profile.queries?.accidents ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 사고`)
+    ...riskQueries.map(rq => `${rq} 사고사례 예방`)
   ]);
 
   const regulation = uniq([
     ...((profile.queries?.regulation ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 안전기준`)
+    ...riskQueries.map(rq => `${rq} 법규 안전기준`)
   ]);
 
   const education = uniq([
     ...((profile.queries?.education ?? []).map((q) => `${q}`)),
-    ...riskQueries.map(rq => `${rq} 안전교육`)
+    ...riskQueries.map(rq => `${rq} 안전교육 훈련`)
   ]);
 
   const all = uniq([...accidents, ...regulation, ...education]);
