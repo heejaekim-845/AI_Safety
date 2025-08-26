@@ -78,8 +78,8 @@ function clamp01(x: number) {
 function processCategory(
   items: any[], 
   category: 'incident'|'education'|'regulation',
-  equipment: string, 
-  workType: string,
+  equipmentInfoObj: any, 
+  workType: any,
   resolvedProfile?: any
 ) {
   console.log(`[processCategory] ${category}: ${items.length}개 항목 처리 시작`);
@@ -99,10 +99,21 @@ function processCategory(
   console.log(`... 총 ${items.length}개 항목`);
   console.log(`===============================\n`);
 
-  // 벡터 검색 결과를 그대로 사용 - applyHybridScoring에서 키워드 가중치 처리
+  // 실제 하이브리드 스코어링 적용
   const withScores = items.map(item => {
     const baseScore = normalizedScore(item);
-    return { ...item, finalScore: baseScore, baseScore, relevanceBoost: 0 };
+    
+    // applyHybridScoring으로 실제 하이브리드 점수 계산
+    const hybridScore = applyHybridScoring({
+      id: item.id,
+      title: item.metadata?.title,
+      text: item.document,
+      content: item.document,
+      metadata: item.metadata,
+      vectorScore: item.vectorScore ?? item.score ?? item.similarity
+    }, resolvedProfile, equipmentInfoObj, workType);
+    
+    return { ...item, finalScore: hybridScore, baseScore, relevanceBoost: 0 };
   }).sort((a,b) => b.finalScore - a.finalScore);
 
   console.log(`[processCategory] ${category}: ${withScores.length}개 항목 점수 계산 완료`);
@@ -849,9 +860,9 @@ JSON 형식으로 응답:
         // ===== 프로파일 기반 벡터 검색 (동적 키워드 제거됨) =====
         
         // 각 카테고리별 프로파일 활용 검색
-        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
-        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);  
-        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj?.name || '', workType?.name || '', resolvedProfile);
+        const finalIncidents   = processCategory(preIncidents,   'incident',  equipmentInfoObj, workType, resolvedProfile);
+        const finalEducation   = processCategory(preEducation,   'education', equipmentInfoObj, workType, resolvedProfile);  
+        const finalRegulations = processCategory(preRegulations, 'regulation', equipmentInfoObj, workType, resolvedProfile);
 
         // === 최종 선정 결과 로그 ===
         console.log(`\n========== 최종 선정 결과 ==========`);
