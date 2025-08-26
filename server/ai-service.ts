@@ -32,12 +32,7 @@ const SIMPLE_CONFIG = {
 // ---------- Type normalization ----------
 function normType(m: any) {
   const s = (m?.type || m?.sourceType || '').toLowerCase();
-  
-  // 디버깅: 법규 데이터가 어떻게 분류되는지 확인
-  if (s.includes('regulation') || s.includes('법규') || s.includes('기준') || s.includes('규정')) {
-    console.log(`[normType] 법규 관련 데이터 발견: type="${m?.type}", sourceType="${m?.sourceType}", 결과="${s}"`);
-  }
-  
+   
   if (s === 'accident') return 'incident';
   return s;
 }
