@@ -85,13 +85,9 @@ export default function Briefing() {
   const datesWithWork = new Set(
     allWorkSchedules.map((schedule: WorkSchedule) => {
       const scheduleDate = new Date(schedule.scheduledDate);
-      const dateString = format(scheduleDate, 'yyyy-MM-dd');
-      console.log('작업 일정 날짜:', schedule.scheduledDate, '→', dateString);
-      return dateString;
+      return format(scheduleDate, 'yyyy-MM-dd');
     })
   );
-  
-  console.log('작업이 있는 날짜 목록:', Array.from(datesWithWork));
 
   // Custom day renderer for calendar
   const renderDay = (day: Date) => {
@@ -768,24 +764,24 @@ export default function Briefing() {
                               </Badge>
                             </div>
                             
-                            {/* Basic information - moved out of gray box */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            {/* Basic information - in a single line */}
+                            <div className="flex flex-wrap items-center gap-6 mb-4 text-sm">
                               {accident.date && (
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-gray-700 mb-1">날짜</span>
-                                  <span className="text-sm text-gray-900">{accident.date}</span>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-medium text-gray-700">날짜</span>
+                                  <span className="text-gray-900">{accident.date}</span>
                                 </div>
                               )}
                               {accident.location && (
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-gray-700 mb-1">장소</span>
-                                  <span className="text-sm text-gray-900">{accident.location}</span>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-medium text-gray-700">장소</span>
+                                  <span className="text-gray-900">{accident.location}</span>
                                 </div>
                               )}
                               {accident.damage && (
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-gray-700 mb-1">피해규모</span>
-                                  <span className="text-sm font-semibold text-red-600">{accident.damage}</span>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-medium text-gray-700">피해규모</span>
+                                  <span className="font-semibold text-red-600">{accident.damage}</span>
                                 </div>
                               )}
                             </div>
