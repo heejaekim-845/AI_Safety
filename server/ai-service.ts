@@ -103,7 +103,6 @@ function processCategory(
   // 프로파일 특화 쿼리로 이미 관련성 높은 결과를 가져왔으므로, 추가 필터링 최소화
   const relevantItems = items; // 벡터 검색 결과를 그대로 신뢰
 
-  console.log(`[processCategory] ${category}: 프로파일 기반 검색 결과 신뢰 - 필터링 없이 ${items.length}개 항목 유지`);
 
   // 2단계: 프로파일 기반 관련성 가중치 적용
   const withScores = relevantItems.map(item => {
@@ -886,10 +885,7 @@ JSON 형식으로 응답:
         let filteredChromaResults = chromaResults;
         
         // 카테고리별 특화 검색 완료 - 중복 교육자료 검색 로직 제거됨
-
-        // 프로파일 기반 벡터 검색 결과 활용 - 별도 키워드 가중치 시스템 제거
-        // 프로파일 특화 쿼리가 이미 최적화된 검색을 수행했으므로 추가 가중치 불필요
-        console.log(`프로파일 기반 벡터 검색 결과 직접 활용 - 키워드 가중치 시스템 비활성화`);
+    
         
         // 카테고리별 분류
         const preIncidents = (candidatesRaw || []).filter(r => {
