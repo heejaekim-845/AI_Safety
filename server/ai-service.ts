@@ -1643,9 +1643,9 @@ ${specialNotes || "없음"}
       });
       
       return `${index + 1}. ${metadata.title || metadata.metadataTitle || `사고사례 ${index + 1}`}
-   - 발생일시: ${metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'}
    - 피해정도: ${metadata.severity || metadata.damage_level || metadata.metadataSeverity || '미상'}
    - 사고원인: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
+   // - 발생일시: ${metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'} // 프롬프트 최적화로 주석처리
     }).join('\n\n');
   }
 
@@ -1660,10 +1660,10 @@ ${specialNotes || "없음"}
       const url = material.url || metadata.url || '';
       const type = metadata.type || material.type || '일반 교육자료';
       
-      return `${index + 1}. ${title}
-   - 자료유형: ${type}
-   - 링크: ${url || '링크 없음'}
-   - 키워드: ${metadata.keywords || material.keywords || ''}`;
+      return `${index + 1}. ${title}`;
+      // - 자료유형: ${type} // 프롬프트 최적화로 주석처리
+      // - 링크: ${url || '링크 없음'} // 프롬프트 최적화로 주석처리
+      // - 키워드: ${metadata.keywords || material.keywords || ''} // 프롬프트 최적화로 주석처리
     }).join('\n\n');
   }
 
@@ -1693,9 +1693,9 @@ ${specialNotes || "없음"}
       });
       
       return `${index + 1}. ${accident.title || metadata.title || metadata.metadataTitle || `사고사례 ${index + 1}`}
-   - 발생일시: ${accident.date || metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'}
    - 피해정도: ${accident.severity || metadata.severity || metadata.damage_level || metadata.metadataSeverity || '미상'}
    - 사고원인: ${accident.cause || accident.description || content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
+   // - 발생일시: ${accident.date || metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'} // 프롬프트 최적화로 주석처리
     }).join('\n\n');
   }
 
@@ -1819,9 +1819,8 @@ ${content}
 【관련법령 ${index + 1}】
 ${regulation.lawName}
 ${regulation.articleNumber}${articleTitle}
-
-▣ ${regulation.summary}
     `;
+      // ▣ ${regulation.summary} // 프롬프트 최적화로 조문 내용 주석처리
     }).join('\n\n');
   }
 
