@@ -1689,20 +1689,22 @@ ${specialNotes || "없음"}
     console.log("첫 번째 사고사례 데이터:", JSON.stringify(accidents[0], null, 2));
     
     return accidents.map((accident, index) => {
-      const metadata = accident.metadata || {};
-      const content = accident.document || accident.content || accident.pageContent || "내용 없음";
+      // ChromaDB 데이터는 플랫 객체 구조이므로 직접 접근
+      const title = accident.title || `사고사례 ${index + 1}`;
+      const damage = accident.damage || accident.severity || '미상';
+      const content = accident.summary || accident.direct_cause || accident.root_cause || "내용 없음";
       
-      console.log(`사고사례 ${index + 1} 데이터:`, {
-        metadata: metadata,
+      console.log(`🔥 수정된 ChromaDB 사고사례 ${index + 1} 파싱:`, {
+        title: title,
+        damage: damage,
         content: content?.slice(0, 100) + "...",
-        hasContent: !!content,
-        contentLength: content?.length || 0
+        originalKeys: Object.keys(accident)
       });
       
-      return `${index + 1}. ${metadata.title || metadata.metadataTitle || `사고사례 ${index + 1}`}
-   - 피해정도: ${metadata.severity || metadata.damage_level || metadata.metadataSeverity || '미상'}
+      return `${index + 1}. ${title}
+   - 피해정도: ${damage}
    - 사고원인: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
-   // - 발생일시: ${metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'} // 프롬프트 최적화로 주석처리
+   // - 발생일시: ${accident.date || '날짜 미상'} // 프롬프트 최적화로 주석처리
     }).join('\n\n');
   }
 

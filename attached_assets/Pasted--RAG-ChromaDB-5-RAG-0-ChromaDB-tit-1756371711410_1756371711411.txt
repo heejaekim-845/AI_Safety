@@ -1,0 +1,107 @@
+🎯 RAG 검색 후 다음 단계 진행 중...
+🎯 사고사례 처리 경로: ChromaDB=5건, 기존RAG=0건
+🔍 ChromaDB 사고사례 첫 번째 항목: {
+  "title": "특별고압 수배전반 점검 중 전기화상",
+  "date": "미기재",
+  "location": "공장 내",
+  "accident_type": "화상",
+  "damage": "사망 1명",
+  "summary": "수배전반 점검 후, 전력 투입 문제로 협의하던 중 특별고압(22.9kV)이 흐르는 수배전반 내부에 접근했다가 전기 스파크로 화상을 입고 사망.",
+  "direct_cause": "정전조치 미실시 상태에서 충전전로에 접근.",
+  "root_cause": "안전절차 미준수.",
+  "prevention": "작업 전 해당 전로 정전조치 실시, 수배전반 점검문에 경고 및 연동장치 설치.",
+  "work_type": "수배전반 점검",
+  "industry": "제조업",
+  "risk_keywords": "#화상, #고압, #수배전반, #정전작업",
+  "relevanceScore": "0.105"
+}
+✅ ChromaDB formatChromaAccidentCases 호출
+=== ChromaDB 사고사례 데이터 구조 확인 ===
+첫 번째 사고사례 데이터: {
+  "title": "특별고압 수배전반 점검 중 전기화상",
+  "date": "미기재",
+  "location": "공장 내",
+  "accident_type": "화상",
+  "damage": "사망 1명",
+  "summary": "수배전반 점검 후, 전력 투입 문제로 협의하던 중 특별고압(22.9kV)이 흐르는 수배전반 내부에 접근했다가 전기 스파크로 화상을 입고 사망.",
+  "direct_cause": "정전조치 미실시 상태에서 충전전로에 접근.",
+  "root_cause": "안전절차 미준수.",
+  "prevention": "작업 전 해당 전로 정전조치 실시, 수배전반 점검문에 경고 및 연동장치 설치.",
+  "work_type": "수배전반 점검",
+  "industry": "제조업",
+  "risk_keywords": "#화상, #고압, #수배전반, #정전작업",
+  "relevanceScore": "0.105"
+}
+사고사례 1 데이터: {
+  metadata: {},
+  content: '내용 없음...',
+  hasContent: true,
+  contentLength: 5
+}
+사고사례 2 데이터: {
+  metadata: {},
+  content: '내용 없음...',
+  hasContent: true,
+  contentLength: 5
+}
+사고사례 3 데이터: {
+  metadata: {},
+  content: '내용 없음...',
+  hasContent: true,
+  contentLength: 5
+}
+사고사례 4 데이터: {
+  metadata: {},
+  content: '내용 없음...',
+  hasContent: true,
+  contentLength: 5
+}
+사고사례 5 데이터: {
+  metadata: {},
+  content: '내용 없음...',
+  hasContent: true,
+  contentLength: 5
+}
+🎯 최종 accidentContext 길이: 208자
+🎯 accidentContext 미리보기: 1. 사고사례 1
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+2. 사고사례 2
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+3. 사고사례 3
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+4. 사고사례 4
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+5. 사고사례 5
+   - 피해정도: 미상
+   - 사고원...
+🚨🚨🚨 PROMPT 생성 직전 - accidentContext 확인 🚨🚨🚨
+🚨 accidentContext 타입: string
+🚨 accidentContext 길이: 208
+🚨 accidentContext 내용: 1. 사고사례 1
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+2. 사고사례 2
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+3. 사고사례 3
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+4. 사고사례 4
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+
+5. 사고사례 5
+   - 피해정도: 미상
+   - 사고원인: 내용 없음
+🚨 chromaAccidents 길이: 5
