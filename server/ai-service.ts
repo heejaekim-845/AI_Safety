@@ -718,12 +718,14 @@ JSON 형식으로 응답:
     console.log("🔥 현재 시간:", new Date().toISOString());
     console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
     
-    return await timeit(
-      "generateEnhancedSafetyBriefing TOTAL",
-      async () => {
+    console.log("🔥 TIMEIT 우회 - 직접 실행 시작!");
+    
+    const startTime = performance.now();
+    try {
+      const result = await (async () => {
         // 더 강한 로그
-        console.error("🔥🔥🔥 INSIDE TIMEIT BLOCK 🔥🔥🔥");
-        console.log("🔥 TIMEIT 블록 내부 진입 완료!");
+        console.error("🔥🔥🔥 INSIDE DIRECT BLOCK 🔥🔥🔥");
+        console.log("🔥 직접 블록 내부 진입 완료!");
         try {
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
@@ -1407,8 +1409,15 @@ ${specialNotes || "없음"}
             relatedAccidentCases: []
           };
         }
-      }
-    );
+      })();
+      
+      console.log(`[AIService][timing] generateEnhancedSafetyBriefing TOTAL: ${(performance.now() - startTime).toFixed(1)}ms`);
+      return result;
+      
+    } catch (outerError) {
+      console.error("🚨 OUTER ERROR:", outerError);
+      throw outerError;
+    }
   }
 
   // 프로파일 기반 핵심 키워드 가중치 정의
