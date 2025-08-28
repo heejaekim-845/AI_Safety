@@ -934,27 +934,7 @@ JSON 형식으로 응답:
           console.log(`  ${idx+1}. "${acc.metadata?.title}" - 종합점수: ${normalizedFinalScore.toFixed(3)}, 벡터: ${normalizedVectorScore.toFixed(3)}, 하이브리드계산: ${accFullScore.toFixed(3)}`);
         });
         
-        // 교육자료 필터링 전후 비교
-        const rawEducationResults = filteredChromaResults.filter(r => r.metadata.type === 'education');
-        console.log(`교육자료 필터링 전: ${rawEducationResults.length}건`);
-        console.log('교육자료 하이브리드 점수:');
-        rawEducationResults.slice(0, 3).forEach((edu, idx) => {
-          // 정규화된 점수 사용 [0,1] 범위
-          const normalizedFinalScore = normalizedScore(edu);
-          const normalizedVectorScore = normalizedScore(edu);
-          
-          // 실제 키워드 점수 계산을 위해 하이브리드 스코어링 재실행
-          const fullScoreBreakdown = applyHybridScoring({
-            id: edu.id,
-            title: edu.metadata?.title,
-            text: edu.document,
-            content: edu.document,
-            metadata: edu.metadata,
-            vectorScore: edu.vectorScore ?? edu.score ?? edu.similarity
-          }, resolvedProfile, equipmentInfoObj, workType);
-          
-          console.log(`[education] "${edu.metadata?.title || 'No title'}" 최종점수: ${normalizedFinalScore.toFixed(3)} (벡터: ${normalizedVectorScore.toFixed(3)}, 하이브리드계산: ${fullScoreBreakdown.toFixed(3)})`);
-        });
+
         
         // 사고사례: 벡터DB 메타데이터에서 직접 추출 (텍스트 파싱 제거)
         chromaAccidents = hybridFilteredAccidents
