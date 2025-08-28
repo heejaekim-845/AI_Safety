@@ -1235,6 +1235,9 @@ ${specialNotes || "없음"}
         async () => {
           const length = prompt.length;
           console.log(`프롬프트 길이: ${length}자`);
+          console.log("=== 실제 Gemini API 프롬프트 ===");
+          console.log(prompt);
+          console.log("=== 프롬프트 끝 ===");
           return length;
         }
       );
