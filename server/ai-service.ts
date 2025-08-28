@@ -1633,7 +1633,7 @@ ${specialNotes || "없음"}
     
     return accidents.map((accident, index) => {
       const metadata = accident.metadata || {};
-      const content = accident.content || accident.pageContent || accident.document || "내용 없음";
+      const content = accident.document || accident.content || accident.pageContent || "내용 없음";
       
       console.log(`사고사례 ${index + 1} 데이터:`, {
         metadata: metadata,
