@@ -132,9 +132,12 @@ export default function QRScanner() {
                     
                     {/* Equipment Details */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 mb-2 text-lg truncate">
-                        {eq.name}({eq.code})
+                      <h4 className="font-semibold text-gray-900 mb-1 text-lg break-words leading-tight">
+                        {eq.name}
                       </h4>
+                      <p className="text-sm text-gray-500 mb-2 break-words">
+                        {eq.code}
+                      </p>
                       <p className="text-gray-600 mb-2 truncate">{eq.location}</p>
                       <RiskLevelBadge level={eq.riskLevel} />
                     </div>
