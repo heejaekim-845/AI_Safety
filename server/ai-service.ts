@@ -1199,6 +1199,13 @@ JSON 형식으로 응답:
       console.log(`🎯 최종 accidentContext 길이: ${accidentContext.length}자`);
       console.log(`🎯 accidentContext 미리보기: ${accidentContext.slice(0, 200)}...`);
 
+      console.log("🚨🚨🚨 PROMPT 생성 직전 - accidentContext 확인 🚨🚨🚨");
+      console.log("🚨 accidentContext 타입:", typeof accidentContext);
+      console.log("🚨 accidentContext 길이:", accidentContext?.length || 'undefined');
+      console.log("🚨 accidentContext 내용:", accidentContext?.slice(0, 300) || 'undefined');
+      console.log("🚨 chromaAccidents 길이:", chromaAccidents?.length || 'undefined');
+      console.log("🚨🚨🚨 PROMPT 생성 시작 🚨🚨🚨");
+
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
 【설비 정보】
