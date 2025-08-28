@@ -1100,7 +1100,17 @@ JSON 형식으로 응답:
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 10);
 
-        // AI를 사용하여 각 조문 요약
+        // 법규 요약 생성 대신 전체 내용 사용 (성능 최적화)
+        safetyRegulations = await timeit(
+          `7.법규전체내용사용 x${sortedRegulations.length}`,
+          async () => sortedRegulations.map((reg) => ({
+            ...reg,
+            summary: reg.fullContent // AI 요약 대신 전체 내용 사용
+          }))
+        );
+        
+        // AI 요약 생성 (주석처리 - 필요시 활성화)
+        /*
         safetyRegulations = await timeit(
           `7.법규요약생성 x${sortedRegulations.length}`,
           () => Promise.all(
@@ -1113,6 +1123,7 @@ JSON 형식으로 응답:
             })
           )
         );
+        */
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
       } catch (error) {
