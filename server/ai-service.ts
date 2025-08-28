@@ -725,43 +725,62 @@ JSON 형식으로 응답:
           let safetyRegulations: any[] = [];
 
           try {
-        // 실제 데이터베이스 데이터와 사용자 입력 기반 설비 정보 구성
-        const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
-        const equipmentInfoObj: EquipmentInfo & {riskFactors?: any} = {
-          name: equipmentInfo.name,
-          tags: [], // inferEquipmentTags 제거됨 - 프로파일 기반 키워드 시스템 사용
-          riskTags: equipmentRisks, // 실제 DB의 위험 정보 기반
-          riskFactors: equipmentInfo.riskFactors, // 실제 DB의 risk_factors JSONB 데이터 포함
-          metadata: {
-            type: equipmentInfo.manufacturer || 'unknown',
-            location: equipmentInfo.location || '',
-            workType: workType.name || '',
-            specialNotes: specialNotes || '', // 사용자 특이사항 입력
-            riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
+        // 1단계: 설비 정보 구성
+        const equipmentInfoObj = await timeit(
+          "1.설비정보구성",
+          async () => {
+            const equipmentRisks = this.extractEquipmentRisks(equipmentInfo);
+            return {
+              name: equipmentInfo.name,
+              tags: [], // inferEquipmentTags 제거됨 - 프로파일 기반 키워드 시스템 사용
+              riskTags: equipmentRisks, // 실제 DB의 위험 정보 기반
+              riskFactors: equipmentInfo.riskFactors, // 실제 DB의 risk_factors JSONB 데이터 포함
+              metadata: {
+                type: equipmentInfo.manufacturer || 'unknown',
+                location: equipmentInfo.location || '',
+                workType: workType.name || '',
+                specialNotes: specialNotes || '', // 사용자 특이사항 입력
+                riskLevel: equipmentInfo.riskLevel || 'MEDIUM'
+              }
+            } as EquipmentInfo & {riskFactors?: any};
           }
-        };
+        );
         
-        console.log(`\n========== 프로파일 기반 검색 시작 ==========`);
-        console.log(`⚠️ [CRITICAL DEBUG] equipmentInfoObj 확인:`, JSON.stringify(equipmentInfoObj, null, 2));
-        const resolvedProfile = resolveProfile(equipmentInfoObj, workType);
-        console.log(`✅ 프로파일 해석 완료: ${resolvedProfile.id}`);
-        console.log(`✅ 프로파일 설명: ${resolvedProfile.description}`);
+        // 2단계: 프로파일 해석
+        const resolvedProfile = await timeit(
+          "2.프로파일해석",
+          async () => {
+            console.log(`\n========== 프로파일 기반 검색 시작 ==========`);
+            console.log(`⚠️ [CRITICAL DEBUG] equipmentInfoObj 확인:`, JSON.stringify(equipmentInfoObj, null, 2));
+            const profile = resolveProfile(equipmentInfoObj, workType);
+            console.log(`✅ 프로파일 해석 완료: ${profile.id}`);
+            console.log(`✅ 프로파일 설명: ${profile.description}`);
+            return profile;
+          }
+        );
         
         // 동적 키워드 추출 기능 제거됨 - 프로파일 정적 키워드만 사용
         
-        // 토큰화 작업을 한 번만 수행하여 성능 최적화
-        const cachedTokens = {
-          nameTokens: equipmentInfo.name.split(/[\s·,|/\\]+/).filter(Boolean),
-          wtTokens: workType.name.split(/[\s·,|/\\]+/).filter(Boolean),
-          eqTags: (equipmentInfoObj.tags ?? []).map((t: string) => t.toLowerCase()),
-          riskTags: (equipmentInfoObj.riskTags ?? []).map((t: string) => t.toLowerCase())
-        };
-        
-        // 프로파일 기반 특화 검색 쿼리 생성 (중복 토큰화 제거)
-        console.log(`🔍 프로파일 기반 특화 쿼리 생성 중... (토큰화 최적화 적용)`);
-        console.log(`🔍 [CRITICAL] buildTargetedSearchQuery 호출 전 - equipmentInfoObj:`, equipmentInfoObj);
-        const targetedQueries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType, cachedTokens);
-        console.log(`✅ 특화 쿼리 생성 완료 - targetedQueries:`, targetedQueries);
+        // 3단계: 검색 쿼리 생성
+        const targetedQueries = await timeit(
+          "3.검색쿼리생성",
+          async () => {
+            // 토큰화 작업을 한 번만 수행하여 성능 최적화
+            const cachedTokens = {
+              nameTokens: equipmentInfo.name.split(/[\s·,|/\\]+/).filter(Boolean),
+              wtTokens: workType.name.split(/[\s·,|/\\]+/).filter(Boolean),
+              eqTags: (equipmentInfoObj.tags ?? []).map((t: string) => t.toLowerCase()),
+              riskTags: (equipmentInfoObj.riskTags ?? []).map((t: string) => t.toLowerCase())
+            };
+            
+            // 프로파일 기반 특화 검색 쿼리 생성 (중복 토큰화 제거)
+            console.log(`🔍 프로파일 기반 특화 쿼리 생성 중... (토큰화 최적화 적용)`);
+            console.log(`🔍 [CRITICAL] buildTargetedSearchQuery 호출 전 - equipmentInfoObj:`, equipmentInfoObj);
+            const queries = buildTargetedSearchQuery(resolvedProfile, equipmentInfoObj, workType, cachedTokens);
+            console.log(`✅ 특화 쿼리 생성 완료 - targetedQueries:`, queries);
+            return queries;
+          }
+        );
         
         // 프로파일 특화 쿼리 사용
         const incident = targetedQueries.accidents;
@@ -795,8 +814,8 @@ JSON 형식으로 응답:
         console.log(`- 법규 쿼리: ${regulationQueries.length}개`);
         console.log(`- 교육자료 쿼리: ${educationQueries.length}개`);
 
-        // 카테고리별 특화 검색 실행 (분리된 검색)
-        const allCandidates = await timeit('category-specific.search', () => 
+        // 4단계: 벡터 검색 실행
+        const allCandidates = await timeit('4.벡터검색실행', () => 
           this.runCategorySpecificSearchQueries(incidentQueries, regulationQueries, educationQueries)
         );
         const candidatesRaw = dedupById(allCandidates || []);
@@ -813,13 +832,16 @@ JSON 형식으로 응답:
         });
         console.log(`카테고리별 분포:`, categoryDistribution);
         
-        // 하이브리드 점수 적용
-        const candidatesWithHybridScore = this.applyHybridScoringWithPenalty(
-          candidatesRaw, 
-          resolvedProfile, 
-          equipmentInfoObj, 
-          workType, 
-          false // isEducation: false (혼합 결과)
+        // 5단계: 하이브리드 점수 적용
+        const candidatesWithHybridScore = await timeit(
+          "5.하이브리드점수적용",
+          async () => this.applyHybridScoringWithPenalty(
+            candidatesRaw, 
+            resolvedProfile, 
+            equipmentInfoObj, 
+            workType, 
+            false // isEducation: false (혼합 결과)
+          )
         );
         
         // 하이브리드 점수로 재정렬
@@ -968,7 +990,7 @@ JSON 형식으로 응답:
         
         // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
         const educationDataWithUrls = await timeit(
-          `matchEducationWithUrls x${hybridFilteredEducation.length}`,
+          `6.교육자료URL매칭 x${hybridFilteredEducation.length}`,
           () => this.matchEducationWithUrls(hybridFilteredEducation)
         );
         
@@ -1080,7 +1102,7 @@ JSON 형식으로 응답:
 
         // AI를 사용하여 각 조문 요약
         safetyRegulations = await timeit(
-          `summarizeRegulationCached x${sortedRegulations.length}`,
+          `7.법규요약생성 x${sortedRegulations.length}`,
           () => Promise.all(
             sortedRegulations.map(async (reg) => {
               const summary = await this.summarizeRegulation(reg.fullContent, reg.articleTitle);
@@ -1197,7 +1219,7 @@ ${specialNotes || "없음"}
 }`;
 
       const response = await timeit(
-        "gemini.generateContent(briefing)",
+        "8.AI브리핑생성",
         () => genai.models.generateContent({
           model: "gemini-2.5-flash",
           config: {
