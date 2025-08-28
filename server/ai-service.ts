@@ -1229,9 +1229,20 @@ ${specialNotes || "없음"}
   "safetySlogan": "오늘의 안전 슬로건"
 }`;
 
+      // 8-1단계: 프롬프트 준비 완료 (이미 준비됨)
+      const promptLength = await timeit(
+        "8-1.프롬프트길이측정",
+        async () => {
+          const length = prompt.length;
+          console.log(`프롬프트 길이: ${length}자`);
+          return length;
+        }
+      );
+
+      // 8-2단계: Gemini API 호출 (네트워크 + AI 처리)
       const response = await timeit(
-        "8.AI브리핑생성",
-        () => genai.models.generateContent({
+        "8-2.Gemini_API호출",
+        async () => genai.models.generateContent({
           model: "gemini-2.5-flash",
           config: {
             systemInstruction: "당신은 RAG 기반 산업 안전 전문가입니다. 제공된 실제 사고사례를 참고하여 실용적이고 구체적인 안전 브리핑을 생성합니다. 관련 사고사례의 교훈을 안전 권고사항에 반영하세요.",
@@ -1241,61 +1252,84 @@ ${specialNotes || "없음"}
         })
       );
 
-      const result = JSON.parse(response.text || "{}");
-      
-      // Process and merge registered checklist items with AI recommendations
-      const processedTools = this.mergeRegisteredAndAIItems(
-        workType.requiredTools || [],
-        result.requiredTools || []
+      // 8-3단계: JSON 응답 파싱
+      const result: any = await timeit(
+        "8-3.JSON응답파싱",
+        async () => {
+          const responseText = response.text || "{}";
+          console.log(`응답 길이: ${responseText.length}자`);
+          return JSON.parse(responseText);
+        }
       );
       
-      const processedSafetyEquipment = this.mergeRegisteredAndAIItems(
-        workType.requiredEquipment || [],
-        result.requiredSafetyEquipment || []
+      // 8-4단계: 등록된 도구/장비와 AI 추천 병합
+      const { processedTools, processedSafetyEquipment } = await timeit(
+        "8-4.도구장비병합처리",
+        async () => {
+          const tools = this.mergeRegisteredAndAIItems(
+            workType.requiredTools || [],
+            result.requiredTools || []
+          );
+          
+          const equipment = this.mergeRegisteredAndAIItems(
+            workType.requiredEquipment || [],
+            result.requiredSafetyEquipment || []
+          );
+          
+          return { processedTools: tools, processedSafetyEquipment: equipment };
+        }
       );
       
-      // Update result with processed items
-      result.requiredTools = processedTools;
-      result.requiredSafetyEquipment = processedSafetyEquipment;
-      
-      // Force override with actual RAG search results regardless of AI response
-      result.regulations = safetyRegulations.length > 0 ? safetyRegulations.map(reg => ({
-        lawName: reg.lawName,
-        articleNumber: reg.articleNumber,
-        articleTitle: reg.articleTitle,
-        summary: reg.summary,
-        relevanceScore: reg.distance
-      })) : [];
-      
-      result.relatedIncidents = chromaAccidents.length > 0 ? chromaAccidents.map(acc => ({
-        title: acc.title,
-        severity: this.mapAccidentTypeToSeverity(acc.accident_type),
-        workType: acc.work_type,
-        accidentType: acc.accident_type,
-        summary: acc.summary,
-        prevention: acc.prevention,
-        date: acc.date,
-        location: acc.location,
-        damage: acc.damage
-      })) : [];
-      
-      result.educationMaterials = educationMaterials.length > 0 ? educationMaterials.map(edu => ({
-        title: edu.title,
-        type: edu.type,
-        keywords: edu.keywords,
-        content: edu.content,
-        url: edu.url,
-        date: edu.date
-      })) : [];
+      // 8-5단계: RAG 검색 결과 적용 및 최종 결과 구성
+      const finalResult: any = await timeit(
+        "8-5.RAG결과적용_최종구성",
+        async () => {
+          // Update result with processed items
+          result.requiredTools = processedTools;
+          result.requiredSafetyEquipment = processedSafetyEquipment;
+          
+          // Force override with actual RAG search results regardless of AI response
+          result.regulations = safetyRegulations.length > 0 ? safetyRegulations.map(reg => ({
+            lawName: reg.lawName,
+            articleNumber: reg.articleNumber,
+            articleTitle: reg.articleTitle,
+            summary: reg.summary,
+            relevanceScore: reg.distance
+          })) : [];
+          
+          result.relatedIncidents = chromaAccidents.length > 0 ? chromaAccidents.map(acc => ({
+            title: acc.title,
+            severity: this.mapAccidentTypeToSeverity(acc.accident_type),
+            workType: acc.work_type,
+            accidentType: acc.accident_type,
+            summary: acc.summary,
+            prevention: acc.prevention,
+            date: acc.date,
+            location: acc.location,
+            damage: acc.damage
+          })) : [];
+          
+          result.educationMaterials = educationMaterials.length > 0 ? educationMaterials.map(edu => ({
+            title: edu.title,
+            type: edu.type,
+            keywords: edu.keywords,
+            content: edu.content,
+            url: edu.url,
+            date: edu.date
+          })) : [];
+
+          return result;
+        }
+      );
 
       // Add debug info
       console.log('RAG 검색 결과 적용:', {
-        regulations: result.regulations.length,
-        incidents: result.relatedIncidents.length, 
-        education: result.educationMaterials.length
+        regulations: finalResult.regulations.length,
+        incidents: finalResult.relatedIncidents.length, 
+        education: finalResult.educationMaterials.length
       });
 
-      return result;
+      return finalResult;
 
         } catch (error) {
           console.error("Enhanced safety briefing generation error:", error);
