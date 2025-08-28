@@ -1150,6 +1150,8 @@ JSON 형식으로 응답:
       }
 
       // Format accident context for AI prompt
+      console.log(`🎯 사고사례 처리 경로: ChromaDB=${chromaAccidents.length}건, 기존RAG=${relevantAccidents.length + workTypeAccidents.length}건`);
+      
       const accidentContext = chromaAccidents.length > 0 
         ? this.formatChromaAccidentCases(chromaAccidents)
         : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
