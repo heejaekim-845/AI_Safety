@@ -1151,10 +1151,19 @@ JSON 형식으로 응답:
 
       // Format accident context for AI prompt
       console.log(`🎯 사고사례 처리 경로: ChromaDB=${chromaAccidents.length}건, 기존RAG=${relevantAccidents.length + workTypeAccidents.length}건`);
+      console.log(`🔍 ChromaDB 사고사례 첫 번째 항목:`, chromaAccidents[0] ? JSON.stringify(chromaAccidents[0], null, 2) : 'undefined');
       
-      const accidentContext = chromaAccidents.length > 0 
-        ? this.formatChromaAccidentCases(chromaAccidents)
-        : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
+      let accidentContext;
+      if (chromaAccidents.length > 0) {
+        console.log('✅ ChromaDB formatChromaAccidentCases 호출');
+        accidentContext = this.formatChromaAccidentCases(chromaAccidents);
+      } else {
+        console.log('✅ 기존RAG formatAccidentCases 호출');
+        accidentContext = this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
+      }
+      
+      console.log(`🎯 최종 accidentContext 길이: ${accidentContext.length}자`);
+      console.log(`🎯 accidentContext 미리보기: ${accidentContext.slice(0, 200)}...`);
 
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
