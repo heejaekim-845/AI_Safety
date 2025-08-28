@@ -7,7 +7,8 @@ import {
   ClipboardList, 
   Shield,
   Settings,
-  User
+  User,
+  Bot
 } from "lucide-react";
 
 interface BottomNavigationProps {
@@ -48,6 +49,12 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
       path: "/briefing"
     },
     {
+      id: "chatbot",
+      label: "매뉴얼",
+      icon: Bot,
+      path: "/manual-chatbot"
+    },
+    {
       id: "admin",
       label: "관리",
       icon: Settings,
@@ -62,7 +69,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/50 max-w-full mx-auto z-40 h-20 shadow-2xl">
-      <div className="grid grid-cols-5 py-2 px-2 max-w-lg mx-auto">
+      <div className="grid grid-cols-6 py-2 px-2 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;

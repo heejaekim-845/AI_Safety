@@ -12,6 +12,7 @@ import Briefing from "@/pages/Briefing";
 import AdminPanel from "@/pages/AdminPanel";
 import VectorDBManagement from "@/pages/VectorDBManagement";
 import VectorDBAnalysis from "@/pages/VectorDBAnalysis";
+import ManualChatbot from "@/pages/ManualChatbot";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
 
@@ -29,6 +30,8 @@ function Router() {
       setActiveTab("dashboard");
     } else if (location === "/briefing") {
       setActiveTab("briefing");
+    } else if (location === "/manual-chatbot") {
+      setActiveTab("chatbot");
     } else if (location === "/admin") {
       setActiveTab("admin");
     }
@@ -71,6 +74,7 @@ function Router() {
           <Route path="/work-management/:equipmentId" component={WorkManagement} />
           <Route path="/work-session/:sessionId" component={WorkProcedure} />
           <Route path="/briefing" component={Briefing} />
+          <Route path="/manual-chatbot" component={ManualChatbot} />
           <Route path="/admin" component={AdminPanel} />
           <Route path="/vector-management" component={VectorDBManagement} />
           <Route path="/vector-analysis" component={VectorDBAnalysis} />

@@ -5,6 +5,7 @@ import { aiService } from "./ai-service";
 import { weatherService } from "./weather-service";
 import { simpleRagService as ragService } from "./simple-rag-service";
 import { chromaDBService } from "./chromadb-service";
+import { ManualChatbotService } from "./manual-chatbot-service";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -36,6 +37,9 @@ const upload = multer({
     }
   }
 });
+
+// 매뉴얼 챗봇 서비스 인스턴스
+const manualChatbotService = new ManualChatbotService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -1479,6 +1483,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('벡터DB 재구축 실패:', error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 매뉴얼 챗봇 API 라우트
+  app.get("/api/manual-chatbot/equipment", async (req, res) => {
+    try {
+      console.log('설비 목록 조회 요청');
+      
+      const equipment = await manualChatbotService.getAvailableEquipment();
+      
+      res.json({
+        success: true,
+        equipment,
+        message: `${equipment.length}개의 설비 패밀리를 찾았습니다.`
+      });
+    } catch (error: any) {
+      console.error('설비 목록 조회 실패:', error);
+      res.status(500).json({
+        success: false,
+        equipment: [],
+        message: `설비 목록 조회 실패: ${error.message}`
+      });
+    }
+  });
+
+  app.post("/api/manual-chatbot/search", async (req, res) => {
+    try {
+      const { query, equipmentFilter, familyFilter, limit = 5 } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({
+          success: false,
+          chunks: [],
+          message: "검색어를 입력해주세요."
+        });
+      }
+
+      console.log(`매뉴얼 검색: "${query}", 설비: ${equipmentFilter}, 패밀리: ${familyFilter}`);
+      
+      const chunks = await manualChatbotService.searchManualContent(
+        query.trim(),
+        equipmentFilter,
+        familyFilter,
+        limit
+      );
+      
+      res.json({
+        success: true,
+        chunks,
+        message: `${chunks.length}개의 관련 매뉴얼 내용을 찾았습니다.`,
+        query: query.trim()
+      });
+    } catch (error: any) {
+      console.error('매뉴얼 검색 실패:', error);
+      res.status(500).json({
+        success: false,
+        chunks: [],
+        message: `매뉴얼 검색 실패: ${error.message}`
+      });
+    }
+  });
+
+  app.post("/api/manual-chatbot/chat", async (req, res) => {
+    try {
+      const { query, context } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: "질문을 입력해주세요."
+        });
+      }
+
+      if (!context || !context.sessionId) {
+        return res.status(400).json({
+          success: false,
+          message: "대화 컨텍스트가 필요합니다."
+        });
+      }
+
+      console.log(`매뉴얼 챗봇 질문: "${query}", 세션: ${context.sessionId}`);
+      
+      const response = await manualChatbotService.generateResponse(query.trim(), context);
+      
+      res.json({
+        success: true,
+        response,
+        message: "응답이 성공적으로 생성되었습니다."
+      });
+    } catch (error: any) {
+      console.error('매뉴얼 챗봇 응답 생성 실패:', error);
+      res.status(500).json({
+        success: false,
+        message: `응답 생성 실패: ${error.message}`
+      });
     }
   });
 
