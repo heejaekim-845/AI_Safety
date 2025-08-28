@@ -723,6 +723,7 @@ JSON 형식으로 응답:
       async () => {
         // 더 강한 로그
         console.error("🔥🔥🔥 INSIDE TIMEIT BLOCK 🔥🔥🔥");
+        console.log("🔥 TIMEIT 블록 내부 진입 완료!");
         try {
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
@@ -732,6 +733,7 @@ JSON 형식으로 응답:
           let safetyRegulations: any[] = [];
 
           try {
+        console.log("🔥 TRY 블록 시작!");
         // 1단계: 설비 정보 구성
         const equipmentInfoObj = await timeit(
           "1.설비정보구성",
