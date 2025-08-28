@@ -1626,13 +1626,23 @@ ${specialNotes || "없음"}
       return "관련 사고사례가 없습니다.";
     }
 
+    console.log("=== ChromaDB 사고사례 데이터 구조 확인 ===");
+    console.log("첫 번째 사고사례 데이터:", JSON.stringify(accidents[0], null, 2));
+    
     return accidents.map((accident, index) => {
       const metadata = accident.metadata || {};
-      const content = accident.content || accident.pageContent || "내용 없음";
+      const content = accident.content || accident.pageContent || accident.document || "내용 없음";
       
-      return `${index + 1}. ${metadata.title || `사고사례 ${index + 1}`}
-   - 발생일시: ${metadata.date || metadata.accident_date || '날짜 미상'}
-   - 피해정도: ${metadata.severity || metadata.damage_level || '미상'}
+      console.log(`사고사례 ${index + 1} 데이터:`, {
+        metadata: metadata,
+        content: content?.slice(0, 100) + "...",
+        hasContent: !!content,
+        contentLength: content?.length || 0
+      });
+      
+      return `${index + 1}. ${metadata.title || metadata.metadataTitle || `사고사례 ${index + 1}`}
+   - 발생일시: ${metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'}
+   - 피해정도: ${metadata.severity || metadata.damage_level || metadata.metadataSeverity || '미상'}
    - 사고원인: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
     }).join('\n\n');
   }
