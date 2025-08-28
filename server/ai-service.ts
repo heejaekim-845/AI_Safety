@@ -705,12 +705,6 @@ JSON 형식으로 응답:
   ): Promise<any> {
     // ===== 절대적으로 강제 로그 출력 테스트 =====
     console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    console.error("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    console.warn("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    console.debug("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    
-    console.log("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
-    console.error("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
     console.warn("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
     
     console.log("🔥 equipmentInfo.name:", equipmentInfo?.name);
@@ -952,6 +946,8 @@ JSON 형식으로 응답:
         // 하이브리드 점수 디버깅 로그 - 정규화된 finalScore 기반
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
         console.log('상위 사고사례 하이브리드 점수:');
+
+        //이부분 조금 의심됨
         hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
           // 정규화된 점수 사용 [0,1] 범위
           const normalizedFinalScore = acc.finalScore ?? normalizedScore(acc);
