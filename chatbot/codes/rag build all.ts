@@ -26,7 +26,9 @@ import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-import pdf from 'pdf-parse';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+// @ts-ignore
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.js');
 
 import MiniSearch from 'minisearch';
 import { OpenAI } from 'openai';
@@ -212,31 +214,16 @@ const STANDARD_TERMS = [
 
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
-  const buffer = fs.readFileSync(pdfPath);
-  const data = await pdf(buffer);
-  
-  // Simple page splitting - this is a basic approximation
-  // Real page splitting would require more sophisticated parsing
-  const fullText = data.text.replace(/\s+/g, ' ').trim();
-  
-  // Split by page breaks or use chunk size as fallback
-  const pageBreaks = fullText.split(/\f|\n\s*\n\s*\n/); // Form feed or multiple newlines
-  
-  if (pageBreaks.length > 1) {
-    return pageBreaks.filter(page => page.trim().length > 50); // Filter out very short pages
-  }
-  
-  // Fallback: split into chunks of approximately 2000 characters per "page"
+  const data = new Uint8Array(fs.readFileSync(pdfPath));
+  const doc = await pdfjsLib.getDocument({ data }).promise;
   const pages: string[] = [];
-  const chunkSize = 2000;
-  for (let i = 0; i < fullText.length; i += chunkSize) {
-    const chunk = fullText.slice(i, i + chunkSize);
-    if (chunk.trim()) {
-      pages.push(chunk.trim());
-    }
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map((it: any) => it.str).join(' ').replace(/\s+/g,' ').replace(/\u0000/g,'').trim();
+    pages.push(text);
   }
-  
-  return pages.length > 0 ? pages : [fullText];
+  return pages;
 }
 
 // ----------------------------- Heading detection -----------------------------
