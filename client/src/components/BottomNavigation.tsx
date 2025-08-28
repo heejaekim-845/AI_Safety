@@ -50,7 +50,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
     },
     {
       id: "chatbot",
-      label: "매뉴얼",
+      label: "매뉴얼 챗봇",
       icon: Bot,
       path: "/manual-chatbot"
     },
