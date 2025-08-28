@@ -117,11 +117,11 @@ export default function Briefing() {
       { progress: 15, step: '설비 위험 요소 분석 중...', duration: 3000 },
       { progress: 25, step: '기상 정보 수집 중...', duration: 2000 },
       { progress: 35, step: 'RAG 데이터베이스 검색 중...', duration: 4000 },
-      { progress: 50, step: '유사 사고사례 검색 중...', duration: 6000 },
-      { progress: 65, step: '관련 법규 검색 중...', duration: 5000 },
-      { progress: 75, step: '안전 교육자료 검색 중...', duration: 4000 },
-      { progress: 85, step: 'AI 안전 분석 수행 중...', duration: 8000 },
-      { progress: 95, step: '브리핑 문서 생성 중...', duration: 3000 }
+      { progress: 50, step: '유사 사고사례 검색 중...', duration: 8000 },
+      { progress: 65, step: '관련 법규 검색 중...', duration: 8000 },
+      { progress: 75, step: '안전 교육자료 검색 중...', duration: 8000 },
+      { progress: 85, step: 'AI 안전 분석 수행 중...', duration: 10000 },
+      { progress: 95, step: '브리핑 문서 생성 중...', duration: 10000 }
     ];
 
     let currentStepIndex = 0;

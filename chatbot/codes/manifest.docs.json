@@ -1,0 +1,39 @@
+{
+  "docs": [
+    {
+      "match": "170kV 50kA Spring GIS",
+      "family": "변전설비",
+      "equipment": ["170kV GIS"],
+      "doc_id": "GIS-170kV-Spring-v1.2",
+      "doc_version": "v1.2",
+      "doc_date": "2024-05-10"
+    },
+    {
+      "match": "수차발전기 대점검 순서도(배수)",
+      "family": "1수력 공통",
+      "equipment": ["수차발전기"]
+    },
+    {
+      "match": "2호기 조속기.pdf",
+      "family": "1수력 2호기",
+      "equipment": ["디지털조속기"],
+      "doc_id": "GOV-DIG-EN-00"
+    },
+    {
+      "match": "1호기 매뉴얼(en).pdf",
+      "family": "1수력 1호기",
+      "equipment": ["수차발전기"],
+      "doc_id": "UNIT1-OM-EN",
+      "doc_version": "revA",
+      "doc_date": "2023-11-01"
+    },
+    {
+      "match": "2호기 매뉴얼.pdf",
+      "family": "1수력 2호기",
+      "equipment": ["수차발전기"],
+      "doc_id": "UNIT2-OM-KO",
+      "doc_version": "revB",
+      "doc_date": "2024-03-15"
+    }
+  ]
+}
