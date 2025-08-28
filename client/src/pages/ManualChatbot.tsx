@@ -74,8 +74,8 @@ export default function ManualChatbot() {
   });
   
   const [inputMessage, setInputMessage] = useState('');
-
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
 
   // 설비 목록 조회
   const { data: equipmentData, isLoading: equipmentLoading } = useQuery({
@@ -205,16 +205,20 @@ export default function ManualChatbot() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className={`grid grid-cols-1 gap-6 ${isFilterCollapsed ? 'lg:grid-cols-1' : 'lg:grid-cols-4'}`}>
           {/* 필터 패널 */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                검색 필터
+          <Card className={isFilterCollapsed ? 'lg:col-span-1' : 'lg:col-span-1'}>
+            <CardHeader className="cursor-pointer" onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  검색 필터
+                </div>
+                {isFilterCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            {!isFilterCollapsed && (
+              <CardContent className="space-y-4">
               {/* 패밀리 선택 */}
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-2 block">설비 패밀리</label>
@@ -279,11 +283,12 @@ export default function ManualChatbot() {
                   )}
                 </div>
               </div>
-            </CardContent>
+              </CardContent>
+            )}
           </Card>
 
           {/* 채팅 영역 */}
-          <Card className="lg:col-span-3">
+          <Card className={isFilterCollapsed ? 'lg:col-span-1' : 'lg:col-span-3'}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <FileText className="w-5 h-5" />
