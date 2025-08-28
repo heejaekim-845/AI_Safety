@@ -959,8 +959,13 @@ JSON 형식으로 응답:
 
         
         // 사고사례: 벡터DB 메타데이터에서 직접 추출 (텍스트 파싱 제거)
+        console.log(`🔍 hybridFilteredAccidents 원본 데이터 구조 확인:`);
+        if (hybridFilteredAccidents.length > 0) {
+          console.log(`첫 번째 사고사례 원본:`, JSON.stringify(hybridFilteredAccidents[0], null, 2));
+        }
+        
         chromaAccidents = hybridFilteredAccidents
-          .map((r) => {
+          .map((r, index) => {
               const metadata = r.metadata;
               const document = r.document;
               const lines = document.split('\n');
@@ -971,7 +976,7 @@ JSON 형식으로 응답:
                 return line ? line.split(':')[1]?.trim() || fallback : fallback;
               };
               
-              return {
+              const result = {
                 title: metadata.title || '',
                 date: metadata.date || extractField('날짜') || '날짜 미상',
                 location: metadata.location || extractField('장소') || '장소 미상',
@@ -986,6 +991,21 @@ JSON 형식으로 응답:
                 risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
                 relevanceScore: (1 - (r.distance || 0)).toFixed(3)
               };
+              
+              if (index === 0) {
+                console.log(`🎯 첫 번째 사고사례 파싱 결과:`);
+                console.log(`  metadata.title: "${metadata.title || 'undefined'}"`);
+                console.log(`  metadata.damage: "${metadata.damage || 'undefined'}"`);
+                console.log(`  metadata.summary: "${metadata.summary || 'undefined'}"`);
+                console.log(`  extractField('피해규모'): "${extractField('피해규모')}"`);
+                console.log(`  extractField('개요'): "${extractField('개요')}"`);
+                console.log(`  lines[1]: "${lines[1] || 'undefined'}"`);
+                console.log(`  document 길이: ${document.length}자`);
+                console.log(`  document 처음 200자: "${document.slice(0, 200)}"`);
+                console.log(`  최종 result:`, JSON.stringify(result, null, 2));
+              }
+              
+              return result;
             });
         
         // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
