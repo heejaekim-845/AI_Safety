@@ -703,13 +703,20 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    // ===== 강제 로그 출력 테스트 =====
-    console.error("=".repeat(50));
-    console.error("🔥 FORCED LOG TEST - 이 로그가 보이나요?");
-    console.error("🔥 equipmentInfo.name:", equipmentInfo?.name);
-    console.error("🔥 workType.name:", workType?.name);
-    console.error("🔥 workType.description:", workType?.description?.substring(0, 100));
-    console.error("=".repeat(50));
+    // ===== 절대적으로 강제 로그 출력 테스트 =====
+    console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
+    console.error("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
+    console.warn("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
+    console.debug("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
+    
+    console.log("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
+    console.error("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
+    console.warn("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
+    
+    console.log("🔥 equipmentInfo.name:", equipmentInfo?.name);
+    console.log("🔥 workType.name:", workType?.name);
+    console.log("🔥 현재 시간:", new Date().toISOString());
+    console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
     
     return await timeit(
       "generateEnhancedSafetyBriefing TOTAL",
