@@ -703,23 +703,19 @@ JSON 형식으로 응답:
     weatherData: any,
     specialNotes?: string
   ): Promise<any> {
-    // ===== 절대적으로 강제 로그 출력 테스트 =====
-    console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    console.warn("🔥🔥🔥 AI SERVICE FUNCTION CALLED - 이 로그가 절대 안 보이면 완전히 다른 코드가 실행중");
+    // ===== 강제 로그 출력 테스트 =====
+    console.error("=".repeat(50));
+    console.error("🔥 FORCED LOG TEST - 이 로그가 보이나요?");
+    console.error("🔥 equipmentInfo.name:", equipmentInfo?.name);
+    console.error("🔥 workType.name:", workType?.name);
+    console.error("🔥 workType.description:", workType?.description?.substring(0, 100));
+    console.error("=".repeat(50));
     
-    console.log("🔥 equipmentInfo.name:", equipmentInfo?.name);
-    console.log("🔥 workType.name:", workType?.name);
-    console.log("🔥 현재 시간:", new Date().toISOString());
-    console.log("💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥");
-    
-    console.log("🔥 TIMEIT 우회 - 직접 실행 시작!");
-    
-    const startTime = performance.now();
-    try {
-      const result = await (async () => {
+    return await timeit(
+      "generateEnhancedSafetyBriefing TOTAL",
+      async () => {
         // 더 강한 로그
-        console.error("🔥🔥🔥 INSIDE DIRECT BLOCK 🔥🔥🔥");
-        console.log("🔥 직접 블록 내부 진입 완료!");
+        console.error("🔥🔥🔥 INSIDE TIMEIT BLOCK 🔥🔥🔥");
         try {
           // Get relevant accident cases using both ChromaDB RAG and simple RAG
           let relevantAccidents: AccidentCase[] = [];
@@ -729,7 +725,6 @@ JSON 형식으로 응답:
           let safetyRegulations: any[] = [];
 
           try {
-        console.log("🔥 TRY 블록 시작!");
         // 1단계: 설비 정보 구성
         const equipmentInfoObj = await timeit(
           "1.설비정보구성",
@@ -924,8 +919,6 @@ JSON 형식으로 응답:
           });
         }
         console.log(`====================================`);
-        
-        console.log(`🎯 결과 검증 단계 시작...`);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
@@ -946,8 +939,6 @@ JSON 형식으로 응답:
         // 하이브리드 점수 디버깅 로그 - 정규화된 finalScore 기반
         console.log(`하이브리드 검색 결과: incidents=${hybridFilteredAccidents.length}, education=${hybridFilteredEducation.length}, regulation=${regulations.length}`);
         console.log('상위 사고사례 하이브리드 점수:');
-
-        //이부분 조금 의심됨
         hybridFilteredAccidents.slice(0, 3).forEach((acc, idx) => {
           // 정규화된 점수 사용 [0,1] 범위
           const normalizedFinalScore = acc.finalScore ?? normalizedScore(acc);
@@ -968,13 +959,8 @@ JSON 형식으로 응답:
 
         
         // 사고사례: 벡터DB 메타데이터에서 직접 추출 (텍스트 파싱 제거)
-        console.log(`🔍 hybridFilteredAccidents 원본 데이터 구조 확인:`);
-        if (hybridFilteredAccidents.length > 0) {
-          console.log(`첫 번째 사고사례 원본:`, JSON.stringify(hybridFilteredAccidents[0], null, 2));
-        }
-        
         chromaAccidents = hybridFilteredAccidents
-          .map((r, index) => {
+          .map((r) => {
               const metadata = r.metadata;
               const document = r.document;
               const lines = document.split('\n');
@@ -985,7 +971,7 @@ JSON 형식으로 응답:
                 return line ? line.split(':')[1]?.trim() || fallback : fallback;
               };
               
-              const result = {
+              return {
                 title: metadata.title || '',
                 date: metadata.date || extractField('날짜') || '날짜 미상',
                 location: metadata.location || extractField('장소') || '장소 미상',
@@ -1000,21 +986,6 @@ JSON 형식으로 응답:
                 risk_keywords: metadata.risk_keywords || extractField('위험요소') || (inferRiskTags(equipmentInfoObj).join(', ') || '미상'),
                 relevanceScore: (1 - (r.distance || 0)).toFixed(3)
               };
-              
-              if (index === 0) {
-                console.log(`🎯 첫 번째 사고사례 파싱 결과:`);
-                console.log(`  metadata.title: "${metadata.title || 'undefined'}"`);
-                console.log(`  metadata.damage: "${metadata.damage || 'undefined'}"`);
-                console.log(`  metadata.summary: "${metadata.summary || 'undefined'}"`);
-                console.log(`  extractField('피해규모'): "${extractField('피해규모')}"`);
-                console.log(`  extractField('개요'): "${extractField('개요')}"`);
-                console.log(`  lines[1]: "${lines[1] || 'undefined'}"`);
-                console.log(`  document 길이: ${document.length}자`);
-                console.log(`  document 처음 200자: "${document.slice(0, 200)}"`);
-                console.log(`  최종 result:`, JSON.stringify(result, null, 2));
-              }
-              
-              return result;
             });
         
         // 교육자료: 하이브리드 점수 상위 6건 + URL 매칭
@@ -1155,7 +1126,6 @@ JSON 형식으로 응답:
         */
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
-        console.log(`🎯 RAG 검색 후 다음 단계 진행 중...`);
       } catch (error) {
         console.log('🚨🚨🚨 ChromaDB 검색 실패, 상세 오류 정보:');
         console.log('🚨 오류 타입:', typeof error);
@@ -1181,26 +1151,10 @@ JSON 형식으로 응답:
 
       // Format accident context for AI prompt
       console.log(`🎯 사고사례 처리 경로: ChromaDB=${chromaAccidents.length}건, 기존RAG=${relevantAccidents.length + workTypeAccidents.length}건`);
-      console.log(`🔍 ChromaDB 사고사례 첫 번째 항목:`, chromaAccidents[0] ? JSON.stringify(chromaAccidents[0], null, 2) : 'undefined');
       
-      let accidentContext;
-      if (chromaAccidents.length > 0) {
-        console.log('✅ ChromaDB formatChromaAccidentCases 호출');
-        accidentContext = this.formatChromaAccidentCases(chromaAccidents);
-      } else {
-        console.log('✅ 기존RAG formatAccidentCases 호출');
-        accidentContext = this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
-      }
-      
-      console.log(`🎯 최종 accidentContext 길이: ${accidentContext.length}자`);
-      console.log(`🎯 accidentContext 미리보기: ${accidentContext.slice(0, 200)}...`);
-
-      console.log("🚨🚨🚨 PROMPT 생성 직전 - accidentContext 확인 🚨🚨🚨");
-      console.log("🚨 accidentContext 타입:", typeof accidentContext);
-      console.log("🚨 accidentContext 길이:", accidentContext?.length || 'undefined');
-      console.log("🚨 accidentContext 내용:", accidentContext?.slice(0, 300) || 'undefined');
-      console.log("🚨 chromaAccidents 길이:", chromaAccidents?.length || 'undefined');
-      console.log("🚨🚨🚨 PROMPT 생성 시작 🚨🚨🚨");
+      const accidentContext = chromaAccidents.length > 0 
+        ? this.formatChromaAccidentCases(chromaAccidents)
+        : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
 
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
@@ -1412,15 +1366,8 @@ ${specialNotes || "없음"}
             relatedAccidentCases: []
           };
         }
-      })();
-      
-      console.log(`[AIService][timing] generateEnhancedSafetyBriefing TOTAL: ${(performance.now() - startTime).toFixed(1)}ms`);
-      return result;
-      
-    } catch (outerError) {
-      console.error("🚨 OUTER ERROR:", outerError);
-      throw outerError;
-    }
+      }
+    );
   }
 
   // 프로파일 기반 핵심 키워드 가중치 정의
@@ -1685,22 +1632,20 @@ ${specialNotes || "없음"}
     console.log("첫 번째 사고사례 데이터:", JSON.stringify(accidents[0], null, 2));
     
     return accidents.map((accident, index) => {
-      // ChromaDB 데이터는 플랫 객체 구조이므로 직접 접근
-      const title = accident.title || `사고사례 ${index + 1}`;
-      const damage = accident.damage || accident.severity || '미상';
-      const content = accident.summary || accident.direct_cause || accident.root_cause || "내용 없음";
+      const metadata = accident.metadata || {};
+      const content = accident.document || accident.content || accident.pageContent || "내용 없음";
       
-      console.log(`🔥 수정된 ChromaDB 사고사례 ${index + 1} 파싱:`, {
-        title: title,
-        damage: damage,
+      console.log(`사고사례 ${index + 1} 데이터:`, {
+        metadata: metadata,
         content: content?.slice(0, 100) + "...",
-        originalKeys: Object.keys(accident)
+        hasContent: !!content,
+        contentLength: content?.length || 0
       });
       
-      return `${index + 1}. ${title}
-   - 피해정도: ${damage}
+      return `${index + 1}. ${metadata.title || metadata.metadataTitle || `사고사례 ${index + 1}`}
+   - 피해정도: ${metadata.severity || metadata.damage_level || metadata.metadataSeverity || '미상'}
    - 사고원인: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`;
-   // - 발생일시: ${accident.date || '날짜 미상'} // 프롬프트 최적화로 주석처리
+   // - 발생일시: ${metadata.date || metadata.accident_date || metadata.metadataDate || '날짜 미상'} // 프롬프트 최적화로 주석처리
     }).join('\n\n');
   }
 
