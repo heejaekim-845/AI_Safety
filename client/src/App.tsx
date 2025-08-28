@@ -57,10 +57,7 @@ function Router() {
               </h2>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="material-icons cursor-pointer">notifications</span>
-            <span className="material-icons cursor-pointer">account_circle</span>
-          </div>
+
         </div>
       </nav>
 
