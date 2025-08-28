@@ -268,7 +268,10 @@ export class ChromaRAGService {
     incidents: AccidentCase[];
     education: EducationData[];
   }> {
-    console.log('키워드 검색은 벡터 DB(ai-service.ts)에서 처리됩니다');
+    console.log('🎯 키워드 검색 호출됨 - 빈 결과 반환 중');
+    console.log(`🎯 검색 파라미터: equipment="${equipment}", workType="${workType}", riskLevel="${riskLevel}"`);
+    console.log('🎯 반환값: regulations=0건, incidents=0건, education=0건');
+    
     return {
       regulations: [],
       incidents: [],
