@@ -74,7 +74,7 @@ export default function ManualChatbot() {
   });
   
   const [inputMessage, setInputMessage] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
 
   // 설비 목록 조회
@@ -157,15 +157,7 @@ export default function ManualChatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatContext.messages]);
 
-  // 설비 필터 변경
-  const handleEquipmentChange = (equipment: string) => {
-    setChatContext(prev => ({
-      ...prev,
-      selectedEquipment: prev.selectedEquipment?.includes(equipment)
-        ? prev.selectedEquipment.filter(eq => eq !== equipment)
-        : [...(prev.selectedEquipment || []), equipment]
-    }));
-  };
+
 
   // 패밀리 필터 변경
   const handleFamilyChange = (family: string) => {
@@ -209,88 +201,89 @@ export default function ManualChatbot() {
                 <p className="text-gray-600">AI가 매뉴얼 내용을 바탕으로 설비 관련 질문에 답변해드립니다</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className="gap-2"
-            >
-              <Settings className="w-4 h-4" />
-              필터 설정
-              {showFilters ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </Button>
+
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* 필터 패널 */}
-          {showFilters && (
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  검색 필터
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* 패밀리 선택 */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">설비 패밀리</label>
-                  <Select value={chatContext.selectedFamily || 'all'} onValueChange={handleFamilyChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="패밀리 선택" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">전체</SelectItem>
-                      {equipmentData?.equipment?.map((group: EquipmentGroup) => (
-                        <SelectItem key={group.family} value={group.family}>
-                          {group.family}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                검색 필터
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* 패밀리 선택 */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">설비 패밀리</label>
+                <Select value={chatContext.selectedFamily || 'all'} onValueChange={handleFamilyChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="패밀리 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체</SelectItem>
+                    {equipmentData?.equipment?.map((group: EquipmentGroup) => (
+                      <SelectItem key={group.family} value={group.family}>
+                        {group.family}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                {/* 설비 선택 */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">설비 종류</label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+              {/* 설비 선택 */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">설비 종류</label>
+                <Select 
+                  value={chatContext.selectedEquipment?.[0] || 'all'} 
+                  onValueChange={(value) => setChatContext(prev => ({
+                    ...prev,
+                    selectedEquipment: value === 'all' ? [] : [value]
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="설비 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체</SelectItem>
                     {availableEquipment.map((equipment: string, index: number) => (
-                      <label key={`${equipment}-${index}`} className="flex items-center space-x-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={chatContext.selectedEquipment?.includes(equipment) || false}
-                          onChange={() => handleEquipmentChange(equipment)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <span className="text-gray-700">{equipment}</span>
-                      </label>
+                      <SelectItem key={`${equipment}-${index}`} value={equipment}>
+                        {equipment}
+                      </SelectItem>
                     ))}
-                  </div>
-                </div>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                {/* 선택된 필터 요약 */}
-                <div>
-                  <div className="text-sm font-medium text-gray-700 mb-2">선택된 필터</div>
-                  <div className="space-y-1">
-                    {chatContext.selectedFamily && (
-                      <Badge variant="secondary" className="text-xs">
-                        패밀리: {chatContext.selectedFamily}
-                      </Badge>
-                    )}
-                    {chatContext.selectedEquipment?.map(eq => (
-                      <Badge key={eq} variant="outline" className="text-xs mr-1">
-                        {eq}
-                      </Badge>
-                    ))}
-                  </div>
+              {/* 선택된 필터 요약 */}
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-2">선택된 필터</div>
+                <div className="space-y-1">
+                  {chatContext.selectedFamily && chatContext.selectedFamily !== 'all' && (
+                    <Badge variant="secondary" className="text-xs">
+                      패밀리: {chatContext.selectedFamily}
+                    </Badge>
+                  )}
+                  {chatContext.selectedEquipment && chatContext.selectedEquipment.length > 0 && (
+                    <Badge variant="outline" className="text-xs">
+                      설비: {chatContext.selectedEquipment[0]}
+                    </Badge>
+                  )}
+                  {(!chatContext.selectedFamily || chatContext.selectedFamily === 'all') && 
+                   (!chatContext.selectedEquipment || chatContext.selectedEquipment.length === 0) && (
+                    <Badge variant="outline" className="text-xs">
+                      전체 매뉴얼 검색
+                    </Badge>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* 채팅 영역 */}
-          <Card className={showFilters ? "lg:col-span-3" : "lg:col-span-4"}>
+          <Card className="lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <FileText className="w-5 h-5" />
