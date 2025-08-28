@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User, CheckCircle, Wrench, HardHat, ScrollText, History, GraduationCap, Zap } from "lucide-react";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User, CheckCircle, Wrench, HardHat, ScrollText, History, GraduationCap, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -61,6 +61,7 @@ export default function Briefing() {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [quizAnswers, setQuizAnswers] = useState<{[key: number]: number}>({});
+  const [expandedRegulations, setExpandedRegulations] = useState<{[key: number]: boolean}>({});
   const queryClient = useQueryClient();
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
@@ -171,6 +172,7 @@ export default function Briefing() {
       setTimeout(() => {
         setBriefingData(data);
         setQuizAnswers({});
+        setExpandedRegulations({});
         setIsGenerating(false);
         setGenerationProgress(0);
         setCurrentStep('');
@@ -221,6 +223,13 @@ export default function Briefing() {
     setQuizAnswers(prev => ({
       ...prev,
       [quizIndex]: selectedOption
+    }));
+  };
+
+  const toggleRegulationExpansion = (index: number) => {
+    setExpandedRegulations(prev => ({
+      ...prev,
+      [index]: !prev[index]
     }));
   };
 
@@ -766,21 +775,62 @@ export default function Briefing() {
                     <CardContent>
                       <div className="space-y-3">
                         {briefingData.regulations && briefingData.regulations.length > 0 ? (
-                          briefingData.regulations.map((reg: any, index) => (
-                            <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                              <div className="mb-3">
-                                <div className="font-bold text-blue-900 text-base mb-1">
-                                  {reg.lawName || '산업안전보건기준에 관한 규칙'}
+                          briefingData.regulations.map((reg: any, index) => {
+                            const isExpanded = expandedRegulations[index];
+                            const content = reg.summary || reg.content;
+                            
+                            return (
+                              <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div className="mb-3">
+                                  <div className="font-bold text-blue-900 text-base mb-1">
+                                    {reg.lawName || '산업안전보건기준에 관한 규칙'}
+                                  </div>
+                                  <div className="font-semibold text-blue-800">
+                                    {reg.articleNumber}{reg.articleTitle ? `(${reg.articleTitle})` : ''}
+                                  </div>
                                 </div>
-                                <div className="font-semibold text-blue-800">
-                                  {reg.articleNumber}{reg.articleTitle ? `(${reg.articleTitle})` : ''}
+                                <div className="relative">
+                                  <div 
+                                    className={`text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100 ${
+                                      !isExpanded ? 'line-clamp-2 overflow-hidden' : ''
+                                    }`}
+                                    style={{
+                                      display: !isExpanded ? '-webkit-box' : 'block',
+                                      WebkitLineClamp: !isExpanded ? 2 : 'none',
+                                      WebkitBoxOrient: !isExpanded ? 'vertical' : 'initial',
+                                    }}
+                                  >
+                                    {content}
+                                  </div>
+                                  {!isExpanded && content && content.length > 100 && (
+                                    <div 
+                                      className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"
+                                    />
+                                  )}
+                                  {content && content.length > 100 && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => toggleRegulationExpansion(index)}
+                                      className="mt-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 p-2 h-auto"
+                                    >
+                                      {isExpanded ? (
+                                        <>
+                                          <ChevronUp className="w-4 h-4 mr-1" />
+                                          접기
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown className="w-4 h-4 mr-1" />
+                                          더보기
+                                        </>
+                                      )}
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
-                              <div className="text-blue-700 text-sm leading-relaxed bg-white p-3 rounded border border-blue-100">
-                                {reg.summary || reg.content}
-                              </div>
-                            </div>
-                          ))
+                            );
+                          })
                         ) : (
                           <div className="text-sm text-gray-500 italic p-3 text-center bg-gray-50 rounded">
                             현재 작업에 해당하는 특별 규정이 검색되지 않았습니다.<br/>
