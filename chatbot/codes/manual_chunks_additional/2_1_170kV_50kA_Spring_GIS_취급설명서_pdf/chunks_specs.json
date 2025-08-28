@@ -1,0 +1,7142 @@
+[
+  {
+    "id": "d643b659-5fc4-4c8f-afce-267728a85770",
+    "chunk_id": "GIS-170kV-Spring-v1.2-1-2-goyku",
+    "text": "- 1 - 170kV 50kA 스프링조작식 GIS ( TYPE : HSG-175A,B ) - 2 - ￭ 기기의 설치 운전 점검 및 보수작업을 실시하기 전에 반드시 본 취급설명서 에 기록된 내용을 충분히 이해하고 실시하여야 합니다 .. ￭ 본 기기를 안전하게 사용하기 위해서는 제품에 대한 지식이 요구되므로 , 반드시 교육 및 훈련받은 자에 의해서만 설치 운전 점검 및 보수작업이 진행되어야 합니다 . ￭ ( 주 ) 효성은 본 취급설명서의 오용으로 인해 발생하는 인명사고 및 제품손상에 대해 책임을 지지 않습니다 . ￭ 본 취급설명서의 전체 혹은 그 내용의 일부분이라도 ( 주 ) 효성의 사전 허락 없이 다른 사람에게 전달되거나 또는 복사되어서는 안되며 위반 시에는 관련 법규에 따라 처벌받을 수 있습니다 . ￭ 본 취급설명서의 사진 및 구조도면은 제품의 기본적인 취급방식을 설명하기 위해 작성되었으므로 공급된 제품과 항상 일치하는 것은 아닙니다 . ￭ 본 취급설명서는 GIS 의 설치 운전 점검 및 보수작업에 대한 기본사항을 나타내는 것이므로 , 보다 자세한 사항의 이해가 필요하거나 본 취급설명서에 기재된 사항 이외의 작업을 실시하고자 할 때는 반드시 하기 주소로 연락을 취하여야 합니다 . ￭ 만약 운전불능 혹은 고장발생 시에는",
+    "char_len": 633,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 1,
+    "page_end": 2,
+    "section_path": "",
+    "title": "- 1 - 170kV 50kA 스프링조작식 GIS ( TYPE : HSG-175A,B ) - 2 - ￭ 기기의 설치 운전 점검 및 보수작업을 실",
+    "task_type": [
+      "설치",
+      "운전",
+      "점검"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "8eea01fb-ebaf-4f6c-b4bc-714a8eea85f2",
+    "chunk_id": "GIS-170kV-Spring-v1.2-7-7-t8smp",
+    "text": "사 양 1. 개 요 ------------------------------------------------------ 6 2 . 정격 및 사양 2.1 GIS(Ga s In s ulat ed S w itc h g e ar) -------------------------------- 6 2.2 차단 기 ( C ircuit Br e ak e r) ---------------------------------------- 7 2. 3 단 로기 ( D i s conn e cting S w itc h ) --------------------------------- 7",
+    "char_len": 313,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 7,
+    "page_end": 7,
+    "section_path": "제1장>2.2",
+    "title": "사 양 1",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "75e77559-c65c-4c2a-abe6-903deb621299",
+    "chunk_id": "GIS-170kV-Spring-v1.2-7-7-e518e",
+    "text": "7 2. 3 단 로기 ( D i s conn e cting S w itc h ) --------------------------------- 7 2.4 접지개 폐 기 (Eart h ing S w itc h ) ---------------------------------- 7 2.5 변 류기 ( C urr e nt Tran sf orm e r) ---------------------------------- 7",
+    "char_len": 229,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 7,
+    "page_end": 7,
+    "section_path": "제1장>2.5",
+    "title": "7 2",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "5c1978fd-c3ef-4af6-aadc-35f829613ebb",
+    "chunk_id": "GIS-170kV-Spring-v1.2-8-8-bfvf7",
+    "text": "IS 의 우수한 성능이 장기간에 걸쳐 충분히 발휘될 수 있도록 기재사항을 충분히 이해하고 , 적정한 취급을 하여 주십시오 . 2. 정격 및 사양 2.1 GIS(Ga s In s ulat ed S w itc h g e ar) 형 식 HSG-175A, 175B 회 로 구 조 차단기 , 분기 BUS, 주모선 , Cable head 삼상 일괄형 붓싱 삼상 분리형 정 격 전 압 (kVrms) 170 정 격 전 류 (Arms) 차단기 , 분기 BUS 1250 / 2000 / 4000 주모선 3150 / 4000 정 격 주 파 수 (Hz) 60 정격 단시간 전류 (kA/1sec) 50 절 연 계 급 상용주파내전압 (kVrms/1 분 ) 325 뇌충격내전압 (kVpeak) 750 제어회로 상용주파내전압 (kVrms/1 분 ) 2 정 격 가 스 압 력 (Mpa G at 20 ℃ ) 차단기",
+    "char_len": 437,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 8,
+    "page_end": 8,
+    "section_path": "제1장>2.1",
+    "title": "IS 의 우수한 성능이 장기간에 걸쳐 충분히 발휘될 수 있도록 기재사항을 충분히 이해하고 , 적정한 취급을 하여 주십시오 ",
+    "task_type": [],
+    "component": [
+      "차단기",
+      "붓싱",
+      "모선",
+      "Frequency"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "9a99eefd-f93e-4478-a005-4431441b9f39",
+    "chunk_id": "GIS-170kV-Spring-v1.2-8-9-kv7lw",
+    "text": "뇌충격내전압 (kVpeak) 750 제어회로 상용주파내전압 (kVrms/1 분 ) 2 정 격 가 스 압 력 (Mpa G at 20 ℃ ) 차단기 0.6 ( = 6 kgf/ ㎠ G) 분기 BUS, 붓싱 , Cable head, 주모선 0.5 ( = 5 kgf/ ㎠ G) 제어 및 조작 전압 직류회로 (DC, V) 125 교류회로 (AC, V) 단상 220",
+    "char_len": 197,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 8,
+    "page_end": 9,
+    "section_path": "제1장>0.5",
+    "title": "뇌충격내전압 (kVpeak) 750 제어회로 상용주파내전압 (kVrms/1 분 ) 2 정 격 가 스 압 력 (Mpa G at 20 ℃ ) 차단기",
+    "task_type": [],
+    "component": [
+      "차단기",
+      "붓싱",
+      "모선"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "c788a0ac-c96a-47d1-bc91-fbff5970d5b4",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-9-jhz71",
+    "text": "le head, 주모선 0.5 ( = 5 kgf/ ㎠ G) 제어 및 조작 전압 직류회로 (DC, V) 125 교류회로 (AC, V) 단상 220 제 1 장 일반사양 - 7 - 2.2 차단 기 ( C ircuit Br e ak e r) 형 식 HCSP-175A, 175B 정 격 전 압 (kVrms) 170 정 격 전 류 (Arms) 1250 / 2000 / 4000 정 격 차 단 전 류 (kArms) 50 정 격 투 입 전 류 (kApeak) 130 정 격 차 단 시 간 (Cycles) 3 표 준 동 작 책 무 O-",
+    "char_len": 290,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 9,
+    "section_path": "제1장>2.2",
+    "title": "le head, 주모선 0",
+    "task_type": [],
+    "component": [
+      "모선",
+      "Setpoint"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "ec81a9b3-91e4-44ba-8f38-1e98ae166c04",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-9-8er7f",
+    "text": "단 전 류 (kArms) 50 정 격 투 입 전 류 (kApeak) 130 정 격 차 단 시 간 (Cycles) 3 표 준 동 작 책 무 O- 0.3s-CO-3min-CO 정 격 개 극 시 간 ( ㎳ ) 30 ± 3.0 ms 무부하 투입 시간 ( ㎳ ) 75 ± 7.5 ms 3 극부동시 개폐시간 개극시간 ( 단독 Open 동작시 ) ( ㎳ )",
+    "char_len": 192,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 9,
+    "section_path": "제1장>7.5",
+    "title": "단 전 류 (kArms) 50 정 격 투 입 전 류 (kApeak) 130 정 격 차 단 시 간 (Cycles) 3 표 준 동 작 책 무 O- ",
+    "task_type": [
+      "운전"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "aacab425-581e-4435-a7ca-27f64eab7b2d",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-9-r8a0g",
+    "text": ") 30 ± 3.0 ms 무부하 투입 시간 ( ㎳ ) 75 ± 7.5 ms 3 극부동시 개폐시간 개극시간 ( 단독 Open 동작시 ) ( ㎳ ) 2.8 투입시간 ( 단독 Close 동작시 ) ( ㎳ ) 4.2 제 어 전 류 투입전류 (A) 10 이하 트립전류 (A) 0.5 ～ 10 정격 제어 및 조작 전 압 직류회로 (DC, V) 125 교류회로 (AC, V) 단상 220 2. 3 단 로기 ( D i s conn e cting S w itc h ) 용 도 선 로 용 모 선 용 조 작 기 형 식 전 동 전 동 형 식 HDMO-175A HDMO-175B 정 격 전 압 (kVrms) 170 170 정 격 전 류 (Arms) 1250 / 2000 1250 / 2000 / 4000 정 격 조 작 전 압 (DC, V) 125 125",
+    "char_len": 408,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 9,
+    "section_path": "제1장>0.5",
+    "title": ") 30 ± 3",
+    "task_type": [
+      "운전"
+    ],
+    "component": [
+      "Trip"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "c4c91622-3696-4aa7-88fe-6a8498f314e1",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-9-7aqfe",
+    "text": "70 170 정 격 전 류 (Arms) 1250 / 2000 1250 / 2000 / 4000 정 격 조 작 전 압 (DC, V) 125 125 2.4 접지개 폐 기 (Eart h ing S w itc h ) 조 작 기 형 식 전동 - 스프링 수 동 형 식 HEMS-175A HEMA-175A, 175B 용 도 선로 접지 기기 및 작업시 접지 정 격 전 압 (kVrms) 170 170 정 격 투 입 전 류 (kApeak) 130 - 정 격 조 작 전 압 (DC, V) 125 -",
+    "char_len": 268,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 9,
+    "section_path": "제1장>2.4",
+    "title": "70 170 정 격 전 류 (Arms) 1250 / 2000 1250 / 2000 / 4000 정 격 조 작 전 압 (DC, V) 125 125",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "b53cd1aa-2256-404a-8037-b3324e23867d",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-9-eik9x",
+    "text": "접지 정 격 전 압 (kVrms) 170 170 정 격 투 입 전 류 (kApeak) 130 - 정 격 조 작 전 압 (DC, V) 125 - 2.5 변 류기 ( C urr e nt Tran sf orm e r) 변 류 기 용 도 계 전 기 용 계 측 기 용 형 식 붓싱형 변류기 (BCT) 붓싱형 변류기 (BCT) 부 담 200 VA",
+    "char_len": 187,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 9,
+    "section_path": "제1장>2.5",
+    "title": "접지 정 격 전 압 (kVrms) 170 170 정 격 투 입 전 류 (kApeak) 130 - 정 격 조 작 전 압 (DC, V) 125 - ",
+    "task_type": [],
+    "component": [
+      "붓싱"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "9271e508-3772-41c5-837f-62a11e00972f",
+    "chunk_id": "GIS-170kV-Spring-v1.2-9-10-sf32a",
+    "text": "sf orm e r) 변 류 기 용 도 계 전 기 용 계 측 기 용 형 식 붓싱형 변류기 (BCT) 붓싱형 변류기 (BCT) 부 담 200 VA 22.5 VA 오 차 계 급 C 800 1.2B 0.9 변 류 비 1200/800/600/400/200 : 5 A 2000/1500/1200/800/400 : 5 A 4000/3000/2000/1500/1000 : 5A 1200/800/600/400/200 : 5 A 2000/1500/1200/800/400 : 5 A 4000/3000/2000/1500/1000 : 5A 2 차 권 선 상용주파 내전압 2 kVrms/1 분 , 60 Hz 2 kVrms/1 분 , 60 Hz",
+    "char_len": 346,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 9,
+    "page_end": 10,
+    "section_path": "제1장>0.9",
+    "title": "sf orm e r) 변 류 기 용 도 계 전 기 용 계 측 기 용 형 식 붓싱형 변류기 (BCT) 붓싱형 변류기 (BCT) 부 담 200 VA",
+    "task_type": [],
+    "component": [
+      "붓싱",
+      "Frequency"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "spec": {
+      "frequency_Hz": 60
+    },
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "5f8884cb-b57b-48c9-b122-ae20697322c3",
+    "chunk_id": "GIS-170kV-Spring-v1.2-10-10-xbqr8",
+    "text": "000/2000/1500/1000 : 5A 2 차 권 선 상용주파 내전압 2 kVrms/1 분 , 60 Hz 2 kVrms/1 분 , 60 Hz 제 1 장 일반사양 - 8 - 2.6 계 기용 변 압기 (Pot e ntial Tran sf orm e r) 용 도 (kVrms) 선로용 / 모선용 정 격 1 차 전 압 (kVrms) 154/ √ 3 정 격 2 차 전 압 (Vrms) 110-110/ √ 3 110-190/3 권 선 용 도 Meter 용 Relay 용 권선별 오차 계급",
+    "char_len": 268,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 10,
+    "page_end": 10,
+    "section_path": "제1장>2.6",
+    "title": "000/2000/1500/1000 : 5A 2 차 권 선 상용주파 내전압 2 kVrms/1 분 , 60 Hz 2 kVrms/1 분 , 60 Hz",
+    "task_type": [],
+    "component": [
+      "모선",
+      "Frequency"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "spec": {
+      "frequency_Hz": 60
+    },
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "5d494587-20ce-4fc7-9de1-210517659570",
+    "chunk_id": "GIS-170kV-Spring-v1.2-10-11-3rhvx",
+    "text": "√ 3 정 격 2 차 전 압 (Vrms) 110-110/ √ 3 110-190/3 권 선 용 도 Meter 용 Relay 용 권선별 오차 계급 1.0CL 3P 부 담 (VA) 300 500 정 격 가 스 압 력 (kgf/ ㎠ G at 20 ℃ ) 5 2.7 붓싱 (Bu sh ing) 정 격 전 압 (kVrms) 170 정 격 전 류 (Arms) 1250 / 2000 애자최소 연면거리 ( ㎜ ) 4175 이상",
+    "char_len": 229,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 10,
+    "page_end": 11,
+    "section_path": "제1장>2.7",
+    "title": "√ 3 정 격 2 차 전 압 (Vrms) 110-110/ √ 3 110-190/3 권 선 용 도 Meter 용 Relay 용 권선별 오차 계급 ",
+    "task_type": [],
+    "component": [
+      "붓싱"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "d0da6290-5f81-4258-a49e-96da8bf533e4",
+    "chunk_id": "GIS-170kV-Spring-v1.2-12-14-i87l1",
+    "text": "접지개폐기 , 현장 조작함 (Local Control Panel), 인입 접속부 ( 붓싱 또는 CABLE HEAD) 등으로 구성되어 있습니다 . 제 1 장 일반사양 - 10 - ▣ 그림 1-1. GIS 기본구조도 제 1 장 일반사양 - 11 - 3 .1 차단 기 ( C ircuit Br e ak e r) 및 변 류기 ( C urr e nt Tran sf orm e r) 아 - 크 (Arc) 열에 의한 열팽창 방식과 퍼퍼형 (Puffer type) 을 조합한 복합소호형 차단기는 저조작력과 소형화 를 가져 왔습니다 . 또한 차단기 극간에 콘덴서를 취부하지 않았으므로 모선 PT 와의 철공진 현상과 모선측 유도전압 발생요인이 제거되었을 뿐 아니라 , 극간 절연성능이 향상되었으며 부품수가 많 지 않으므로 보수 점검이 간단하고 신뢰 성이 대단히 높 습니다 . 변류기는 차단기 외함 내에 내장되어 있으며 , 변류기의 기능은 선로의 이상전류를 감지하여 System 을 보호하는 기능과 상시 통전 전류 등을 측정 (Metering) 하는 기능을 가지고 있습니다 . ▣ 그림 1-2. 차단기 구조도",
+    "char_len": 553,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 12,
+    "page_end": 14,
+    "section_path": "제1장",
+    "title": "접지개폐기 , 현장 조작함 (Local Control Panel), 인입 접속부 ( 붓싱 또는 CABLE HEAD) 등으로 구성되어 있습니다 ",
+    "task_type": [
+      "점검"
+    ],
+    "component": [
+      "차단기",
+      "접지개폐기",
+      "붓싱",
+      "모선",
+      "SCADA"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.13 ▣ 그림",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "1b7be236-fc4b-41d1-8f37-143e8566cf7e",
+    "chunk_id": "GIS-170kV-Spring-v1.2-15-16-h8hyk",
+    "text": "쉴 드 144 쿠션 109 가동 주 접 촉 자 118 흡착제 케이스 127 노즐 136 상부 스 페 이서 ▣ 그림 1-3. 차단부 내부 구조도 제 1 장 일반사양 - 13 - 3 . 1.2 조작부 차단기 조작에 필요한 스프링 조작기 및 조작 LINK 기구부로 구성되어 있습니다 . 그림 1-4 는 조작부의 구조를 보여 주고 있습니다 . ▣ 그림 1-4. 조작부 구조도 1) 조작 Link, Lever 부 구조 (Page14 그림 1-5 참 조 ) 조작 링크 (Link), 레버 (Lever) 부는 스프링조작기의 조작력을 차단부에 전 달 하는 부분으로 연 결 Link, Lever , 핀 (Pin) 등으로 구성되어 있습니다 . 2) 스프링 조작기 구조 ( 별 첨 스프링조작기 SOM-170 취급 설명서 참 조 )",
+    "char_len": 397,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 15,
+    "page_end": 16,
+    "section_path": "제1장>1.2",
+    "title": "쉴 드 144 쿠션 109 가동 주 접 촉 자 118 흡착제 케이스 127 노즐 136 상부 스 페 이서 ▣ 그림 1-3",
+    "task_type": [],
+    "component": [
+      "차단기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.15 그림 1",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "0e824ba0-123b-4212-a718-0e51da147977",
+    "chunk_id": "GIS-170kV-Spring-v1.2-16-17-6s9ml",
+    "text": "Lever , 핀 (Pin) 등으로 구성되어 있습니다 . 2) 스프링 조작기 구조 ( 별 첨 스프링조작기 SOM-170 취급 설명서 참 조 ) 제 1 장 일반사양 - 14 - 번호 품 명 번호 품 명 103 차단부 탱크 476 힌 지 (Hinge) 311 피스톤 (Piston) 477 로크 플레이트 (Lock-Plate) 471 핀 (Pin) 478 링크 (Link) 472 메 인 레버 ( 샤 프트 ) 479 메 인 레버 (Main Lever) 473 부 쉬 (Bush) 480 로크 너 트 (Lock-Nut) 474 핀 (Pin) 481 웨 어 링 (Wear Ring) 475 로크 너 트 (Lock-Nut) 482 로크 플레이트 (Lock-Plate) ▣ 그림 1-5. 조작 Link, Lever 부 구조도",
+    "char_len": 399,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 16,
+    "page_end": 17,
+    "section_path": "제1장",
+    "title": "Lever , 핀 (Pin) 등으로 구성되어 있습니다 ",
+    "task_type": [],
+    "component": [
+      "모선"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.16 ▣ 그림",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "2d00e635-fe1a-426a-9a8e-55492c65859b",
+    "chunk_id": "GIS-170kV-Spring-v1.2-18-20-k8yyt",
+    "text": "219 , 경 보 표시등 (Annunciator) 226 , 단자대 206 등으로 구성되어 있습니다 . ▣ 그림 1-6. 현장 조작함 구조도 1 제 1 장 일반사양 - 16 - ▣ 현장조작함 사진 ( 참 고용 ) 제 1 장 일반사양 - 17 - ▣ 그림 1-7. 현장 조작함 구조도 2 ▣ 그림 1-8. 현장 조작함 구조도 3",
+    "char_len": 182,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 18,
+    "page_end": 20,
+    "section_path": "제1장",
+    "title": "219 , 경 보 표시등 (Annunciator) 226 , 단자대 206 등으로 구성되어 있습니다 ",
+    "task_type": [],
+    "component": [
+      "SCADA"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.19 ▣ 그림",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "36314f4c-b268-430f-91fd-8f411a15eff5",
+    "chunk_id": "GIS-170kV-Spring-v1.2-21-21-zek75",
+    "text": "6DS CLOSE 용 Aux. Relay OMRON, MM2XP, 125Vdc ● CX15 Remote 선로측 자동 ES CLOSE 용 Aux. Relay OMRON, MM2XP, 125Vdc ● ● ● ● CX21 SCADA CB 투입용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● CX22 SCADA 1DS CLOSE 용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● CX23 SCADA 2DS CLOSE 용 Aux. Relay OMRON, MM2XP, 24Vdc ● CX24 SCADA 6DS CLOSE 용 Aux. Relay OMRON, MM2XP, 24Vdc ● CX25 SCADA 선로측 자동 ES CLOSE 용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● TX11 Remote CB 트립용 Aux. Relay OMRON, MM2XP, 125Vdc ● ● ● ● TX12 Remote 1DS OPEN 용 Aux. Relay OMRON, MM2XP, 125Vdc ● ● ● ● TX13 Remote 2DS OPEN 용 Aux. Relay OMRON, MM2XP, 125Vdc ● TX14 Remote 6DS OPEN 용 Aux. Relay OMRON, MM2XP, 125Vdc ● TX15 Remote 선로측 자동 ES OPEN 용 Aux. Relay OMRON, MM2XP, 125Vdc ● ● ● ● TX21 SCADA CB 트립용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● TX22 SCADA 1DS OPEN 용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● TX23 SCADA 2DS OPEN 용 Aux. Relay OMRON, MM2XP, 24Vdc ● TX24 SCADA 6DS OPEN 용 Aux. Relay OMRON, MM2XP, 24Vdc ● TX25 SCADA 선로측 자동 ES OPEN 용 Aux.",
+    "char_len": 980,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 21,
+    "page_end": 21,
+    "section_path": "제1장",
+    "title": "6DS CLOSE 용 Aux",
+    "task_type": [
+      "운전"
+    ],
+    "component": [
+      "차단기",
+      "단로기",
+      "접지개폐기",
+      "SCADA",
+      "Trip"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "92ed57cb-cc80-4a76-b348-10b6d43085fd",
+    "chunk_id": "GIS-170kV-Spring-v1.2-21-22-hbrat",
+    "text": "ADA 6DS OPEN 용 Aux. Relay OMRON, MM2XP, 24Vdc ● TX25 SCADA 선로측 자동 ES OPEN 용 Aux. Relay OMRON, MM2XP, 24Vdc ● ● ● ● IRR1 인 터 록 해제용 Aux. Relay OMRON, MM4XP, 125Vdc ● IRR2 인 터 록 해제용 Aux. Relay OMRON, MM2XP, 125Vdc ● ● ● ● RSX1 경 보회로 Reset 용 Aux. Relay OMRON, MM4XP, 125Vdc ● ● ● ● RSX2 경 보회로 Reset 용 Aux. Relay OMRON, MM4XP, 125Vdc ● ● RSX3 경 보회로 Reset 용 Aux. Relay OMRON, MM4XP, 125Vdc",
+    "char_len": 383,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 21,
+    "page_end": 22,
+    "section_path": "제1장",
+    "title": "ADA 6DS OPEN 용 Aux",
+    "task_type": [],
+    "component": [
+      "단로기",
+      "접지개폐기",
+      "SCADA"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "43fb0ece-4ff9-4ae8-9399-81c1cf892913",
+    "chunk_id": "GIS-170kV-Spring-v1.2-26-27-ibls0",
+    "text": "그림은 당사 표준형 Composite Bushing 및 Cable Head 구조 임 ) ▣ 그림 1-13. 붓싱 , Cable Head 구조도 제 1 장 일반사양 - 24 - 3 .7 3 P D S 및 2 D S 조작기 3PDS 조작기는 모선용 단로기 / 수동 ES 에 적용되는 3 단 개폐기이며 , 2PDS 조작기는 모선용 단로기 및 선로용 단로기에 적용는 2 단 개폐기로 구동부 , 제어회로부 , 상태표시부 , 셔터 부 , 잠 금장치부 , 인 터락 부로 구성 됩 니다 . 상 세 한 내용은 별 첨 DS/ES 조작기 취급설명서를 참 고 바랍 니다 . 아 래 사진은 3PDS 조작기 및 2PDS 조작기 내부 모습입니다 . ▣ 사진 3PDS 조작기 내부 ▣ 사진 2PDS 조작기 내부",
+    "char_len": 381,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 26,
+    "page_end": 27,
+    "section_path": "제1장",
+    "title": "그림은 당사 표준형 Composite Bushing 및 Cable Head 구조 임 ) ▣ 그림 1-13",
+    "task_type": [],
+    "component": [
+      "단로기",
+      "접지개폐기",
+      "붓싱",
+      "모선"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "29150411-4183-45cd-813c-b807e3fe64be",
+    "chunk_id": "GIS-170kV-Spring-v1.2-27-28-raffy",
+    "text": "바랍 니다 . 아 래 사진은 3PDS 조작기 및 2PDS 조작기 내부 모습입니다 . ▣ 사진 3PDS 조작기 내부 ▣ 사진 2PDS 조작기 내부 제 1 장 일반사양 - 25 - 3 .8 HES 조작기 HES 조작기는 모 터 - 스프링 조작기로 선로용 접지개폐기에 적용되며 동작 메카 니 즘 , 제어회로 , 기계적상 태표시 , 인 터 록 장치로 구성 됩 니다 . 상 세 한 내용은 별 첨 DS/ES 조작기 취급설명서를 참 고 바랍 니다 . 아 래 사진은 HES 조작기의 내부모습을 보여 주고 있습니다 . ▣ 사진 . HES 조작기 내부",
+    "char_len": 298,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 27,
+    "page_end": 28,
+    "section_path": "제1장",
+    "title": "바랍 니다 ",
+    "task_type": [],
+    "component": [
+      "단로기",
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "9f423937-1e60-4fbc-b98b-6d5843930ca5",
+    "chunk_id": "GIS-170kV-Spring-v1.2-28-28-5us0d",
+    "text": "/ES 조작기 취급설명서를 참 고 바랍 니다 . 아 래 사진은 HES 조작기의 내부모습을 보여 주고 있습니다 . ▣ 사진 . HES 조작기 내부 제 1 장 일반사양 - 26 - 3 .9 수동 조작기 ▣ 사진 . 수동조작기 내부 수동 조작기는 수동 조작 핸들 을 움직여 수동형 접지개폐기를 투입 혹 은 개방시키는 장치입니다 . 그림 1-16 은 수동 조작기의 구조를 보여주고 있습니다 . 3 .",
+    "char_len": 219,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 28,
+    "page_end": 28,
+    "section_path": "제1장",
+    "title": "/ES 조작기 취급설명서를 참 고 바랍 니다 ",
+    "task_type": [
+      "운전"
+    ],
+    "component": [
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.28 그림 1",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "f3cb4ccf-5f53-42cd-a406-da936b06ae2d",
+    "chunk_id": "GIS-170kV-Spring-v1.2-28-28-x1tce",
+    "text": "작 핸들 을 움직여 수동형 접지개폐기를 투입 혹 은 개방시키는 장치입니다 . 그림 1-16 은 수동 조작기의 구조를 보여주고 있습니다 . 3 . 9.1 조작부 조작부는 조작 샤 프트 903 , 마 그 네틱 코 일 904 , 조작 레버 908 , 푸쉬 버 튼 스위치 (Push button S/W) 909 등으로 구성되어 있습니다 . 3 .",
+    "char_len": 189,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 28,
+    "page_end": 28,
+    "section_path": "제1장>9.1",
+    "title": "작 핸들 을 움직여 수동형 접지개폐기를 투입 혹 은 개방시키는 장치입니다 ",
+    "task_type": [
+      "운전"
+    ],
+    "component": [
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "c33a5ae5-b944-4a1e-a777-caeb4bc8448f",
+    "chunk_id": "GIS-170kV-Spring-v1.2-28-29-m5kjv",
+    "text": "그 네틱 코 일 904 , 조작 레버 908 , 푸쉬 버 튼 스위치 (Push button S/W) 909 등으로 구성되어 있습니다 . 3 . 9.2 기계적 인디케이터 기계적 인 디 케이 터 906 에 의해 ES 의 OPEN, CLOSE 위치를 나타내며 , ES 에 기계적으로 연 결 되어 있습 니다 . 3 .9. 3 기계적 LOCK - OU T 장치 기기의 오동작을 막 기 위하여 Lock-Pin 910 장치를 구비하고 있습니다 .",
+    "char_len": 242,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 28,
+    "page_end": 29,
+    "section_path": "제1장>9.2",
+    "title": "그 네틱 코 일 904 , 조작 레버 908 , 푸쉬 버 튼 스위치 (Push button S/W) 909 등으로 구성되어 있습니다 ",
+    "task_type": [],
+    "component": [
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "a7d20494-eb87-4497-b250-8cd1850dd371",
+    "chunk_id": "GIS-170kV-Spring-v1.2-29-30-df3ls",
+    "text": "있습 니다 . 3 .9. 3 기계적 LOCK - OU T 장치 기기의 오동작을 막 기 위하여 Lock-Pin 910 장치를 구비하고 있습니다 . 제 1 장 일반사양 - 27 - 908 906 907 905 909 910 903 901 904 902 번호 품 명 번호 품 명 901 DOOR 906 INDICATOR 902 CASE 907 AUX. SWITCH 903 조작 SHAFT 908 조작 LEVER 904 MAGNETIC COIL 909 PUSH BUTTON S/W 905 단자대 910 LOCK PIN ▣ 그림 1-16. 수동 조작기 구조도 908 수동조작 핸들 910 909 901 904 ▣ 그림 1-17. 수동 조작기 동작설명도",
+    "char_len": 359,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 29,
+    "page_end": 30,
+    "section_path": "제1장",
+    "title": "있습 니다 ",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.29 ▣ 그림",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "bfb01b3c-d679-40df-bbcd-45c0163c7728",
+    "chunk_id": "GIS-170kV-Spring-v1.2-30-30-mdk7e",
+    "text": "CK PIN ▣ 그림 1-16. 수동 조작기 구조도 908 수동조작 핸들 910 909 901 904 ▣ 그림 1-17. 수동 조작기 동작설명도 제 1 장 일반사양 - 28 - 3 . 9.4 수동 조작기 동작원 리 (Page27 그림 1-17) Door 901 을 열어 , 수동조작 핸들 을 레버 908 에 삽 입하고 Push button S/W 909 를 누 르 면 마 그 네틱 코 일 904 (LMG) 이 여자 ( 勵磁 ) 되어 Lock-pin 910 이 해제 됩 니다 . 이 때 수동조작 핸들 을 회전시 킵 니다 . 단 , Push button S/W 는 동작이 완 전히 이 루 어진 후 에 놓 아주십시오 . 그림 1-17 은 수동 조작기의 동작 방 법 을 보여 줍 니다 . L ock-Pin 910 (Page27, 그 림 1-16) 을 이용하여 조작기를 동작시킬 때에는 인터록 조 건 에 관 계 없이 조작이 가능하므로 반 드시 타 기기 와 의 인터록 조 건 을 확 인하고 조작하여야 한다 . 모 선용 ES 조작기에는 모 선 활선시 DOOR 을 개방하면 , 적 색램 프가 점등되고 부저가 울리 므로 무리 하게 동작시 켜 서는 안된다 . ￭ 조작기기의 인터록 조 건 이 갖추 어지지 않을 때는 수동 조작 코 일 904 ( LM G) 이 여자 ( 勵磁 ) 되지 않아 L ock-Pin 910 이 해제되지 않으므로 무리 하게 동작시 키 지 말아야 한다 . ￭ Pu sh b utton S / W 는 5 분 이상 누르 지 말아야 한다 . 만약 그렇지 않으면 수동 조작 코 일이 장시 간 여자 됨 에 따라 코 일이 소손 될 수 있다 . ￭ C lo se 혹은 Ope n 조작을 하고 Pu sh b utton S / W 를 놓 은 후 다시 핸들 을 조작한 반대방 향 으로 움직 여 조작 완료 상태를 확 인해야 한다 . 이때 조작 반대방 향 으로 움직 이지 않아야 조작이 완료 된 상태이다 . ￭ 조작 완료 후에는 L ock- p in 이 L ock 위치에 확 실히 복 귀 된 것을 눈 으로 확 인해야 한다 .",
+    "char_len": 1009,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 30,
+    "page_end": 30,
+    "section_path": "제1장>9.4",
+    "title": "CK PIN ▣ 그림 1-16",
+    "task_type": [],
+    "component": [
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.30 그림 1",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "21d807d7-2b60-4fa2-9cf3-76d528b45cdb",
+    "chunk_id": "GIS-170kV-Spring-v1.2-30-31-8m4y7",
+    "text": "작이 완료 된 상태이다 . ￭ 조작 완료 후에는 L ock- p in 이 L ock 위치에 확 실히 복 귀 된 것을 눈 으로 확 인해야 한다 . ￭ 수동 동작이 완료 된 후에는 수동조작 핸들 을 반드시 제거하여야 한다 . 170kV 50kA 3 상일괄 스프링조작식 GIS 취급설명서 - 29 - 제 2 장 운송 및 설치 1 . 포 장",
+    "char_len": 186,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 30,
+    "page_end": 31,
+    "section_path": "제2장",
+    "title": "작이 완료 된 상태이다 ",
+    "task_type": [
+      "설치"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "f6683c1b-5cb4-4757-94db-68657dea772e",
+    "chunk_id": "GIS-170kV-Spring-v1.2-31-31-g1eoi",
+    "text": "을 반드시 제거하여야 한다 . 170kV 50kA 3 상일괄 스프링조작식 GIS 취급설명서 - 29 - 제 2 장 운송 및 설치 1 . 포 장 1.1 포 장의 종류 -------------------------------------------------- 40 1.2 포 장의 적용 -------------------------------------------------- 40 1. 3 청 소 ------------------------------------------------------- 41",
+    "char_len": 279,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 31,
+    "page_end": 31,
+    "section_path": "제2장>1.2",
+    "title": "을 반드시 제거하여야 한다 ",
+    "task_type": [
+      "설치"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "63eaf534-1625-4f35-b174-56bdd3074dea",
+    "chunk_id": "GIS-170kV-Spring-v1.2-33-33-ltlcz",
+    "text": "조작함과 예비품 조작함 내부의 먼 지와 배선 잔 여물 들 을 청 소합니다 . 예 비품뿐만이 아니라 공급하는 부품 들 은 신 품으로 공급합니다 . 1.4 건 조제 분리된 GIS 에는 건 조질소 0.02 ～ 0.05 Mpa G 로 주입되고 합성 제 올 라이트 (Zeolite) 와 같 은 건 조제를 넣 습 니다 . 방수 포 장에도 동일 량 의 건 조제를 넣 습니다 .",
+    "char_len": 203,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 33,
+    "page_end": 33,
+    "section_path": "제2장>0.05",
+    "title": "조작함과 예비품 조작함 내부의 먼 지와 배선 잔 여물 들 을 청 소합니다 ",
+    "task_type": [
+      "가스/배수/시험"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "83ef46e2-5faf-4a97-94ce-6545b46f99ee",
+    "chunk_id": "GIS-170kV-Spring-v1.2-49-50-zh9i7",
+    "text": "품을 오 염 된 주위 환 경 또는 높 은 습도조 건 등의 기후에서 사용할 때에는 점검주기를 상기 지정된 점검주기보다 짧 게 해야 한다 . ▣ 표 4.2 임 시점검 주기 1 순시점검 , 보통점검 시 기기의 이상상태가 발견되었을 때 2 기기가 비정상적으로 동작하는 것이 발견되었을 때나 기기의 정격을 초과하는 조 건 에서 운전 되었을 때 3 차단 / 개폐 회수 혹 은 누적 차단 / 개폐 회수가 다 음 과 같 을 때 기기명 차단 / 개폐 종 류 차단 / 개폐 전류 차단 / 개폐 회수 형식명 차단기 무부하 개폐 - 10,000 회 HCSP 정격 차단전류 50 kA 10 회 차단전류 25 kA 30 회 10 kA 100 회 정격 부하전류 2,000 A 1,000 회 1,000 A 이하 2,000 회 단로기 무부하 개폐 - 2,000 회 HDMO 충전전류 개폐 1 A 2,000 회 모선 루 프 개폐 정격전류 이하 200 회 HDMO 접지개폐기 무부하 개폐 - 2,000 회 HEMA, HEMS 유도전류 개폐 300 A 100 회 HEMS 단 락 투입전류 50 kA 투입 2 회",
+    "char_len": 545,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 49,
+    "page_end": 50,
+    "section_path": "제4장>4.2",
+    "title": "품을 오 염 된 주위 환 경 또는 높 은 습도조 건 등의 기후에서 사용할 때에는 점검주기를 상기 지정된 점검주기보다 짧 게 해야 한다 ",
+    "task_type": [
+      "운전",
+      "점검"
+    ],
+    "component": [
+      "차단기",
+      "단로기",
+      "접지개폐기",
+      "모선",
+      "Setpoint"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "c5203b16-fc8c-40e3-83a2-cfe80334e67c",
+    "chunk_id": "GIS-170kV-Spring-v1.2-58-58-thy3y",
+    "text": "요시 메틸 알코올 을 적 신 천 으로 닦 는다 . 청 소 후 흩 어진 이물질을 제거하기 위해 표면은 항상 메틸 알코올 로 청 소하여 야 한다 . ③ 알루 미 늄 (Aluminium) 표면 알루 미 늄 표면은 메틸 알코올 을 적 신 천 으로 닦 은 후 즉 시 건 조하고 깨끗 한 천 으로 이물질을 청 소하라 . ④ 가동 접 촉 자 (Moving Contact) 표면 은도금 된 가동접 촉 면은 필요시 메틸 알코올 을 적 신 부드 러 운 천 으로 청 소하라 . 도금이 안 된 가동 접 촉 면은 수 세 미를 사용하고 메틸 알코올 을 적 신 부드 러 운 천 으로 닦 아라 . 수 세 미로 닦 은 후 에는 이물질을 청 소하기 위해 항상 깨끗 하게 청 소하여 야 한다 . 고정접 촉 자의 표면과 퍼퍼 실린더 (Puffer Cylinder) 에는 히타 루베 -280 을 약 간 바 른다 . 여분의 히타 루베 는 조 심 스 럽 게 닦 아낸다 .",
+    "char_len": 464,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 58,
+    "page_end": 58,
+    "section_path": "⑴4",
+    "title": "요시 메틸 알코올 을 적 신 천 으로 닦 는다 ",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "step_no": 4,
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "7009f254-aabd-468c-97eb-a424fba1c7ec",
+    "chunk_id": "GIS-170kV-Spring-v1.2-69-69-ux7xw",
+    "text": "부위는 사상이 끝 난 상태에서 하도 작업을 해 야 한다 . 2) 하도 작업 12 시간 이상 경 과 후 전 반 적인 상도를 실 시해 야 합니다 . 7.2. 3 페인트 사용용도 및 종류 1) 하도 : EPONA #2000 2) 상도 : Munsell No.5Y 7/1 3) 단선도 : 적 색 에나 멜 페 인트 4) 절연물 표시 : 황 색 에나 멜 페 인트 (Gas pipe :",
+    "char_len": 208,
+    "collection": "specs",
+    "doc_id": "GIS-170kV-Spring-v1.2",
+    "page_start": 69,
+    "page_end": 69,
+    "section_path": "제4장>7.2",
+    "title": "부위는 사상이 끝 난 상태에서 하도 작업을 해 야 한다 ",
+    "task_type": [],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS",
+      "SF6",
+      "CB",
+      "DS",
+      "ES",
+      "Bushing",
+      "Bus",
+      "배수",
+      "방수문",
+      "드레인",
+      "펌프",
+      "크레인",
+      "밀폐공간",
+      "잠수",
+      "SCADA",
+      "Governor",
+      "SPC",
+      "OPC",
+      "POC",
+      "Wicket gate",
+      "Guide Vane",
+      "Servomotor",
+      "Droop",
+      "Isochronous",
+      "Island operation",
+      "Paralleling",
+      "Overspeed test",
+      "PID",
+      "Kp",
+      "Ki",
+      "Kd",
+      "Setpoint",
+      "Frequency",
+      "RPM",
+      "Gate opening",
+      "MW"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "v1.2",
+    "doc_date": "2024-05-10",
+    "family": "변전설비",
+    "equipment": [
+      "170kV GIS"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]

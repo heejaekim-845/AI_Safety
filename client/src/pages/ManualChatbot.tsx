@@ -255,8 +255,8 @@ export default function ManualChatbot() {
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-2 block">설비 종류</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {availableEquipment.map((equipment: string) => (
-                      <label key={equipment} className="flex items-center space-x-2 text-sm">
+                    {availableEquipment.map((equipment: string, index: number) => (
+                      <label key={`${equipment}-${index}`} className="flex items-center space-x-2 text-sm">
                         <input
                           type="checkbox"
                           checked={chatContext.selectedEquipment?.includes(equipment) || false}
@@ -422,7 +422,7 @@ export default function ManualChatbot() {
                 </div>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
-                  <span>472개 매뉴얼 페이지 검색 가능</span>
+                  <span>666개 매뉴얼 청크 검색 가능 (5개 매뉴얼)</span>
                 </div>
               </div>
             </CardContent>

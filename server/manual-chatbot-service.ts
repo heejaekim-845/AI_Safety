@@ -60,13 +60,13 @@ export class ManualChatbotService {
         throw new Error('OpenAI API 키가 설정되지 않았습니다.');
       }
 
-      // 매뉴얼 임베딩 파일 확인
-      const embeddingFile = './chatbot/codes/manual_chunks/merged/embeddings.ndjson';
+      // 통합 매뉴얼 임베딩 파일 확인
+      const embeddingFile = './chatbot/codes/manual_chunks_all.ndjson';
       try {
         await fs.access(embeddingFile);
-        console.log('매뉴얼 임베딩 파일 발견:', embeddingFile);
+        console.log('통합 매뉴얼 임베딩 파일 발견:', embeddingFile);
       } catch {
-        throw new Error(`매뉴얼 임베딩 파일을 찾을 수 없습니다: ${embeddingFile}`);
+        throw new Error(`통합 매뉴얼 임베딩 파일을 찾을 수 없습니다: ${embeddingFile}`);
       }
 
       // OpenAI 연결 테스트
@@ -92,8 +92,8 @@ export class ManualChatbotService {
       
       const queryVector = embeddingResponse.data[0].embedding;
 
-      // 매뉴얼 임베딩 파일에서 직접 검색
-      const embeddingFile = './chatbot/codes/manual_chunks/merged/embeddings.ndjson';
+      // 통합 매뉴얼 임베딩 파일에서 직접 검색
+      const embeddingFile = './chatbot/codes/manual_chunks_all.ndjson';
       const fileContent = await fs.readFile(embeddingFile, 'utf-8');
       const lines = fileContent.trim().split('\n');
       
@@ -258,8 +258,8 @@ ${relevantChunks.map((chunk, i) =>
     await this.initialize();
 
     try {
-      // 매뉴얼 임베딩 파일에서 메타데이터 수집
-      const embeddingFile = './chatbot/codes/manual_chunks/merged/embeddings.ndjson';
+      // 통합 매뉴얼 임베딩 파일에서 메타데이터 수집
+      const embeddingFile = './chatbot/codes/manual_chunks_all.ndjson';
       const fileContent = await fs.readFile(embeddingFile, 'utf-8');
       const lines = fileContent.trim().split('\n');
       
