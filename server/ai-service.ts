@@ -919,6 +919,8 @@ JSON 형식으로 응답:
           });
         }
         console.log(`====================================`);
+        
+        console.log(`🎯 결과 검증 단계 시작...`);
 
         // 결과 검증
         const incidentsOut   = finalIncidents;
@@ -1146,6 +1148,7 @@ JSON 형식으로 응답:
         */
 
         console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log(`🎯 RAG 검색 후 다음 단계 진행 중...`);
       } catch (error) {
         console.log('🚨🚨🚨 ChromaDB 검색 실패, 상세 오류 정보:');
         console.log('🚨 오류 타입:', typeof error);
