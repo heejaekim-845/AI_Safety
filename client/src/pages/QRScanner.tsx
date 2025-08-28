@@ -20,7 +20,7 @@ export default function QRScanner() {
 
   const handleQRScan = (code: string) => {
     // Try to find equipment by code
-    const foundEquipment = equipment?.find(eq => eq.code === code);
+    const foundEquipment = equipmentArray.find((eq) => eq.code === code);
     if (foundEquipment) {
       handleEquipmentSelect(foundEquipment.id);
     } else {
@@ -29,11 +29,12 @@ export default function QRScanner() {
     setShowScanner(false);
   };
 
-  const filteredEquipment = equipment?.filter(eq => 
+  const equipmentArray = Array.isArray(equipment) ? equipment : [];
+  const filteredEquipment = equipmentArray.filter((eq) => 
     eq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     eq.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     eq.location.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  );
 
   if (isLoading) {
     return (
@@ -140,7 +141,7 @@ export default function QRScanner() {
                         <span className="text-gray-400">/</span>
                         <span className="break-words">{eq.location}</span>
                       </div>
-                      <RiskLevelBadge level={eq.riskLevel} />
+                      <RiskLevelBadge level={eq.riskLevel || "MEDIUM"} />
                     </div>
                   </div>
                   <ChevronRight className="text-gray-400 h-6 w-6 mt-1 flex-shrink-0" />
