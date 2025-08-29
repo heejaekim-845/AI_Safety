@@ -302,9 +302,9 @@ export default function WorkProcedureComponent() {
                       <Textarea
                         value={specialNotes}
                         onChange={(e) => setSpecialNotes(e.target.value)}
-                        placeholder="이상 상황이나 주의사항을 입력하세요..."
-                        rows={3}
-                        className="flex-1"
+                        placeholder="설비이상 또는 피해상황 입력"
+                        rows={1}
+                        className="flex-1 text-sm"
                       />
                       <Button 
                         variant="outline"
