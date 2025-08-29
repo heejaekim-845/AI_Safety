@@ -304,7 +304,7 @@ export default function WorkProcedureComponent() {
                         onChange={(e) => setSpecialNotes(e.target.value)}
                         placeholder="설비이상 또는 피해상황 입력"
                         rows={1}
-                        className="flex-1 text-sm"
+                        className="flex-1 text-sm h-10 min-h-10 resize-none"
                       />
                       <Button 
                         variant="outline"
