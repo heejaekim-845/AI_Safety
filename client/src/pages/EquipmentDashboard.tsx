@@ -36,6 +36,7 @@ export default function EquipmentDashboard() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const [isPlayingGuide, setIsPlayingGuide] = useState(false);
+  const [isGeneratingVoice, setIsGeneratingVoice] = useState(false); // 음성 생성 중 상태
   const [isPaused, setIsPaused] = useState(false);
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
@@ -77,7 +78,8 @@ export default function EquipmentDashboard() {
       return;
     }
 
-    setIsPlayingGuide(true);
+    // 음성 생성/재생 시작
+    setIsGeneratingVoice(true);
     setIsPaused(false);
 
     // Google TTS 먼저 시도
@@ -106,6 +108,7 @@ export default function EquipmentDashboard() {
           audio.onerror = () => {
             console.error('[VoiceGuide] Google TTS 오디오 재생 오류');
             setIsPlayingGuide(false);
+            setIsGeneratingVoice(false);
             setIsPaused(false);
             setCurrentAudio(null);
             URL.revokeObjectURL(audioUrl);
@@ -113,15 +116,20 @@ export default function EquipmentDashboard() {
             playWithWebSpeechAPI();
           };
 
+          // 음성 생성 완료, 재생 시작
+          setIsGeneratingVoice(false);
+          setIsPlayingGuide(true);
           setCurrentAudio(audio);
           await audio.play();
           console.log('[VoiceGuide] Google TTS 재생 성공');
           return;
         } else {
           console.warn('[VoiceGuide] Google TTS API 실패, Web Speech API로 폴백');
+          setIsGeneratingVoice(false);
         }
       } catch (error) {
         console.error('[VoiceGuide] Google TTS 오류:', error);
+        setIsGeneratingVoice(false);
       }
     }
 
@@ -145,10 +153,14 @@ export default function EquipmentDashboard() {
       
       utterance.onerror = () => {
         setIsPlayingGuide(false);
+        setIsGeneratingVoice(false);
         setIsPaused(false);
         setCurrentUtterance(null);
       };
       
+      // Web Speech API는 즉시 재생 (생성 시간 없음)
+      setIsGeneratingVoice(false);
+      setIsPlayingGuide(true);
       setCurrentUtterance(utterance);
       speechSynthesis.speak(utterance);
     }
@@ -177,6 +189,7 @@ export default function EquipmentDashboard() {
     }
     
     setIsPlayingGuide(false);
+    setIsGeneratingVoice(false);
     setIsPaused(false);
   };
 
@@ -807,19 +820,33 @@ export default function EquipmentDashboard() {
               <div className="flex gap-2">
                 <Button 
                   onClick={handlePlayVoiceGuide}
-                  disabled={!voiceGuide?.guide || (isPlayingGuide && !isPaused)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={!voiceGuide?.guide || isGeneratingVoice || (isPlayingGuide && !isPaused)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400"
                 >
-                  {isPaused ? <Play className="w-4 h-4 mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
-                  {isPaused ? '재생' : '음성 재생'}
+                  {isGeneratingVoice ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      음성 생성중...
+                    </>
+                  ) : isPaused ? (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      재생
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-4 h-4 mr-2" />
+                      음성 재생
+                    </>
+                  )}
                 </Button>
                 
-                {isPlayingGuide && (
+                {(isPlayingGuide || isGeneratingVoice) && (
                   <>
                     <Button 
                       onClick={handlePauseVoiceGuide}
-                      disabled={isPaused}
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                      disabled={isPaused || isGeneratingVoice}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white disabled:bg-gray-400"
                     >
                       <Pause className="w-4 h-4" />
                     </Button>
