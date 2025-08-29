@@ -1627,15 +1627,22 @@ ${specialNotes || "없음"}
     }
 
     console.log("=== ChromaDB 사고사례 데이터 구조 확인 ===");
-    console.log("첫 번째 사고사례 데이터:", JSON.stringify(accidents[0], null, 2));
+    console.log("🔍 전체 사고사례 배열 길이:", accidents.length);
+    console.log("🔍 첫 번째 사고사례 전체 구조:", JSON.stringify(accidents[0], null, 2));
     
     return accidents.map((accident, index) => {
+      console.log(`🔍 사고사례 ${index + 1} 원본 데이터 전체 키:`, Object.keys(accident));
+      console.log(`🔍 사고사례 ${index + 1} 전체 구조:`, JSON.stringify(accident, null, 2));
+      
       const metadata = accident.metadata || {};
       const content = accident.document || accident.content || accident.pageContent || "내용 없음";
       
-      console.log(`사고사례 ${index + 1} 데이터:`, {
-        metadata: metadata,
-        content: content?.slice(0, 100) + "...",
+      console.log(`🔍 사고사례 ${index + 1} 필드별 값:`, {
+        'accident.document': accident.document,
+        'accident.content': accident.content,
+        'accident.pageContent': accident.pageContent,
+        'metadata': metadata,
+        'content_final': content,
         hasContent: !!content,
         contentLength: content?.length || 0
       });
