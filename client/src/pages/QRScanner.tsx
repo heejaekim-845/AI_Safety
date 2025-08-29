@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,13 +6,34 @@ import { Input } from "@/components/ui/input";
 import { useEquipment } from "@/hooks/useEquipment";
 import WorkingQRScanner from "@/components/WorkingQRScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
-import { Search, Camera, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap } from "lucide-react";
 
 export default function QRScanner() {
   const [, setLocation] = useLocation();
   const [showScanner, setShowScanner] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
   const { data: equipment, isLoading } = useEquipment();
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch current weather for Seoul (default location)
+  const { data: weatherData } = useQuery({
+    queryKey: ['/api/weather/current'],
+    queryFn: async () => {
+      const response = await apiRequest("POST", "/api/weather/current", { location: "서울" });
+      return response.json();
+    },
+    refetchInterval: 600000, // Refresh every 10 minutes
+  });
 
   const handleEquipmentSelect = (equipmentId: number) => {
     setLocation(`/equipment/${equipmentId}`);
@@ -36,6 +57,50 @@ export default function QRScanner() {
     eq.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Format date and time
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
+    });
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
+  // Get weather icon based on condition
+  const getWeatherIcon = (condition: string) => {
+    switch (condition?.toLowerCase()) {
+      case 'clear':
+      case '맑음':
+        return <Sun className="h-5 w-5 text-yellow-500" />;
+      case 'clouds':
+      case '구름':
+        return <Cloud className="h-5 w-5 text-gray-500" />;
+      case 'rain':
+      case '비':
+        return <CloudRain className="h-5 w-5 text-blue-500" />;
+      case 'drizzle':
+      case '이슬비':
+        return <CloudDrizzle className="h-5 w-5 text-blue-400" />;
+      case 'snow':
+      case '눈':
+        return <Snowflake className="h-5 w-5 text-blue-200" />;
+      case 'thunderstorm':
+      case '천둥번개':
+        return <Zap className="h-5 w-5 text-purple-500" />;
+      default:
+        return <Cloud className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-6 flex items-center justify-center min-h-96">
@@ -49,6 +114,60 @@ export default function QRScanner() {
 
   return (
     <div className="p-4 pb-20 fade-in min-h-screen">
+      {/* Date, Time & Weather Info Box */}
+      <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {/* Date */}
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {formatDate(currentTime)}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Time */}
+              <div className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-indigo-600" />
+                <div>
+                  <p className="text-lg font-bold text-gray-900 font-mono">
+                    {formatTime(currentTime)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Weather Info */}
+            {weatherData ? (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  {getWeatherIcon(weatherData.condition)}
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-gray-900">
+                      {weatherData.temperature}°C
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {weatherData.condition}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  <p>{weatherData.location}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2 text-gray-400">
+                <Cloud className="h-5 w-5" />
+                <span className="text-sm">날씨 정보 로딩중...</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="text-center mb-4">
         <div className="floating">
           <img 
