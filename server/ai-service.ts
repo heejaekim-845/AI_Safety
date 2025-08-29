@@ -1151,10 +1151,6 @@ JSON 형식으로 응답:
 
       // Format accident context for AI prompt
       console.log(`🎯 사고사례 처리 경로: ChromaDB=${chromaAccidents.length}건, 기존RAG=${relevantAccidents.length + workTypeAccidents.length}건`);
-      
-      const accidentContext = chromaAccidents.length > 0 
-        ? this.formatChromaAccidentCases(chromaAccidents)
-        : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents]);
 
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
@@ -1180,7 +1176,9 @@ JSON 형식으로 응답:
 - 안전 주의사항: ${weatherData.safetyWarnings?.join(", ") || "없음"}
 
 【관련 사고사례】
-${accidentContext}
+${chromaAccidents.length > 0 
+  ? this.formatChromaAccidentCases(chromaAccidents)
+  : this.formatAccidentCases([...relevantAccidents, ...workTypeAccidents])}
 
 ${educationMaterials.length > 0 ? `【관련 교육자료】
 ${this.formatEducationMaterials(educationMaterials)}` : ''}
