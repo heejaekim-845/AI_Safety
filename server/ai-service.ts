@@ -1856,11 +1856,40 @@ ${regulation.articleNumber}${articleTitle}
 
   private formatRisks(equipmentInfo: any): string {
     const risks = [];
-    if (equipmentInfo.highVoltageRisk) risks.push("고전압");
-    if (equipmentInfo.highPressureRisk) risks.push("고압가스");
-    if (equipmentInfo.highTemperatureRisk) risks.push("고온");
-    if (equipmentInfo.heightRisk) risks.push("고소");
-    if (equipmentInfo.heavyWeightRisk) risks.push("고중량");
+    
+    // 새로운 riskFactors 스키마 우선 사용
+    if (equipmentInfo.riskFactors) {
+      const rf = equipmentInfo.riskFactors;
+      
+      if (rf.highVoltage) {
+        const detail = rf.highVoltageDetail ? ` (${rf.highVoltageDetail})` : '';
+        risks.push(`고전압${detail}`);
+      }
+      if (rf.highPressure) {
+        const detail = rf.highPressureDetail ? ` (${rf.highPressureDetail})` : '';
+        risks.push(`고압${detail}`);
+      }
+      if (rf.highTemperature) {
+        const detail = rf.highTemperatureDetail ? ` (${rf.highTemperatureDetail})` : '';
+        risks.push(`고온${detail}`);
+      }
+      if (rf.height) {
+        const detail = rf.heightDetail ? ` (${rf.heightDetail})` : '';
+        risks.push(`고소작업${detail}`);
+      }
+      if (rf.mechanical) {
+        const detail = rf.mechanicalDetail ? ` (${rf.mechanicalDetail})` : '';
+        risks.push(`기계적위험${detail}`);
+      }
+    } else {
+      // 구버전 스키마 폴백
+      if (equipmentInfo.highVoltageRisk) risks.push("고전압");
+      if (equipmentInfo.highPressureRisk) risks.push("고압가스");
+      if (equipmentInfo.highTemperatureRisk) risks.push("고온");
+      if (equipmentInfo.heightRisk) risks.push("고소");
+      if (equipmentInfo.heavyWeightRisk) risks.push("고중량");
+    }
+    
     return risks.length > 0 ? risks.join(", ") : "없음";
   }
 
