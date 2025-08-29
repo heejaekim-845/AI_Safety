@@ -1027,7 +1027,7 @@ export default function AdminPanel() {
                                 </Button>
                               </div>
 
-                              <div className="grid grid-cols-3 gap-3">
+                              <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">장치명</Label>
                                   <Input
@@ -1052,18 +1052,18 @@ export default function AdminPanel() {
                                     }}
                                   />
                                 </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">이미지 URL</Label>
-                                  <Input
-                                    placeholder="장치 위치 이미지 경로"
-                                    value={device.imageUrl || ""}
-                                    onChange={(e) => {
-                                      const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                      devices[index] = { ...devices[index], imageUrl: e.target.value };
-                                      field.onChange(devices);
-                                    }}
-                                  />
-                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">이미지 URL</Label>
+                                <Input
+                                  placeholder="장치 위치 이미지 경로"
+                                  value={device.imageUrl || ""}
+                                  onChange={(e) => {
+                                    const devices = Array.isArray(field.value) ? [...field.value] : [];
+                                    devices[index] = { ...devices[index], imageUrl: e.target.value };
+                                    field.onChange(devices);
+                                  }}
+                                />
                               </div>
                             </div>
                           ))}
@@ -1929,7 +1929,7 @@ export default function AdminPanel() {
                                 </Button>
                               </div>
 
-                              <div className="grid grid-cols-3 gap-3">
+                              <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">장치명</Label>
                                   <Input
@@ -1954,18 +1954,18 @@ export default function AdminPanel() {
                                     }}
                                   />
                                 </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">이미지 URL</Label>
-                                  <Input
-                                    placeholder="장치 위치 이미지 경로"
-                                    value={device.imageUrl || ""}
-                                    onChange={(e) => {
-                                      const devices = Array.isArray(field.value) ? [...field.value] : [];
-                                      devices[index] = { ...devices[index], imageUrl: e.target.value };
-                                      field.onChange(devices);
-                                    }}
-                                  />
-                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">이미지 URL</Label>
+                                <Input
+                                  placeholder="장치 위치 이미지 경로"
+                                  value={device.imageUrl || ""}
+                                  onChange={(e) => {
+                                    const devices = Array.isArray(field.value) ? [...field.value] : [];
+                                    devices[index] = { ...devices[index], imageUrl: e.target.value };
+                                    field.onChange(devices);
+                                  }}
+                                />
                               </div>
                             </div>
                           ))}
