@@ -328,11 +328,11 @@ export default function QRScanner() {
                           <span className="text-lg">{safetyRisk.icon}</span>
                           <div>
                             <p className="text-sm font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                              오늘 위험수준: {safetyRisk.level}
+                              오늘 위험수준 : {safetyRisk.level}
                             </p>
                           </div>
                         </div>
-                        <p className="text-xs" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <p className="text-xs text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                           {safetyRisk.workRecommendation}
                         </p>
                       </div>
