@@ -10,8 +10,6 @@ import { apiRequest } from "@/lib/api";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import nitrogenMsdsImage from "@assets/nitrogen_1_1750834174079.png";
 
-import fireExtinguisherImage from "@assets/Fire Extinguisher Emergency Escape Route_1750839863344.jpg";
-import aedImage from "@assets/AED_1750839869531.png";
 import { 
   ArrowLeft, 
   Shield, 
@@ -42,8 +40,6 @@ export default function EquipmentDashboard() {
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [useGoogleTTS, setUseGoogleTTS] = useState(true); // Google TTS 우선 사용
   const [showSafetyDevices, setShowSafetyDevices] = useState(false);
-  const [showFireExtinguisher, setShowFireExtinguisher] = useState(false);
-  const [showAED, setShowAED] = useState(false);
   
   const equipmentId = parseInt(id || "0");
   
@@ -675,61 +671,92 @@ export default function EquipmentDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-3">
-              {/* Fire Extinguisher & Emergency Escape Route */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="w-full text-green-700 border-green-200 hover:bg-green-50"
-                  >
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    소화기 & 비상대피로 위치
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg font-bold">
-                      소화기 & 비상대피로 위치도
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-4">
-                    <img 
-                      src={fireExtinguisherImage} 
-                      alt="소화기 및 비상대피로 위치도" 
-                      className="w-full h-auto border rounded-lg shadow-sm"
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* AED Location */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="w-full text-red-700 border-red-200 hover:bg-red-50"
-                  >
-                    <Heart className="mr-2 h-4 w-4" />
-                    AED(자동심장충격기) 위치
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg font-bold">
-                      AED(자동심장충격기) 위치도
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-4">
-                    <img 
-                      src={aedImage} 
-                      alt="AED 위치도" 
-                      className="w-full h-auto border rounded-lg shadow-sm"
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+            {equipment?.safetyFacilityLocations && equipment.safetyFacilityLocations.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3">
+                {equipment.safetyFacilityLocations.map((facility: any, index: number) => (
+                  <Dialog key={index}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className={`w-full ${
+                          facility.type === 'FIRE_EXTINGUISHER' ? 'text-red-700 border-red-200 hover:bg-red-50' :
+                          facility.type === 'AED' ? 'text-red-700 border-red-200 hover:bg-red-50' :
+                          facility.type === 'EMERGENCY_EXIT' ? 'text-orange-700 border-orange-200 hover:bg-orange-50' :
+                          facility.type === 'FIRST_AID' ? 'text-blue-700 border-blue-200 hover:bg-blue-50' :
+                          'text-green-700 border-green-200 hover:bg-green-50'
+                        }`}
+                      >
+                        {facility.type === 'FIRE_EXTINGUISHER' && <AlertTriangle className="mr-2 h-4 w-4" />}
+                        {facility.type === 'AED' && <Heart className="mr-2 h-4 w-4" />}
+                        {facility.type === 'EMERGENCY_EXIT' && <ArrowLeft className="mr-2 h-4 w-4" />}
+                        {facility.type === 'FIRST_AID' && <CheckCircle className="mr-2 h-4 w-4" />}
+                        {facility.type === 'OTHER' && <MapPin className="mr-2 h-4 w-4" />}
+                        {facility.name} ({facility.location})
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="text-lg font-bold">
+                          {facility.name} 위치도
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="mt-4">
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">위치:</span> {facility.location}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            <span className="font-medium">시설유형:</span> {
+                              facility.type === 'FIRE_EXTINGUISHER' ? '소화기' :
+                              facility.type === 'AED' ? '자동심장충격기' :
+                              facility.type === 'EMERGENCY_EXIT' ? '비상구' :
+                              facility.type === 'FIRST_AID' ? '응급처치함' :
+                              '기타'
+                            }
+                          </p>
+                        </div>
+                        {facility.imageUrl ? (
+                          <img 
+                            src={facility.imageUrl} 
+                            alt={`${facility.name} 위치도`} 
+                            className="w-full h-auto border rounded-lg shadow-sm"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="text-center py-8 text-gray-500">
+                                    <MapPin class="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                                    <p>이미지를 불러올 수 없습니다</p>
+                                    <p class="text-xs mt-1">${facility.imageUrl}</p>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="text-center py-8 text-gray-500">
+                            <MapPin className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                            <p>위치 이미지가 등록되지 않았습니다</p>
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                  <MapPin className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+                  <p className="text-sm text-gray-600">등록된 안전시설이 없습니다.</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    설비 편집에서 안전시설을 추가해주세요.
+                  </p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
