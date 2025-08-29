@@ -269,83 +269,95 @@ export default function QRScanner() {
 
   return (
     <div className="p-4 pb-20 fade-in min-h-screen">
-      {/* 경보 우선 스트립 */}
+      {/* 날씨 정보 카드 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            {/* 좌측: 날씨·시간 정보 */}
-            <div className="text-left">
-              {weatherData ? (
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-3">
-                    {getWeatherIcon(weatherData.condition)}
-                    <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                      <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
-                      <span className="text-gray-600 ml-2">풍속 {weatherData.windSpeed}m/s</span>
-                      {weatherData.rainfall > 0 && (
-                        <span className="text-blue-600 ml-2">강우량 {weatherData.rainfall}mm</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                    <p>{weatherData.location}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-400" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  날씨 정보 로딩중...
-                </div>
-              )}
-              
-              {/* 날짜/시간 */}
-              <div className="text-left mt-2 pt-2 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  {currentTime.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    weekday: 'short'
-                  })} {formatTime(currentTime)}
+          {weatherData ? (
+            <div className="space-y-3">
+              {/* 1. 현재위치 (우측 정렬) */}
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-700" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  현재위치 : {weatherData.location}
                 </p>
               </div>
-            </div>
 
-            {/* 우측: 안전 위험도 배지 */}
-            {weatherData ? (
+              {/* 2. 날씨 아이콘 + 상태 (좌측) */}
+              <div className="flex items-center space-x-3">
+                {getWeatherIcon(weatherData.condition)}
+                <div>
+                  <p className="text-lg font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    {weatherData.condition} {weatherData.temperature}°C
+                  </p>
+                </div>
+              </div>
+
+              {/* 3. 풍속, 강우량 (좌측) | 위험수준 (우측) */}
+              <div className="flex justify-between items-start">
+                <div className="text-sm text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  <p>풍속 {weatherData.windSpeed}m/s</p>
+                  {weatherData.rainfall > 0 && (
+                    <p className="text-blue-600">강우량 {weatherData.rainfall}mm</p>
+                  )}
+                </div>
+                {(() => {
+                  const safetyRisk = calculateSafetyRisk(weatherData.temperature, weatherData.humidity);
+                  return (
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        위험수준 : <span className={`inline-block px-2 py-1 rounded text-white text-xs ${safetyRisk.color}`}>
+                          {safetyRisk.icon} {safetyRisk.level}
+                        </span>
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* 4. 작업시간 권장 (우측 정렬) */}
               <div className="text-right">
                 {(() => {
                   const safetyRisk = calculateSafetyRisk(weatherData.temperature, weatherData.humidity);
                   return (
-                    <>
-                      <div className={`${safetyRisk.color} text-white px-3 py-2 rounded-lg shadow-md`}>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-lg">{safetyRisk.icon}</span>
-                          <div>
-                            <p className="text-sm font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                              오늘 위험수준: {safetyRisk.level}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-xs" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                          {safetyRisk.workRecommendation}
-                        </p>
-                      </div>
-                      <div className="text-xs text-gray-600 mt-2 text-right" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                        <p>체감 {safetyRisk.heatIndex}°C, WBGT {safetyRisk.wbgt}</p>
-                      </div>
-                    </>
+                    <p className="text-sm text-gray-700" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      {safetyRisk.workRecommendation}
+                    </p>
                   );
                 })()}
               </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <div className="bg-gray-400 text-white px-3 py-2 rounded-lg flex items-center space-x-2">
-                  <Cloud className="h-5 w-5 animate-pulse" />
-                  <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>로딩중...</span>
+
+              {/* 5. 구분선 */}
+              <hr className="border-gray-300" />
+
+              {/* 6. 날짜, 시간 (좌측) | 체감온도, WBGT (우측) */}
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-700" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  <p>{currentTime.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    weekday: 'short'
+                  })}</p>
+                  <p>{formatTime(currentTime)}</p>
                 </div>
+                {(() => {
+                  const safetyRisk = calculateSafetyRisk(weatherData.temperature, weatherData.humidity);
+                  return (
+                    <div className="text-right text-sm text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      <p>체감 {safetyRisk.heatIndex}°C</p>
+                      <p>WBGT {safetyRisk.wbgt}</p>
+                    </div>
+                  );
+                })()}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center space-x-2">
+              <Cloud className="h-8 w-8 animate-pulse text-gray-400" />
+              <span className="text-sm text-gray-400" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                날씨 정보 로딩중...
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
