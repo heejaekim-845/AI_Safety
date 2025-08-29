@@ -123,7 +123,7 @@ export default function QRScanner() {
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                     {formatDate(currentTime)}
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export default function QRScanner() {
               <div className="flex items-center space-x-2">
                 <Clock className="h-5 w-5 text-indigo-600" />
                 <div>
-                  <p className="text-lg font-bold text-gray-900 font-mono">
+                  <p className="text-lg font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                     {formatTime(currentTime)}
                   </p>
                 </div>
@@ -142,26 +142,26 @@ export default function QRScanner() {
 
             {/* Weather Info */}
             {weatherData ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <div className="flex items-center space-x-2">
                   {getWeatherIcon(weatherData.condition)}
                   <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       {weatherData.temperature}°C
                     </p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       {weatherData.condition}
                     </p>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   <p>{weatherData.location}</p>
                 </div>
               </div>
             ) : (
               <div className="flex items-center space-x-2 text-gray-400">
                 <Cloud className="h-5 w-5" />
-                <span className="text-sm">날씨 정보 로딩중...</span>
+                <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>날씨 정보 로딩중...</span>
               </div>
             )}
           </div>

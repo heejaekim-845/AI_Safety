@@ -519,6 +519,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Current Weather API
+  app.post("/api/weather/current", async (req, res) => {
+    try {
+      const { location } = req.body;
+      
+      if (!location) {
+        return res.status(400).json({ error: "Location is required" });
+      }
+
+      const weatherData = await weatherService.getCurrentWeather(location);
+      res.json(weatherData);
+    } catch (error) {
+      console.error("Error fetching current weather:", error);
+      res.status(500).json({ error: "Failed to fetch weather data" });
+    }
+  });
+
   app.post("/api/ai/voice-guide", async (req, res) => {
     try {
       const { equipmentId } = req.body;
