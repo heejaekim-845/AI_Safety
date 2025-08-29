@@ -122,29 +122,97 @@ export default function QRScanner() {
     });
   };
 
-  // Get weather icon based on condition
+  // Get weather icon based on condition with animations and colorful styling
   const getWeatherIcon = (condition: string) => {
     switch (condition?.toLowerCase()) {
       case 'clear':
       case '맑음':
-        return <Sun className="h-5 w-5 text-yellow-500" />;
+        return (
+          <div className="relative">
+            <Sun className="h-8 w-8 text-yellow-400 animate-spin" style={{ 
+              animation: 'spin 8s linear infinite',
+              filter: 'drop-shadow(0 0 8px rgba(252, 211, 77, 0.5))'
+            }} />
+          </div>
+        );
       case 'clouds':
       case '구름':
-        return <Cloud className="h-5 w-5 text-gray-500" />;
+      case '흐림':
+        return (
+          <div className="relative">
+            <Cloud className="h-8 w-8 animate-pulse" style={{ 
+              background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #475569 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 2px 4px rgba(71, 85, 105, 0.3))'
+            }} />
+          </div>
+        );
       case 'rain':
       case '비':
-        return <CloudRain className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className="relative">
+            <CloudRain className="h-8 w-8 animate-bounce" style={{ 
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.4))',
+              animation: 'bounce 1.5s infinite'
+            }} />
+          </div>
+        );
       case 'drizzle':
       case '이슬비':
-        return <CloudDrizzle className="h-5 w-5 text-blue-400" />;
+        return (
+          <div className="relative">
+            <CloudDrizzle className="h-8 w-8" style={{ 
+              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 4px rgba(96, 165, 250, 0.3))',
+              animation: 'pulse 2s infinite'
+            }} />
+          </div>
+        );
       case 'snow':
       case '눈':
-        return <Snowflake className="h-5 w-5 text-blue-200" />;
+        return (
+          <div className="relative">
+            <Snowflake className="h-8 w-8" style={{ 
+              background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 8px rgba(199, 210, 254, 0.6))',
+              animation: 'spin 3s linear infinite'
+            }} />
+          </div>
+        );
       case 'thunderstorm':
       case '천둥번개':
-        return <Zap className="h-5 w-5 text-purple-500" />;
+        return (
+          <div className="relative">
+            <Zap className="h-8 w-8" style={{ 
+              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.7))',
+              animation: 'flash 0.8s infinite alternate'
+            }} />
+          </div>
+        );
       default:
-        return <Cloud className="h-5 w-5 text-gray-500" />;
+        return (
+          <div className="relative">
+            <Cloud className="h-8 w-8 text-gray-400 animate-pulse" style={{ 
+              filter: 'drop-shadow(0 2px 4px rgba(156, 163, 175, 0.3))'
+            }} />
+          </div>
+        );
     }
   };
 
@@ -182,7 +250,7 @@ export default function QRScanner() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-2 text-gray-400">
-                  <Cloud className="h-5 w-5" />
+                  <Cloud className="h-8 w-8 animate-pulse" style={{ filter: 'drop-shadow(0 2px 4px rgba(156, 163, 175, 0.3))' }} />
                   <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>로딩중...</span>
                 </div>
               )}
