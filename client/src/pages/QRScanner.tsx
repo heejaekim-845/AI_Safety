@@ -275,13 +275,13 @@ export default function QRScanner() {
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
-              <div className="absolute -top-1 -right-1 bg-white rounded px-2 py-1 shadow-sm border border-blue-200">
+              <div className="absolute top-0 right-0">
                 <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   현재위치 : {weatherData.location}
                 </p>
               </div>
             )}
-
+            
             <div className="flex items-center justify-between mt-4">
               {/* 좌측: 날씨·시간 정보 */}
               <div className="text-left">
