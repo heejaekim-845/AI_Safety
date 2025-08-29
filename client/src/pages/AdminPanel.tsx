@@ -906,7 +906,7 @@ export default function AdminPanel() {
 
                               <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
-                                  <Label className="text-xs text-muted-foreground">시설명</Label>
+                                  <Label className="text-xs text-muted-foreground">명칭</Label>
                                   <Input
                                     placeholder="예: 안전밸브, 경보장치"
                                     value={facility.name || ""}
@@ -920,7 +920,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">위치</Label>
                                   <Input
-                                    placeholder="예: 1층 입구, 복도 끝"
+                                    placeholder="예: 조작판넬"
                                     value={facility.location || ""}
                                     onChange={(e) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
@@ -933,7 +933,7 @@ export default function AdminPanel() {
 
                               <div className="space-y-3">
                                 <div>
-                                  <Label className="text-xs text-muted-foreground">시설 유형</Label>
+                                  <Label className="text-xs text-muted-foreground">유형</Label>
                                   <Select
                                     value={facility.type || "CONTROL_DEVICE"}
                                     onValueChange={(value) => {
@@ -1808,7 +1808,7 @@ export default function AdminPanel() {
 
                               <div className="grid grid-cols-2 gap-3 mb-3">
                                 <div>
-                                  <Label className="text-xs text-muted-foreground">시설명</Label>
+                                  <Label className="text-xs text-muted-foreground">명칭</Label>
                                   <Input
                                     placeholder="예: 안전밸브, 경보장치"
                                     value={facility.name || ""}
@@ -1822,7 +1822,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">위치</Label>
                                   <Input
-                                    placeholder="예: 1층 입구, 복도 끝"
+                                    placeholder="예: 조작판넬"
                                     value={facility.location || ""}
                                     onChange={(e) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
@@ -1835,7 +1835,7 @@ export default function AdminPanel() {
 
                               <div className="space-y-3">
                                 <div>
-                                  <Label className="text-xs text-muted-foreground">시설 유형</Label>
+                                  <Label className="text-xs text-muted-foreground">유형</Label>
                                   <Select
                                     value={facility.type || "CONTROL_DEVICE"}
                                     onValueChange={(value) => {
