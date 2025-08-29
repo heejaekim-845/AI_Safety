@@ -273,43 +273,11 @@ export default function QRScanner() {
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
-            {/* 좌측: 안전 위험도 배지 */}
-            {weatherData ? (
-              <div className="flex items-center space-x-3">
-                {(() => {
-                  const safetyRisk = calculateSafetyRisk(weatherData.temperature, weatherData.humidity);
-                  return (
-                    <>
-                      <div className={`${safetyRisk.color} text-white px-3 py-2 rounded-lg flex items-center space-x-2 shadow-md`}>
-                        <span className="text-lg">{safetyRisk.icon}</span>
-                        <div>
-                          <p className="text-sm font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                            오늘 위험수준: {safetyRisk.level}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                        <p>체감 {safetyRisk.heatIndex}°C, WBGT {safetyRisk.wbgt}</p>
-                        <p>{safetyRisk.workRecommendation}</p>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <div className="bg-gray-400 text-white px-3 py-2 rounded-lg flex items-center space-x-2">
-                  <Cloud className="h-5 w-5 animate-pulse" />
-                  <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>로딩중...</span>
-                </div>
-              </div>
-            )}
-
-            {/* 우측: 날씨·시간 요약 */}
-            <div className="text-right">
+            {/* 좌측: 날씨·시간 정보 */}
+            <div className="text-left">
               {weatherData ? (
                 <div className="space-y-1">
-                  <div className="flex items-center justify-end space-x-3">
+                  <div className="flex items-center space-x-3">
                     {getWeatherIcon(weatherData.condition)}
                     <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
@@ -327,7 +295,7 @@ export default function QRScanner() {
               )}
               
               {/* 날짜/시간 */}
-              <div className="text-right mt-2 pt-2 border-t border-gray-200">
+              <div className="text-left mt-2 pt-2 border-t border-gray-200">
                 <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   {currentTime.toLocaleDateString('ko-KR', {
                     year: 'numeric',
@@ -338,6 +306,42 @@ export default function QRScanner() {
                 </p>
               </div>
             </div>
+
+            {/* 우측: 안전 위험도 배지 */}
+            {weatherData ? (
+              <div className="text-right">
+                {(() => {
+                  const safetyRisk = calculateSafetyRisk(weatherData.temperature, weatherData.humidity);
+                  return (
+                    <>
+                      <div className={`${safetyRisk.color} text-white px-3 py-2 rounded-lg shadow-md`}>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="text-lg">{safetyRisk.icon}</span>
+                          <div>
+                            <p className="text-sm font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                              오늘 위험수준: {safetyRisk.level}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-xs" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                          {safetyRisk.workRecommendation}
+                        </p>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 text-right" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <p>체감 {safetyRisk.heatIndex}°C, WBGT {safetyRisk.wbgt}</p>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <div className="bg-gray-400 text-white px-3 py-2 rounded-lg flex items-center space-x-2">
+                  <Cloud className="h-5 w-5 animate-pulse" />
+                  <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>로딩중...</span>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
