@@ -272,43 +272,49 @@ export default function QRScanner() {
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            {/* 좌측: 날씨·시간 정보 */}
-            <div className="text-left">
-              {weatherData ? (
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-3">
-                    {getWeatherIcon(weatherData.condition)}
-                    <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                      <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
-                      <span className="text-gray-600 ml-2">풍속 {weatherData.windSpeed}m/s</span>
-                      {weatherData.rainfall > 0 && (
-                        <span className="text-blue-600 ml-2">강우량 {weatherData.rainfall}mm</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                    <p>{weatherData.location}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-400" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  날씨 정보 로딩중...
-                </div>
-              )}
-              
-              {/* 날짜/시간 */}
-              <div className="text-left mt-2 pt-2 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  {currentTime.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    weekday: 'short'
-                  })} {formatTime(currentTime)}
+          <div className="relative">
+            {/* 우측 상단: 현재위치 */}
+            {weatherData && (
+              <div className="absolute top-0 right-0">
+                <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  현재위치 : {weatherData.location === 'Daejeon' ? '대전' : weatherData.location.replace('광역시', '')}
                 </p>
               </div>
-            </div>
+            )}
+
+            <div className="flex items-center justify-between mt-4">
+              {/* 좌측: 날씨·시간 정보 */}
+              <div className="text-left">
+                {weatherData ? (
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-3">
+                      {getWeatherIcon(weatherData.condition)}
+                      <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      <p>풍속 {weatherData.windSpeed}m/s · 강우량 {weatherData.rainfall}mm</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-400" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    날씨 정보 로딩중...
+                  </div>
+                )}
+                
+                {/* 날짜/시간 */}
+                <div className="text-left mt-2 pt-2 border-t border-gray-200">
+                  <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    {currentTime.toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      weekday: 'short'
+                    })} {formatTime(currentTime)}
+                  </p>
+                </div>
+              </div>
 
             {/* 우측: 안전 위험도 배지 */}
             {weatherData ? (
@@ -345,6 +351,7 @@ export default function QRScanner() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </CardContent>
       </Card>
