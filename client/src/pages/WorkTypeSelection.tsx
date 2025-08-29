@@ -233,18 +233,15 @@ export default function WorkTypeSelection() {
               
               {/* 설비 정보 */}
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2 truncate">{equipment.name}</h3>
-                <div className="flex items-center gap-3 text-sm">
-                  <Badge variant="outline" className="text-blue-700 border-blue-300 bg-white/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-blue-900 truncate">{equipment.name}</h3>
+                  <Badge variant="outline" className="text-blue-700 border-blue-300 bg-white/50 flex-shrink-0">
                     {equipment.code}
                   </Badge>
-                  <span className="text-blue-700">📍 {equipment.location}</span>
                 </div>
-              </div>
-              
-              {/* 위험도 배지 */}
-              <div className="flex-shrink-0">
-                <RiskLevelBadge level={equipment.riskLevel} />
+                <div className="text-sm text-blue-700">
+                  📍 {equipment.location}
+                </div>
               </div>
             </div>
           </CardContent>
