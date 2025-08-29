@@ -6,6 +6,7 @@ import { weatherService } from "./weather-service";
 import { simpleRagService as ragService } from "./simple-rag-service";
 import { chromaDBService } from "./chromadb-service";
 import { ManualChatbotService } from "./manual-chatbot-service";
+import { googleTTSService } from "./google-tts-service";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -532,6 +533,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("AI 음성 안내 생성 오류:", error);
       res.status(500).json({ message: "음성 안내를 생성할 수 없습니다." });
+    }
+  });
+
+  // Google Cloud Text-to-Speech 음성 안내 (고품질 TTS)
+  app.post("/api/ai/google-tts-voice-guide", async (req, res) => {
+    try {
+      const { equipmentId } = req.body;
+      
+      const equipment = await storage.getEquipmentById(equipmentId);
+      if (!equipment) {
+        return res.status(404).json({ message: "설비를 찾을 수 없습니다." });
+      }
+
+      console.log('[GoogleTTS API] 음성 가이드 생성 시작:', { 
+        equipmentId, 
+        equipmentName: equipment.name 
+      });
+
+      // 1. AI로 텍스트 생성 (기존 로직)
+      const voiceGuide = await aiService.generateVoiceGuide(equipment);
+      
+      // 2. Google TTS로 오디오 생성
+      const audioBuffer = await googleTTSService.generateKoreanSpeech(voiceGuide);
+      
+      console.log('[GoogleTTS API] 음성 가이드 생성 완료:', { 
+        textLength: voiceGuide.length,
+        audioSize: audioBuffer.length 
+      });
+
+      // 3. MP3 오디오 파일로 응답
+      res.set({
+        'Content-Type': 'audio/mpeg',
+        'Content-Disposition': 'attachment; filename="voice-guide.mp3"',
+        'Content-Length': audioBuffer.length.toString()
+      });
+      
+      res.send(audioBuffer);
+
+    } catch (error: any) {
+      console.error("[GoogleTTS API] 음성 안내 생성 오류:", error);
+      
+      // Google Cloud 관련 오류인 경우 구체적인 메시지 제공
+      if (error.message.includes('인증') || error.message.includes('API 키')) {
+        res.status(401).json({ 
+          message: "Google Cloud TTS 인증에 실패했습니다. 관리자에게 문의하세요.",
+          fallbackAvailable: true 
+        });
+      } else if (error.message.includes('할당량')) {
+        res.status(429).json({ 
+          message: "TTS 서비스 할당량이 초과되었습니다. 잠시 후 다시 시도해주세요.",
+          fallbackAvailable: true 
+        });
+      } else {
+        res.status(500).json({ 
+          message: "고품질 음성 안내 생성에 실패했습니다. 기본 음성을 사용해주세요.",
+          fallbackAvailable: true 
+        });
+      }
     }
   });
 

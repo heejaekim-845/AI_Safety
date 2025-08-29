@@ -38,6 +38,8 @@ export default function EquipmentDashboard() {
   const [isPlayingGuide, setIsPlayingGuide] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [useGoogleTTS, setUseGoogleTTS] = useState(true); // Google TTS 우선 사용
   const [showSafetyDevices, setShowSafetyDevices] = useState(false);
   const [showFireExtinguisher, setShowFireExtinguisher] = useState(false);
   const [showAED, setShowAED] = useState(false);
@@ -60,50 +62,122 @@ export default function EquipmentDashboard() {
     enabled: !!equipmentId
   });
 
-  const handlePlayVoiceGuide = () => {
-    if (voiceGuide?.guide && 'speechSynthesis' in window) {
-      if (isPaused && currentUtterance) {
-        // Resume paused audio
+  const handlePlayVoiceGuide = async () => {
+    if (!voiceGuide?.guide) return;
+
+    // 재생 중인 경우 재생/일시정지 토글
+    if (isPaused && (currentUtterance || currentAudio)) {
+      if (currentAudio) {
+        currentAudio.play();
+        setIsPaused(false);
+      } else if (currentUtterance && 'speechSynthesis' in window) {
         speechSynthesis.resume();
         setIsPaused(false);
-        return;
       }
+      return;
+    }
+
+    setIsPlayingGuide(true);
+    setIsPaused(false);
+
+    // Google TTS 먼저 시도
+    if (useGoogleTTS) {
+      try {
+        console.log('[VoiceGuide] Google TTS 시도 중...');
+        
+        const response = await fetch('/api/ai/google-tts-voice-guide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ equipmentId })
+        });
+
+        if (response.ok) {
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          
+          audio.onended = () => {
+            setIsPlayingGuide(false);
+            setIsPaused(false);
+            setCurrentAudio(null);
+            URL.revokeObjectURL(audioUrl);
+          };
+          
+          audio.onerror = () => {
+            console.error('[VoiceGuide] Google TTS 오디오 재생 오류');
+            setIsPlayingGuide(false);
+            setIsPaused(false);
+            setCurrentAudio(null);
+            URL.revokeObjectURL(audioUrl);
+            // 폴백: Web Speech API 사용
+            playWithWebSpeechAPI();
+          };
+
+          setCurrentAudio(audio);
+          await audio.play();
+          console.log('[VoiceGuide] Google TTS 재생 성공');
+          return;
+        } else {
+          console.warn('[VoiceGuide] Google TTS API 실패, Web Speech API로 폴백');
+        }
+      } catch (error) {
+        console.error('[VoiceGuide] Google TTS 오류:', error);
+      }
+    }
+
+    // 폴백: Web Speech API 사용
+    playWithWebSpeechAPI();
+  };
+
+  const playWithWebSpeechAPI = () => {
+    if (voiceGuide?.guide && 'speechSynthesis' in window) {
+      console.log('[VoiceGuide] Web Speech API 사용');
       
-      // Start new playback
-      setIsPlayingGuide(true);
-      setIsPaused(false);
       const utterance = new SpeechSynthesisUtterance(voiceGuide.guide);
       utterance.lang = 'ko-KR';
-      utterance.rate = 1.1; // 20% faster speed for improved user experience
+      utterance.rate = 1.1; // 20% 빠른 재생 속도
+      
       utterance.onend = () => {
         setIsPlayingGuide(false);
         setIsPaused(false);
         setCurrentUtterance(null);
       };
+      
       utterance.onerror = () => {
         setIsPlayingGuide(false);
         setIsPaused(false);
         setCurrentUtterance(null);
       };
+      
       setCurrentUtterance(utterance);
       speechSynthesis.speak(utterance);
     }
   };
 
   const handlePauseVoiceGuide = () => {
-    if ('speechSynthesis' in window && isPlayingGuide) {
+    if (currentAudio && isPlayingGuide) {
+      currentAudio.pause();
+      setIsPaused(true);
+    } else if ('speechSynthesis' in window && isPlayingGuide) {
       speechSynthesis.pause();
       setIsPaused(true);
     }
   };
 
   const handleStopVoiceGuide = () => {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+    }
+    
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
-      setIsPlayingGuide(false);
-      setIsPaused(false);
       setCurrentUtterance(null);
     }
+    
+    setIsPlayingGuide(false);
+    setIsPaused(false);
   };
 
   const handleWorkTypeSelection = () => {

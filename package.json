@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@chroma-core/default-embed": "^0.1.8",
+    "@google-cloud/text-to-speech": "^6.3.0",
     "@google/genai": "^1.13.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
