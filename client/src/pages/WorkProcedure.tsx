@@ -298,28 +298,25 @@ export default function WorkProcedureComponent() {
                   {/* Special Notes Input */}
                   <div className="mt-4">
                     <Label className="text-sm font-medium text-gray-700 mb-2">특이사항 입력</Label>
-                    <Textarea
-                      value={specialNotes}
-                      onChange={(e) => setSpecialNotes(e.target.value)}
-                      placeholder="이상 상황이나 주의사항을 입력하세요..."
-                      rows={3}
-                      className="w-full mb-3"
-                    />
-                    
-                    <div className="flex gap-2">
-                      {specialNotes.trim() && (
-                        <Button 
-                          variant="outline"
-                          onClick={() => handleAnalyzeStepNote(currentProcedure)}
-                          disabled={analyzeStepNoteMutation.isPending}
-                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                        >
-                          {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
-                        </Button>
-                      )}
+                    <div className="flex gap-2 mb-3">
+                      <Textarea
+                        value={specialNotes}
+                        onChange={(e) => setSpecialNotes(e.target.value)}
+                        placeholder="이상 상황이나 주의사항을 입력하세요..."
+                        rows={3}
+                        className="flex-1"
+                      />
+                      <Button 
+                        variant="outline"
+                        onClick={() => handleAnalyzeStepNote(currentProcedure)}
+                        disabled={!specialNotes.trim() || analyzeStepNoteMutation.isPending}
+                        className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                      >
+                        {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
+                      </Button>
                     </div>
                     
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-2">
                       <Button
                         onClick={handleStepBack}
                         disabled={updateSessionMutation.isPending || currentStep <= 1}
