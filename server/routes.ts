@@ -519,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Current Weather API
+  // Current Weather API (by location name)
   app.post("/api/weather/current", async (req, res) => {
     try {
       const { location } = req.body;
@@ -532,6 +532,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(weatherData);
     } catch (error) {
       console.error("Error fetching current weather:", error);
+      res.status(500).json({ error: "Failed to fetch weather data" });
+    }
+  });
+
+  // Current Weather API (by coordinates)
+  app.post("/api/weather/current-coords", async (req, res) => {
+    try {
+      const { lat, lon } = req.body;
+      
+      if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        return res.status(400).json({ error: "Valid latitude and longitude are required" });
+      }
+
+      const weatherData = await weatherService.getCurrentWeatherByCoords(lat, lon);
+      res.json(weatherData);
+    } catch (error) {
+      console.error("Error fetching weather by coordinates:", error);
       res.status(500).json({ error: "Failed to fetch weather data" });
     }
   });

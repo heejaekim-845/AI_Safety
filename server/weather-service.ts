@@ -229,6 +229,57 @@ export class WeatherService {
     }
   }
 
+  // 좌표 기반 현재 날씨 조회
+  async getCurrentWeatherByCoords(lat: number, lon: number): Promise<WeatherData> {
+    try {
+      console.log(`좌표 기반 현재 날씨 조회: lat=${lat}, lon=${lon}`);
+      
+      if (!this.API_KEY) {
+        console.warn('OpenWeather API 키가 없습니다.');
+        throw new Error('OpenWeather API key not configured');
+      }
+
+      // Reverse geocoding to get location name
+      const geoResponse = await axios.get(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${this.API_KEY}`
+      );
+      
+      let locationName = "현재 위치";
+      if (geoResponse.data && geoResponse.data.length > 0) {
+        const locationData = geoResponse.data[0];
+        locationName = locationData.local_names?.ko || locationData.name || "현재 위치";
+      }
+
+      // Get weather by coordinates
+      const weatherResponse = await axios.get(
+        `${this.CURRENT_WEATHER_URL}?lat=${lat}&lon=${lon}&appid=${this.API_KEY}&units=metric&lang=kr`
+      );
+
+      const data = weatherResponse.data;
+      const temperature = Math.round(data.main.temp);
+      const condition = this.translateWeatherCondition(data.weather[0].main);
+      
+      const weatherData: WeatherData = {
+        location: locationName,
+        temperature,
+        humidity: data.main.humidity,
+        windSpeed: Math.round(data.wind?.speed || 0),
+        condition,
+        description: this.getWeatherDescription(condition, temperature),
+        safetyWarnings: this.generateSafetyWarnings(condition, temperature, data.main.humidity, Math.round(data.wind?.speed || 0)),
+        weatherDate: new Date().toISOString().split('T')[0],
+        weatherTime: new Date().toTimeString().slice(0, 5),
+        weatherType: 'current'
+      };
+
+      console.log(`좌표 기반 현재 날씨 조회 완료: ${locationName}`, weatherData);
+      return weatherData;
+    } catch (error) {
+      console.error("좌표 기반 날씨 조회 실패:", error);
+      throw new Error(`좌표 기반 날씨 정보를 가져올 수 없습니다: ${error}`);
+    }
+  }
+
   // 기존 메서드 (하위 호환성)
   async getWeatherForLocation(location: string): Promise<WeatherData> {
     try {

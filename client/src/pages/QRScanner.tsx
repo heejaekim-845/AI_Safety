@@ -15,6 +15,8 @@ export default function QRScanner() {
   const [showScanner, setShowScanner] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [userLocation, setUserLocation] = useState<string>("서울"); // Default fallback
+  const [locationStatus, setLocationStatus] = useState<"loading" | "success" | "error">("loading");
   const { data: equipment, isLoading } = useEquipment();
 
   // Update time every second
@@ -25,14 +27,60 @@ export default function QRScanner() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch current weather for Seoul (default location)
+  // Get user's current location
+  useEffect(() => {
+    const getCurrentLocation = () => {
+      if (!navigator.geolocation) {
+        console.log("Geolocation is not supported by this browser.");
+        setLocationStatus("error");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            console.log(`GPS coordinates: ${latitude}, ${longitude}`);
+            
+            // 좌표를 서버로 전달해서 날씨 정보 가져오기
+            const response = await apiRequest("POST", "/api/weather/current-coords", { 
+              lat: latitude, 
+              lon: longitude 
+            });
+            
+            const weatherData = await response.json();
+            setUserLocation(weatherData.location);
+            setLocationStatus("success");
+            console.log(`Location detected: ${weatherData.location}`);
+          } catch (error) {
+            console.error("Error getting location name:", error);
+            setLocationStatus("error");
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setLocationStatus("error");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes cache
+        }
+      );
+    };
+
+    getCurrentLocation();
+  }, []);
+
+  // Fetch current weather based on user location
   const { data: weatherData } = useQuery({
-    queryKey: ['/api/weather/current'],
+    queryKey: ['/api/weather/current', userLocation],
     queryFn: async () => {
-      const response = await apiRequest("POST", "/api/weather/current", { location: "서울" });
+      const response = await apiRequest("POST", "/api/weather/current", { location: userLocation });
       return response.json();
     },
     refetchInterval: 600000, // Refresh every 10 minutes
+    enabled: !!userLocation && locationStatus === "success",
   });
 
   const handleEquipmentSelect = (equipmentId: number) => {
