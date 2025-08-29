@@ -5,6 +5,7 @@ interface WeatherData {
   temperature: number;
   humidity: number;
   windSpeed: number;
+  rainfall: number;
   condition: string;
   description: string;
   safetyWarnings: string[];
@@ -264,6 +265,7 @@ export class WeatherService {
         temperature,
         humidity: data.main.humidity,
         windSpeed: Math.round(data.wind?.speed || 0),
+        rainfall: data.rain?.['1h'] || data.rain?.['3h'] || 0,
         condition,
         description: this.getWeatherDescription(condition, temperature),
         safetyWarnings: this.generateSafetyWarnings(condition, temperature, data.main.humidity, Math.round(data.wind?.speed || 0)),
@@ -372,6 +374,7 @@ export class WeatherService {
       temperature,
       humidity,
       windSpeed,
+      rainfall: data.rain?.['1h'] || data.rain?.['3h'] || 0,
       condition,
       description: this.getWeatherDescription(condition, temperature),
       safetyWarnings,
@@ -413,6 +416,7 @@ export class WeatherService {
       temperature,
       humidity,
       windSpeed,
+      rainfall: condition === '비' ? Math.floor(Math.random() * 10) + 1 : 0, // Mock rainfall data
       condition,
       description: this.getWeatherDescription(condition, temperature),
       safetyWarnings,
@@ -502,6 +506,7 @@ export class WeatherService {
       temperature,
       humidity,
       windSpeed,
+      rainfall: data.rain || 0,
       condition,
       description: this.getWeatherDescription(condition, temperature, 'historical'),
       safetyWarnings,
@@ -539,6 +544,7 @@ export class WeatherService {
       temperature,
       humidity,
       windSpeed,
+      rainfall: data.rain?.['1h'] || data.rain || 0,
       condition,
       description: this.getWeatherDescription(condition, temperature, 'forecast'),
       safetyWarnings,

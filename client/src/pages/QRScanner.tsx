@@ -282,6 +282,9 @@ export default function QRScanner() {
                     <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
                       <span className="text-gray-600 ml-2">풍속 {weatherData.windSpeed}m/s</span>
+                      {weatherData.rainfall > 0 && (
+                        <span className="text-blue-600 ml-2">강우량 {weatherData.rainfall}mm</span>
+                      )}
                     </div>
                   </div>
                   <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
