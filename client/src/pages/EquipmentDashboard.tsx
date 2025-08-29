@@ -524,11 +524,34 @@ export default function EquipmentDashboard() {
                           </DialogHeader>
                           <div className="mt-4">
                             {equipment.msdsImageUrl?.endsWith('.pdf') ? (
-                              <iframe
-                                src={equipment.msdsImageUrl}
-                                className="w-full h-96 border rounded-lg shadow-sm"
-                                title={`${equipment.hazardousChemicalName} MSDS 문서`}
-                              />
+                              <div className="space-y-4">
+                                <div className="text-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                                  <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                  <p className="text-gray-600 mb-4">
+                                    MSDS PDF 문서를 보려면 아래 버튼을 클릭하세요
+                                  </p>
+                                  <div className="flex gap-3 justify-center">
+                                    <Button
+                                      onClick={() => window.open(equipment.msdsImageUrl, '_blank')}
+                                      className="bg-blue-600 hover:bg-blue-700"
+                                    >
+                                      <FileText className="mr-2 h-4 w-4" />
+                                      새 창에서 보기
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        const link = document.createElement('a');
+                                        link.href = equipment.msdsImageUrl || '';
+                                        link.download = `${equipment.hazardousChemicalName}_MSDS.pdf`;
+                                        link.click();
+                                      }}
+                                    >
+                                      다운로드
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
                             ) : (
                               <img 
                                 src={equipment.msdsImageUrl} 
