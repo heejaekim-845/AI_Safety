@@ -275,9 +275,9 @@ export default function QRScanner() {
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
-              <div className="absolute top-0 right-0">
+              <div className="absolute -top-1 -right-1 bg-white rounded px-2 py-1 shadow-sm border border-blue-200">
                 <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  현재위치 : {weatherData.location === 'Daejeon' ? '대전' : weatherData.location.replace('광역시', '')}
+                  현재위치 : {weatherData.location}
                 </p>
               </div>
             )}
