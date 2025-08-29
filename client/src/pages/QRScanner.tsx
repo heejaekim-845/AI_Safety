@@ -284,16 +284,16 @@ export default function QRScanner() {
             
             <div className="flex items-center justify-between mt-4">
               {/* 좌측: 날씨·시간 정보 */}
-              <div className="text-left">
+              <div className="text-center">
                 {weatherData ? (
                   <div className="space-y-1">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center space-x-4">
                       {getWeatherIcon(weatherData.condition)}
                       <div className="text-lg" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                         <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    <div className="text-sm text-gray-600 text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       <p>풍속 {weatherData.windSpeed}m/s · 강우량 {weatherData.rainfall}mm</p>
                     </div>
                   </div>
