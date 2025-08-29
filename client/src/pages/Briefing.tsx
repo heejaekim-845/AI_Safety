@@ -288,9 +288,9 @@ export default function Briefing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-2">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="text-center">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               AI 기반 안전 브리핑 시스템
@@ -310,7 +310,7 @@ export default function Briefing() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Date Selection Panel */}
           <div className="lg:col-span-1">
             <Card>
@@ -323,7 +323,7 @@ export default function Briefing() {
                   브리핑을 확인할 작업 날짜를 선택하세요
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-2 sm:p-4">
+              <CardContent className="p-1 sm:p-2">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -496,7 +496,7 @@ export default function Briefing() {
         {/* Safety Briefing Dialog */}
         {briefingData && (
           <Dialog open={!!briefingData} onOpenChange={() => setBriefingData(null)}>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-3">
               <DialogHeader className="pb-4 border-b">
                 <DialogTitle className="flex items-center gap-2 text-2xl mb-3">
                   <Shield className="w-7 h-7 text-blue-600" />
@@ -517,7 +517,7 @@ export default function Briefing() {
                 </div>
               </DialogHeader>
 
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {/* Today's Safety Slogan */}
                 <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
                   <CardContent className="pt-6">
@@ -589,7 +589,7 @@ export default function Briefing() {
                 </Card>
 
                 {/* Work Summary and Risk Assessment */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -649,7 +649,7 @@ export default function Briefing() {
                 </div>
 
                 {/* Required Tools and Safety Equipment */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -764,7 +764,7 @@ export default function Briefing() {
                 </Card>
 
                 {/* Related Information Tabs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
