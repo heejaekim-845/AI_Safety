@@ -523,14 +523,22 @@ export default function EquipmentDashboard() {
                             </DialogTitle>
                           </DialogHeader>
                           <div className="mt-4">
-                            <img 
-                              src={equipment.msdsImageUrl} 
-                              alt={`${equipment.hazardousChemicalName} MSDS 정보`} 
-                              className="w-full h-auto border rounded-lg shadow-sm"
-                              onError={(e) => {
-                                e.currentTarget.src = "/placeholder-msds.png";
-                              }}
-                            />
+                            {equipment.msdsImageUrl?.endsWith('.pdf') ? (
+                              <iframe
+                                src={equipment.msdsImageUrl}
+                                className="w-full h-96 border rounded-lg shadow-sm"
+                                title={`${equipment.hazardousChemicalName} MSDS 문서`}
+                              />
+                            ) : (
+                              <img 
+                                src={equipment.msdsImageUrl} 
+                                alt={`${equipment.hazardousChemicalName} MSDS 정보`} 
+                                className="w-full h-auto border rounded-lg shadow-sm"
+                                onError={(e) => {
+                                  e.currentTarget.src = "/placeholder-msds.png";
+                                }}
+                              />
+                            )}
                           </div>
                         </DialogContent>
                       </Dialog>
