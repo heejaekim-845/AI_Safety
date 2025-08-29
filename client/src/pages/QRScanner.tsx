@@ -271,11 +271,11 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
-              <div className="absolute -top-1 right-1">
+              <div className="absolute -top-3 right-1">
                 <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   현재위치 : {weatherData.location}
                 </p>
@@ -356,19 +356,6 @@ export default function QRScanner() {
         </CardContent>
       </Card>
 
-      <div className="text-center mb-4">
-        <div className="floating">
-          <img 
-            src="/attached_assets/d38a3897-2e42-47b1-9feb-3970364f22e1_1751375612245.jpg" 
-            alt="QR Scanner" 
-            className="mx-auto mb-4"
-            style={{ width: '128px', height: '182px' }}
-          />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">설비 인식</h2>
-        <p className="text-gray-600">QR 코드를 스캔하거나 설비를 직접 선택하세요</p>
-      </div>
-      
       {/* QR Scanner Interface */}
       {showScanner ? (
         <WorkingQRScanner 
@@ -376,7 +363,18 @@ export default function QRScanner() {
           onClose={() => setShowScanner(false)}
         />
       ) : (
-        <div className="card-minimal p-4 mb-4 text-center card-hover">
+        <div className="card-minimal p-6 mb-4 text-center card-hover">
+          <div className="floating mb-6">
+            <img 
+              src="/attached_assets/d38a3897-2e42-47b1-9feb-3970364f22e1_1751375612245.jpg" 
+              alt="QR Scanner" 
+              className="mx-auto mb-4"
+              style={{ width: '128px', height: '182px' }}
+            />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">설비 인식</h2>
+          <p className="text-gray-600 mb-6">QR 코드를 스캔하거나 설비를 직접 선택하세요</p>
+          
           <div className="w-16 h-16 mx-auto mb-3 glass-effect flex items-center justify-center">
             <Camera size={32} className="text-blue-600" />
           </div>
