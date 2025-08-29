@@ -271,7 +271,7 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
-        <CardContent className="p-2">
+        <CardContent className="p-3">
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
