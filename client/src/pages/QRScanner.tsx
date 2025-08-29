@@ -169,7 +169,7 @@ export default function QRScanner() {
       case '맑음':
         return (
           <div className="relative">
-            <Sun className="h-8 w-8 text-yellow-400 animate-spin" style={{ 
+            <Sun className="h-12 w-12 text-yellow-400 animate-spin" style={{ 
               animation: 'spin 8s linear infinite',
               filter: 'drop-shadow(0 0 8px rgba(252, 211, 77, 0.5))'
             }} />
@@ -180,7 +180,7 @@ export default function QRScanner() {
       case '흐림':
         return (
           <div className="relative">
-            <Cloud className="h-8 w-8 animate-pulse" style={{ 
+            <Cloud className="h-12 w-12 animate-pulse" style={{ 
               background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #475569 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -193,7 +193,7 @@ export default function QRScanner() {
       case '비':
         return (
           <div className="relative">
-            <CloudRain className="h-8 w-8 animate-bounce" style={{ 
+            <CloudRain className="h-12 w-12 animate-bounce" style={{ 
               background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -207,7 +207,7 @@ export default function QRScanner() {
       case '이슬비':
         return (
           <div className="relative">
-            <CloudDrizzle className="h-8 w-8" style={{ 
+            <CloudDrizzle className="h-12 w-12" style={{ 
               background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -221,7 +221,7 @@ export default function QRScanner() {
       case '눈':
         return (
           <div className="relative">
-            <Snowflake className="h-8 w-8" style={{ 
+            <Snowflake className="h-12 w-12" style={{ 
               background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -235,7 +235,7 @@ export default function QRScanner() {
       case '천둥번개':
         return (
           <div className="relative">
-            <Zap className="h-8 w-8" style={{ 
+            <Zap className="h-12 w-12" style={{ 
               background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -248,7 +248,7 @@ export default function QRScanner() {
       default:
         return (
           <div className="relative">
-            <Cloud className="h-8 w-8 text-gray-400 animate-pulse" style={{ 
+            <Cloud className="h-12 w-12 text-gray-400 animate-pulse" style={{ 
               filter: 'drop-shadow(0 2px 4px rgba(156, 163, 175, 0.3))'
             }} />
           </div>
@@ -287,13 +287,13 @@ export default function QRScanner() {
               <div className="text-left">
                 {weatherData ? (
                   <div className="space-y-1">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-4">
                       {getWeatherIcon(weatherData.condition)}
-                      <div className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      <div className="text-lg" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                         <span className="font-bold text-gray-900">{weatherData.condition} {weatherData.temperature}°C</span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    <div className="text-sm text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       <p>풍속 {weatherData.windSpeed}m/s · 강우량 {weatherData.rainfall}mm</p>
                     </div>
                   </div>
