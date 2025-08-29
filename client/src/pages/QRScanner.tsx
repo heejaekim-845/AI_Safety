@@ -275,7 +275,7 @@ export default function QRScanner() {
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
-              <div className="absolute -top-6 right-1">
+              <div className="absolute -top-1 right-1">
                 <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   현재위치 : {weatherData.location}
                 </p>
@@ -332,7 +332,7 @@ export default function QRScanner() {
                             </p>
                           </div>
                         </div>
-                        <p className="text-xs text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <p className="text-xs" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                           {safetyRisk.workRecommendation}
                         </p>
                       </div>
