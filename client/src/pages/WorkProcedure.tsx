@@ -18,7 +18,8 @@ import {
   CheckCircle, 
   AlertTriangle, 
   Reply,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 import type { WorkSession, WorkProcedure } from "@shared/schema";
 
@@ -142,6 +143,21 @@ export default function WorkProcedureComponent() {
           { stepId: stepNumber, note: specialNotes }
         ]
       })
+    };
+
+    updateSessionMutation.mutate(updateData);
+    setSpecialNotes("");
+  };
+
+  const handleStepBack = () => {
+    if (!session || currentStep <= 1) return;
+    
+    const newCompletedSteps = (session.completedSteps || []).filter(step => step !== currentStep - 1);
+    const newCurrentStep = currentStep - 1;
+    
+    const updateData: Partial<WorkSession> = {
+      completedSteps: newCompletedSteps,
+      currentStep: newCurrentStep
     };
 
     updateSessionMutation.mutate(updateData);
@@ -301,12 +317,25 @@ export default function WorkProcedureComponent() {
                           {analyzeStepNoteMutation.isPending ? "분석 중..." : "AI 안전 분석"}
                         </Button>
                       )}
+                    </div>
+                    
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        onClick={handleStepBack}
+                        disabled={updateSessionMutation.isPending || currentStep <= 1}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        이전 단계
+                      </Button>
                       <Button
                         onClick={() => handleStepComplete(currentProcedure.stepNumber)}
                         disabled={updateSessionMutation.isPending}
                         className="flex-1 bg-primary hover:bg-primary/90"
                       >
                         {currentProcedure.stepNumber === totalSteps ? "작업 완료" : "다음 단계"}
+                        <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                   </div>
