@@ -908,7 +908,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설명</Label>
                                   <Input
-                                    placeholder="예: 소화기, AED"
+                                    placeholder="예: 안전밸브, 경보장치"
                                     value={facility.name || ""}
                                     onChange={(e) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
@@ -931,7 +931,7 @@ export default function AdminPanel() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설 유형</Label>
                                   <Select
@@ -1809,7 +1809,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설명</Label>
                                   <Input
-                                    placeholder="예: 소화기, AED"
+                                    placeholder="예: 안전밸브, 경보장치"
                                     value={facility.name || ""}
                                     onChange={(e) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
@@ -1832,7 +1832,7 @@ export default function AdminPanel() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설 유형</Label>
                                   <Select
