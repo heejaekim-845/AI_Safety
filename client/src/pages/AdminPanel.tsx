@@ -870,7 +870,7 @@ export default function AdminPanel() {
                         const currentFacilities = form.getValues("safetyFacilityLocations") || [];
                         form.setValue("safetyFacilityLocations", [
                           ...currentFacilities,
-                          { name: "", location: "", type: "FIRE_EXTINGUISHER", imageUrl: "" }
+                          { name: "", location: "", type: "CONTROL_DEVICE", imageUrl: "" }
                         ]);
                       }}
                     >
@@ -935,7 +935,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설 유형</Label>
                                   <Select
-                                    value={facility.type || "FIRE_EXTINGUISHER"}
+                                    value={facility.type || "CONTROL_DEVICE"}
                                     onValueChange={(value) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
                                       facilities[index] = { ...facilities[index], type: value };
@@ -946,6 +946,7 @@ export default function AdminPanel() {
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                      <SelectItem value="CONTROL_DEVICE">조작장치</SelectItem>
                                       <SelectItem value="FIRE_EXTINGUISHER">소화기</SelectItem>
                                       <SelectItem value="AED">자동심장충격기</SelectItem>
                                       <SelectItem value="EMERGENCY_EXIT">비상구</SelectItem>
@@ -1836,7 +1837,7 @@ export default function AdminPanel() {
                                 <div>
                                   <Label className="text-xs text-muted-foreground">시설 유형</Label>
                                   <Select
-                                    value={facility.type || "FIRE_EXTINGUISHER"}
+                                    value={facility.type || "CONTROL_DEVICE"}
                                     onValueChange={(value) => {
                                       const facilities = Array.isArray(field.value) ? [...field.value] : [];
                                       facilities[index] = { ...facilities[index], type: value };
@@ -1847,6 +1848,7 @@ export default function AdminPanel() {
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                      <SelectItem value="CONTROL_DEVICE">조작장치</SelectItem>
                                       <SelectItem value="FIRE_EXTINGUISHER">소화기</SelectItem>
                                       <SelectItem value="AED">자동심장충격기</SelectItem>
                                       <SelectItem value="EMERGENCY_EXIT">비상구</SelectItem>
