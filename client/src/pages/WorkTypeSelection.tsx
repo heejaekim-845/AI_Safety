@@ -208,18 +208,43 @@ export default function WorkTypeSelection() {
 
       {/* 현재 선택된 설비 정보 */}
       {equipment && (
-        <Card className="card-minimal mb-4 bg-blue-50 border-blue-200">
+        <Card className="card-minimal mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-blue-900">{equipment.name}</h3>
-                  <Badge variant="outline" className="text-xs text-blue-700 border-blue-300">
+            <div className="flex items-start gap-4">
+              {/* 썸네일 이미지 */}
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden border-2 border-white shadow-sm">
+                  {equipment.imageUrl ? (
+                    <img 
+                      src={equipment.imageUrl} 
+                      alt={equipment.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs ${equipment.imageUrl ? 'hidden' : ''}`}>
+                    설비
+                  </div>
+                </div>
+              </div>
+              
+              {/* 설비 정보 */}
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-semibold text-blue-900 mb-2 truncate">{equipment.name}</h3>
+                <div className="flex items-center gap-3 text-sm">
+                  <Badge variant="outline" className="text-blue-700 border-blue-300 bg-white/50">
                     {equipment.code}
                   </Badge>
-                  <RiskLevelBadge level={equipment.riskLevel} />
+                  <span className="text-blue-700">📍 {equipment.location}</span>
                 </div>
-                <p className="text-sm text-blue-700">📍 {equipment.location}</p>
+              </div>
+              
+              {/* 위험도 배지 */}
+              <div className="flex-shrink-0">
+                <RiskLevelBadge level={equipment.riskLevel} />
               </div>
             </div>
           </CardContent>
