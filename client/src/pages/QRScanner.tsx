@@ -118,8 +118,7 @@ export default function QRScanner() {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     });
   };
 
@@ -165,18 +164,53 @@ export default function QRScanner() {
       {/* Date, Time & Weather Info Box */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Top Row */}
+            <div className="flex items-center justify-start">
+              {/* Weather Info */}
+              {weatherData ? (
+                <div className="flex items-center space-x-2">
+                  {getWeatherIcon(weatherData.condition)}
+                  <div>
+                    <p className="text-lg font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      {weatherData.temperature}°C
+                    </p>
+                    <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      {weatherData.condition}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2 text-gray-400">
+                  <Cloud className="h-5 w-5" />
+                  <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>로딩중...</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end">
               {/* Date */}
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  <p className="text-lg font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                     {formatDate(currentTime)}
                   </p>
                 </div>
               </div>
-              
+            </div>
+
+            {/* Bottom Row */}
+            <div className="flex items-center justify-start">
+              {/* Weather Location */}
+              {weatherData && (
+                <div className="text-sm text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  <p>{weatherData.location}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end">
               {/* Time */}
               <div className="flex items-center space-x-2">
                 <Clock className="h-5 w-5 text-indigo-600" />
@@ -187,31 +221,6 @@ export default function QRScanner() {
                 </div>
               </div>
             </div>
-
-            {/* Weather Info */}
-            {weatherData ? (
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-2">
-                  {getWeatherIcon(weatherData.condition)}
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                      {weatherData.temperature}°C
-                    </p>
-                    <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                      {weatherData.condition}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  <p>{weatherData.location}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2 text-gray-400">
-                <Cloud className="h-5 w-5" />
-                <span className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>날씨 정보 로딩중...</span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
