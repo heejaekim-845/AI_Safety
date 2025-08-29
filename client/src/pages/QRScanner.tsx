@@ -271,22 +271,22 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
-        <CardContent className="p-4">
+        <CardContent className="p-2">
           <div className="relative">
             {/* 우측 상단: 현재위치 */}
             {weatherData && (
-              <div className="absolute -top-1 right-1">
+              <div className="absolute -top-3 right-1">
                 <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                   현재위치 : {weatherData.location}
                 </p>
               </div>
             )}
             
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between mt-2">
               {/* 좌측: 날씨·시간 정보 */}
               <div className="text-center">
                 {weatherData ? (
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="flex items-center justify-center space-x-4">
                       {getWeatherIcon(weatherData.condition)}
                       <div className="text-lg" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
@@ -304,7 +304,7 @@ export default function QRScanner() {
                 )}
                 
                 {/* 날짜/시간 */}
-                <div className="text-left mt-2 pt-2 border-t border-gray-200">
+                <div className="text-left mt-1 pt-1 border-t border-gray-200">
                   <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                     {currentTime.toLocaleDateString('ko-KR', {
                       year: 'numeric',
