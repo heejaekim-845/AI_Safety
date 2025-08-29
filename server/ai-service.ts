@@ -1125,7 +1125,8 @@ JSON 형식으로 응답:
         );
         */
 
-        console.log(`RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log(`🎯 RAG 검색 완료: 사고사례 ${chromaAccidents.length}건, 교육자료 ${educationMaterials.length}건, 법규 ${safetyRegulations.length}건`);
+        console.log('🔍 ChromaDB 사고사례 첫 번째 데이터:', JSON.stringify(chromaAccidents[0], null, 2));
       } catch (error) {
         console.log('🚨🚨🚨 ChromaDB 검색 실패, 상세 오류 정보:');
         console.log('🚨 오류 타입:', typeof error);
@@ -1151,6 +1152,12 @@ JSON 형식으로 응답:
 
       // Format accident context for AI prompt
       console.log(`🎯 사고사례 처리 경로: ChromaDB=${chromaAccidents.length}건, 기존RAG=${relevantAccidents.length + workTypeAccidents.length}건`);
+      console.log('🔍 chromaAccidents.length > 0 조건:', chromaAccidents.length > 0);
+      if (chromaAccidents.length > 0) {
+        console.log('🎯 ChromaDB 경로 선택 - formatChromaAccidentCases 호출');
+      } else {
+        console.log('🎯 기존 RAG 경로 선택 - formatAccidentCases 호출');
+      }
 
       const prompt = `다음 정보를 종합하여 포괄적인 AI 안전 브리핑을 생성해주세요:
 
