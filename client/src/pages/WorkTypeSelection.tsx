@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWorkTypes } from "@/hooks/useWorkTypes";
+import { useEquipment } from "@/hooks/useEquipment";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import { useState } from "react";
@@ -55,6 +56,7 @@ export default function WorkTypeSelection() {
   const equipmentIdNum = parseInt(equipmentId || "0");
   
   const { data: workTypes, isLoading } = useWorkTypes(equipmentIdNum);
+  const { data: equipment, isLoading: equipmentLoading } = useEquipment(equipmentIdNum);
   
   const { data: incidents } = useQuery({
     queryKey: [`/api/work-types/${selectedWorkType?.id}/incidents`],
@@ -179,12 +181,12 @@ export default function WorkTypeSelection() {
     return <Badge variant="secondary" className="bg-success text-white">허가 불필요</Badge>;
   };
 
-  if (isLoading) {
+  if (isLoading || equipmentLoading) {
     return (
       <div className="p-6 flex items-center justify-center min-h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">작업 유형을 불러오는 중...</p>
+          <p className="text-gray-600">정보를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -203,6 +205,26 @@ export default function WorkTypeSelection() {
         </Button>
         <h2 className="text-xl font-medium">작업 유형 선택</h2>
       </div>
+
+      {/* 현재 선택된 설비 정보 */}
+      {equipment && (
+        <Card className="card-minimal mb-4 bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-medium text-blue-900">{equipment.name}</h3>
+                  <Badge variant="outline" className="text-xs text-blue-700 border-blue-300">
+                    {equipment.code}
+                  </Badge>
+                  <RiskLevelBadge level={equipment.riskLevel} />
+                </div>
+                <p className="text-sm text-blue-700">📍 {equipment.location}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-3">
         {workTypes?.map((workType) => (
