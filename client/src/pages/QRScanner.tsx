@@ -238,7 +238,7 @@ export default function QRScanner() {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               filter: 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.4))',
-              animation: 'bounce 2s infinite'
+              animation: 'small-bounce 2s infinite'
             }} />
           </div>
         );

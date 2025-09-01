@@ -25,6 +25,18 @@
   }
 }
 
+/* 작은 바운스 애니메이션 - 높이 줄임 */
+@keyframes small-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-6px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
 .gradient-wave-bg {
   background: linear-gradient(-45deg, #00bcd4, #4fc3f7, #7e57c2, #9c27b0, #00bcd4);
   background-size: 400% 400%;
