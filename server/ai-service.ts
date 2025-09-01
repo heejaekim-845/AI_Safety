@@ -2159,23 +2159,28 @@ ${this.formatRisks(equipmentInfo)}
   // 법령 및 기준 검색 함수
   async generateLegalRecommendations(
     equipmentName: string,
-    workTypeName: string,
-    riskLevel: string,
+    workProcedures: any[],
     equipmentDetails: any
   ): Promise<LegalRecommendationsResponse> {
     try {
-      console.log(`법령 검색 시작: ${equipmentName} - ${workTypeName} (위험등급: ${riskLevel})`);
+      console.log(`법령 검색 시작: ${equipmentName} - 작업절차 ${workProcedures.length}개 단계`);
       
       // 설비 위험 요소 추출
       const riskFactors = this.extractEquipmentRisks(equipmentDetails);
+      
+      // 작업절차 내용 정리
+      const procedureSteps = workProcedures
+        .sort((a, b) => a.stepNumber - b.stepNumber)
+        .map((proc, index) => `${index + 1}. ${proc.title}${proc.description ? ` - ${proc.description}` : ''}`)
+        .join('\n');
       
       const prompt = `다음 산업설비 작업에 대한 관련 법령 및 기준을 찾아주세요:
 
 ## 작업 정보
 - 설비명: ${equipmentName}
-- 작업유형: ${workTypeName}
-- 위험등급: ${riskLevel}
 - 주요 위험요소: ${riskFactors.join(', ')}
+- 작업절차:
+${procedureSteps}
 
 ## 검색 요청 항목
 다음 5개 카테고리별로 관련 법령 및 기준을 찾아주세요:
@@ -2193,8 +2198,8 @@ ${this.formatRisks(equipmentInfo)}
 {
   "workSummary": "작업 요약 설명",
   "equipmentName": "${equipmentName}",
-  "workType": "${workTypeName}",
-  "riskLevel": "${riskLevel}",
+  "workType": "작업유형명",
+  "riskLevel": "위험등급",
   "recommendations": {
     "industrialSafetyHealth": [
       {
@@ -2248,8 +2253,7 @@ ${this.formatRisks(equipmentInfo)}
       console.log('\n========== AI 법령 검색 프롬프트 ==========');
       console.log('전송 시간:', new Date().toLocaleString());
       console.log('설비명:', equipmentName);
-      console.log('작업유형:', workTypeName);
-      console.log('위험등급:', riskLevel);
+      console.log('작업절차 단계 수:', workProcedures.length);
       console.log('위험요소:', riskFactors.join(', '));
       console.log('\n--- Gemini로 전송되는 프롬프트 ---');
       console.log(prompt);

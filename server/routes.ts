@@ -913,6 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get related data
       const equipment = await storage.getEquipmentById(workSchedule.equipmentId!);
       const workType = await storage.getWorkTypeById(workSchedule.workTypeId!);
+      const workProcedures = await storage.getProceduresByWorkTypeId(workSchedule.workTypeId!);
       
       if (!equipment || !workType) {
         return res.status(404).json({ message: "설비 또는 작업 유형을 찾을 수 없습니다." });
@@ -923,8 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate legal recommendations using AI
       const legalRecommendations = await aiService.generateLegalRecommendations(
         equipment.name,
-        workType.name,
-        equipment.riskLevel || 'MEDIUM',
+        workProcedures,
         equipment
       );
 
