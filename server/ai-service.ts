@@ -190,6 +190,7 @@ export interface LegalRecommendationsResponse {
   equipmentName: string;
   workType: string;
   riskLevel: string;
+  promptLog?: string;
   recommendations: {
     industrialSafetyHealth: LegalRecommendation[];
     administrativeRules: LegalRecommendation[];
@@ -2340,6 +2341,27 @@ ${this.formatRisks(equipmentInfo)}
       });
 
       const result = JSON.parse(response.text || "{}");
+      
+      // 프롬프트 로그 추가
+      const promptLog = `=== AI 법령 검색 프롬프트 로그 ===
+시간: ${new Date().toLocaleString()}
+설비: ${equipmentName}
+작업: ${workTypeName}
+위험등급: ${riskLevel}
+위험요소: ${riskFactors.join(', ')}
+
+전송된 프롬프트:
+${prompt}
+
+검색 결과:
+- 산업안전보건법: ${result.recommendations?.industrialSafetyHealth?.length || 0}건
+- 행정규칙: ${result.recommendations?.administrativeRules?.length || 0}건
+- KOSHA GUIDE: ${result.recommendations?.koshaGuide?.length || 0}건
+- 기계설비법: ${result.recommendations?.mechanicalEquipmentLaw?.length || 0}건
+- KEC: ${result.recommendations?.kec?.length || 0}건
+=== 프롬프트 로그 끝 ===`;
+      
+      result.promptLog = promptLog;
       
       console.log(`법령 검색 완료: ${result.recommendations?.industrialSafetyHealth?.length || 0}개 산안법, ${result.recommendations?.koshaGuide?.length || 0}개 KOSHA 가이드 등`);
       
