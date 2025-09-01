@@ -376,57 +376,58 @@ export default function QRScanner() {
 
       {/* Notice Scrolling Box */}
       {recentNotices && recentNotices.length > 0 && (
-        <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
-          <CardContent className="p-0">
-            <div className="flex items-center justify-between p-3 border-b border-green-200">
-              <div className="flex items-center space-x-2">
-                <div className="bg-green-500 rounded-full p-1">
-                  <Megaphone className="h-3 w-3 text-white" />
+        <>
+          {/* 안내사항 제목 */}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+              <div className="bg-green-500 rounded-full p-1 mr-2">
+                <Megaphone className="h-4 w-4 text-white" />
+              </div>
+              안내사항
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/notices')}
+              className="text-green-600 hover:text-green-800 text-sm h-8 px-3"
+            >
+              전체보기
+            </Button>
+          </div>
+          
+          <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
+            <CardContent className="p-0">
+              <div className="relative h-16 overflow-hidden">
+                <div className="scrolling-notices">
+                  {recentNotices.map((notice: any, index: number) => (
+                    <div 
+                      key={`${notice.id}-${index}`}
+                      className="flex items-center space-x-2 py-2 px-3 whitespace-nowrap scrolling-item"
+                      style={{
+                        animationDelay: `${index * 4}s`,
+                        animationDuration: `${recentNotices.length * 4}s`
+                      }}
+                    >
+                      {notice.isImportant && (
+                        <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                      )}
+                      <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
+                      <span className="text-sm text-gray-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        {notice.title}
+                      </span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({new Date(notice.createdAt).toLocaleDateString('ko-KR', {
+                          month: 'short',
+                          day: 'numeric'
+                        })})
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <h3 className="text-sm font-semibold text-green-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  안내사항
-                </h3>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation('/notices')}
-                className="text-green-600 hover:text-green-800 text-xs h-6 px-2"
-              >
-                전체보기
-              </Button>
-            </div>
-            
-            <div className="relative h-16 overflow-hidden">
-              <div className="scrolling-notices">
-                {recentNotices.map((notice: any, index: number) => (
-                  <div 
-                    key={`${notice.id}-${index}`}
-                    className="flex items-center space-x-2 py-2 px-3 whitespace-nowrap scrolling-item"
-                    style={{
-                      animationDelay: `${index * 4}s`,
-                      animationDuration: `${recentNotices.length * 4}s`
-                    }}
-                  >
-                    {notice.isImportant && (
-                      <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
-                    )}
-                    <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                      {notice.title}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      ({new Date(notice.createdAt).toLocaleDateString('ko-KR', {
-                        month: 'short',
-                        day: 'numeric'
-                      })})
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {/* QR Scanner Interface */}
