@@ -2,6 +2,7 @@ import { LocalIndex } from 'vectra';
 import { OpenAI } from 'openai';
 import path from 'path';
 import fs from 'fs/promises';
+import MiniSearch from 'minisearch';
 
 export interface ManualChatMessage {
   id: string;
@@ -42,11 +43,34 @@ export class ManualChatbotService {
   private openai: OpenAI;
   private isInitialized = false;
   private readonly indexPath = './chatbot/codes/vectra-manuals';
+  private miniSearch: MiniSearch;
+  private documentsLoaded = false;
+
+  // 안전장치 관련 동의어 정의
+  private readonly safetyAliases = [
+    // 한글 동의어
+    "안전장치", "보호장치", "보호계전기", "인터록", "전기적 인터록", "기계적 인터록", 
+    "차단장치", "안전핀", "압력계전기", "저압차단", "과전류", "과압", "경보", "경고", "주의",
+    // 영문 동의어
+    "safety device", "protection", "protective relay", "interlock", "mechanical interlock",
+    "electrical interlock", "lock", "trip", "alarm", "warning", "low pressure lockout", 
+    "pressure switch", "PRD", "pressure relief device", "relief valve"
+  ];
 
   constructor() {
     this.index = new LocalIndex(this.indexPath);
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY || "",
+    });
+    
+    // MiniSearch 초기화 - BM25 스파스 검색용
+    this.miniSearch = new MiniSearch({
+      fields: ['text', 'title', 'equipment', 'component', 'task_type'], // 검색할 필드들
+      storeFields: ['id', 'text', 'metadata', 'score'], // 저장할 필드들
+      searchOptions: {
+        boost: { title: 2, equipment: 1.5, component: 1.2 }, // 필드별 가중치
+        fuzzy: 0.2 // 퍼지 매칭
+      }
     });
   }
 
@@ -72,6 +96,9 @@ export class ManualChatbotService {
       // OpenAI 연결 테스트
       await this.openai.models.list();
       
+      // MiniSearch 문서 로딩
+      await this.loadDocumentsToMiniSearch();
+      
       this.isInitialized = true;
       console.log('매뉴얼 챗봇 서비스 초기화 완료');
     } catch (error) {
@@ -80,46 +107,189 @@ export class ManualChatbotService {
     }
   }
 
+  // 질의 확장 함수
+  private expandQuery(query: string): string[] {
+    const normalizedQuery = query.toLowerCase();
+    
+    // 안전 관련 키워드가 포함되어 있는지 확인
+    const hasSafetyKeyword = /안전|safety|interlock|보호|계전|alarm|warning|trip|압력|차단|경보|경고|주의/i.test(query);
+    
+    if (hasSafetyKeyword) {
+      // 원본 쿼리 + 안전장치 동의어들 결합
+      return Array.from(new Set([query, ...this.safetyAliases]));
+    }
+    
+    return [query];
+  }
+
+  // MiniSearch용 문서 로딩
+  private async loadDocumentsToMiniSearch(): Promise<void> {
+    if (this.documentsLoaded) return;
+
+    try {
+      const embeddingFile = './chatbot/codes/manual_chunks_all.ndjson';
+      const fileContent = await fs.readFile(embeddingFile, 'utf-8');
+      const lines = fileContent.trim().split('\n');
+      
+      const documents = [];
+      
+      for (const line of lines) {
+        try {
+          const chunk = JSON.parse(line);
+          const metadata = chunk.metadata || {};
+          
+          documents.push({
+            id: chunk.id || `chunk_${Date.now()}_${Math.random()}`,
+            text: chunk.text || '',
+            title: metadata.title || '',
+            equipment: Array.isArray(metadata.equipment) ? metadata.equipment.join(' ') : '',
+            component: Array.isArray(metadata.component) ? metadata.component.join(' ') : '',
+            task_type: Array.isArray(metadata.task_type) ? metadata.task_type.join(' ') : '',
+            metadata: metadata
+          });
+        } catch (error) {
+          continue; // 파싱 오류 무시
+        }
+      }
+      
+      this.miniSearch.addAll(documents);
+      this.documentsLoaded = true;
+      console.log(`MiniSearch에 ${documents.length}개 문서 로딩 완료`);
+    } catch (error) {
+      console.error('MiniSearch 문서 로딩 실패:', error);
+    }
+  }
+
+  // RRF(Reciprocal Rank Fusion) 점수 결합
+  private combineScoresRRF(sparseResults: any[], denseResults: any[], k: number = 60): Map<string, number> {
+    const combinedScores = new Map<string, number>();
+    
+    // 스파스 검색 결과 RRF 점수 계산
+    sparseResults.forEach((result, index) => {
+      const rrf = 1 / (k + index + 1);
+      combinedScores.set(result.id, (combinedScores.get(result.id) || 0) + rrf);
+    });
+    
+    // 덴스 검색 결과 RRF 점수 계산
+    denseResults.forEach((result, index) => {
+      const rrf = 1 / (k + index + 1);
+      combinedScores.set(result.id, (combinedScores.get(result.id) || 0) + rrf);
+    });
+    
+    return combinedScores;
+  }
+
+  // 안전 태그 가중치 적용
+  private applySafetyBoost(chunk: any, boost: number = 0.2): number {
+    const metadata = chunk.metadata || {};
+    const text = chunk.text || '';
+    const title = metadata.title || '';
+    
+    // hazards, safety 태그나 안전 관련 키워드가 포함된 경우 가중치 적용
+    const safetyKeywords = /안전|safety|hazard|위험|보호|protection|경보|alarm|경고|warning|인터록|interlock/i;
+    const hasHazardTag = Array.isArray(metadata.task_type) && metadata.task_type.some((tag: string) => 
+      /hazard|safety|안전|위험/i.test(tag)
+    );
+    const hasSafetyContent = safetyKeywords.test(text) || safetyKeywords.test(title);
+    
+    return (hasHazardTag || hasSafetyContent) ? boost : 0;
+  }
+
   async searchManualContent(query: string, equipmentFilter?: string[], familyFilter?: string, limit: number = 5): Promise<ManualChunk[]> {
     await this.initialize();
 
     try {
-      // 질의 임베딩 생성
+      // 1. 질의 확장
+      const expandedQueries = this.expandQuery(query);
+      console.log(`질의 확장 결과: ${expandedQueries.length}개 쿼리`);
+
+      // 2. 스파스 검색 (MiniSearch - BM25)
+      const sparseResults = [];
+      for (const expandedQuery of expandedQueries) {
+        const results = this.miniSearch.search(expandedQuery);
+        sparseResults.push(...results.slice(0, limit * 2));
+      }
+      
+      // 스파스 결과 중복 제거 및 점수 정규화
+      const uniqueSparseResults = Array.from(
+        new Map(sparseResults.map(r => [r.id, r])).values()
+      ).slice(0, limit * 2);
+
+      // 3. 덴스 검색 (벡터 검색)
       const embeddingResponse = await this.openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: query,
       });
       
       const queryVector = embeddingResponse.data[0].embedding;
-
-      // 통합 매뉴얼 임베딩 파일에서 직접 검색
       const embeddingFile = './chatbot/codes/manual_chunks_all.ndjson';
       const fileContent = await fs.readFile(embeddingFile, 'utf-8');
       const lines = fileContent.trim().split('\n');
       
-      const similarities: { chunk: any; score: number }[] = [];
+      const denseResults: { chunk: any; score: number; id: string }[] = [];
       
       for (const line of lines) {
         try {
           const chunk = JSON.parse(line);
           if (!chunk.embedding || !Array.isArray(chunk.embedding)) continue;
           
-          // 코사인 유사도 계산
           const score = this.cosineSimilarity(queryVector, chunk.embedding);
-          similarities.push({ chunk, score });
+          denseResults.push({ 
+            chunk, 
+            score, 
+            id: chunk.id || `chunk_${Date.now()}_${Math.random()}`
+          });
         } catch (error) {
-          continue; // 파싱 오류 무시
+          continue;
         }
       }
+      
+      // 덴스 결과 정렬
+      denseResults.sort((a, b) => b.score - a.score);
+      const topDenseResults = denseResults.slice(0, limit * 2);
 
-      // 유사도 기준 정렬
-      similarities.sort((a, b) => b.score - a.score);
+      // 4. RRF로 점수 결합
+      const combinedScores = this.combineScoresRRF(
+        uniqueSparseResults, 
+        topDenseResults.map(r => ({ id: r.id, score: r.score }))
+      );
 
-      // 결과 필터링 및 변환
+      // 5. 결과 통합 및 안전 가중치 적용
+      const allChunks = new Map();
+      
+      // 스파스 결과 추가
+      uniqueSparseResults.forEach(result => {
+        if (result.metadata) {
+          allChunks.set(result.id, result);
+        }
+      });
+      
+      // 덴스 결과 추가
+      topDenseResults.forEach(result => {
+        if (!allChunks.has(result.id)) {
+          allChunks.set(result.id, {
+            id: result.id,
+            text: result.chunk.text,
+            metadata: result.chunk.metadata,
+            score: result.score
+          });
+        }
+      });
+
+      // 6. 최종 점수 계산 및 정렬
+      const finalResults = Array.from(allChunks.values()).map(chunk => {
+        const rrfScore = combinedScores.get(chunk.id) || 0;
+        const safetyBoost = this.applySafetyBoost(chunk);
+        const finalScore = rrfScore + safetyBoost;
+        
+        return { ...chunk, finalScore };
+      }).sort((a, b) => b.finalScore - a.finalScore);
+
+      // 7. 필터링 및 변환
       const chunks: ManualChunk[] = [];
       
-      for (const { chunk, score } of similarities) {
-        const metadata = chunk.metadata || {};
+      for (const result of finalResults) {
+        const metadata = result.metadata || {};
         
         // 설비 필터링
         if (equipmentFilter && equipmentFilter.length > 0) {
@@ -135,8 +305,8 @@ export class ManualChatbotService {
         }
 
         chunks.push({
-          id: chunk.id || `chunk_${Date.now()}_${Math.random()}`,
-          text: chunk.text || '',
+          id: result.id,
+          text: result.text || '',
           metadata: {
             doc_id: metadata.doc_id || '',
             family: metadata.family || '',
@@ -149,12 +319,13 @@ export class ManualChatbotService {
             task_type: Array.isArray(metadata.task_type) ? metadata.task_type : [],
             component: Array.isArray(metadata.component) ? metadata.component : []
           },
-          score
+          score: result.finalScore
         });
 
         if (chunks.length >= limit) break;
       }
 
+      console.log(`하이브리드 검색 완료: 스파스 ${uniqueSparseResults.length}개, 덴스 ${topDenseResults.length}개 → 최종 ${chunks.length}개`);
       return chunks;
     } catch (error) {
       console.error('매뉴얼 검색 실패:', error);
