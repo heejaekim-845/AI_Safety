@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User, CheckCircle, Wrench, HardHat, ScrollText, History, GraduationCap, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, Eye, Shield, BookOpen, AlertTriangle, Clock, MapPin, Thermometer, Wind, Droplets, Plus, Edit, Trash2, User, CheckCircle, Wrench, HardHat, ScrollText, History, GraduationCap, Zap, ChevronDown, ChevronUp, Scale, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
@@ -25,6 +25,28 @@ interface WorkSchedule {
   equipmentName?: string;
   equipmentCode?: string;
   workTypeName?: string;
+}
+
+interface LegalRecommendation {
+  category: string;
+  title: string;
+  articleNumber: string;
+  content: string;
+  relevance: string;
+}
+
+interface LegalRecommendationsData {
+  workSummary: string;
+  equipmentName: string;
+  workType: string;
+  riskLevel: string;
+  recommendations: {
+    industrialSafetyHealth: LegalRecommendation[];
+    administrativeRules: LegalRecommendation[];
+    koshaGuide: LegalRecommendation[];
+    mechanicalEquipmentLaw: LegalRecommendation[];
+    kec: LegalRecommendation[];
+  };
 }
 
 interface SafetyBriefingData {
@@ -62,6 +84,9 @@ export default function Briefing() {
   const [currentStep, setCurrentStep] = useState('');
   const [quizAnswers, setQuizAnswers] = useState<{[key: number]: number}>({});
   const [expandedRegulations, setExpandedRegulations] = useState<{[key: number]: boolean}>({});
+  const [legalData, setLegalData] = useState<LegalRecommendationsData | null>(null);
+  const [isLoadingLegal, setIsLoadingLegal] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
   const queryClient = useQueryClient();
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
@@ -216,6 +241,23 @@ export default function Briefing() {
   const handleDeleteSchedule = async (scheduleId: number) => {
     if (confirm('이 작업 일정을 삭제하시겠습니까?')) {
       deleteScheduleMutation.mutate(scheduleId);
+    }
+  };
+
+  const handleLegalRecommendations = async () => {
+    if (!selectedWorkSchedule) return;
+    
+    setIsLoadingLegal(true);
+    try {
+      const response = await apiRequest('POST', `/api/legal-recommendations/${selectedWorkSchedule.id}`);
+      const data = await response.json();
+      setLegalData(data);
+      setShowLegalModal(true);
+    } catch (error) {
+      console.error('법령 검색 오류:', error);
+      alert('법령 및 기준 검색 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoadingLegal(false);
     }
   };
 
@@ -498,10 +540,26 @@ export default function Briefing() {
           <Dialog open={!!briefingData} onOpenChange={() => setBriefingData(null)}>
             <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-3">
               <DialogHeader className="pb-4 border-b">
-                <DialogTitle className="flex items-center gap-2 text-2xl mb-3">
-                  <Shield className="w-7 h-7 text-blue-600" />
-                  AI 안전 브리핑
-                </DialogTitle>
+                <div className="flex items-center justify-between mb-3">
+                  <DialogTitle className="flex items-center gap-2 text-2xl">
+                    <Shield className="w-7 h-7 text-blue-600" />
+                    AI 안전 브리핑
+                  </DialogTitle>
+                  <Button
+                    onClick={handleLegalRecommendations}
+                    disabled={isLoadingLegal}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    {isLoadingLegal ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    ) : (
+                      <Scale className="w-4 h-4" />
+                    )}
+                    AI추천 관련 법령 및 기준 확인
+                  </Button>
+                </div>
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg">
                   <h2 className="text-xl font-bold text-center">
                     {selectedWorkSchedule?.equipmentName} - {selectedWorkSchedule?.workTypeName}
@@ -1102,6 +1160,190 @@ export default function Briefing() {
                     </CardContent>
                   </Card>
                 )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Legal Recommendations Dialog */}
+        {legalData && (
+          <Dialog open={showLegalModal} onOpenChange={setShowLegalModal}>
+            <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-3">
+              <DialogHeader className="pb-4 border-b">
+                <DialogTitle className="flex items-center gap-2 text-2xl mb-3">
+                  <Scale className="w-7 h-7 text-green-600" />
+                  AI추천 관련 법령 및 기준
+                </DialogTitle>
+                <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-3 rounded-lg">
+                  <h2 className="text-xl font-bold text-center">
+                    {legalData.equipmentName} - {legalData.workType}
+                  </h2>
+                  <p className="text-center text-green-100 mt-1 text-sm">
+                    위험등급: {legalData.riskLevel} • 작업 요약: {legalData.workSummary}
+                  </p>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {/* 산업안전보건법 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <FileText className="w-5 h-5 text-red-600" />
+                      산업안전보건법 관련 조항
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {legalData.recommendations.industrialSafetyHealth.length > 0 ? (
+                      <div className="space-y-3">
+                        {legalData.recommendations.industrialSafetyHealth.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-red-50">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-red-800">{item.title}</h4>
+                              <Badge variant="outline" className="text-red-600 border-red-300">
+                                {item.articleNumber}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
+                            <div className="text-xs text-red-600 bg-red-100 p-2 rounded">
+                              <strong>관련성:</strong> {item.relevance}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">관련 조항이 없습니다.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* 행정규칙 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ScrollText className="w-5 h-5 text-orange-600" />
+                      행정규칙 (훈령, 고시, 예규)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {legalData.recommendations.administrativeRules.length > 0 ? (
+                      <div className="space-y-3">
+                        {legalData.recommendations.administrativeRules.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-orange-50">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-orange-800">{item.title}</h4>
+                              <Badge variant="outline" className="text-orange-600 border-orange-300">
+                                {item.articleNumber}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
+                            <div className="text-xs text-orange-600 bg-orange-100 p-2 rounded">
+                              <strong>관련성:</strong> {item.relevance}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">관련 행정규칙이 없습니다.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* KOSHA GUIDE */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      KOSHA GUIDE
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {legalData.recommendations.koshaGuide.length > 0 ? (
+                      <div className="space-y-3">
+                        {legalData.recommendations.koshaGuide.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-blue-50">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-blue-800">{item.title}</h4>
+                              <Badge variant="outline" className="text-blue-600 border-blue-300">
+                                {item.articleNumber}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
+                            <div className="text-xs text-blue-600 bg-blue-100 p-2 rounded">
+                              <strong>관련성:</strong> {item.relevance}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">관련 KOSHA 가이드가 없습니다.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* 기계설비법 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Wrench className="w-5 h-5 text-purple-600" />
+                      기계설비법
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {legalData.recommendations.mechanicalEquipmentLaw.length > 0 ? (
+                      <div className="space-y-3">
+                        {legalData.recommendations.mechanicalEquipmentLaw.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-purple-50">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-purple-800">{item.title}</h4>
+                              <Badge variant="outline" className="text-purple-600 border-purple-300">
+                                {item.articleNumber}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
+                            <div className="text-xs text-purple-600 bg-purple-100 p-2 rounded">
+                              <strong>관련성:</strong> {item.relevance}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">관련 기계설비법이 없습니다.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* KEC */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Zap className="w-5 h-5 text-yellow-600" />
+                      KEC (한국전기설비규정)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {legalData.recommendations.kec.length > 0 ? (
+                      <div className="space-y-3">
+                        {legalData.recommendations.kec.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-3 bg-yellow-50">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-yellow-800">{item.title}</h4>
+                              <Badge variant="outline" className="text-yellow-600 border-yellow-300">
+                                {item.articleNumber}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
+                            <div className="text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
+                              <strong>관련성:</strong> {item.relevance}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">관련 KEC 규정이 없습니다.</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </DialogContent>
           </Dialog>
