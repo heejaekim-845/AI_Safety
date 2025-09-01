@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, gte, lt } from "drizzle-orm";
+import { eq, and, gte, lt, desc } from "drizzle-orm";
 import {
   equipment,
   workTypes,
@@ -9,6 +9,7 @@ import {
   riskReports,
   workSchedules,
   safetyBriefings,
+  notices,
 } from "@shared/schema";
 import { IStorage } from "./storage";
 
@@ -470,6 +471,77 @@ export class DatabaseStorage implements IStorage {
       return result;
     } catch (error) {
       console.error('Database error in updateSafetyBriefing:', error);
+      throw error;
+    }
+  }
+
+  // Notices operations
+  async getAllNotices() {
+    try {
+      const result = await db.select().from(notices).orderBy(desc(notices.createdAt));
+      return result;
+    } catch (error) {
+      console.error('Database error in getAllNotices:', error);
+      return [];
+    }
+  }
+
+  async getRecentNotices(limit: number = 3) {
+    try {
+      const result = await db
+        .select()
+        .from(notices)
+        .where(eq(notices.isActive, true))
+        .orderBy(desc(notices.createdAt))
+        .limit(limit);
+      return result;
+    } catch (error) {
+      console.error('Database error in getRecentNotices:', error);
+      return [];
+    }
+  }
+
+  async getNoticeById(id: number) {
+    try {
+      const [result] = await db.select().from(notices).where(eq(notices.id, id));
+      return result || undefined;
+    } catch (error) {
+      console.error('Database error in getNoticeById:', error);
+      return undefined;
+    }
+  }
+
+  async createNotice(noticeData: any) {
+    try {
+      const [result] = await db.insert(notices).values(noticeData).returning();
+      return result;
+    } catch (error) {
+      console.error('Database error in createNotice:', error);
+      throw error;
+    }
+  }
+
+  async updateNotice(id: number, noticeData: any) {
+    try {
+      const [result] = await db
+        .update(notices)
+        .set({ ...noticeData, updatedAt: new Date() })
+        .where(eq(notices.id, id))
+        .returning();
+      
+      if (!result) throw new Error(`Notice with id ${id} not found`);
+      return result;
+    } catch (error) {
+      console.error('Database error in updateNotice:', error);
+      throw error;
+    }
+  }
+
+  async deleteNotice(id: number) {
+    try {
+      await db.delete(notices).where(eq(notices.id, id));
+    } catch (error) {
+      console.error('Database error in deleteNotice:', error);
       throw error;
     }
   }

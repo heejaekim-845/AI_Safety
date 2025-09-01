@@ -32,7 +32,8 @@ import {
   Database,
   RefreshCw,
   BookOpen,
-  BarChart3
+  BarChart3,
+  MessageSquare
 } from "lucide-react";
 
 export default function AdminPanel() {
@@ -405,6 +406,28 @@ export default function AdminPanel() {
               </div>
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Notice Management Section */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-heading-1 text-white mb-2">안내사항 관리</h2>
+            <p className="text-body text-green-50">시스템 안내사항을 관리하고 사용자에게 공지합니다</p>
+          </div>
+
+          <Button 
+            onClick={() => setLocation('/notice-management')}
+            className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
+            size="lg"
+          >
+            <MessageSquare className="mr-2 h-5 w-4" />
+            <div className="text-left">
+              <div className="font-semibold">안내사항 관리</div>
+              <div className="text-xs opacity-80">등록/수정/삭제</div>
+            </div>
+          </Button>
         </div>
       </div>
 

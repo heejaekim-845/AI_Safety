@@ -19,7 +19,8 @@ import {
   insertRiskReportSchema,
   insertIncidentSchema,
   insertWorkScheduleSchema,
-  insertSafetyBriefingSchema
+  insertSafetyBriefingSchema,
+  insertNoticeSchema
 } from "@shared/schema";
 
 // Multer 설정
@@ -1706,6 +1707,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: `응답 생성 실패: ${error.message}`
       });
+    }
+  });
+
+  // Notices routes
+  app.get("/api/notices", async (req, res) => {
+    try {
+      const notices = await storage.getAllNotices();
+      res.json(notices);
+    } catch (error) {
+      console.error("안내사항 목록 조회 오류:", error);
+      res.status(500).json({ message: "안내사항 목록을 불러올 수 없습니다." });
+    }
+  });
+
+  app.get("/api/notices/recent", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 3;
+      const notices = await storage.getRecentNotices(limit);
+      res.json(notices);
+    } catch (error) {
+      console.error("최근 안내사항 조회 오류:", error);
+      res.status(500).json({ message: "최근 안내사항을 불러올 수 없습니다." });
+    }
+  });
+
+  app.get("/api/notices/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const notice = await storage.getNoticeById(id);
+      if (!notice) {
+        return res.status(404).json({ message: "안내사항을 찾을 수 없습니다." });
+      }
+      res.json(notice);
+    } catch (error) {
+      console.error("안내사항 조회 오류:", error);
+      res.status(500).json({ message: "안내사항을 불러올 수 없습니다." });
+    }
+  });
+
+  app.post("/api/notices", async (req, res) => {
+    try {
+      const noticeData = insertNoticeSchema.parse(req.body);
+      const notice = await storage.createNotice(noticeData);
+      res.status(201).json(notice);
+    } catch (error) {
+      console.error("안내사항 생성 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "안내사항을 생성할 수 없습니다." });
+    }
+  });
+
+  app.patch("/api/notices/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const noticeData = insertNoticeSchema.partial().parse(req.body);
+      const notice = await storage.updateNotice(id, noticeData);
+      res.json(notice);
+    } catch (error) {
+      console.error("안내사항 수정 오류:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "입력 데이터가 올바르지 않습니다.", errors: error.errors });
+      }
+      res.status(500).json({ message: "안내사항을 수정할 수 없습니다." });
+    }
+  });
+
+  app.delete("/api/notices/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteNotice(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("안내사항 삭제 오류:", error);
+      res.status(500).json({ message: "안내사항을 삭제할 수 없습니다." });
     }
   });
 

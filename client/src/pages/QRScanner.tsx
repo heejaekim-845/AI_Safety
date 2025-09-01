@@ -8,7 +8,7 @@ import WorkingQRScanner from "@/components/WorkingQRScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
-import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap, Shield, AlertTriangle } from "lucide-react";
+import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap, Shield, AlertTriangle, Megaphone, MessageSquare } from "lucide-react";
 
 export default function QRScanner() {
   const [, setLocation] = useLocation();
@@ -81,6 +81,16 @@ export default function QRScanner() {
     },
     refetchInterval: 600000, // Refresh every 10 minutes
     enabled: !!userLocation && locationStatus === "success",
+  });
+
+  // Fetch recent notices
+  const { data: recentNotices } = useQuery({
+    queryKey: ['/api/notices/recent'],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/notices/recent");
+      return response.json();
+    },
+    refetchInterval: 300000, // Refresh every 5 minutes
   });
 
   const handleEquipmentSelect = (equipmentId: number) => {
@@ -363,6 +373,61 @@ export default function QRScanner() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Notice Scrolling Box */}
+      {recentNotices && recentNotices.length > 0 && (
+        <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
+          <CardContent className="p-0">
+            <div className="flex items-center justify-between p-3 border-b border-green-200">
+              <div className="flex items-center space-x-2">
+                <div className="bg-green-500 rounded-full p-1">
+                  <Megaphone className="h-3 w-3 text-white" />
+                </div>
+                <h3 className="text-sm font-semibold text-green-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                  안내사항
+                </h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation('/notices')}
+                className="text-green-600 hover:text-green-800 text-xs h-6 px-2"
+              >
+                전체보기
+              </Button>
+            </div>
+            
+            <div className="relative h-16 overflow-hidden">
+              <div className="scrolling-notices">
+                {recentNotices.map((notice: any, index: number) => (
+                  <div 
+                    key={`${notice.id}-${index}`}
+                    className="flex items-center space-x-2 py-2 px-3 whitespace-nowrap scrolling-item"
+                    style={{
+                      animationDelay: `${index * 4}s`,
+                      animationDuration: `${recentNotices.length * 4}s`
+                    }}
+                  >
+                    {notice.isImportant && (
+                      <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                    )}
+                    <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      {notice.title}
+                    </span>
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({new Date(notice.createdAt).toLocaleDateString('ko-KR', {
+                        month: 'short',
+                        day: 'numeric'
+                      })})
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* QR Scanner Interface */}
       {showScanner ? (

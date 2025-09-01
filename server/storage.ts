@@ -7,6 +7,7 @@ import {
   riskReports,
   workSchedules,
   safetyBriefings,
+  notices,
   type Equipment,
   type InsertEquipment,
   type WorkType,
@@ -23,6 +24,8 @@ import {
   type InsertWorkSchedule,
   type SafetyBriefing,
   type InsertSafetyBriefing,
+  type Notice,
+  type InsertNotice,
 } from "@shared/schema";
 
 // Interface for storage operations
@@ -77,6 +80,14 @@ export interface IStorage {
   createSafetyBriefing(briefing: InsertSafetyBriefing): Promise<SafetyBriefing>;
   getSafetyBriefingByWorkScheduleId(workScheduleId: number): Promise<SafetyBriefing | undefined>;
   updateSafetyBriefing(id: number, briefing: Partial<SafetyBriefing>): Promise<SafetyBriefing>;
+
+  // Notices operations
+  getAllNotices(): Promise<Notice[]>;
+  getRecentNotices(limit?: number): Promise<Notice[]>;
+  getNoticeById(id: number): Promise<Notice | undefined>;
+  createNotice(notice: InsertNotice): Promise<Notice>;
+  updateNotice(id: number, notice: Partial<InsertNotice>): Promise<Notice>;
+  deleteNotice(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -88,6 +99,7 @@ export class MemStorage implements IStorage {
   private riskReports: Map<number, RiskReport> = new Map();
   private workSchedules: Map<number, WorkSchedule> = new Map();
   private safetyBriefings: Map<number, SafetyBriefing> = new Map();
+  private notices: Map<number, Notice> = new Map();
   private currentId = 3;
 
   constructor() {
@@ -712,6 +724,55 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...briefingData };
     this.safetyBriefings.set(id, updated);
     return updated;
+  }
+
+  // Notices operations
+  async getAllNotices(): Promise<Notice[]> {
+    return Array.from(this.notices.values())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getRecentNotices(limit: number = 3): Promise<Notice[]> {
+    return Array.from(this.notices.values())
+      .filter(notice => notice.isActive)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+  }
+
+  async getNoticeById(id: number): Promise<Notice | undefined> {
+    return this.notices.get(id);
+  }
+
+  async createNotice(noticeData: InsertNotice): Promise<Notice> {
+    const id = this.currentId++;
+    const newNotice: Notice = {
+      id,
+      title: noticeData.title,
+      content: noticeData.content,
+      isImportant: noticeData.isImportant ?? false,
+      isActive: noticeData.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.notices.set(id, newNotice);
+    return newNotice;
+  }
+
+  async updateNotice(id: number, noticeData: Partial<InsertNotice>): Promise<Notice> {
+    const existing = this.notices.get(id);
+    if (!existing) throw new Error(`Notice with id ${id} not found`);
+    
+    const updated = { 
+      ...existing, 
+      ...noticeData,
+      updatedAt: new Date()
+    };
+    this.notices.set(id, updated);
+    return updated;
+  }
+
+  async deleteNotice(id: number): Promise<void> {
+    this.notices.delete(id);
   }
 }
 

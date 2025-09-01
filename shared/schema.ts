@@ -155,6 +155,17 @@ export const safetyBriefings = pgTable("safety_briefings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Notices table
+export const notices = pgTable("notices", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  isImportant: boolean("is_important").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertEquipmentSchema = createInsertSchema(equipment).omit({
   id: true,
@@ -213,6 +224,12 @@ export const insertSafetyBriefingSchema = createInsertSchema(safetyBriefings).om
   createdAt: true,
 });
 
+export const insertNoticeSchema = createInsertSchema(notices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type Equipment = typeof equipment.$inferSelect;
 export type InsertEquipment = z.infer<typeof insertEquipmentSchema>;
@@ -237,3 +254,6 @@ export type InsertWorkSchedule = z.infer<typeof insertWorkScheduleSchema>;
 
 export type SafetyBriefing = typeof safetyBriefings.$inferSelect;
 export type InsertSafetyBriefing = z.infer<typeof insertSafetyBriefingSchema>;
+
+export type Notice = typeof notices.$inferSelect;
+export type InsertNotice = z.infer<typeof insertNoticeSchema>;

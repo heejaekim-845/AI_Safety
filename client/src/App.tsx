@@ -13,6 +13,8 @@ import AdminPanel from "@/pages/AdminPanel";
 import VectorDBManagement from "@/pages/VectorDBManagement";
 import VectorDBAnalysis from "@/pages/VectorDBAnalysis";
 import ManualChatbot from "@/pages/ManualChatbot";
+import NoticeManagement from "@/pages/NoticeManagement";
+import NoticeList from "@/pages/NoticeList";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useState, useEffect } from "react";
 
@@ -75,6 +77,8 @@ function Router() {
           <Route path="/admin" component={AdminPanel} />
           <Route path="/vector-management" component={VectorDBManagement} />
           <Route path="/vector-analysis" component={VectorDBAnalysis} />
+          <Route path="/notice-management" component={NoticeManagement} />
+          <Route path="/notices" component={NoticeList} />
         </Switch>
       </div>
 
