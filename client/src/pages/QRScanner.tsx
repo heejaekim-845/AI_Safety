@@ -391,7 +391,6 @@ export default function QRScanner() {
       
       {/* Manual Equipment Selection */}
       <div className="border-t border-gray-200/50 pt-4">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">또는 설비 직접 선택</h3>
         
         {/* Search */}
         <div className="relative mb-4">
