@@ -427,14 +427,14 @@ export default function Briefing() {
                               onClick={() => handleGenerateBriefing(schedule)}
                               disabled={isGenerating}
                               size="sm"
-                              className="bg-blue-600 hover:bg-blue-700"
+                              className="bg-blue-600 hover:bg-blue-700 w-full"
                             >
                               AI 안전브리핑
                             </Button>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 w-full">
                               <WorkScheduleForm 
                                 trigger={
-                                  <Button variant="outline" size="sm">
+                                  <Button variant="outline" size="sm" className="flex-1">
                                     <Edit className="w-4 h-4" />
                                   </Button>
                                 }
@@ -445,7 +445,7 @@ export default function Briefing() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleDeleteSchedule(schedule.id)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-1"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
