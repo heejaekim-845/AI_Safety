@@ -375,10 +375,6 @@ export default function QRScanner() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">설비 인식</h2>
           <p className="text-gray-600 mb-6">QR 코드를 스캔하거나 설비를 직접 선택하세요</p>
           
-          <div className="w-16 h-16 mx-auto mb-3 glass-effect flex items-center justify-center">
-            <Camera size={32} className="text-blue-600" />
-          </div>
-          <p className="text-gray-600 mb-4 text-base">카메라로 QR 코드를 스캔하세요</p>
           <Button 
             onClick={() => setShowScanner(true)}
             className="bg-blue-600 hover:bg-blue-700 hover:shadow-xl text-white font-medium px-8 py-3 rounded-xl transition-all duration-300"
