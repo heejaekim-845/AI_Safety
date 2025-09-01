@@ -309,27 +309,25 @@ export default function QRScanner() {
   return (
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 오늘의 작업환경 제목 */}
-      <h1 className="text-xl font-bold text-gray-900 mb-3 flex items-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-        <div className="bg-yellow-400 rounded-full p-1 mr-2">
-          <AlertTriangle className="h-4 w-4 text-black" />
-        </div>
-        오늘의 작업환경
-      </h1>
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-xl font-bold text-gray-900 flex items-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+          <div className="bg-yellow-400 rounded-full p-1 mr-2">
+            <AlertTriangle className="h-4 w-4 text-black" />
+          </div>
+          오늘의 작업환경
+        </h1>
+        {weatherData && (
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-200" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+            📍 {weatherData.location}
+          </span>
+        )}
+      </div>
       
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-3">
           <div className="relative">
-            {/* 우측 상단: 현재위치 */}
-            {weatherData && (
-              <div className="absolute -top-3 right-1">
-                <p className="text-xs text-gray-600" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                  현재위치 : {weatherData.location}
-                </p>
-              </div>
-            )}
-            
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between">
               {/* 좌측: 날씨·시간 정보 */}
               <div className="text-center">
                 {weatherData ? (
