@@ -384,7 +384,7 @@ export default function Briefing() {
                   <div className="space-y-4">
                     {workSchedules.map((schedule: WorkSchedule) => (
                       <div key={schedule.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-1">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-lg">
