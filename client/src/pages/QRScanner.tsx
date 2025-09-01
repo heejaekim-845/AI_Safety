@@ -8,7 +8,7 @@ import WorkingQRScanner from "@/components/WorkingQRScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
-import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap } from "lucide-react";
+import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap, Shield } from "lucide-react";
 
 export default function QRScanner() {
   const [, setLocation] = useLocation();
