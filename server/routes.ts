@@ -899,6 +899,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI 추천 관련 법령 및 기준 확인 API
+  app.post("/api/legal-recommendations/:workScheduleId", async (req, res) => {
+    try {
+      const workScheduleId = parseInt(req.params.workScheduleId);
+      
+      // Get work schedule
+      const workSchedule = await storage.getWorkScheduleById(workScheduleId);
+      if (!workSchedule) {
+        return res.status(404).json({ message: "작업 일정을 찾을 수 없습니다." });
+      }
+
+      // Get related data
+      const equipment = await storage.getEquipmentById(workSchedule.equipmentId!);
+      const workType = await storage.getWorkTypeById(workSchedule.workTypeId!);
+      
+      if (!equipment || !workType) {
+        return res.status(404).json({ message: "설비 또는 작업 유형을 찾을 수 없습니다." });
+      }
+
+      console.log(`법령 검색 요청: ${equipment.name} - ${workType.name}`);
+
+      // Generate legal recommendations using AI
+      const legalRecommendations = await aiService.generateLegalRecommendations(
+        equipment.name,
+        workType.name,
+        equipment.riskLevel || 'MEDIUM',
+        equipment
+      );
+
+      res.json(legalRecommendations);
+    } catch (error) {
+      console.error("법령 검색 오류:", error);
+      res.status(500).json({ message: "법령 및 기준 검색 중 오류가 발생했습니다." });
+    }
+  });
 
   // ChromaDB 임베디드 모드 테스트 엔드포인트
   app.get("/api/test-vector-db", async (req, res) => {

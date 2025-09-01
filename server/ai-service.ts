@@ -177,6 +177,28 @@ export interface RiskAnalysis {
   preventiveMeasures: string[];
 }
 
+export interface LegalRecommendation {
+  category: string;
+  title: string;
+  articleNumber: string;
+  content: string;
+  relevance: string;
+}
+
+export interface LegalRecommendationsResponse {
+  workSummary: string;
+  equipmentName: string;
+  workType: string;
+  riskLevel: string;
+  recommendations: {
+    industrialSafetyHealth: LegalRecommendation[];
+    administrativeRules: LegalRecommendation[];
+    koshaGuide: LegalRecommendation[];
+    mechanicalEquipmentLaw: LegalRecommendation[];
+    kec: LegalRecommendation[];
+  };
+}
+
 export class AIService {
   private accidentDataCache?: any[];
 
@@ -2132,6 +2154,200 @@ ${this.formatRisks(equipmentInfo)}
     }
     
     return Array.from(new Set(risks)); // 중복 제거
+  }
+
+  // 법령 및 기준 검색 함수
+  async generateLegalRecommendations(
+    equipmentName: string,
+    workTypeName: string,
+    riskLevel: string,
+    equipmentDetails: any
+  ): Promise<LegalRecommendationsResponse> {
+    try {
+      console.log(`법령 검색 시작: ${equipmentName} - ${workTypeName} (위험등급: ${riskLevel})`);
+      
+      // 설비 위험 요소 추출
+      const riskFactors = this.extractEquipmentRisks(equipmentDetails);
+      
+      const prompt = `다음 산업설비 작업에 대한 관련 법령 및 기준을 찾아주세요:
+
+## 작업 정보
+- 설비명: ${equipmentName}
+- 작업유형: ${workTypeName}
+- 위험등급: ${riskLevel}
+- 주요 위험요소: ${riskFactors.join(', ')}
+
+## 검색 요청 항목
+다음 5개 카테고리별로 관련 법령 및 기준을 찾아주세요:
+
+1. **산업안전보건법 관련 조항**: 직접적으로 관련된 법령 조항
+2. **행정규칙 (훈령, 고시, 예규)**: 관련 행정규칙 및 지침
+3. **KOSHA GUIDE**: 한국산업안전보건공단 가이드라인
+4. **기계설비법**: 기계 및 설비 관련 법규
+5. **KEC (한국전기설비규정)**: 전기설비 관련 규정 (전기 관련시에만)
+
+## 응답 형식
+각 카테고리별로 최대 3개씩 관련도가 높은 법령을 JSON 형식으로 제공해주세요.
+
+응답 형식:
+{
+  "workSummary": "작업 요약 설명",
+  "equipmentName": "${equipmentName}",
+  "workType": "${workTypeName}",
+  "riskLevel": "${riskLevel}",
+  "recommendations": {
+    "industrialSafetyHealth": [
+      {
+        "category": "산업안전보건법",
+        "title": "법령명",
+        "articleNumber": "조항번호",
+        "content": "주요 내용 요약",
+        "relevance": "관련성 설명"
+      }
+    ],
+    "administrativeRules": [
+      {
+        "category": "행정규칙",
+        "title": "규칙명",
+        "articleNumber": "조항번호",
+        "content": "주요 내용 요약",
+        "relevance": "관련성 설명"
+      }
+    ],
+    "koshaGuide": [
+      {
+        "category": "KOSHA GUIDE",
+        "title": "가이드명",
+        "articleNumber": "가이드번호",
+        "content": "주요 내용 요약",
+        "relevance": "관련성 설명"
+      }
+    ],
+    "mechanicalEquipmentLaw": [
+      {
+        "category": "기계설비법",
+        "title": "법령명",
+        "articleNumber": "조항번호",
+        "content": "주요 내용 요약",
+        "relevance": "관련성 설명"
+      }
+    ],
+    "kec": [
+      {
+        "category": "KEC",
+        "title": "규정명",
+        "articleNumber": "조항번호",
+        "content": "주요 내용 요약",
+        "relevance": "관련성 설명"
+      }
+    ]
+  }
+}`;
+
+      const response = await genai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: "당신은 산업안전보건 및 법규 전문가입니다. 주어진 작업에 대해 관련 법령과 기준을 정확하고 구체적으로 찾아서 제공합니다.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              workSummary: { type: "string" },
+              equipmentName: { type: "string" },
+              workType: { type: "string" },
+              riskLevel: { type: "string" },
+              recommendations: {
+                type: "object",
+                properties: {
+                  industrialSafetyHealth: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        articleNumber: { type: "string" },
+                        content: { type: "string" },
+                        relevance: { type: "string" }
+                      },
+                      required: ["category", "title", "articleNumber", "content", "relevance"]
+                    }
+                  },
+                  administrativeRules: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        articleNumber: { type: "string" },
+                        content: { type: "string" },
+                        relevance: { type: "string" }
+                      },
+                      required: ["category", "title", "articleNumber", "content", "relevance"]
+                    }
+                  },
+                  koshaGuide: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        articleNumber: { type: "string" },
+                        content: { type: "string" },
+                        relevance: { type: "string" }
+                      },
+                      required: ["category", "title", "articleNumber", "content", "relevance"]
+                    }
+                  },
+                  mechanicalEquipmentLaw: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        articleNumber: { type: "string" },
+                        content: { type: "string" },
+                        relevance: { type: "string" }
+                      },
+                      required: ["category", "title", "articleNumber", "content", "relevance"]
+                    }
+                  },
+                  kec: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string" },
+                        title: { type: "string" },
+                        articleNumber: { type: "string" },
+                        content: { type: "string" },
+                        relevance: { type: "string" }
+                      },
+                      required: ["category", "title", "articleNumber", "content", "relevance"]
+                    }
+                  }
+                },
+                required: ["industrialSafetyHealth", "administrativeRules", "koshaGuide", "mechanicalEquipmentLaw", "kec"]
+              }
+            },
+            required: ["workSummary", "equipmentName", "workType", "riskLevel", "recommendations"]
+          }
+        },
+        contents: prompt
+      });
+
+      const result = JSON.parse(response.text || "{}");
+      
+      console.log(`법령 검색 완료: ${result.recommendations?.industrialSafetyHealth?.length || 0}개 산안법, ${result.recommendations?.koshaGuide?.length || 0}개 KOSHA 가이드 등`);
+      
+      return result;
+    } catch (error) {
+      console.error("법령 검색 오류:", error);
+      throw new Error("법령 및 기준 검색 중 오류가 발생했습니다.");
+    }
   }
 }
 
