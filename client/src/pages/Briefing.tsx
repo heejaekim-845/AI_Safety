@@ -160,7 +160,7 @@ export default function Briefing() {
     }, 200); // More frequent updates for smoother animation
 
     try {
-      const response = await apiPromise;
+      const response = await apiPromise as Response;
       const data = await response.json();
       
       // Immediately complete progress when API finishes
@@ -384,7 +384,7 @@ export default function Briefing() {
                   <div className="space-y-4">
                     {workSchedules.map((schedule: WorkSchedule) => (
                       <div key={schedule.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-lg">
