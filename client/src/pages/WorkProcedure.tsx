@@ -74,7 +74,7 @@ export default function WorkProcedureComponent() {
   
   const sessionIdNum = parseInt(sessionId || "0");
   
-  const { data: session, isLoading: sessionLoading } = useQuery({
+  const { data: session, isLoading: sessionLoading } = useQuery<WorkSession>({
     queryKey: [`/api/work-sessions/${sessionIdNum}`],
     enabled: !!sessionIdNum
   });
@@ -139,7 +139,7 @@ export default function WorkProcedureComponent() {
       currentStep: newCurrentStep,
       ...(specialNotes && {
         specialNotes: [
-          ...(session.specialNotes || []),
+          ...((Array.isArray(session.specialNotes) ? session.specialNotes : []) || []),
           { stepId: stepNumber, note: specialNotes }
         ]
       })
@@ -175,8 +175,8 @@ export default function WorkProcedureComponent() {
         description: step.description,
         category: step.category
       },
-      equipmentId: session.equipmentId,
-      workTypeId: session.workTypeId
+      equipmentId: session.equipmentId!,
+      workTypeId: session.workTypeId!
     });
   };
 
