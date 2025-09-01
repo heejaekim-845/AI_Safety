@@ -370,18 +370,18 @@ export default function QRScanner() {
                     <>
                       <div className={`${safetyRisk.color} text-white px-3 py-2 rounded-lg shadow-md`}>
                         <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-lg">{safetyRisk.icon}</span>
+                          <span className="text-xl">{safetyRisk.icon}</span>
                           <div>
-                            <p className="text-sm font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                            <p className="text-base font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                               오늘 위험수준 : {safetyRisk.level}
                             </p>
                           </div>
                         </div>
-                        <p className="text-xs" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <p className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                           {safetyRisk.workRecommendation}
                         </p>
                       </div>
-                      <div className="text-xs text-gray-600 mt-2 text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      <div className="text-sm text-gray-600 mt-2 text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                         <p>체감 {safetyRisk.heatIndex}°C, WBGT {safetyRisk.wbgt}</p>
                       </div>
                     </>
