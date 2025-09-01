@@ -83,12 +83,14 @@ export default function QRScanner() {
     enabled: !!userLocation && locationStatus === "success",
   });
 
-  // Fetch recent notices
-  const { data: recentNotices } = useQuery({
-    queryKey: ['/api/notices/recent'],
+  // Fetch all active notices
+  const { data: activeNotices } = useQuery({
+    queryKey: ['/api/notices'],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/notices/recent");
-      return response.json();
+      const response = await apiRequest("GET", "/api/notices");
+      const notices = await response.json();
+      // Filter only active notices
+      return notices.filter((notice: any) => notice.isActive);
     },
     refetchInterval: 300000, // Refresh every 5 minutes
   });
@@ -374,8 +376,8 @@ export default function QRScanner() {
         </CardContent>
       </Card>
 
-      {/* Notice Scrolling Box */}
-      {recentNotices && recentNotices.length > 0 && (
+      {/* Notice List */}
+      {activeNotices && activeNotices.length > 0 && (
         <>
           {/* 안내사항 제목 */}
           <div className="flex items-center justify-between mb-3">
@@ -396,35 +398,30 @@ export default function QRScanner() {
           </div>
           
           <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-0">
-              <div className="relative h-16 overflow-hidden">
-                <div className="scrolling-notices">
-                  {recentNotices.map((notice: any, index: number) => (
-                    <div 
-                      key={`${notice.id}-${index}`}
-                      className="flex items-center space-x-2 py-2 px-3 whitespace-nowrap scrolling-item"
-                      style={{
-                        animationDelay: `${index * 4}s`,
-                        animationDuration: `${recentNotices.length * 4}s`
-                      }}
-                    >
-                      {notice.isImportant && (
-                        <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
-                      )}
-                      <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-800" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                        {notice.title}
-                      </span>
-                      <span className="text-xs text-gray-500 ml-2">
-                        ({new Date(notice.createdAt).toLocaleDateString('ko-KR', {
-                          month: 'short',
-                          day: 'numeric'
-                        })})
-                      </span>
-                    </div>
-                  ))}
+            <CardContent className="p-4 space-y-3">
+              {activeNotices.map((notice: any, index: number) => (
+                <div 
+                  key={notice.id}
+                  className="flex items-center space-x-2 py-2 px-3 bg-white/50 rounded-lg notice-fadein"
+                  style={{
+                    animationDelay: `${index * 0.2}s`
+                  }}
+                >
+                  {notice.isImportant && (
+                    <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                  )}
+                  <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-800 flex-1" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    {notice.title}
+                  </span>
+                  <span className="text-xs text-gray-500 flex-shrink-0">
+                    {new Date(notice.createdAt).toLocaleDateString('ko-KR', {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
                 </div>
-              </div>
+              ))}
             </CardContent>
           </Card>
         </>
