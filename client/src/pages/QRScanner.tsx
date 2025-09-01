@@ -270,7 +270,8 @@ export default function QRScanner() {
   return (
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 오늘의 작업환경 제목 */}
-      <h1 className="text-xl font-bold text-gray-900 mb-3" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+      <h1 className="text-xl font-bold text-gray-900 mb-3 flex items-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+        <Shield className="h-6 w-6 text-blue-600 mr-2" />
         오늘의 작업환경
       </h1>
       
