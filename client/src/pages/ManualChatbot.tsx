@@ -76,6 +76,7 @@ export default function ManualChatbot() {
   const [inputMessage, setInputMessage] = useState('');
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
+  const [expandedReferences, setExpandedReferences] = useState<Set<string>>(new Set());
 
   // 설비 목록 조회
   const { data: equipmentData, isLoading: equipmentLoading } = useQuery({
@@ -176,6 +177,19 @@ export default function ManualChatbot() {
         newSet.delete(chunkId);
       } else {
         newSet.add(chunkId);
+      }
+      return newSet;
+    });
+  };
+
+  // 참고매뉴얼 섹션 토글 함수
+  const toggleReference = (messageId: string) => {
+    setExpandedReferences(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(messageId)) {
+        newSet.delete(messageId);
+      } else {
+        newSet.add(messageId);
       }
       return newSet;
     });
@@ -327,47 +341,60 @@ export default function ManualChatbot() {
                           {/* 소스 청크 표시 (AI 응답만) */}
                           {message.role === 'assistant' && message.sourceChunks && message.sourceChunks.length > 0 && (
                             <div className="mt-3 pt-3 border-t border-gray-300">
-                              <p className="text-sm font-medium mb-2">참고 매뉴얼 ({message.sourceChunks.length}개)</p>
-                              <div className="space-y-2">
-                                {message.sourceChunks.map((chunk) => (
-                                  <div key={chunk.id} className="border border-gray-300 rounded-md">
-                                    <button
-                                      onClick={() => toggleChunk(chunk.id)}
-                                      className="w-full text-left p-2 text-sm hover:bg-gray-50 rounded-md flex items-center justify-between"
-                                    >
-                                      <span>
-                                        <strong>{chunk.metadata.title || '제목 없음'}</strong>
-                                        <span className="ml-2 text-gray-600">
-                                          (페이지 {chunk.metadata.page_start}-{chunk.metadata.page_end})
+                              <button
+                                onClick={() => toggleReference(message.id)}
+                                className="w-full text-left flex items-center justify-between hover:bg-gray-50 p-1 rounded"
+                              >
+                                <p className="text-sm font-medium">참고 매뉴얼 ({message.sourceChunks.length}개)</p>
+                                {expandedReferences.has(message.id) ? (
+                                  <ChevronDown className="w-4 h-4" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4" />
+                                )}
+                              </button>
+                              
+                              {expandedReferences.has(message.id) && (
+                                <div className="space-y-2 mt-2">
+                                  {message.sourceChunks.map((chunk) => (
+                                    <div key={chunk.id} className="border border-gray-300 rounded-md">
+                                      <button
+                                        onClick={() => toggleChunk(chunk.id)}
+                                        className="w-full text-left p-2 text-sm hover:bg-gray-50 rounded-md flex items-center justify-between"
+                                      >
+                                        <span>
+                                          <strong>{chunk.metadata.title || '제목 없음'}</strong>
+                                          <span className="ml-2 text-gray-600">
+                                            (페이지 {chunk.metadata.page_start}-{chunk.metadata.page_end})
+                                          </span>
                                         </span>
-                                      </span>
-                                      {expandedChunks.has(chunk.id) ? (
-                                        <ChevronDown className="w-4 h-4" />
-                                      ) : (
-                                        <ChevronRight className="w-4 h-4" />
-                                      )}
-                                    </button>
-                                    {expandedChunks.has(chunk.id) && (
-                                      <div className="p-3 border-t border-gray-200 bg-gray-50">
-                                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                                          {chunk.text.substring(0, 500)}
-                                          {chunk.text.length > 500 && '...'}
-                                        </p>
-                                        <div className="flex gap-2 mt-2">
-                                          <Badge variant="outline" className="text-xs">
-                                            {chunk.metadata.family}
-                                          </Badge>
-                                          {chunk.metadata.equipment.map(eq => (
-                                            <Badge key={eq} variant="secondary" className="text-xs">
-                                              {eq}
+                                        {expandedChunks.has(chunk.id) ? (
+                                          <ChevronDown className="w-4 h-4" />
+                                        ) : (
+                                          <ChevronRight className="w-4 h-4" />
+                                        )}
+                                      </button>
+                                      {expandedChunks.has(chunk.id) && (
+                                        <div className="p-3 border-t border-gray-200 bg-gray-50">
+                                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                            {chunk.text.substring(0, 500)}
+                                            {chunk.text.length > 500 && '...'}
+                                          </p>
+                                          <div className="flex gap-2 mt-2">
+                                            <Badge variant="outline" className="text-xs">
+                                              {chunk.metadata.family}
                                             </Badge>
-                                          ))}
+                                            {chunk.metadata.equipment.map(eq => (
+                                              <Badge key={eq} variant="secondary" className="text-xs">
+                                                {eq}
+                                              </Badge>
+                                            ))}
+                                          </div>
                                         </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
