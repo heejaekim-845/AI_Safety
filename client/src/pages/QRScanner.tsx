@@ -425,11 +425,11 @@ export default function QRScanner() {
           </div>
           
           <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-4">
-              <div className="relative h-12 overflow-hidden">
+            <CardContent className="p-2">
+              <div className="relative h-8 overflow-hidden">
                 {activeNotices.length > 0 && (
                   <div 
-                    className={`flex items-center space-x-2 py-2 px-3 bg-white/50 rounded-lg transition-opacity duration-600 ${
+                    className={`flex items-center space-x-1.5 py-1 px-2 bg-white/50 rounded transition-opacity duration-600 ${
                       isNoticeVisible ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
@@ -437,7 +437,7 @@ export default function QRScanner() {
                       <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
                     )}
                     <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-800 flex-1" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                    <span className="text-sm text-gray-800 flex-1 truncate" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                       {activeNotices[currentNoticeIndex]?.title}
                     </span>
                     <span className="text-xs text-gray-500 flex-shrink-0">
