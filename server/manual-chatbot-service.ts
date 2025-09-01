@@ -57,6 +57,41 @@ export class ManualChatbotService {
     "pressure switch", "PRD", "pressure relief device", "relief valve"
   ];
 
+  // 한글-영문 키워드 매핑
+  private readonly koreanEnglishMapping: { [key: string]: string[] } = {
+    '발전기': ['generator', 'dynamo'],
+    '베어링': ['bearing'],
+    '점검': ['inspection', 'check', 'maintenance'],
+    '정밀점검': ['overhaul inspection', 'detailed inspection'],
+    '주기점검': ['periodic inspection', 'routine inspection'],
+    '정기점검': ['periodic maintenance', 'scheduled maintenance'],
+    '교체': ['replacement', 'replace'],
+    '수리': ['repair', 'fix'],
+    '정비': ['maintenance', 'service'],
+    '조립': ['assembly', 'assemble'],
+    '분해': ['disassembly', 'dismantle'],
+    '냉각': ['cooling', 'cooler'],
+    '윤활': ['lubrication', 'lubricating'],
+    '오일': ['oil'],
+    '온도': ['temperature'],
+    '압력': ['pressure'],
+    '진동': ['vibration'],
+    '소음': ['noise'],
+    '수차': ['turbine'],
+    '로터': ['rotor'],
+    '스테이터': ['stator'],
+    '브러시': ['brush'],
+    '슬립링': ['slip ring'],
+    '절연': ['insulation'],
+    '권선': ['winding'],
+    '코일': ['coil'],
+    '자극': ['pole'],
+    '여자': ['excitation'],
+    '계전기': ['relay'],
+    '차단기': ['breaker'],
+    '스위치': ['switch']
+  };
+
   constructor() {
     this.index = new LocalIndex(this.indexPath);
     this.openai = new OpenAI({
@@ -107,19 +142,53 @@ export class ManualChatbotService {
     }
   }
 
+  // 한글 질의를 영문으로 번역하는 함수
+  private translateKoreanQuery(query: string): string {
+    let translatedQuery = query;
+    
+    // 한글 키워드를 영문으로 치환
+    Object.entries(this.koreanEnglishMapping).forEach(([korean, englishTerms]) => {
+      const koreanRegex = new RegExp(korean, 'gi');
+      if (koreanRegex.test(translatedQuery)) {
+        // 첫 번째 영문 용어로 치환
+        translatedQuery = translatedQuery.replace(koreanRegex, englishTerms[0]);
+      }
+    });
+    
+    return translatedQuery;
+  }
+
   // 질의 확장 함수
   private expandQuery(query: string): string[] {
     const normalizedQuery = query.toLowerCase();
+    const translatedQuery = this.translateKoreanQuery(query);
+    
+    // 원본 질의와 번역된 질의 모두 포함
+    const expandedQueries = [query];
+    
+    // 번역된 질의가 원본과 다르면 추가
+    if (translatedQuery !== query) {
+      expandedQueries.push(translatedQuery);
+    }
+    
+    // 한글-영문 키워드 매핑으로 추가 키워드 생성
+    Object.entries(this.koreanEnglishMapping).forEach(([korean, englishTerms]) => {
+      if (query.includes(korean)) {
+        englishTerms.forEach(englishTerm => {
+          expandedQueries.push(englishTerm);
+        });
+      }
+    });
     
     // 안전 관련 키워드가 포함되어 있는지 확인
     const hasSafetyKeyword = /안전|safety|interlock|보호|계전|alarm|warning|trip|압력|차단|경보|경고|주의/i.test(query);
     
     if (hasSafetyKeyword) {
-      // 원본 쿼리 + 안전장치 동의어들 결합
-      return Array.from(new Set([query, ...this.safetyAliases]));
+      // 안전장치 동의어들 추가
+      expandedQueries.push(...this.safetyAliases);
     }
     
-    return [query];
+    return Array.from(new Set(expandedQueries));
   }
 
   // MiniSearch용 문서 로딩
