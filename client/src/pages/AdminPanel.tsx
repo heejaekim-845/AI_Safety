@@ -376,8 +376,8 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      {/* Vector DB Management Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-6 mb-8">
+      {/* Vector DB Management Section - Hidden */}
+      <div className="hidden bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-6 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-heading-1 text-white mb-2">벡터DB 관리</h2>
