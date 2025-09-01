@@ -325,7 +325,7 @@ export default function QRScanner() {
       
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
-        <CardContent className="p-3">
+        <CardContent className="px-3 py-2">
           <div className="relative">
             <div className="flex items-center justify-between">
               {/* 좌측: 날씨·시간 정보 */}
@@ -349,7 +349,7 @@ export default function QRScanner() {
                 )}
                 
                 {/* 날짜/시간 */}
-                <div className="text-left mt-2 pt-2 border-t border-gray-200">
+                <div className="text-left mt-1.5 pt-1.5 border-t border-gray-200">
                   <p className="text-sm font-medium text-gray-900" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                     {currentTime.toLocaleDateString('ko-KR', {
                       year: 'numeric',
