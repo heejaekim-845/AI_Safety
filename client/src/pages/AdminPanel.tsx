@@ -381,7 +381,6 @@ export default function AdminPanel() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-heading-1 text-white mb-2">벡터DB 관리</h2>
-            <p className="text-body text-purple-50">안전 데이터베이스 상태 및 관리 시스템</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -390,10 +389,9 @@ export default function AdminPanel() {
               className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
               size="lg"
             >
-              <Database className="mr-2 h-5 w-5" />
+              <Database className="mr-2 h-5 w-4" />
               <div className="text-left">
                 <div className="font-semibold">데이터 관리</div>
-                <div className="text-xs text-white/80">상태확인, 임베딩, 백업복구</div>
               </div>
             </Button>
             <Button 
@@ -401,10 +399,9 @@ export default function AdminPanel() {
               className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
               size="lg"
             >
-              <BarChart3 className="mr-2 h-5 w-5" />
+              <BarChart3 className="mr-2 h-5 w-4" />
               <div className="text-left">
                 <div className="font-semibold">상세 분석</div>
-                <div className="text-xs text-white/80">검색, 분류, 통계분석</div>
               </div>
             </Button>
           </div>
