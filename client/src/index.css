@@ -318,21 +318,8 @@
     50% { transform: rotate(3deg); }
   }
 
-  /* Notice fadein animation */
-  .notice-fadein {
-    opacity: 0;
-    transform: translateY(10px);
-    animation: notice-fadein 0.6s ease-out forwards;
-  }
-
-  @keyframes notice-fadein {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Notice smooth transition effect */
+  .duration-600 {
+    transition-duration: 600ms;
   }
 }

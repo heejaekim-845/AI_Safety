@@ -17,6 +17,8 @@ export default function QRScanner() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userLocation, setUserLocation] = useState<string>("서울"); // Default fallback
   const [locationStatus, setLocationStatus] = useState<"loading" | "success" | "error">("loading");
+  const [currentNoticeIndex, setCurrentNoticeIndex] = useState(0);
+  const [isNoticeVisible, setIsNoticeVisible] = useState(true);
   const { data: equipment, isLoading } = useEquipment();
 
   // Update time every second
@@ -94,6 +96,31 @@ export default function QRScanner() {
     },
     refetchInterval: 300000, // Refresh every 5 minutes
   });
+
+  // Notice rotation effect
+  useEffect(() => {
+    if (!activeNotices || activeNotices.length <= 1) return;
+
+    const rotateNotice = () => {
+      setIsNoticeVisible(false);
+      
+      setTimeout(() => {
+        setCurrentNoticeIndex((prev) => 
+          prev >= activeNotices.length - 1 ? 0 : prev + 1
+        );
+        setIsNoticeVisible(true);
+      }, 300); // Half of fade duration
+    };
+
+    const interval = setInterval(rotateNotice, 4000); // Change every 4 seconds
+    return () => clearInterval(interval);
+  }, [activeNotices]);
+
+  // Reset notice index when notices change
+  useEffect(() => {
+    setCurrentNoticeIndex(0);
+    setIsNoticeVisible(true);
+  }, [activeNotices]);
 
   const handleEquipmentSelect = (equipmentId: number) => {
     setLocation(`/equipment/${equipmentId}`);
@@ -398,30 +425,30 @@ export default function QRScanner() {
           </div>
           
           <Card className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-4 space-y-3">
-              {activeNotices.map((notice: any, index: number) => (
-                <div 
-                  key={notice.id}
-                  className="flex items-center space-x-2 py-2 px-3 bg-white/50 rounded-lg notice-fadein"
-                  style={{
-                    animationDelay: `${index * 0.2}s`
-                  }}
-                >
-                  {notice.isImportant && (
-                    <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
-                  )}
-                  <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
-                  <span className="text-sm text-gray-800 flex-1" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                    {notice.title}
-                  </span>
-                  <span className="text-xs text-gray-500 flex-shrink-0">
-                    {new Date(notice.createdAt).toLocaleDateString('ko-KR', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </span>
-                </div>
-              ))}
+            <CardContent className="p-4">
+              <div className="relative h-12 overflow-hidden">
+                {activeNotices.length > 0 && (
+                  <div 
+                    className={`flex items-center space-x-2 py-2 px-3 bg-white/50 rounded-lg transition-opacity duration-600 ${
+                      isNoticeVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    {activeNotices[currentNoticeIndex]?.isImportant && (
+                      <AlertTriangle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                    )}
+                    <MessageSquare className="h-3 w-3 text-green-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-800 flex-1" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                      {activeNotices[currentNoticeIndex]?.title}
+                    </span>
+                    <span className="text-xs text-gray-500 flex-shrink-0">
+                      {activeNotices[currentNoticeIndex] && new Date(activeNotices[currentNoticeIndex].createdAt).toLocaleDateString('ko-KR', {
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </>
