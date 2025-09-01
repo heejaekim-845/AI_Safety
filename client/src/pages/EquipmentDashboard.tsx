@@ -359,12 +359,12 @@ export default function EquipmentDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4">
               {equipment.riskFactors?.highTemperature && (
                 <Card className="card-minimal card-hover">
-                  <CardContent className="p-5">
-                    <div className="flex items-center mb-3">
-                      <span className="material-icons text-red-600 mr-3 text-2xl">whatshot</span>
+                  <CardContent className="p-3">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-red-600 mr-2 text-2xl">whatshot</span>
                       <span className="font-semibold text-gray-900">고온 위험</span>
                     </div>
                     {equipment.riskFactors?.highTemperatureDetail ? (
@@ -378,9 +378,9 @@ export default function EquipmentDashboard() {
               
               {equipment.riskFactors?.highPressure && (
                 <Card className="card-minimal card-hover">
-                  <CardContent className="p-5">
-                    <div className="flex items-center mb-3">
-                      <span className="material-icons text-orange-600 mr-3 text-2xl">compress</span>
+                  <CardContent className="p-3">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-orange-600 mr-2 text-2xl">compress</span>
                       <span className="font-semibold text-gray-900">고압 가스</span>
                     </div>
                     {equipment.riskFactors?.highPressureDetail ? (
@@ -394,9 +394,9 @@ export default function EquipmentDashboard() {
               
               {equipment.riskFactors?.highVoltage && (
                 <Card className="card-minimal card-hover">
-                  <CardContent className="p-5">
-                    <div className="flex items-center mb-3">
-                      <span className="material-icons text-yellow-600 mr-3 text-2xl">electrical_services</span>
+                  <CardContent className="p-3">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-yellow-600 mr-2 text-2xl">electrical_services</span>
                       <span className="font-semibold text-gray-900">고전압 위험</span>
                     </div>
                     {equipment.riskFactors?.highVoltageDetail ? (
@@ -410,9 +410,9 @@ export default function EquipmentDashboard() {
               
               {equipment.riskFactors?.height && (
                 <Card className="card-minimal card-hover">
-                  <CardContent className="p-5">
-                    <div className="flex items-center mb-3">
-                      <span className="material-icons text-purple-600 mr-3 text-2xl">height</span>
+                  <CardContent className="p-3">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-purple-600 mr-2 text-2xl">height</span>
                       <span className="font-semibold text-gray-900">추락 위험</span>
                     </div>
                     {equipment.riskFactors?.heightDetail ? (
@@ -426,9 +426,9 @@ export default function EquipmentDashboard() {
               
               {equipment.riskFactors?.mechanical && (
                 <Card className="card-minimal card-hover">
-                  <CardContent className="p-5">
-                    <div className="flex items-center mb-3">
-                      <span className="material-icons text-gray-600 mr-3 text-2xl">fitness_center</span>
+                  <CardContent className="p-3">
+                    <div className="flex items-center mb-2">
+                      <span className="material-icons text-gray-600 mr-2 text-2xl">fitness_center</span>
                       <span className="font-semibold text-gray-900">기계적 위험</span>
                     </div>
                     {equipment.riskFactors?.mechanicalDetail ? (
