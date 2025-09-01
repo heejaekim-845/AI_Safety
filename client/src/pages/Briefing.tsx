@@ -87,8 +87,6 @@ export default function Briefing() {
   const [legalData, setLegalData] = useState<LegalRecommendationsData | null>(null);
   const [isLoadingLegal, setIsLoadingLegal] = useState(false);
   const [showLegalModal, setShowLegalModal] = useState(false);
-  const [legalPromptLog, setLegalPromptLog] = useState<string>('');
-  const [showLegalLog, setShowLegalLog] = useState(false);
   const queryClient = useQueryClient();
 
   const dateString = format(selectedDate, 'yyyy-MM-dd');
@@ -254,26 +252,6 @@ export default function Briefing() {
       const response = await apiRequest('POST', `/api/legal-recommendations/${selectedWorkSchedule.id}`);
       const data = await response.json();
       setLegalData(data);
-      
-      // 프롬프트 로그 저장 (백엔드에서 전달된 경우)
-      if (data.promptLog) {
-        setLegalPromptLog(data.promptLog);
-      } else {
-        // 기본 로그 생성
-        const logMessage = `법령 검색 요청:
-설비: ${selectedWorkSchedule.equipmentName}
-작업: ${selectedWorkSchedule.workTypeName}
-시간: ${new Date().toLocaleString()}
-
-검색 결과:
-- 산업안전보건법: ${data.recommendations.industrialSafetyHealth.length}건
-- 행정규칙: ${data.recommendations.administrativeRules.length}건
-- KOSHA GUIDE: ${data.recommendations.koshaGuide.length}건
-- 기계설비법: ${data.recommendations.mechanicalEquipmentLaw.length}건
-- KEC: ${data.recommendations.kec.length}건`;
-        setLegalPromptLog(logMessage);
-      }
-      
       setShowLegalModal(true);
     } catch (error) {
       console.error('법령 검색 오류:', error);
@@ -836,57 +814,25 @@ export default function Briefing() {
                           <ScrollText className="w-5 h-5" />
                           관련 법령 및 규정
                         </CardTitle>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={handleLegalRecommendations}
-                            disabled={isLoadingLegal}
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-2 animate-pulse hover:animate-none transition-all duration-300 hover:scale-105 hover:shadow-lg border-green-500 text-green-600 hover:bg-green-50"
-                          >
-                            {isLoadingLegal ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-                            ) : (
-                              <Scale className="w-4 h-4" />
-                            )}
-                            AI추천 법령 검색
-                          </Button>
-                          {legalPromptLog && (
-                            <Button
-                              onClick={() => setShowLegalLog(!showLegalLog)}
-                              variant="ghost"
-                              size="sm"
-                              className="flex items-center gap-1 text-gray-500 hover:text-gray-700"
-                            >
-                              <FileText className="w-4 h-4" />
-                              로그
-                            </Button>
+                        <Button
+                          onClick={handleLegalRecommendations}
+                          disabled={isLoadingLegal}
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-2 animate-pulse hover:animate-none transition-all duration-500 hover:scale-105 hover:shadow-lg border-blue-500 text-blue-600 hover:bg-blue-50"
+                          style={{ animationDuration: '2s' }}
+                        >
+                          {isLoadingLegal ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          ) : (
+                            <Scale className="w-4 h-4" />
                           )}
-                        </div>
+                          AI추천 법령 검색
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {/* 프롬프트 로그 표시 */}
-                        {showLegalLog && legalPromptLog && (
-                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="text-sm font-semibold text-gray-700">프롬프트 로그</h4>
-                              <Button
-                                onClick={() => setShowLegalLog(false)}
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                              >
-                                ×
-                              </Button>
-                            </div>
-                            <pre className="text-xs text-gray-600 whitespace-pre-wrap bg-white p-2 rounded border max-h-40 overflow-y-auto">
-                              {legalPromptLog}
-                            </pre>
-                          </div>
-                        )}
-                        
                         {briefingData.regulations && briefingData.regulations.length > 0 ? (
                           briefingData.regulations.map((reg: any, index) => {
                             const isExpanded = expandedRegulations[index];
