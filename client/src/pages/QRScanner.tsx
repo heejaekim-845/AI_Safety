@@ -377,7 +377,7 @@ export default function QRScanner() {
                             </p>
                           </div>
                         </div>
-                        <p className="text-sm" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+                        <p className="text-sm text-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
                           {safetyRisk.workRecommendation}
                         </p>
                       </div>
