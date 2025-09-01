@@ -202,9 +202,9 @@ export default function NoticeManagement() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
+      <Card className="mb-8">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-3 gap-6">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-blue-100 rounded-lg">
                 <FileText className="h-6 w-6 text-blue-600" />
@@ -214,11 +214,7 @@ export default function NoticeManagement() {
                 <p className="text-2xl font-bold text-gray-900">{filteredNotices.length}개</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardContent className="p-6">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-red-100 rounded-lg">
                 <AlertCircle className="h-6 w-6 text-red-600" />
@@ -230,11 +226,7 @@ export default function NoticeManagement() {
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardContent className="p-6">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-green-100 rounded-lg">
                 <FileText className="h-6 w-6 text-green-600" />
@@ -246,9 +238,9 @@ export default function NoticeManagement() {
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Search */}
       <div className="relative mb-6">
