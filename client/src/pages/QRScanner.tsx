@@ -269,6 +269,11 @@ export default function QRScanner() {
 
   return (
     <div className="p-4 pb-20 fade-in min-h-screen">
+      {/* 오늘의 작업환경 제목 */}
+      <h1 className="text-xl font-bold text-gray-900 mb-3" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+        오늘의 작업환경
+      </h1>
+      
       {/* 경보 우선 스트립 */}
       <Card className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
         <CardContent className="p-3">
