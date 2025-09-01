@@ -8,7 +8,7 @@ import WorkingQRScanner from "@/components/WorkingQRScanner";
 import RiskLevelBadge from "@/components/RiskLevelBadge";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
-import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap, Shield } from "lucide-react";
+import { Search, Camera, ChevronRight, Clock, Calendar, Cloud, Sun, CloudRain, Snowflake, CloudDrizzle, Zap, Shield, AlertTriangle } from "lucide-react";
 
 export default function QRScanner() {
   const [, setLocation] = useLocation();
@@ -271,7 +271,9 @@ export default function QRScanner() {
     <div className="p-4 pb-20 fade-in min-h-screen">
       {/* 오늘의 작업환경 제목 */}
       <h1 className="text-xl font-bold text-gray-900 mb-3 flex items-center" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-        <Shield className="h-6 w-6 text-blue-600 mr-2" />
+        <div className="bg-yellow-400 rounded-full p-1 mr-2">
+          <AlertTriangle className="h-4 w-4 text-black" />
+        </div>
         오늘의 작업환경
       </h1>
       
