@@ -1229,14 +1229,6 @@ export default function Briefing() {
                   <Scale className="w-7 h-7 text-green-600" />
                   AI추천 관련 법령 및 기준
                 </DialogTitle>
-                <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-3 rounded-lg">
-                  <h2 className="text-xl font-bold text-center">
-                    {legalData.equipmentName} - {legalData.workType}
-                  </h2>
-                  <p className="text-center text-green-100 mt-1 text-sm">
-                    위험등급: {legalData.riskLevel} • 작업 요약: {legalData.workSummary}
-                  </p>
-                </div>
               </DialogHeader>
 
               <div className="space-y-4">
