@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -126,16 +126,17 @@ export default function QRScanner() {
     setLocation(`/equipment/${equipmentId}`);
   };
 
-  const handleQRScan = (code: string) => {
+  const handleQRScan = useCallback((code: string) => {
     // Try to find equipment by code
-    const foundEquipment = equipmentArray.find((eq) => eq.code === code);
+    const equipmentList = Array.isArray(equipment) ? equipment : [];
+    const foundEquipment = equipmentList.find((eq) => eq.code === code);
     if (foundEquipment) {
       handleEquipmentSelect(foundEquipment.id);
     } else {
       alert("해당 QR 코드의 설비를 찾을 수 없습니다.");
     }
     setShowScanner(false);
-  };
+  }, [equipment]);
 
   const equipmentArray = Array.isArray(equipment) ? equipment : [];
   const filteredEquipment = equipmentArray.filter((eq) => 
@@ -456,7 +457,10 @@ export default function QRScanner() {
       {showScanner ? (
         <WorkingQRScanner 
           onScan={handleQRScan}
-          onClose={() => setShowScanner(false)}
+          onClose={useCallback(() => {
+            console.log('QR Scanner closing...');
+            setShowScanner(false);
+          }, [])}
         />
       ) : (
         <div className="card-minimal p-6 mb-4 text-center card-hover">

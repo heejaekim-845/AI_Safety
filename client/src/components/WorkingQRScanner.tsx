@@ -16,23 +16,47 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
   const streamRef = useRef<MediaStream | null>(null);
 
   const stopCamera = () => {
-    if (codeReaderRef.current) {
-      codeReaderRef.current.reset();
-      codeReaderRef.current = null;
+    try {
+      // ZXing 라이브러리 정리
+      if (codeReaderRef.current) {
+        codeReaderRef.current.reset();
+        codeReaderRef.current = null;
+      }
+      
+      // 미디어 스트림 정리
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log('Camera track stopped:', track.kind);
+        });
+        streamRef.current = null;
+      }
+      
+      // 비디오 엘리먼트 정리
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+        videoRef.current.pause();
+        videoRef.current.load();
+      }
+      
+      setIsScanning(false);
+    } catch (err) {
+      console.error('Error stopping camera:', err);
     }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setIsScanning(false);
   };
 
   useEffect(() => {
+    let isMounted = true;
+    
     const startQRScanning = async () => {
+      // 이미 스캐닝 중이면 중복 시작 방지
+      if (isScanning || codeReaderRef.current || streamRef.current) {
+        return;
+      }
+      
       try {
+        if (!isMounted) return;
+        
         setIsScanning(true);
         const codeReader = new BrowserMultiFormatReader();
         codeReaderRef.current = codeReader;
@@ -40,13 +64,22 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { facingMode: 'environment' }
         });
+        
+        if (!isMounted) {
+          // 컴포넌트가 언마운트되었으면 스트림 즉시 정리
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        
         streamRef.current = stream;
 
-        if (videoRef.current) {
+        if (videoRef.current && isMounted) {
           videoRef.current.srcObject = stream;
           
           // Start scanning
-          codeReader.decodeFromVideoDevice(undefined, videoRef.current, (result, err) => {
+          codeReader.decodeFromVideoDevice(null, videoRef.current, (result, err) => {
+            if (!isMounted) return;
+            
             if (result) {
               console.log('QR Code detected:', result.getText());
               onScan(result.getText());
@@ -58,16 +91,21 @@ export default function WorkingQRScanner({ onScan, onClose }: WorkingQRScannerPr
           });
         }
       } catch (err) {
-        console.error('Camera error:', err);
-        setError("카메라 접근이 거부되었습니다.");
-        setIsScanning(false);
+        if (isMounted) {
+          console.error('Camera error:', err);
+          setError("카메라 접근이 거부되었습니다.");
+          setIsScanning(false);
+        }
       }
     };
     
     startQRScanning();
     
-    return stopCamera;
-  }, [onScan]);
+    return () => {
+      isMounted = false;
+      stopCamera();
+    };
+  }, []);
 
   const handleManualInput = () => {
     const code = prompt("QR 코드를 직접 입력하세요 (예: COMP-A-101):");
