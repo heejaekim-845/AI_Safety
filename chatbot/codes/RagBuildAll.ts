@@ -213,6 +213,17 @@ const STANDARD_TERMS = [
   'PID','Kp','Ki','Kd','Setpoint','Frequency','RPM','Gate opening','MW'
 ];
 
+// 텍스트에서 실제 포함된 표준 용어만 추출
+function extractRelevantTerms(text: string, allTerms: string[]): string[] {
+  const lowerText = text.toLowerCase();
+  return allTerms.filter(term => {
+    const lowerTerm = term.toLowerCase();
+    // 정확한 단어 매칭 (부분 문자열 방지)
+    const regex = new RegExp(`\\b${lowerTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    return regex.test(text) || lowerText.includes(lowerTerm);
+  });
+}
+
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
   const data = new Uint8Array(fs.readFileSync(pdfPath));
@@ -340,7 +351,7 @@ function buildChunk(docId: string, family: string, equipment: string[], text: st
     component: guessComponents(text),
     actuation: '스프링',
     hazards: collection === 'hazards' ? ['추락','질식','가스','감전','잠수','밀폐공간','overspeed'].filter(h => new RegExp(h,'i').test(text)) : undefined,
-    standard_terms: STANDARD_TERMS,
+    standard_terms: extractRelevantTerms(text, STANDARD_TERMS),
     spec: Object.keys(extractSpecs(text)).length ? extractSpecs(text) : undefined,
     alias_map: ALIAS_MAP,
     source_anchor: sourceAnchor,

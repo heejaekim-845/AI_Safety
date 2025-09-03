@@ -1,0 +1,192 @@
+[
+  {
+    "id": "42096ed7-3bce-4483-a004-0e7a785d3463",
+    "chunk_id": "1호기 매뉴얼(en).pdf-25-27-gsvos",
+    "text": "se the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer. ( 2.3) Adjust the cotter with the nut until head length of the cotter is (H1 + h’) mm and record. ( 2.4) Replace the stopper. VOITH FUJI M9 50 - 5 J594 6 5 / 7 Fig 3 shows method of head length measurement o f the cotter with a depth gauge. VOITH FUJI M9 50 - 5 J594 6 6 / 7 2. Fitting Run (1) When the guide bearing or thrust beari ng is replaced with new one, put it in a fitting run until it is fitted. (2) Raise the water wheel generator rotor with a hydraulic jack (used also as a pneumatic brake) to its maximum permissible jack - up height and hold it there for 15 to 20 minutes to al low an oil film to be formed on the sliding surface of the thrust bearing. (3) Confirm that the hydraulic jack has been lowered down and start the fitting run. (4) Provide RPM ra ting brackets under racing condition as shown in (6) below. When the bearing t emperature gets the saturation level in the first RPM rating bracket, increase the RPM to the next bracket and check the bearing temperature again.",
+    "char_len": 1076,
+    "collection": "checklists",
+    "doc_id": "1호기 매뉴얼(en).pdf",
+    "page_start": 25,
+    "page_end": 27,
+    "section_path": "2.4",
+    "title": "se the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer",
+    "task_type": [
+      "점검"
+    ],
+    "component": [
+      "RPM"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "ES",
+      "RPM"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "Hydro",
+    "equipment": [
+      "Generator",
+      "Aux",
+      "Switchgear"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]
