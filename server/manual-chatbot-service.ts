@@ -57,11 +57,11 @@ export class ManualChatbotService {
     "pressure switch", "PRD", "pressure relief device", "relief valve"
   ];
 
-  // 한글-영문 키워드 매핑 (확장)
+  // 한글-영문 키워드 매핑
   private readonly koreanEnglishMapping: { [key: string]: string[] } = {
     '발전기': ['generator', 'dynamo'],
     '베어링': ['bearing'],
-    '점검': ['inspection', 'check', 'maintenance', 'examine'],
+    '점검': ['inspection', 'check', 'maintenance'],
     '정밀점검': ['overhaul inspection', 'detailed inspection'],
     '주기점검': ['periodic inspection', 'routine inspection'],
     '정기점검': ['periodic maintenance', 'scheduled maintenance'],
@@ -74,22 +74,9 @@ export class ManualChatbotService {
     '윤활': ['lubrication', 'lubricating'],
     '오일': ['oil'],
     '온도': ['temperature'],
-    '고온': ['high temperature', 'overheating', 'overheat'],
-    '저온': ['low temperature'],
-    '과열': ['overheating', 'overheat'],
     '압력': ['pressure'],
     '진동': ['vibration'],
     '소음': ['noise'],
-    '방법': ['method', 'procedure', 'way', 'process'],
-    '방식': ['method', 'way', 'manner'],
-    '절차': ['procedure', 'process', 'step'],
-    '단계': ['step', 'stage', 'phase'],
-    '발생': ['occur', 'happen', 'generate'],
-    '발생시': ['when occur', 'in case of', 'during'],
-    '상황': ['situation', 'condition', 'case'],
-    '문제': ['problem', 'issue', 'trouble'],
-    '고장': ['failure', 'malfunction', 'breakdown'],
-    '이상': ['abnormal', 'unusual', 'irregular'],
     '수차': ['turbine'],
     '로터': ['rotor'],
     '스테이터': ['stator'],
@@ -289,7 +276,6 @@ export class ManualChatbotService {
       // 1. 질의 확장
       const expandedQueries = this.expandQuery(query);
       console.log(`질의 확장 결과: ${expandedQueries.length}개 쿼리`);
-      console.log(`확장된 쿼리들:`, expandedQueries);
 
       // 2. 스파스 검색 (MiniSearch - BM25)
       const sparseResults = [];
