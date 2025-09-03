@@ -215,12 +215,11 @@ const STANDARD_TERMS = [
 
 // 텍스트에서 실제 포함된 표준 용어만 추출
 function extractRelevantTerms(text: string, allTerms: string[]): string[] {
-  const lowerText = text.toLowerCase();
   return allTerms.filter(term => {
     const lowerTerm = term.toLowerCase();
-    // 정확한 단어 매칭 (부분 문자열 방지)
+    // 정확한 단어 매칭만 사용 (부분 문자열 매칭 제거)
     const regex = new RegExp(`\\b${lowerTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    return regex.test(text) || lowerText.includes(lowerTerm);
+    return regex.test(text);
   });
 }
 
