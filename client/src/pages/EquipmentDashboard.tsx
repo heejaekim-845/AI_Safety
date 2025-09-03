@@ -671,9 +671,9 @@ export default function EquipmentDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {equipment?.safetyFacilityLocations && equipment.safetyFacilityLocations.length > 0 ? (
+            {equipment?.safetyFacilityLocations && equipment.safetyFacilityLocations.filter((facility: any) => facility.name && facility.name.trim()).length > 0 ? (
               <div className="grid grid-cols-1 gap-3">
-                {equipment.safetyFacilityLocations.map((facility: any, index: number) => (
+                {equipment.safetyFacilityLocations.filter((facility: any) => facility.name && facility.name.trim()).map((facility: any, index: number) => (
                   <Dialog key={index}>
                     <DialogTrigger asChild>
                       <Button 
