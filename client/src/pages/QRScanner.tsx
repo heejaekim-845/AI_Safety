@@ -138,6 +138,11 @@ export default function QRScanner() {
     setShowScanner(false);
   }, [equipment]);
 
+  const handleCloseScanner = useCallback(() => {
+    console.log('QR Scanner closing...');
+    setShowScanner(false);
+  }, []);
+
   const equipmentArray = Array.isArray(equipment) ? equipment : [];
   const filteredEquipment = equipmentArray.filter((eq) => 
     eq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -457,10 +462,7 @@ export default function QRScanner() {
       {showScanner ? (
         <WorkingQRScanner 
           onScan={handleQRScan}
-          onClose={useCallback(() => {
-            console.log('QR Scanner closing...');
-            setShowScanner(false);
-          }, [])}
+          onClose={handleCloseScanner}
         />
       ) : (
         <div className="card-minimal p-6 mb-4 text-center card-hover">
