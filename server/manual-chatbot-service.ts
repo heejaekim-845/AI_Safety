@@ -365,27 +365,27 @@ export class ManualChatbotService {
       for (const result of finalResults) {
         const metadata = result.metadata || {};
         
-        // 설비 필터링 (임시로 완화)
+        // 설비 필터링 (정확한 매칭으로 복원)
         if (equipmentFilter && equipmentFilter.length > 0) {
           const hasMatchingEquipment = equipmentFilter.some(eq => {
             const equipmentArray = Array.isArray(metadata.equipment) ? metadata.equipment : [];
-            // 부분 매칭도 허용
+            // 정확한 설비명 매칭 또는 포함 관계 확인
             return equipmentArray.some(equip => 
-              equip?.toLowerCase().includes(eq.toLowerCase()) || 
-              eq.toLowerCase().includes(equip?.toLowerCase() || '')
+              equip === eq || // 정확히 일치
+              equip?.toLowerCase().includes(eq.toLowerCase()) || // 설비에 필터 키워드 포함
+              eq.toLowerCase().includes(equip?.toLowerCase() || '') // 필터가 설비를 포함
             );
           });
           if (!hasMatchingEquipment) continue;
         }
 
-        // 패밀리 필터링 (테스트를 위해 임시 비활성화)
-        /*
+        // 패밀리 필터링 (정확한 매칭으로 복원)
         if (familyFilter && metadata.family) {
-          const familyMatch = metadata.family.toLowerCase().includes(familyFilter.toLowerCase()) || 
-                            familyFilter.toLowerCase().includes(metadata.family.toLowerCase());
-          if (!familyMatch) continue;
+          // 정확한 패밀리 매칭
+          if (metadata.family !== familyFilter) {
+            continue;
+          }
         }
-        */
 
         chunks.push({
           id: result.id,
