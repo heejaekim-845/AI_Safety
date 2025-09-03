@@ -741,6 +741,99 @@ export default function EquipmentDashboard() {
                             <p>위치 이미지가 등록되지 않았습니다</p>
                           </div>
                         )}
+                        
+                        {/* 안전시설 사용방법 안내 */}
+                        <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border-l-4 border-blue-400">
+                          <h3 className="font-bold text-blue-900 mb-3 flex items-center">
+                            <AlertTriangle className="mr-2 h-5 w-5 text-blue-600" />
+                            {
+                              facility.type === 'FIRE_EXTINGUISHER' ? '소화기 사용방법' :
+                              facility.type === 'AED' ? 'AED(자동심장충격기) 사용방법' :
+                              facility.type === 'EMERGENCY_EXIT' ? '비상구 이용방법' :
+                              facility.type === 'FIRST_AID' ? '응급처치함 사용방법' :
+                              '안전시설 이용 안내'
+                            }
+                          </h3>
+                          
+                          {facility.type === 'FIRE_EXTINGUISHER' && (
+                            <div className="text-sm text-blue-800 space-y-2">
+                              <div className="bg-white p-3 rounded border-l-4 border-red-400">
+                                <p className="font-bold text-red-700 mb-2">🔥 PASS 4단계 사용법</p>
+                                <ul className="space-y-1">
+                                  <li><strong>P (Pull):</strong> 안전핀을 뽑는다</li>
+                                  <li><strong>A (Aim):</strong> 호스를 불씨 아래 부분으로 향한다</li>
+                                  <li><strong>S (Squeeze):</strong> 손잡이를 꽉 쥔다</li>
+                                  <li><strong>S (Sweep):</strong> 좌우로 골고루 분사한다</li>
+                                </ul>
+                                <p className="mt-2 text-red-600 font-medium">※ 바람을 등지고 2-3m 거리에서 사용</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {facility.type === 'AED' && (
+                            <div className="text-sm text-blue-800 space-y-2">
+                              <div className="bg-white p-3 rounded border-l-4 border-red-400">
+                                <p className="font-bold text-red-700 mb-2">❤️ AED 사용 5단계</p>
+                                <ol className="space-y-1 list-decimal list-inside">
+                                  <li>전원 켜기 (뚜껑 열기 또는 전원 버튼)</li>
+                                  <li>패드 부착 (오른쪽 가슴 위, 왼쪽 겨드랑이 아래)</li>
+                                  <li>심장리듬 분석 (모든 사람 떨어지세요!)</li>
+                                  <li>충격 버튼 누르기 (필요시 음성 안내에 따라)</li>
+                                  <li>심폐소생술 실시 (30회 가슴압박, 2회 인공호흡)</li>
+                                </ol>
+                                <p className="mt-2 text-red-600 font-medium">※ 119 신고 후 구급차 도착까지 계속 실시</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {facility.type === 'EMERGENCY_EXIT' && (
+                            <div className="text-sm text-blue-800 space-y-2">
+                              <div className="bg-white p-3 rounded border-l-4 border-orange-400">
+                                <p className="font-bold text-orange-700 mb-2">🚪 비상구 이용수칙</p>
+                                <ul className="space-y-1">
+                                  <li>• 평상시 비상구 위치와 경로를 숙지해두세요</li>
+                                  <li>• 비상시에는 엘리베이터 사용을 금지합니다</li>
+                                  <li>• 낮은 자세로 벽을 따라 이동하세요</li>
+                                  <li>• 연기가 있을 때는 코와 입을 막고 이동</li>
+                                  <li>• 비상구 앞에 물건을 쌓아두지 마세요</li>
+                                </ul>
+                                <p className="mt-2 text-orange-600 font-medium">※ 침착하게 질서를 지켜 대피하세요</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {facility.type === 'FIRST_AID' && (
+                            <div className="text-sm text-blue-800 space-y-2">
+                              <div className="bg-white p-3 rounded border-l-4 border-green-400">
+                                <p className="font-bold text-green-700 mb-2">🏥 응급처치함 사용법</p>
+                                <ul className="space-y-1">
+                                  <li>• <strong>외상:</strong> 거즈, 밴드, 붕대로 지혈 및 보호</li>
+                                  <li>• <strong>화상:</strong> 차가운 물로 식힌 후 화상연고 도포</li>
+                                  <li>• <strong>베인 상처:</strong> 소독약으로 소독 후 밴드 부착</li>
+                                  <li>• <strong>삐끗함:</strong> 냉찜질팩으로 부기 완화</li>
+                                  <li>• 사용 후에는 보충이 필요한 용품을 신고하세요</li>
+                                </ul>
+                                <p className="mt-2 text-green-600 font-medium">※ 심각한 상처는 즉시 119 신고</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {facility.type === 'OTHER' && (
+                            <div className="text-sm text-blue-800 space-y-2">
+                              <div className="bg-white p-3 rounded border-l-4 border-blue-400">
+                                <p className="font-bold text-blue-700 mb-2">⚠️ 안전시설 이용 안내</p>
+                                <ul className="space-y-1">
+                                  <li>• 시설 사용 전 작동 상태를 확인하세요</li>
+                                  <li>• 정기적인 점검과 관리가 필요합니다</li>
+                                  <li>• 고장 발견 시 즉시 관리자에게 신고하세요</li>
+                                  <li>• 비상시에만 사용하고 평상시 훼손 금지</li>
+                                  <li>• 사용법을 모를 때는 전문가의 도움을 받으세요</li>
+                                </ul>
+                                <p className="mt-2 text-blue-600 font-medium">※ 생명과 직결된 중요한 시설입니다</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
