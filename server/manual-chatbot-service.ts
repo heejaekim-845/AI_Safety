@@ -268,6 +268,11 @@ export class ManualChatbotService {
     await this.initialize();
 
     try {
+      // 디버깅 로그
+      console.log(`🔍 매뉴얼 검색 - 쿼리: "${query}"`);
+      console.log(`📦 설비 필터: ${equipmentFilter ? JSON.stringify(equipmentFilter) : 'null'}`);
+      console.log(`🏭 패밀리 필터: ${familyFilter || 'null'}`);
+
       // 1. 질의 확장
       const expandedQueries = this.expandQuery(query);
       console.log(`질의 확장 결과: ${expandedQueries.length}개 쿼리`);
@@ -360,17 +365,24 @@ export class ManualChatbotService {
       for (const result of finalResults) {
         const metadata = result.metadata || {};
         
-        // 설비 필터링
+        // 설비 필터링 (임시로 완화)
         if (equipmentFilter && equipmentFilter.length > 0) {
-          const hasMatchingEquipment = equipmentFilter.some(eq => 
-            Array.isArray(metadata.equipment) && metadata.equipment.includes(eq)
-          );
+          const hasMatchingEquipment = equipmentFilter.some(eq => {
+            const equipmentArray = Array.isArray(metadata.equipment) ? metadata.equipment : [];
+            // 부분 매칭도 허용
+            return equipmentArray.some(equip => 
+              equip?.toLowerCase().includes(eq.toLowerCase()) || 
+              eq.toLowerCase().includes(equip?.toLowerCase() || '')
+            );
+          });
           if (!hasMatchingEquipment) continue;
         }
 
-        // 패밀리 필터링
-        if (familyFilter && metadata.family !== familyFilter) {
-          continue;
+        // 패밀리 필터링 (임시로 완화)
+        if (familyFilter && metadata.family) {
+          const familyMatch = metadata.family.toLowerCase().includes(familyFilter.toLowerCase()) || 
+                            familyFilter.toLowerCase().includes(metadata.family.toLowerCase());
+          if (!familyMatch) continue;
         }
 
         chunks.push({
@@ -395,6 +407,16 @@ export class ManualChatbotService {
       }
 
       console.log(`하이브리드 검색 완료: 스파스 ${uniqueSparseResults.length}개, 덴스 ${topDenseResults.length}개 → 최종 ${chunks.length}개`);
+      
+      // 결과가 없을 때 샘플 메타데이터 출력
+      if (chunks.length === 0 && finalResults.length > 0) {
+        console.log(`❌ 필터링 후 결과 없음. 샘플 메타데이터:`);
+        finalResults.slice(0, 3).forEach((result, i) => {
+          const metadata = result.metadata || {};
+          console.log(`  [${i+1}] equipment: ${JSON.stringify(metadata.equipment)}, family: "${metadata.family}"`);
+        });
+      }
+      
       return chunks;
     } catch (error) {
       console.error('매뉴얼 검색 실패:', error);
