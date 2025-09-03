@@ -378,12 +378,14 @@ export class ManualChatbotService {
           if (!hasMatchingEquipment) continue;
         }
 
-        // 패밀리 필터링 (임시로 완화)
+        // 패밀리 필터링 (테스트를 위해 임시 비활성화)
+        /*
         if (familyFilter && metadata.family) {
           const familyMatch = metadata.family.toLowerCase().includes(familyFilter.toLowerCase()) || 
                             familyFilter.toLowerCase().includes(metadata.family.toLowerCase());
           if (!familyMatch) continue;
         }
+        */
 
         chunks.push({
           id: result.id,
