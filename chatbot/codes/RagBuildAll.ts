@@ -226,7 +226,11 @@ function extractRelevantTerms(text: string, allTerms: string[]): string[] {
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
   const data = new Uint8Array(fs.readFileSync(pdfPath));
-  const doc = await pdfjsLib.getDocument({ data }).promise;
+  const doc = await pdfjsLib.getDocument({ 
+    data,
+    cMapUrl: '/home/runner/workspace/node_modules/pdfjs-dist/cmaps/',
+    cMapPacked: true 
+  }).promise;
   const pages: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
