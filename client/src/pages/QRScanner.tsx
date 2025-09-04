@@ -31,19 +31,51 @@ export default function QRScanner() {
 
   // Get user's current location
   useEffect(() => {
-    // 네트워크 기반 위치 정보 가져오기 (IP geolocation)
+    // 네트워크 기반 위치 정보 가져오기 (더 상세한 정보)
     const tryNetworkBasedLocation = async () => {
       try {
         console.log("네트워크 기반 위치 정보 시도 중...");
         
-        // 공개 IP geolocation 서비스 사용
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
+        // 더 상세한 정보를 제공하는 IP geolocation 서비스 시도
+        try {
+          const response = await fetch('https://ipinfo.io/json?token=');
+          const data = await response.json();
+          
+          if (data.city && data.country === 'KR') {
+            // region이 있으면 더 구체적인 위치 조합
+            let detailedLocation = data.city;
+            if (data.region && data.region !== data.city) {
+              detailedLocation = `${data.region} ${data.city}`;
+            }
+            console.log(`상세 네트워크 위치 감지: ${detailedLocation}`);
+            setUserLocation(detailedLocation);
+            setLocationStatus("success");
+            return;
+          }
+        } catch (ipinfoError) {
+          console.log("ipinfo.io 서비스 실패, 대체 서비스 시도");
+        }
         
-        if (data.city && data.country_code === 'KR') {
-          const networkLocation = data.city;
-          console.log(`네트워크 기반 위치 감지: ${networkLocation}`);
-          setUserLocation(networkLocation);
+        // 대체 서비스: ipapi.co (기존)
+        const fallbackResponse = await fetch('https://ipapi.co/json/');
+        const fallbackData = await fallbackResponse.json();
+        
+        if (fallbackData.city && fallbackData.country_code === 'KR') {
+          // 더 구체적인 정보 조합 시도
+          let detailedLocation = fallbackData.city;
+          if (fallbackData.region && fallbackData.region !== fallbackData.city) {
+            detailedLocation = `${fallbackData.region} ${fallbackData.city}`;
+          }
+          // postal code나 district 정보가 있으면 추가
+          if (fallbackData.postal && fallbackData.postal.length > 0) {
+            // 한국 우편번호 패턴 체크 (5자리)
+            if (/^\d{5}$/.test(fallbackData.postal)) {
+              detailedLocation += ` (${fallbackData.postal})`;
+            }
+          }
+          
+          console.log(`네트워크 기반 위치 감지: ${detailedLocation}`);
+          setUserLocation(detailedLocation);
           setLocationStatus("success");
         } else {
           // 네트워크 기반도 실패하면 기본 위치 사용
@@ -87,7 +119,44 @@ export default function QRScanner() {
             const { latitude, longitude } = position.coords;
             console.log(`GPS coordinates: ${latitude}, ${longitude}`);
             
-            // 좌표를 서버로 전달해서 날씨 정보 가져오기
+            // GPS 좌표로 역지오코딩하여 상세 주소 가져오기
+            try {
+              const geoResponse = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ko&addressdetails=1&zoom=18`
+              );
+              const geoData = await geoResponse.json();
+              
+              if (geoData.address) {
+                // 한국 주소 체계에 맞춰 상세 위치 구성
+                const addr = geoData.address;
+                let detailedLocation = '';
+                
+                // 시/도 + 구/군/시 + 동/읍/면 조합
+                if (addr.city || addr.county) {
+                  detailedLocation = addr.city || addr.county;
+                }
+                if (addr.borough || addr.district || addr.suburb) {
+                  detailedLocation += ` ${addr.borough || addr.district || addr.suburb}`;
+                }
+                if (addr.neighbourhood || addr.village || addr.hamlet) {
+                  detailedLocation += ` ${addr.neighbourhood || addr.village || addr.hamlet}`;
+                }
+                
+                // 빈 문자열이면 기본 형식 사용
+                if (!detailedLocation.trim()) {
+                  detailedLocation = addr.city || addr.county || '알 수 없는 위치';
+                }
+                
+                console.log(`GPS 기반 상세 위치: ${detailedLocation.trim()}`);
+                setUserLocation(detailedLocation.trim());
+                setLocationStatus("success");
+                return; // 성공하면 날씨 API 호출 스킵
+              }
+            } catch (geoError) {
+              console.log("역지오코딩 실패, 날씨 API 사용:", geoError);
+            }
+            
+            // 역지오코딩 실패 시 기존 날씨 API 사용
             const response = await apiRequest("POST", "/api/weather/current-coords", { 
               lat: latitude, 
               lon: longitude 
