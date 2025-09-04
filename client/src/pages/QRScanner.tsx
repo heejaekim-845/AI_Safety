@@ -34,8 +34,23 @@ export default function QRScanner() {
     const getCurrentLocation = () => {
       if (!navigator.geolocation) {
         console.log("Geolocation is not supported by this browser.");
+        setUserLocation("대전광역시"); // 기본 위치 설정
         setLocationStatus("error");
         return;
+      }
+
+      // 위치 권한 확인 (가능한 경우)
+      if ('permissions' in navigator) {
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+          console.log('Geolocation permission:', result.state);
+          if (result.state === 'denied') {
+            setUserLocation("대전광역시");
+            setLocationStatus("error");
+            return;
+          }
+        }).catch((error) => {
+          console.log('Permission query not supported:', error);
+        });
       }
 
       navigator.geolocation.getCurrentPosition(
@@ -56,17 +71,36 @@ export default function QRScanner() {
             console.log(`Location detected: ${weatherData.location}`);
           } catch (error) {
             console.error("Error getting location name:", error);
+            // 위치 이름 가져오기 실패 시에도 기본 위치로 대체
+            setUserLocation("대전광역시");
             setLocationStatus("error");
           }
         },
         (error) => {
           console.error("Error getting location:", error);
+          let errorMessage = "위치 정보를 가져올 수 없습니다.";
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "위치 접근이 거부되었습니다.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "위치 정보가 없습니다.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "위치 요청 시간 초과";
+              break;
+          }
+          
+          console.log(errorMessage);
+          // 에러 발생 시 기본 위치로 대체하고 날씨 정보는 여전히 표시
+          setUserLocation("대전광역시");
           setLocationStatus("error");
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutes cache
+          enableHighAccuracy: false, // 모바일에서 더 빠른 응답을 위해 false로 변경
+          timeout: 15000, // 15초로 증가
+          maximumAge: 600000 // 10분 캐시
         }
       );
     };
@@ -82,7 +116,7 @@ export default function QRScanner() {
       return response.json();
     },
     refetchInterval: 600000, // Refresh every 10 minutes
-    enabled: !!userLocation && locationStatus === "success",
+    enabled: !!userLocation, // 위치가 있으면 에러 상태여도 날씨 정보 가져오기
   });
 
   // Fetch all active notices
