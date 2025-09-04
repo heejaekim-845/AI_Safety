@@ -453,10 +453,22 @@ export default function QRScanner() {
           </div>
           오늘의 작업환경
         </h1>
-        {weatherData && (
-          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-200" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-            📍 {weatherData.location}
-          </span>
+        {userLocation && (
+          <div className="flex items-center space-x-2">
+            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-200" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
+              📍 {userLocation}
+            </span>
+            {locationStatus === "success" && (
+              <span className="bg-green-100 text-green-700 text-xs font-medium px-1.5 py-0.5 rounded-full border border-green-200">
+                🎯
+              </span>
+            )}
+            {locationStatus === "error" && (
+              <span className="bg-orange-100 text-orange-700 text-xs font-medium px-1.5 py-0.5 rounded-full border border-orange-200" title="대체 위치 정보">
+                📶
+              </span>
+            )}
+          </div>
         )}
       </div>
       
