@@ -31,6 +31,34 @@ export default function QRScanner() {
 
   // Get user's current location
   useEffect(() => {
+    // 네트워크 기반 위치 정보 가져오기 (IP geolocation)
+    const tryNetworkBasedLocation = async () => {
+      try {
+        console.log("네트워크 기반 위치 정보 시도 중...");
+        
+        // 공개 IP geolocation 서비스 사용
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        
+        if (data.city && data.country_code === 'KR') {
+          const networkLocation = data.city;
+          console.log(`네트워크 기반 위치 감지: ${networkLocation}`);
+          setUserLocation(networkLocation);
+          setLocationStatus("success");
+        } else {
+          // 네트워크 기반도 실패하면 기본 위치 사용
+          console.log("네트워크 기반 위치 정보 실패, 기본 위치 사용");
+          setUserLocation("대전광역시");
+          setLocationStatus("error");
+        }
+      } catch (error) {
+        console.error("네트워크 기반 위치 정보 실패:", error);
+        // 모든 방법 실패 시 기본 위치
+        setUserLocation("대전광역시");
+        setLocationStatus("error");
+      }
+    };
+
     const getCurrentLocation = () => {
       if (!navigator.geolocation) {
         console.log("Geolocation is not supported by this browser.");
@@ -93,9 +121,9 @@ export default function QRScanner() {
           }
           
           console.log(errorMessage);
-          // 에러 발생 시 기본 위치로 대체하고 날씨 정보는 여전히 표시
-          setUserLocation("대전광역시");
-          setLocationStatus("error");
+          
+          // GPS 실패 시 네트워크 기반 위치 정보 시도
+          tryNetworkBasedLocation();
         },
         {
           enableHighAccuracy: false, // 모바일에서 더 빠른 응답을 위해 false로 변경
