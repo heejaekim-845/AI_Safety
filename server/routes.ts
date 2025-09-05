@@ -1041,6 +1041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate legal recommendations using AI
       const legalRecommendations = await aiService.generateLegalRecommendations(
         equipment.name,
+        workType.name,
         workProcedures,
         equipment
       );

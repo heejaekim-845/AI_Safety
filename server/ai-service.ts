@@ -2159,11 +2159,12 @@ ${this.formatRisks(equipmentInfo)}
   // 법령 및 기준 검색 함수
   async generateLegalRecommendations(
     equipmentName: string,
+    workTypeName: string,
     workProcedures: any[],
     equipmentDetails: any
   ): Promise<LegalRecommendationsResponse> {
     try {
-      console.log(`법령 검색 시작: ${equipmentName} - 작업절차 ${workProcedures.length}개 단계`);
+      console.log(`법령 검색 시작: ${equipmentName} - ${workTypeName} (작업절차 ${workProcedures.length}개 단계)`);
       
       // 설비 위험 요소 추출
       const riskFactors = this.extractEquipmentRisks(equipmentDetails);
@@ -2198,7 +2199,7 @@ ${procedureSteps}
 {
   "workSummary": "작업 요약 설명",
   "equipmentName": "${equipmentName}",
-  "workType": "작업유형명",
+  "workType": "${workTypeName}",
   "riskLevel": "위험등급",
   "recommendations": {
     "industrialSafetyHealth": [
