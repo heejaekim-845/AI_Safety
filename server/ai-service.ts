@@ -2179,6 +2179,7 @@ ${this.formatRisks(equipmentInfo)}
 
 ## 작업 정보
 - 설비명: ${equipmentName}
+- 작업유형: ${workTypeName}
 - 주요 위험요소: ${riskFactors.join(', ')}
 - 작업절차:
 ${procedureSteps}
@@ -2201,6 +2202,8 @@ ${procedureSteps}
   "equipmentName": "${equipmentName}",
   "workType": "${workTypeName}",
   "riskLevel": "위험등급",
+
+**중요**: workType은 반드시 "${workTypeName}" 그대로 사용하세요. 임의로 변경하지 마세요.
   "recommendations": {
     "industrialSafetyHealth": [
       {
