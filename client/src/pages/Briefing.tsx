@@ -620,143 +620,140 @@ export default function Briefing() {
                           </div>
                         </div>
 
-                        {/* 시간대별 예보 */}
-                        {briefingData.weatherInfo.hourlyForecast && briefingData.weatherInfo.hourlyForecast.length > 0 && (
-                          <div className="mt-4">
-                            <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                              <Clock className="w-4 h-4" />
-                              시간대별 예보 (작업시간 기준 ±2시간)
-                            </h4>
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <div className="flex gap-3 justify-center">
-                                {(() => {
-                                  // 현재 시간과 날짜
-                                  const now = new Date();
-                                  const currentHour = now.getHours();
-                                  const today = now.toISOString().split('T')[0];
-                                  const weatherDate = (briefingData.weatherInfo as any).weatherDate || today;
+                        {/* 시간대별 예보 (작업시간 기준 고정 표시) */}
+                        <div className="mt-4">
+                          <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            시간대별 예보 (작업시간 기준 ±2시간)
+                          </h4>
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <div className="flex gap-3 justify-center">
+                              {(() => {
+                                // 현재 시간과 날짜
+                                const now = new Date();
+                                const currentHour = now.getHours();
+                                const today = now.toISOString().split('T')[0];
+                                const weatherDate = (briefingData.weatherInfo as any).weatherDate || today;
 
-                                  // 시간 타입 판단 함수
-                                  const getTimeType = (hourTime: string) => {
-                                    const hourNum = parseInt(hourTime.split(':')[0]);
-                                    
-                                    // 날짜가 다르면 미래/과거로 판단
-                                    if (weatherDate !== today) {
-                                      return weatherDate > today ? '미래' : '과거';
-                                    }
-                                    
-                                    // 같은 날이면 시간으로 판단
-                                    if (hourNum < currentHour) {
-                                      return '과거';
-                                    } else if (hourNum === currentHour) {
-                                      return '현재';
-                                    } else {
-                                      return '미래';
-                                    }
-                                  };
+                                // 시간 타입 판단 함수
+                                const getTimeType = (hourTime: string) => {
+                                  const hourNum = parseInt(hourTime.split(':')[0]);
+                                  
+                                  // 날짜가 다르면 미래/과거로 판단
+                                  if (weatherDate !== today) {
+                                    return weatherDate > today ? '미래' : '과거';
+                                  }
+                                  
+                                  // 같은 날이면 시간으로 판단
+                                  if (hourNum < currentHour) {
+                                    return '과거';
+                                  } else if (hourNum === currentHour) {
+                                    return '현재';
+                                  } else {
+                                    return '미래';
+                                  }
+                                };
 
-                                  // 타입별 스타일 반환 함수
-                                  const getTypeStyle = (type: string, isWorkTime: boolean) => {
-                                    if (isWorkTime) {
-                                      return 'bg-blue-100 border-2 border-blue-300';
-                                    }
-                                    
-                                    switch (type) {
-                                      case '과거':
-                                        return 'bg-gray-100 border border-gray-300';
-                                      case '현재':
-                                        return 'bg-green-50 border border-green-300';
-                                      case '미래':
-                                        return 'bg-orange-50 border border-orange-300';
-                                      default:
-                                        return 'bg-white';
-                                    }
-                                  };
+                                // 타입별 스타일 반환 함수
+                                const getTypeStyle = (type: string, isWorkTime: boolean) => {
+                                  if (isWorkTime) {
+                                    return 'bg-blue-100 border-2 border-blue-300';
+                                  }
+                                  
+                                  switch (type) {
+                                    case '과거':
+                                      return 'bg-gray-100 border border-gray-300';
+                                    case '현재':
+                                      return 'bg-green-50 border border-green-300';
+                                    case '미래':
+                                      return 'bg-orange-50 border border-orange-300';
+                                    default:
+                                      return 'bg-white';
+                                  }
+                                };
 
-                                  // 타입별 라벨 색상 반환 함수
-                                  const getTypeLabelStyle = (type: string, isWorkTime: boolean) => {
-                                    if (isWorkTime) {
-                                      return 'text-blue-700';
-                                    }
-                                    
-                                    switch (type) {
-                                      case '과거':
-                                        return 'text-gray-600';
-                                      case '현재':
-                                        return 'text-green-600';
-                                      case '미래':
-                                        return 'text-orange-600';
-                                      default:
-                                        return 'text-gray-600';
-                                    }
-                                  };
+                                // 타입별 라벨 색상 반환 함수
+                                const getTypeLabelStyle = (type: string, isWorkTime: boolean) => {
+                                  if (isWorkTime) {
+                                    return 'text-blue-700';
+                                  }
+                                  
+                                  switch (type) {
+                                    case '과거':
+                                      return 'text-gray-600';
+                                    case '현재':
+                                      return 'text-green-600';
+                                    case '미래':
+                                      return 'text-orange-600';
+                                    default:
+                                      return 'text-gray-600';
+                                  }
+                                };
 
-                                  // 작업 시간 추출 (HH:mm 형식)
-                                  const workTime = selectedWorkSchedule?.briefingTime;
-                                  if (!workTime) {
-                                    // 작업 시간이 없으면 처음 5개만 표시
-                                    return briefingData.weatherInfo.hourlyForecast!.slice(0, 5).map((hour, index) => {
-                                      const timeType = getTimeType(hour.time);
-                                      
-                                      return (
-                                        <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${getTypeStyle(timeType, false)}`}>
-                                          <div className={`text-xs font-medium ${getTypeLabelStyle(timeType, false)}`}>
-                                            {hour.time}
-                                            <div className="text-xs">{timeType}</div>
-                                          </div>
-                                          <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
-                                          <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
-                                          {hour.rainfall > 0 && (
-                                            <div className="flex items-center gap-1 mt-1">
-                                              <Droplets className="w-3 h-3 text-blue-500" />
-                                              <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    });
+                                // 빈 슬롯 생성 함수
+                                const createEmptySlot = (time: string, label: string) => (
+                                  <div key={time} className="flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] bg-gray-200 border border-gray-300">
+                                    <div className="text-xs font-medium text-gray-500">
+                                      {time}
+                                      <div className="text-xs">{label}</div>
+                                    </div>
+                                    <div className="text-sm text-gray-400 mt-1">--°C</div>
+                                    <div className="text-xs text-gray-400 mt-1">--</div>
+                                  </div>
+                                );
+
+                                // 작업 시간 추출 (HH:mm 형식) - 기본값은 현재 시간
+                                const workTime = selectedWorkSchedule?.briefingTime;
+                                const workHour = workTime ? parseInt(workTime.split(':')[0]) : currentHour;
+                                
+                                // 고정 시간대: 작업시간 -2, -1, 0, +1, +2
+                                const targetHours = [workHour-2, workHour-1, workHour, workHour+1, workHour+2];
+                                const timeSlots = targetHours.map(hour => {
+                                  // 24시간 형식으로 조정
+                                  const normalizedHour = ((hour % 24) + 24) % 24;
+                                  return normalizedHour.toString().padStart(2, '0') + ':00';
+                                });
+
+                                return timeSlots.map((timeSlot, index) => {
+                                  const hourNum = parseInt(timeSlot.split(':')[0]);
+                                  const isWorkTime = hourNum === workHour;
+                                  
+                                  // 해당 시간대의 예보 데이터 찾기
+                                  const forecastData = briefingData.weatherInfo?.hourlyForecast?.find(hour => 
+                                    hour.time === timeSlot
+                                  );
+
+                                  if (!forecastData) {
+                                    // 데이터가 없으면 빈 슬롯 표시
+                                    const label = isWorkTime ? '작업시간' : (hourNum < currentHour ? '과거' : (hourNum === currentHour ? '현재' : '미래'));
+                                    return createEmptySlot(timeSlot, label);
                                   }
 
-                                  // 작업시간을 시간 단위로 변환
-                                  const workHour = parseInt(workTime.split(':')[0]);
-                                  const startHour = Math.max(0, workHour - 2);
-                                  const endHour = workHour + 2;
-
-                                  // 해당 시간 범위의 예보만 필터링
-                                  const filteredForecast = briefingData.weatherInfo.hourlyForecast!.filter(hour => {
-                                    const hourNum = parseInt(hour.time.split(':')[0]);
-                                    return hourNum >= startHour && hourNum <= endHour;
-                                  });
-
-                                  return filteredForecast.map((hour, index) => {
-                                    const hourNum = parseInt(hour.time.split(':')[0]);
-                                    const isWorkTime = hourNum === workHour;
-                                    const timeType = getTimeType(hour.time);
-                                    
-                                    return (
-                                      <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${getTypeStyle(timeType, isWorkTime)}`}>
-                                        <div className={`text-xs font-medium ${getTypeLabelStyle(timeType, isWorkTime)}`}>
-                                          {hour.time}
-                                          <div className="text-xs">
-                                            {isWorkTime ? '작업시간' : timeType}
-                                          </div>
+                                  const timeType = getTimeType(timeSlot);
+                                  
+                                  return (
+                                    <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${getTypeStyle(timeType, isWorkTime)}`}>
+                                      <div className={`text-xs font-medium ${getTypeLabelStyle(timeType, isWorkTime)}`}>
+                                        {timeSlot}
+                                        <div className="text-xs">
+                                          {isWorkTime ? '작업시간' : timeType}
                                         </div>
-                                        <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
-                                        <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
-                                        {hour.rainfall > 0 && (
-                                          <div className="flex items-center gap-1 mt-1">
-                                            <Droplets className="w-3 h-3 text-blue-500" />
-                                            <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
-                                          </div>
-                                        )}
                                       </div>
-                                    );
-                                  });
-                                })()}
-                              </div>
+                                      <div className="text-sm font-bold mt-1">{forecastData.temperature}°C</div>
+                                      <div className="text-xs text-gray-600 mt-1">{forecastData.condition}</div>
+                                      {forecastData.rainfall > 0 && (
+                                        <div className="flex items-center gap-1 mt-1">
+                                          <Droplets className="w-3 h-3 text-blue-500" />
+                                          <span className="text-xs text-blue-600">{forecastData.rainfall}mm</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                });
+                              })()}
                             </div>
                           </div>
-                        )}
+                        </div>
                         
                         {briefingData.weatherInfo.safetyWarnings && briefingData.weatherInfo.safetyWarnings.length > 0 && (
                           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
