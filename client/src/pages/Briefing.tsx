@@ -690,17 +690,26 @@ export default function Briefing() {
                                 //   }
                                 // };
 
-                                // 빈 슬롯 생성 함수 - 예보 데이터만 사용
-                                const createEmptySlot = (time: string, isWorkTime: boolean) => (
-                                  <div key={time} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-200 border border-gray-300'}`}>
-                                    <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-gray-500'}`}>
-                                      {time}
-                                      <div className="text-xs">{isWorkTime ? '작업시간' : '예보'}</div>
+                                // 빈 슬롯 생성 함수 - 상대적 시간 표현
+                                const createEmptySlot = (time: string, isWorkTime: boolean, relativeHour: number) => {
+                                  const getTimeLabel = () => {
+                                    if (isWorkTime) return '작업시간';
+                                    if (relativeHour < 0) return `${relativeHour}h`;
+                                    if (relativeHour > 0) return `+${relativeHour}h`;
+                                    return '작업시간';
+                                  };
+                                  
+                                  return (
+                                    <div key={time} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-200 border border-gray-300'}`}>
+                                      <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-gray-500'}`}>
+                                        {time}
+                                        <div className="text-xs">{getTimeLabel()}</div>
+                                      </div>
+                                      <div className="text-sm text-gray-400 mt-1">--°C</div>
+                                      <div className="text-xs text-gray-400 mt-1">--</div>
                                     </div>
-                                    <div className="text-sm text-gray-400 mt-1">--°C</div>
-                                    <div className="text-xs text-gray-400 mt-1">--</div>
-                                  </div>
-                                );
+                                  );
+                                };
 
                                 // 작업 시간 추출 (HH:mm 형식) - 기본값은 현재 시간
                                 const workTime = selectedWorkSchedule?.briefingTime;
@@ -717,6 +726,15 @@ export default function Briefing() {
                                 return timeSlots.map((timeSlot, index) => {
                                   const hourNum = parseInt(timeSlot.split(':')[0]);
                                   const isWorkTime = hourNum === workHour;
+                                  const relativeHour = hourNum - workHour; // 작업시간 기준 상대적 시간 계산
+                                  
+                                  // 시간 라벨 생성 함수
+                                  const getTimeLabel = () => {
+                                    if (isWorkTime) return '작업시간';
+                                    if (relativeHour < 0) return `${relativeHour}h`;
+                                    if (relativeHour > 0) return `+${relativeHour}h`;
+                                    return '작업시간';
+                                  };
                                   
                                   // 해당 시간대의 예보 데이터 찾기
                                   const forecastData = briefingData.weatherInfo?.hourlyForecast?.find(hour => 
@@ -724,8 +742,8 @@ export default function Briefing() {
                                   );
 
                                   if (!forecastData) {
-                                    // 데이터가 없으면 빈 슬롯 표시 (예보 데이터만 사용)
-                                    return createEmptySlot(timeSlot, isWorkTime);
+                                    // 데이터가 없으면 빈 슬롯 표시
+                                    return createEmptySlot(timeSlot, isWorkTime, relativeHour);
                                   }
 
                                   // 예보 데이터만 사용 - 시간 타입 판단 로직 제거
@@ -736,7 +754,7 @@ export default function Briefing() {
                                       <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-orange-600'}`}>
                                         {timeSlot}
                                         <div className="text-xs">
-                                          {isWorkTime ? '작업시간' : '예보'}
+                                          {getTimeLabel()}
                                         </div>
                                       </div>
                                       <div className="text-sm font-bold mt-1">{forecastData.temperature}°C</div>
