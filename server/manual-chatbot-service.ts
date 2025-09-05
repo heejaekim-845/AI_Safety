@@ -365,18 +365,22 @@ export class ManualChatbotService {
       for (const result of finalResults) {
         const metadata = result.metadata || {};
         
-        // 설비 필터링 (정확한 매칭으로 복원)
-        if (equipmentFilter && equipmentFilter.length > 0) {
-          const hasMatchingEquipment = equipmentFilter.some(eq => {
-            const equipmentArray = Array.isArray(metadata.equipment) ? metadata.equipment : [];
-            // 정확한 설비명 매칭 또는 포함 관계 확인
-            return equipmentArray.some(equip => 
-              equip === eq || // 정확히 일치
-              equip?.toLowerCase().includes(eq.toLowerCase()) || // 설비에 필터 키워드 포함
-              eq.toLowerCase().includes(equip?.toLowerCase() || '') // 필터가 설비를 포함
-            );
-          });
-          if (!hasMatchingEquipment) continue;
+        // 설비 필터링 (문자열 또는 배열 처리)
+        if (equipmentFilter) {
+          // 문자열인 경우 배열로 변환
+          const filterArray = Array.isArray(equipmentFilter) ? equipmentFilter : [equipmentFilter];
+          if (filterArray.length > 0 && filterArray[0]) {
+            const hasMatchingEquipment = filterArray.some(eq => {
+              const equipmentArray = Array.isArray(metadata.equipment) ? metadata.equipment : [];
+              // 정확한 설비명 매칭 또는 포함 관계 확인
+              return equipmentArray.some(equip => 
+                equip === eq || // 정확히 일치
+                equip?.toLowerCase().includes(eq.toLowerCase()) || // 설비에 필터 키워드 포함
+                eq.toLowerCase().includes(equip?.toLowerCase() || '') // 필터가 설비를 포함
+              );
+            });
+            if (!hasMatchingEquipment) continue;
+          }
         }
 
         // 패밀리 필터링 (정확한 매칭으로 복원)
@@ -473,7 +477,7 @@ ${relevantChunks.map((chunk, i) =>
 5. 확실하지 않은 내용은 매뉴얼 원문 확인을 권장하세요`;
 
       // 이전 대화 컨텍스트 구성
-      const conversationHistory = context.messages.slice(-6).map(msg => ({
+      const conversationHistory = (context.messages || []).slice(-6).map(msg => ({
         role: msg.role,
         content: msg.content
       }));
