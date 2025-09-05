@@ -447,7 +447,7 @@ export default function ManualChatbot() {
                 </div>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
-                  <span>666개 매뉴얼 청크 검색 가능 (5개 매뉴얼)</span>
+                  <span>1,640개 매뉴얼 청크 검색 가능 (5개 매뉴얼)</span>
                 </div>
               </div>
             </CardContent>
