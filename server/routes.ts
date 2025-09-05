@@ -896,21 +896,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // 1. 현재 실시간 날씨 (메인 온도 표시용)
         const currentWeather = await weatherService.getCurrentWeather(weatherLocation);
         console.log(`현재 실시간 날씨 수집 완료 - 위치: ${weatherLocation}, 온도: ${currentWeather.temperature}°C`);
+        console.log(`현재 실시간 날씨 시간대별 예보 개수: ${currentWeather.hourlyForecast?.length || 0}`);
         
         // 2. 작업 일정에 따른 스마트 날씨 정보 (시간대별 예보용)
         const workWeather = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime || undefined);
         console.log(`작업시간 기준 날씨 수집 완료 - 작업일: ${workSchedule.scheduledDate}, 시간: ${workSchedule.briefingTime}, 타입: ${workWeather.weatherType}`);
+        console.log(`작업시간 기준 날씨 시간대별 예보 개수: ${workWeather.hourlyForecast?.length || 0}`);
         
         // 3. 현재 실시간 온도로 메인 정보 업데이트, 시간대별 예보는 작업시간 기준 유지
         weatherInfo = {
           ...currentWeather,  // 현재 실시간 날씨 (메인 온도)
-          hourlyForecast: workWeather.hourlyForecast,  // 작업시간 기준 시간대별 예보
+          hourlyForecast: workWeather.hourlyForecast || currentWeather.hourlyForecast,  // 작업시간 기준 예보 우선, 없으면 현재 예보
           weatherDate: workWeather.weatherDate,        // 작업 날짜
           weatherTime: workWeather.weatherTime,        // 작업 시간
           weatherType: workWeather.weatherType         // 작업시간 기준 타입
         };
         
-        console.log(`통합 날씨 정보 완료 - 메인온도: ${weatherInfo.temperature}°C (현재), 예보: ${weatherInfo.hourlyForecast?.length}개 시간`);
+        console.log(`🌤️ 통합 날씨 정보 최종 완료:`);
+        console.log(`  - 메인온도: ${weatherInfo.temperature}°C (현재)`);
+        console.log(`  - 예보개수: ${weatherInfo.hourlyForecast?.length}개 시간`);
+        console.log(`  - 첫 3개 예보:`, weatherInfo.hourlyForecast?.slice(0, 3).map(h => `${h.time}=${h.temperature}°C`));
         
       } catch (error) {
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);

@@ -53,7 +53,10 @@ export class WeatherService {
 
   // 작업 일정에 따른 날씨 정보 수집 (시간 포함)
   async getWeatherForWorkDate(location: string, workDate?: string | Date, workTime?: string): Promise<WeatherData> {
+    console.log(`📅 [getWeatherForWorkDate] 시작: location=${location}, workDate=${workDate}, workTime=${workTime}`);
+    
     if (!workDate) {
+      console.log(`📅 [getWeatherForWorkDate] workDate 없음 → getCurrentWeather 호출`);
       return this.getCurrentWeather(location);
     }
 
@@ -64,26 +67,31 @@ export class WeatherService {
       const [hours, minutes] = workTime.split(':').map(Number);
       if (!isNaN(hours) && !isNaN(minutes)) {
         targetDate.setHours(hours, minutes, 0, 0);
-        console.log(`작업 시간 반영: ${workTime} → ${targetDate.toLocaleString('ko-KR')}`);
+        console.log(`📅 작업 시간 반영: ${workTime} → ${targetDate.toLocaleString('ko-KR')}`);
       }
     }
 
     const now = new Date();
     const daysDiff = Math.ceil((targetDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
     const hoursDiff = (targetDate.getTime() - now.getTime()) / (1000 * 3600);
+    
+    console.log(`📅 시간 차이: daysDiff=${daysDiff}, hoursDiff=${hoursDiff.toFixed(1)}`);
 
     if (daysDiff < -1) {
       // 과거 날씨 (1일 전 이상)
+      console.log(`📅 [getWeatherForWorkDate] → getHistoricalWeather 호출`);
       return this.getHistoricalWeather(location, targetDate, workTime);
     } else if (Math.abs(hoursDiff) <= 48) {
       // 48시간 이내 (현재 또는 가까운 미래/과거)
+      console.log(`📅 [getWeatherForWorkDate] 48시간 이내 → getForecastWeather 호출`);
       return this.getForecastWeather(location, targetDate, workTime);
     } else if (daysDiff <= 7) {
       // 7일 이내 예보
+      console.log(`📅 [getWeatherForWorkDate] 7일 이내 → getForecastWeather 호출`);
       return this.getForecastWeather(location, targetDate, workTime);
     } else {
       // 7일 초과 미래 (현재 날씨로 대체)
-      console.warn(`작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate} ${workTime || ''}`);
+      console.warn(`📅 작업일정이 7일을 초과하여 현재 날씨를 제공합니다: ${workDate} ${workTime || ''}`);
       return this.getCurrentWeather(location);
     }
   }
@@ -100,7 +108,7 @@ export class WeatherService {
         throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
       }
 
-      console.log(`현재 날씨 조회: "${location}"`);
+      console.log(`🌡️ [getCurrentWeather] 현재 날씨 조회 시작: "${location}"`);
 
       // One Call API로 현재 날씨와 시간대별 예보를 함께 가져오기
       const response = await axios.get(this.ONE_CALL_URL, {
@@ -118,6 +126,7 @@ export class WeatherService {
       const result = this.parseOneCallCurrentResponse(weatherData.current, location);
       
       // 시간대별 예보 데이터 추가
+      console.log(`🌡️ [getCurrentWeather] hourly 데이터 존재: ${!!weatherData.hourly}, 길이: ${weatherData.hourly?.length || 0}`);
       if (weatherData.hourly) {
         result.hourlyForecast = this.parseHourlyForecast(weatherData.hourly);
       }
@@ -126,7 +135,7 @@ export class WeatherService {
       result.weatherDate = new Date().toISOString().split('T')[0];
       result.weatherTime = new Date().toTimeString().slice(0, 5);
       
-      console.log(`현재 날씨 조회 완료: ${location}`, result);
+      console.log(`🌡️ [getCurrentWeather] 현재 날씨 조회 완료: ${location}`, result);
       return result;
       
     } catch (error: any) {
