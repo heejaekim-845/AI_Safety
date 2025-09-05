@@ -897,12 +897,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         weatherInfo = await weatherService.getWeatherForWorkDate(weatherLocation, workSchedule.scheduledDate, workSchedule.briefingTime || undefined);
         console.log(`스마트 날씨 정보 수집 완료 - 위치: ${weatherLocation}, 작업일: ${workSchedule.scheduledDate}, 시간: ${workSchedule.briefingTime}, 타입: ${weatherInfo.weatherType}`);
         
-        // 브리핑용 날씨 안전 경고 디버깅
-        console.log('=== 브리핑용 날씨 디버깅 (AI 처리 전) ===');
-        console.log('weatherLocation:', weatherLocation);
-        console.log('weatherInfo.safetyWarnings:', weatherInfo?.safetyWarnings);
-        console.log('weatherInfo.temperature:', weatherInfo?.temperature);
-        console.log('weatherInfo.condition:', weatherInfo?.condition);
         
       } catch (error) {
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);

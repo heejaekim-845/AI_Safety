@@ -479,7 +479,7 @@ export class WeatherService {
       warnings.push('파이프 동결 위험 - 보온 조치 확인');
     }
 
-    if (temperature > 30) {
+    if (temperature > 28) {
       warnings.push('열사병 위험 - 충분한 수분 섭취 및 휴식');
       warnings.push('고온 작업 시 냉각복 착용 권장');
     }
