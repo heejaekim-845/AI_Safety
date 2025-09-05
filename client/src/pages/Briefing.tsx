@@ -576,15 +576,22 @@ export default function Briefing() {
                 {/* Weather Information */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Thermometer className="w-5 h-5" />
-                      날씨 정보
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Thermometer className="w-5 h-5" />
+                        날씨 정보
+                      </div>
+                      {briefingData.weatherInfo && (
+                        <div className="text-sm text-gray-600 font-normal">
+                          <MapPin className="w-4 h-4 inline mr-1" />
+                          {briefingData.weatherInfo.location}
+                        </div>
+                      )}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {briefingData.weatherInfo ? (
                       <>
-                        <div className="text-sm text-gray-600 mb-3">위치: {briefingData.weatherInfo.location}</div>
                         <div className="flex flex-wrap items-center justify-center gap-4 mb-4 p-3 bg-blue-50 rounded-lg">
                           <div className="flex items-center gap-2">
                             <Thermometer className="w-5 h-5 text-red-500" />
