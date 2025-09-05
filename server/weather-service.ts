@@ -128,7 +128,7 @@ export class WeatherService {
       // 시간대별 예보 데이터 추가
       console.log(`🌡️ [getCurrentWeather] hourly 데이터 존재: ${!!weatherData.hourly}, 길이: ${weatherData.hourly?.length || 0}`);
       if (weatherData.hourly) {
-        result.hourlyForecast = this.parseHourlyForecast(weatherData.hourly);
+        result.hourlyForecast = await this.parseHourlyForecast(weatherData.hourly, location);
       }
       
       result.weatherType = 'current';
@@ -258,7 +258,7 @@ export class WeatherService {
       
       // 시간대별 예보 데이터 추가
       if (forecastData.hourly) {
-        result.hourlyForecast = this.parseHourlyForecast(forecastData.hourly);
+        result.hourlyForecast = await this.parseHourlyForecast(forecastData.hourly, location, workTime);
       }
       
       result.weatherType = 'forecast';
@@ -624,8 +624,8 @@ export class WeatherService {
     };
   }
 
-  // 시간대별 예보 데이터 파싱 (향후 12시간)
-  private parseHourlyForecast(hourlyData: any[]): HourlyForecast[] {
+  // 시간대별 예보 데이터 파싱 (향후 12시간 + Historical API 보완)
+  private async parseHourlyForecast(hourlyData: any[], location: string, workTime?: string): Promise<HourlyForecast[]> {
     console.log('=== 시간대별 예보 원본 데이터 디버깅 ===');
     console.log('hourlyData 길이:', hourlyData.length);
     
@@ -636,9 +636,9 @@ export class WeatherService {
       console.log(`${index}: UTC시간=${new Date(hour.dt * 1000).toISOString()}, 한국시간=${localTime}, 온도=${hour.temp}°C`);
     });
     
-    return hourlyData.slice(0, 12).map((hour: any) => {
+    // 기본 예보 데이터 파싱
+    const forecastData = hourlyData.slice(0, 12).map((hour: any) => {
       const date = new Date(hour.dt * 1000);
-      // 한국 시간으로 정확히 변환
       const koreaHour = date.toLocaleString('en-US', { 
         timeZone: 'Asia/Seoul',
         hour12: false,
@@ -656,6 +656,104 @@ export class WeatherService {
         rainfall: hour.rain?.['1h'] || 0
       };
     });
+    
+    // 작업시간이 있으면 누락된 과거 시간대를 Historical API로 보완
+    if (workTime) {
+      const workHour = parseInt(workTime.split(':')[0]);
+      const neededHours = [workHour-2, workHour-1, workHour, workHour+1, workHour+2];
+      const availableHours = forecastData.map(f => parseInt(f.time.split(':')[0]));
+      
+      console.log(`🔄 작업시간 ${workTime} 기준 필요한 시간대:`, neededHours.map(h => `${h}:00`));
+      console.log(`🔄 현재 사용가능한 시간대:`, availableHours.map(h => `${h}:00`));
+      
+      const missingPastHours = neededHours.filter(h => h >= 0 && h < Math.min(...availableHours));
+      
+      if (missingPastHours.length > 0) {
+        console.log(`🔄 누락된 과거 시간대 발견: ${missingPastHours.map(h => `${h}:00`).join(', ')}`);
+        
+        try {
+          // Historical API로 과거 시간대 데이터 보완
+          const today = new Date();
+          const historicalData = await this.getHistoricalWeatherForHours(location, today, missingPastHours);
+          
+          // 누락된 시간대를 앞에 추가하고 시간순으로 정렬
+          const allData = [...historicalData, ...forecastData];
+          const sortedData = allData.sort((a, b) => {
+            const hourA = parseInt(a.time.split(':')[0]);
+            const hourB = parseInt(b.time.split(':')[0]);
+            return hourA - hourB;
+          });
+          
+          console.log(`✅ Historical API로 보완 완료: 총 ${sortedData.length}개 시간대`);
+          console.log(`✅ 보완된 시간대:`, sortedData.map(h => h.time).join(', '));
+          
+          return sortedData;
+        } catch (error) {
+          console.warn(`⚠️ Historical API 보완 실패:`, error);
+          return forecastData; // 실패 시 기존 데이터 유지
+        }
+      }
+    }
+    
+    return forecastData;
+  }
+
+  // Historical API로 특정 시간대들의 날씨 데이터 가져오기
+  private async getHistoricalWeatherForHours(location: string, date: Date, hours: number[]): Promise<HourlyForecast[]> {
+    try {
+      const coords = this.getCoordinatesForLocation(location);
+      if (!coords) {
+        throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
+      }
+
+      console.log(`📜 [Historical API] 과거 시간대 요청: ${location}, 시간대: ${hours.map(h => `${h}:00`).join(', ')}`);
+
+      // 오늘 00:00 기준으로 Unix timestamp 생성
+      const todayMidnight = new Date(date);
+      todayMidnight.setHours(0, 0, 0, 0);
+      const unixTimestamp = Math.floor(todayMidnight.getTime() / 1000);
+
+      const response = await axios.get(this.HISTORY_URL, {
+        params: {
+          lat: coords.lat,
+          lon: coords.lon,
+          dt: unixTimestamp,
+          appid: this.API_KEY,
+          units: 'metric',
+          lang: 'ko'
+        }
+      });
+
+      const historicalData = response.data;
+      const resultHours: HourlyForecast[] = [];
+
+      // 요청된 시간대들만 필터링
+      for (const targetHour of hours.sort()) {
+        const targetTimestamp = Math.floor(todayMidnight.getTime() / 1000) + (targetHour * 3600);
+        
+        // hourly 데이터에서 해당 시간대 찾기
+        const hourData = historicalData.hourly?.find((h: any) => h.dt === targetTimestamp);
+        
+        if (hourData) {
+          const hourForecast: HourlyForecast = {
+            time: targetHour.toString().padStart(2, '0') + ':00',
+            temperature: Math.round(hourData.temp),
+            condition: this.translateWeatherCondition(hourData.weather?.[0]?.main || 'Clear'),
+            humidity: hourData.humidity || 50,
+            windSpeed: Math.round(hourData.wind_speed || 0),
+            rainfall: hourData.rain?.['1h'] || 0
+          };
+          
+          resultHours.push(hourForecast);
+          console.log(`📜 Historical 데이터 추가: ${hourForecast.time} = ${hourForecast.temperature}°C`);
+        }
+      }
+
+      return resultHours;
+    } catch (error: any) {
+      console.error(`📜 Historical API 오류:`, error.response?.data || error.message);
+      return [];
+    }
   }
 
   // Remove fallback weather method - no mock data when API fails
