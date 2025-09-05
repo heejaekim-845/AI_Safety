@@ -189,10 +189,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`삭제할 설비: ${existing.name}`);
+      
+      // 1. 관련된 work sessions 삭제
+      console.log("관련 work sessions 삭제 중...");
+      const workSessions = await storage.getWorkSessionsByEquipmentId(id);
+      for (const session of workSessions) {
+        await storage.deleteWorkSession(session.id);
+      }
+      console.log(`${workSessions.length}개 work sessions 삭제 완료`);
+      
+      // 2. 관련된 work procedures 삭제
+      console.log("관련 work procedures 삭제 중...");
+      const workTypes = await storage.getWorkTypesByEquipmentId(id);
+      for (const workType of workTypes) {
+        const procedures = await storage.getProceduresByWorkTypeId(workType.id);
+        for (const procedure of procedures) {
+          await storage.deleteProcedure(procedure.id);
+        }
+        // 3. work types 삭제
+        await storage.deleteWorkType(workType.id);
+      }
+      console.log(`${workTypes.length}개 work types 및 관련 procedures 삭제 완료`);
+      
+      // 4. 관련된 incidents 삭제
+      console.log("관련 incidents 삭제 중...");
+      const incidents = await storage.getIncidentsByEquipmentId(id);
+      for (const incident of incidents) {
+        await storage.deleteIncident(incident.id);
+      }
+      console.log(`${incidents.length}개 incidents 삭제 완료`);
+      
+      // 5. 마지막으로 설비 삭제
       await storage.deleteEquipment(id);
       console.log(`설비 ID ${id} 삭제 완료`);
       
-      res.json({ message: "설비가 성공적으로 삭제되었습니다." });
+      res.json({ message: "설비와 관련 데이터가 성공적으로 삭제되었습니다." });
     } catch (error) {
       console.error("설비 삭제 오류:", error);
       res.status(500).json({ message: "설비를 삭제할 수 없습니다." });
