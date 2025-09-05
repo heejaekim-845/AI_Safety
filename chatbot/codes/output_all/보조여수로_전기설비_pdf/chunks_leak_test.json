@@ -1,0 +1,208 @@
+[
+  {
+    "id": "fc08ccdf-4e0d-4397-b2bd-57a4f90eb9dd",
+    "chunk_id": "보조여수로 전기설비.pdf-4-5-ru6so",
+    "text": "본 취급 설명서는 25.8kV C-GIS 의 구조，운전，보수 및 점검 등을 포함하는 운전방법에 대한 올바른 이해를 위하여 작성되었습니다. 2. 25.8kV C-GIS 를 취급하기 전에는 반드시 본 제품취급설명서에 기술된 내용을 충분히 파악하여야 하며 본 제품취급설명서에서는 C-GIS 운전시의 기본적인 사항만을 기술하였으므로 이해가 되지 않는 부분이나 의문점이 있는 경우에는 당사로 연락 바랍니다. 3. 본 제품취급설명서에 포함되어 있는 사진, 도면 및 참고자료 등은 ◦-（리크의 운전에 필요한 기본을 나타내는 것으로서 납품되는 실물과는 차이가 있을 수 있습니다. 4. 본 제품취급설명서는 충분한 활용을 위하여 반드시 최종운전 및 보수 관계자에 의하여 관리되어야 합니다. 5. 운전 중의 고장 발생 등으로 인한 A/S 요청은 다음의 내용을 파악하여 당사로 연락 바랍니다. - 명판의 기재사항 （형식，제조번호, 용량） - 이상현상 （가능한 한 상세하게） - 연락처 : （주）비츠로테크 품질경영팀 TEL : 1577-1820 （전국어디서나） 031） 489-2188 FAX : 031） 492-2212 （쥐비츠로대크 - 1 제품취급설명서 VITZROTECH 목 차 I . 일반사양 1. 적용범위 ........................................................................................... 3 2. § ........................................................................ 3 3. 구조 및 특성 ................................................................................. 9 4. 시험 및 검사 ................................................................................",
+    "char_len": 971,
+    "collection": "leak_test",
+    "doc_id": "보조여수로 전기설비.pdf",
+    "page_start": 4,
+    "page_end": 5,
+    "section_path": "25.8",
+    "title": "본 취급 설명서는 25",
+    "task_type": [
+      "운전",
+      "점검"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [
+      "GIS"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 공통",
+    "equipment": [
+      "보조여수로",
+      "전기설비",
+      "제어시스템"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]

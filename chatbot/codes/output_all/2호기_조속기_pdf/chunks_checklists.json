@@ -1,0 +1,416 @@
+[
+  {
+    "id": "064ba742-5ad0-4f0b-9509-4ab213bca7c8",
+    "chunk_id": "2호기 조속기.pdf-8-9-cnsv2",
+    "text": "Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM.doc Pag e 44 o f 83 5.3 Dis pla y - Ove rvie w Fig. 4 Display – Overview By default, this main overview display contains the most important machine data and -information. The main window itself contains display and operating elements. This overview is activated automatically after the start of the SAT250-Runtime. One can reach this display from any other display by pressing the -button in the navigation menu. Since with this display it has to do with the highest display level, both the -button as well as the -button are deactivated and are therefore displayed grey. From this display, using the navigation menu one reaches the controller overview display described in the following. 12 5 2 3 4 13 14 7 1 8 9 10 11 6 15 DAE CHEONG - VISUALIZATION EXCHANGE PROJ ECT Ins truction Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM.doc Pag e 45 o f 83 In the active state, the unit information (8 to 10) appears on a green background.",
+    "char_len": 1007,
+    "collection": "checklists",
+    "doc_id": "2호기 조속기.pdf",
+    "page_start": 8,
+    "page_end": 9,
+    "section_path": "5.3",
+    "title": "Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM",
+    "task_type": [
+      "운전",
+      "점검"
+    ],
+    "component": [
+      "조속기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "Governor"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 2호기",
+    "equipment": [
+      "디지털조속기"
+    ],
+    "work_area": "Governor",
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "69d40ad0-2b21-4eef-a2a7-913e30d6f7cb",
+    "chunk_id": "2호기 조속기.pdf-30-31-o93le",
+    "text": "Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM.doc Pag e 66 o f 83 5.14 Dis pla y - S ys te m Co ntrol Fig. 15 Display - System Control This picture has a unique main menu with additional functions. With the - button one can log-on to the system. This is carried out by means of the following dialog: 1 2 3 DAE CHEONG - VISUALIZATION EXCHANGE PROJ ECT Ins truction Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM.doc Pag e 67 o f 83 Fig. 16 Display – Login The input of the data is carried out using the virtual keypad on the touch panel. After entering the user name and the associated password, correspondingly protected function calls or operator inputs can also be carried out. - Logon / Logoff - terminate visualization (SAT250 runtime) program only with user “admin” - one picture back. Additionally also some important system states are indicate in this picture. Tab. 12 Information - System Control No. Description 1 General Information about the automation unit 2 Login – Button 3 Exit - Button",
+    "char_len": 1030,
+    "collection": "checklists",
+    "doc_id": "2호기 조속기.pdf",
+    "page_start": 30,
+    "page_end": 31,
+    "section_path": "5.14",
+    "title": "Manual DCC15-GOV-9873_rev00 O&M Governor DaeCheong - P RELIM",
+    "task_type": [
+      "운전",
+      "점검"
+    ],
+    "component": [
+      "조속기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [
+      "Governor"
+    ],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 2호기",
+    "equipment": [
+      "디지털조속기"
+    ],
+    "work_area": "Governor",
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]

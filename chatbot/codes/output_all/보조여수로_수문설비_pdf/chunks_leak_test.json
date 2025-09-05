@@ -1,0 +1,209 @@
+[
+  {
+    "id": "423b73e4-9f5f-4333-9b81-85ee944722cd",
+    "chunk_id": "보조여수로 수문설비.pdf-136-137-4kdnp",
+    "text": "다른 압력제어 밸브와 공진 한다. 설정압에 차이를 둔다. 유량을 밸브 정격범위의 밖 에서 사용하고 있다. 적정 유량의 밸브를 교환한다. 248 제 5 장 수문설비 4) 이상 발열 이상 현상 원 인 처치 혹은 점검개소 펌프에 소음이 발생한다. 탱크 유량이 적다. 유면계에서 유량을 보아 부족한 경 우는 보충한다. 기름의 점도가 너무 높다. (유온이 낮다) 유온계에서 유온을 확인하여 낮은 경우는 유온을 올린다. 밸브 설정압력이 설정치와 다르다. 설정압력에 따른다. 오일쿨러의 능력 저하 냉각 수량, 수온이 적정하지 않다. 물때의 부착상태를 점검하여 심할 때는 청소한다. 쿨러 통과 유량 부족 기름을 바이패스 시킨다. 밸 브 또 는 구 동 기 기 내 부 의 리크가 너무 많다. 정상인 밸브 또는 패킹과 교환한다. 5) 기름의 누설 이상 현상 원 인 처치 혹은 점검개소 기름의 누설 관이음의 풀어짐 꽉 조인다. 패킹류의 손상과 열화 패킹류 삽입시의 손상, 노화, 립 (LIP) 등의 파손, 열화 등을 점검하여 정상 적인 것으로 교환한다. 시일면의 불량 취부면의 정도 불량, 취부 비틀림, 이 물질 등의 상태를 점검하여 정상으로 수정한다. 패킹류의 정격압력의 부 적정 작동압력에 대해 적정한 패킹류를 사 용하는지를 점검한다. 패킹류의 재질 부적정 합성고무 패킹 등, 내유성인 것을 쓰고 있더라도 조사하여 적정한 것으로 교 환한다. 249 6) 작동 불량 이상 현상 원 인 처치 혹은 점검개소 작동하지 않는다. 전자밸브 솔레노이드의 작동 불량 *전기신호 확인 *파이롯트압 확인 *스풀의 고착, 마그네트의 흡인력 부족 *전압 저하, 솔레노이드 내부의 이 물, 솔레노이드 과열 등의 상태를 점검하여 수정 혹은 교환한다. 제어밸브의 작동 불량 *밸브 피스톤 또는 스풀의 안착 불 량, 내부 누설, 배압의 발생, 편조 임 , 밸 브 내의 이물, 스케일 등의 점검을 하여 수정한다. 규정 속도가 나지 않는다. 유량 부족 속 도 제 어 밸 브 와 펌 프 토 출 량 을 확인한다.",
+    "char_len": 984,
+    "collection": "leak_test",
+    "doc_id": "보조여수로 수문설비.pdf",
+    "page_start": 136,
+    "page_end": 137,
+    "section_path": "제5장",
+    "title": "다른 압력제어 밸브와 공진 한다",
+    "task_type": [
+      "점검",
+      "가스/배수/시험"
+    ],
+    "component": [
+      "수문설비",
+      "Setpoint"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 공통",
+    "equipment": [
+      "보조여수로",
+      "수문설비",
+      "게이트"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]

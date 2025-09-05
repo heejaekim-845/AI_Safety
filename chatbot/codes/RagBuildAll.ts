@@ -31,9 +31,8 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 // @ts-ignore  
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
 
-// Alternative: pdf-parse for better Korean support
-// @ts-ignore
-import pdfParse from 'pdf-parse';
+// Alternative: pdf-parse for better Korean support - removed due to packaging issues
+// import pdfParse from 'pdf-parse';
 
 import MiniSearch from 'minisearch';
 import { OpenAI } from 'openai';
@@ -185,6 +184,12 @@ function guessFamilyEquip(file: string, lang: 'ko'|'en') {
     return { family: '1수력 공통', equipment: ['디지털조속기'] };
   }
   if (lower.includes('순서도') || lower.includes('배수')) return { family: '1수력 공통', equipment: ['수차발전기','방수문','배수'] };
+  // 보조여수로 관련 매뉴얼
+  if (lower.includes('보조여수로')) {
+    if (lower.includes('수문설비')) return { family: '1수력 공통', equipment: ['보조여수로','수문설비','게이트'] };
+    if (lower.includes('전기설비')) return { family: '1수력 공통', equipment: ['보조여수로','전기설비','제어시스템'] };
+    return { family: '1수력 공통', equipment: ['보조여수로'] };
+  }
   // 일반적인 매뉴얼은 공통으로 분류
   if (lower.includes('매뉴얼') || lower.includes('manual')) return { family: '1수력 공통', equipment: ['수차발전기'] };
   return { family: 'Plant', equipment: ['Equipment'] };
@@ -201,6 +206,9 @@ const ALIAS_MAP: Record<string, string[]> = {
   '배수펌프': ['Drainage Pump','배수 피트','DRAINAGE'], '방수문': ['Bulkhead Door','Flood Gate','벌크헤드'],
   '드레인 밸브': ['Drain Valve'], '취수문': ['Intake Gate'], '크레인': ['Gantry Crane','40TON','40 TON','40톤'],
   '밀폐공간': ['Confined Space'], '잠수': ['Diving'], 'SCADA': ['원격','DESK','현장','LOCAL','REMOTE'],
+  // Auxiliary spillway
+  '보조여수로': ['Auxiliary Spillway','스필웨이'], '수문설비': ['Gate Equipment','수문','게이트'], 
+  '전기설비': ['Electrical Equipment','전기제어','제어시스템'], '수위': ['Water Level','수위조절'],
   // Governor / HMI
   '조속기': ['Governor','Digital Governor','Speed Governor','GOV'], 'HMI': ['Man-machine Interface','MMI','운전원 인터페이스','터치패널'],
   '컨트롤러': ['Controller','PLC','제어기'], 'Speed controller': ['SPC','속도 제어기'], 'Opening controller': ['OPC','개도 제어기'],
@@ -224,6 +232,7 @@ const TASK_KEYWORDS = {
 const STANDARD_TERMS = [
   'GIS','SF6','CB','DS','ES','Bushing','Bus',
   '배수','방수문','드레인','펌프','크레인','밀폐공간','잠수','SCADA',
+  '보조여수로','수문설비','전기설비','수위','게이트','제어시스템',
   'Governor','SPC','OPC','POC','Wicket gate','Guide Vane','Servomotor',
   'Droop','Isochronous','Island operation','Paralleling','Overspeed test',
   'PID','Kp','Ki','Kd','Setpoint','Frequency','RPM','Gate opening','MW'
@@ -241,32 +250,8 @@ function extractRelevantTerms(text: string, allTerms: string[]): string[] {
 
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
-  try {
-    // Try pdf-parse first for better Korean support
-    const data = fs.readFileSync(pdfPath);
-    const pdfData = await pdfParse(data);
-    console.log(`pdf-parse extracted: ${pdfData.text.length} chars, first 200: ${pdfData.text.substring(0, 200)}`);
-    
-    // Split text into pages (rough estimation)
-    const avgCharsPerPage = Math.max(1000, pdfData.text.length / pdfData.numpages);
-    const pages: string[] = [];
-    for (let i = 0; i < pdfData.numpages; i++) {
-      const start = i * avgCharsPerPage;
-      const end = Math.min((i + 1) * avgCharsPerPage, pdfData.text.length);
-      const pageText = pdfData.text.substring(start, end).trim();
-      if (pageText) pages.push(pageText);
-    }
-    
-    if (pages.length > 0 && !pages[0].includes('\u0000') && pages[0].length > 50) {
-      console.log('Using pdf-parse results - Korean text detected properly');
-      return pages;
-    }
-  } catch (error) {
-    console.log('pdf-parse failed, falling back to pdfjs-dist:', error);
-  }
-
-  // Fallback to original pdfjs-dist method
-  console.log('Using pdfjs-dist fallback');
+  // Use pdfjs-dist method directly to avoid pdf-parse issues
+  console.log('Using pdfjs-dist for PDF extraction');
   const data = new Uint8Array(fs.readFileSync(pdfPath));
   const doc = await pdfjsLib.getDocument({ 
     data,
@@ -280,9 +265,7 @@ async function extractPages(pdfPath: string): Promise<string[]> {
   const pages: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
-    const content = await page.getTextContent({
-      disableCombineTextItems: false
-    });
+    const content = await page.getTextContent();
     const text = content.items.map((it: any) => it.str).join(' ').replace(/\s+/g,' ').replace(/\u0000/g,'').trim();
     pages.push(text);
   }

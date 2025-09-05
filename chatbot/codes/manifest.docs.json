@@ -28,6 +28,14 @@
       "doc_date": "2023-11-01"
     },
     {
+      "match": "1호기 매뉴얼(kr).pdf",
+      "family": "1수력 1호기",
+      "equipment": ["수차발전기"],
+      "doc_id": "UNIT1-OM-KO",
+      "doc_version": "revA",
+      "doc_date": "2023-11-01"
+    },
+    {
       "match": "2호기 매뉴얼.pdf",
       "family": "1수력 2호기",
       "equipment": ["수차발전기"],

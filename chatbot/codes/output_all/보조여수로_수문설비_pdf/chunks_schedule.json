@@ -1,0 +1,416 @@
+[
+  {
+    "id": "222b11c2-d476-48c1-9f24-7009447dd309",
+    "chunk_id": "보조여수로 수문설비.pdf-28-28-n7wew",
+    "text": "시 에 H . S . G 의 O P E N 솔 레 노 이 드 밸 브 에 전 원 이 투 입 되 어 H.S.G 의 게이트 리프가 상승하기 시작한다. - 게 이 트 리 프 의 작 동 속 도 는 스 로 틀 C H E C K 밸 브 로 조 정 하 는 데 조 정 너 트 를 시 계 방 향 으 로 돌 리 면 속 도 가 빨 라 지 고 반 시 계 방 향 으 로 돌 리면 느려진다. - 게 이 트 리 프 작 동 중 임 의 의 위 치 에 서 정 지 시 키 고 자 할 때 에 는 H.S.G STOP 푸 시 버 튼 을 누 르 면 되 고 , 다 시 OPEN 푸 쉬 버 튼 을 누 르 면 게 이 트 리프가 계속 상승한다. - 게 이 트 리 프 가 상 승 하 는 도 중 에 작 동 에 방 해 가 되 는 물 체 에 과 부 하 가 걸렸을 때 압력스위치가 일정압력 （140kg/cm 2 ） 이상 감지하여 모터를 정지시키며, 게이트 리프 동작을 멈추게 한다. - H.S.G 가 \"FULL OPEN\" 되면 OPEN 리미트 스위치에 의해 모터 동작 개폐기가 OFF 되어 MOTOR 가 동작을 정지하며, 게이트 리프가 동작 을 멈추며, H.S.G FULL OPEN\" 램프가 점등되,고 H.S.G 는 \"FULL OPEN\" 상태를 유지한다. - 장 기 간 열 어 둘 때 에 는 수 동 록 킹 장 치 를 잠 그 고 , H.S.G \"LOCK\" 램프 가 점등되었는지 확인하고, 조작판넬내의 모터 기동용 스위치를 'OFF 1 ' 시킨다. ® 수동조작 정전, 모터펌프 고장, 회로의 단선 등에 의해 전기적 조작이 불가능한 상태에 서 H.S.G 를 열어야 할 경우 다음에 따라 작동시킨다. - 펌프 1 의 릴리프밸브내에 솔레노이드 밸브를 핀 등을 이용하여 CLOSE 위치로 한다.（핀으로",
+    "char_len": 857,
+    "collection": "schedule",
+    "doc_id": "보조여수로 수문설비.pdf",
+    "page_start": 28,
+    "page_end": 28,
+    "section_path": "제5장",
+    "title": "시 에 H ",
+    "task_type": [
+      "운전",
+      "점검",
+      "가스/배수/시험"
+    ],
+    "component": [
+      "수문설비",
+      "Trip"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 공통",
+    "equipment": [
+      "보조여수로",
+      "수문설비",
+      "게이트"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "cb84d74e-13d7-4c6e-a705-e4e121704ee6",
+    "chunk_id": "보조여수로 수문설비.pdf-74-74-55sep",
+    "text": "에 서 내 치 자 와 접 촉 하 지 만 편 심 ， 편 각 의 변 위 량 이 있다면 치영의 중심점에 일정거리 벌어진 곳(미에서 접촉한다. 186 제 5 장 수문설비 3 .변의 3.1 변위 종류 1) 평행 변의 구동축과 피동축이 서로 평행하나 중심이 일치하지 않는 상태 2) 각도 변의 구동축과 피동축이 서로 일직선상에서 각도를 두고 기울어진 상태 3) 합성 변의 평행변위와 각도변위가 복합적으로 일어나는 상태 4) 축방향 변위 구동축과 피동축이 일직선상에서는 일치하나 축 방향으로 움직이는 상태 (허 용 축방향 변위량은 C 의 ±25% 정 도임)",
+    "char_len": 304,
+    "collection": "schedule",
+    "doc_id": "보조여수로 수문설비.pdf",
+    "page_start": 74,
+    "page_end": 74,
+    "section_path": "제5장>3.1",
+    "title": "에 서 내 치 자 와 접 촉 하 지 만 편 심 ， 편 각 의 변 위 량 이 있다면 치영의 중심점에 일정거리 벌어진 곳(미에서 접촉한다",
+    "task_type": [],
+    "component": [
+      "수문설비"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "spec": {
+      "gate_open_pct": 25
+    },
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "보조여수로": [
+        "Auxiliary Spillway",
+        "스필웨이"
+      ],
+      "수문설비": [
+        "Gate Equipment",
+        "수문",
+        "게이트"
+      ],
+      "전기설비": [
+        "Electrical Equipment",
+        "전기제어",
+        "제어시스템"
+      ],
+      "수위": [
+        "Water Level",
+        "수위조절"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "family": "1수력 공통",
+    "equipment": [
+      "보조여수로",
+      "수문설비",
+      "게이트"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]
