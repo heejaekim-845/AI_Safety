@@ -915,7 +915,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`🌤️ 통합 날씨 정보 최종 완료:`);
         console.log(`  - 메인온도: ${weatherInfo.temperature}°C (현재)`);
         console.log(`  - 예보개수: ${weatherInfo.hourlyForecast?.length}개 시간`);
-        console.log(`  - 첫 3개 예보:`, weatherInfo.hourlyForecast?.slice(0, 3).map(h => `${h.time}=${h.temperature}°C`));
+        console.log(`  - 전체 시간대:`, weatherInfo.hourlyForecast?.map(h => h.time).join(', '));
+        console.log(`  - 작업시간: ${workSchedule.briefingTime}`);
+        
+        // 작업시간 ±2시간 필터링 미리보기
+        if (workSchedule.briefingTime && weatherInfo.hourlyForecast) {
+          const workHour = parseInt(workSchedule.briefingTime.split(':')[0]);
+          const targetHours = [workHour-2, workHour-1, workHour, workHour+1, workHour+2]
+            .map(h => (h < 0 ? h + 24 : h).toString().padStart(2, '0') + ':00');
+          
+          console.log(`  - 필요한 시간대: ${targetHours.join(', ')}`);
+          
+          const availableHours = weatherInfo.hourlyForecast.map(h => h.time);
+          const missingHours = targetHours.filter(t => !availableHours.includes(t));
+          
+          if (missingHours.length > 0) {
+            console.log(`  - 누락된 시간대: ${missingHours.join(', ')} ⚠️`);
+          }
+        }
         
       } catch (error) {
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);
