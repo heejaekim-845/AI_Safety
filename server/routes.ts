@@ -190,28 +190,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`삭제할 설비: ${existing.name}`);
       
-      // 1. 관련된 work sessions 삭제
-      console.log("관련 work sessions 삭제 중...");
-      const workSessions = await storage.getWorkSessionsByEquipmentId(id);
-      for (const session of workSessions) {
-        await storage.deleteWorkSession(session.id);
-      }
-      console.log(`${workSessions.length}개 work sessions 삭제 완료`);
-      
-      // 2. 관련된 work procedures 삭제
+      // 1. 관련된 work procedures 삭제
       console.log("관련 work procedures 삭제 중...");
       const workTypes = await storage.getWorkTypesByEquipmentId(id);
+      let totalProcedures = 0;
       for (const workType of workTypes) {
         const procedures = await storage.getProceduresByWorkTypeId(workType.id);
         for (const procedure of procedures) {
-          await storage.deleteProcedure(procedure.id);
+          await storage.deleteWorkProcedure(procedure.id);
+          totalProcedures++;
         }
-        // 3. work types 삭제
+        // 2. work types 삭제
         await storage.deleteWorkType(workType.id);
       }
-      console.log(`${workTypes.length}개 work types 및 관련 procedures 삭제 완료`);
+      console.log(`${workTypes.length}개 work types 및 ${totalProcedures}개 procedures 삭제 완료`);
       
-      // 4. 관련된 incidents 삭제
+      // 3. 관련된 incidents 삭제
       console.log("관련 incidents 삭제 중...");
       const incidents = await storage.getIncidentsByEquipmentId(id);
       for (const incident of incidents) {
@@ -219,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log(`${incidents.length}개 incidents 삭제 완료`);
       
-      // 5. 마지막으로 설비 삭제
+      // 4. 마지막으로 설비 삭제
       await storage.deleteEquipment(id);
       console.log(`설비 ID ${id} 삭제 완료`);
       
