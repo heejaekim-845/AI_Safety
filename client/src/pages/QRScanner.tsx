@@ -651,7 +651,7 @@ export default function QRScanner() {
               className="card-minimal cursor-pointer card-hover"
               onClick={() => handleEquipmentSelect(eq.id)}
             >
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-5 flex-1">
                     {/* Equipment Thumbnail */}
@@ -676,7 +676,7 @@ export default function QRScanner() {
                       </div>
                       
                       {/* Risk Level Circle */}
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm">
+                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm">
                         <div className={`w-full h-full rounded-full ${
                           eq.riskLevel === 'HIGH' || eq.riskLevel === 'RED' ? 'bg-red-500' :
                           eq.riskLevel === 'MEDIUM' || eq.riskLevel === 'YELLOW' ? 'bg-yellow-500' :
@@ -688,10 +688,10 @@ export default function QRScanner() {
                     
                     {/* Equipment Details */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 mb-2 text-lg break-words leading-tight">
+                      <h4 className="font-semibold text-gray-900 mb-1 text-lg break-words leading-tight">
                         {eq.name}
                       </h4>
-                      <div className="mb-2 text-sm text-gray-600">
+                      <div className="mb-1 text-sm text-gray-600">
                         <span className="break-words">{eq.code}</span>
                       </div>
                       <div className="text-sm text-gray-500">
