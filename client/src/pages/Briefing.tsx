@@ -838,7 +838,10 @@ export default function Briefing() {
                       <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">종합 위험도</span>
-                          <Badge className={getRiskLevelColor(briefingData.riskAssessment.overallRiskLevel)}>
+                          <Badge 
+                            variant="outline" 
+                            className={`${getRiskLevelColor(briefingData.riskAssessment.overallRiskLevel)} font-medium`}
+                          >
                             {briefingData.riskAssessment.overallRiskLevel}
                           </Badge>
                         </div>
