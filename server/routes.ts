@@ -176,6 +176,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/equipment/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteEquipment(id);
+      res.json({ message: "설비가 성공적으로 삭제되었습니다." });
+    } catch (error) {
+      console.error("설비 삭제 오류:", error);
+      res.status(500).json({ message: "설비를 삭제할 수 없습니다." });
+    }
+  });
+
   // Work types routes
   app.get("/api/equipment/:equipmentId/work-types", async (req, res) => {
     try {
