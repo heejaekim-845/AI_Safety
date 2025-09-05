@@ -527,8 +527,11 @@ export default function Briefing() {
                     {Math.floor(generationProgress)}%
                   </div>
                 </div>
-                <div className="flex justify-center">
+                <div className="flex flex-col items-center gap-3">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="text-sm text-gray-600 text-center">
+                    조금만 기다려주세요<br />약 1분 가량 소요됩니다
+                  </p>
                 </div>
               </div>
             </DialogContent>
