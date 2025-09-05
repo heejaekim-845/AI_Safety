@@ -190,28 +190,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`삭제할 설비: ${existing.name}`);
       
-      // 1. 관련된 work procedures 삭제
-      console.log("관련 work procedures 삭제 중...");
-      const workTypes = await storage.getWorkTypesByEquipmentId(id);
-      let totalProcedures = 0;
-      for (const workType of workTypes) {
-        const procedures = await storage.getProceduresByWorkTypeId(workType.id);
-        for (const procedure of procedures) {
-          await storage.deleteWorkProcedure(procedure.id);
-          totalProcedures++;
-        }
-        // 2. work types 삭제
-        await storage.deleteWorkType(workType.id);
-      }
-      console.log(`${workTypes.length}개 work types 및 ${totalProcedures}개 procedures 삭제 완료`);
+      // 직접 SQL로 모든 관련 데이터 삭제 (외래키 순서 고려)
+      console.log("모든 관련 데이터 완전 삭제 중...");
       
-      // 3. 관련된 incidents 삭제
-      console.log("관련 incidents 삭제 중...");
-      const incidents = await storage.getIncidentsByEquipmentId(id);
-      for (const incident of incidents) {
-        await storage.deleteIncident(incident.id);
+      try {
+        // 관련 데이터를 순서대로 삭제 (외래키 순서 준수)
+        const workTypes = await storage.getWorkTypesByEquipmentId(id);
+        let totalProcedures = 0;
+        
+        // 1. work_procedures 삭제
+        for (const workType of workTypes) {
+          const procedures = await storage.getProceduresByWorkTypeId(workType.id);
+          for (const procedure of procedures) {
+            await storage.deleteWorkProcedure(procedure.id);
+            totalProcedures++;
+          }
+        }
+        console.log(`${totalProcedures}개 work_procedures 삭제 완료`);
+        
+        // 2. work_types 삭제
+        for (const workType of workTypes) {
+          await storage.deleteWorkType(workType.id);
+        }
+        console.log(`${workTypes.length}개 work_types 삭제 완료`);
+        
+        // 3. incidents 삭제
+        const incidents = await storage.getIncidentsByEquipmentId(id);
+        for (const incident of incidents) {
+          await storage.deleteIncident(incident.id);
+        }
+        console.log(`${incidents.length}개 incidents 삭제 완료`);
+        
+        console.log("모든 관련 데이터 삭제 완료");
+      } catch (err) {
+        console.log("삭제 과정에서 오류 발생:", err);
+        throw err;
       }
-      console.log(`${incidents.length}개 incidents 삭제 완료`);
       
       // 4. 마지막으로 설비 삭제
       await storage.deleteEquipment(id);
