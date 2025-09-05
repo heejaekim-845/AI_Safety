@@ -559,9 +559,14 @@ export default function Briefing() {
                   AI 안전 브리핑
                 </DialogTitle>
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg">
-                  <h2 className="text-xl font-bold text-center">
-                    {selectedWorkSchedule?.equipmentName} - {selectedWorkSchedule?.workTypeName}
-                  </h2>
+                  <div className="text-center">
+                    <h2 className="text-xl font-bold">
+                      {selectedWorkSchedule?.equipmentName}
+                    </h2>
+                    <div className="text-lg text-blue-100 mt-1">
+                      {selectedWorkSchedule?.workTypeName}
+                    </div>
+                  </div>
                   <p className="text-center text-blue-100 mt-1 text-sm">
                     {selectedWorkSchedule?.scheduledDate && format(new Date(selectedWorkSchedule.scheduledDate), 'yyyy년 MM월 dd일 (E)', { locale: ko })}
                     {selectedWorkSchedule?.briefingTime && (
