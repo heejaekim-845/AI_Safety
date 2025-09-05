@@ -689,7 +689,14 @@ export default function Briefing() {
                           </div>
                         )}
                         
-                        {briefingData.weatherInfo.safetyWarnings && briefingData.weatherInfo.safetyWarnings.length > 0 && (
+                        {(() => {
+                          console.log('날씨 안전 경고 디버깅:', {
+                            hasWeatherInfo: !!briefingData.weatherInfo,
+                            safetyWarnings: briefingData.weatherInfo?.safetyWarnings,
+                            length: briefingData.weatherInfo?.safetyWarnings?.length
+                          });
+                          return briefingData.weatherInfo.safetyWarnings && briefingData.weatherInfo.safetyWarnings.length > 0;
+                        })() && (
                           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                             <h4 className="font-semibold text-yellow-800 mb-2">날씨 안전 경고</h4>
                             <ul className="space-y-1">
