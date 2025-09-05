@@ -839,7 +839,12 @@ export default function Briefing() {
                       <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">종합 위험도</span>
-                          <RiskLevelBadge level={briefingData.riskAssessment.overallRiskLevel} />
+                          <RiskLevelBadge level={(() => {
+                            const score = briefingData.riskAssessment.totalScore;
+                            if (score >= 15) return "HIGH";
+                            if (score >= 10) return "MEDIUM";
+                            return "LOW";
+                          })()} />
                         </div>
                         <div className="text-sm text-gray-600">
                           총점: {briefingData.riskAssessment.totalScore}점
