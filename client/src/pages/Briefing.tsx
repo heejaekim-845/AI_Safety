@@ -49,6 +49,15 @@ interface LegalRecommendationsData {
   };
 }
 
+interface HourlyForecast {
+  time: string;
+  temperature: number;
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  rainfall: number;
+}
+
 interface SafetyBriefingData {
   briefing: any;
   weatherInfo: {
@@ -59,6 +68,7 @@ interface SafetyBriefingData {
     condition: string;
     description: string;
     safetyWarnings: string[];
+    hourlyForecast?: HourlyForecast[];
   };
   workSummary: string;
   riskFactors: string[];
@@ -609,6 +619,33 @@ export default function Briefing() {
                             <span className="text-xl font-bold text-gray-700">{briefingData.weatherInfo.condition}</span>
                           </div>
                         </div>
+
+                        {/* 시간대별 예보 */}
+                        {briefingData.weatherInfo.hourlyForecast && briefingData.weatherInfo.hourlyForecast.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              시간대별 예보 (12시간)
+                            </h4>
+                            <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto">
+                              <div className="flex gap-3 min-w-max">
+                                {briefingData.weatherInfo.hourlyForecast.map((hour, index) => (
+                                  <div key={index} className="flex flex-col items-center p-2 bg-white rounded-md shadow-sm min-w-[70px]">
+                                    <div className="text-xs font-medium text-gray-600">{hour.time}</div>
+                                    <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
+                                    <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
+                                    {hour.rainfall > 0 && (
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <Droplets className="w-3 h-3 text-blue-500" />
+                                        <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         
                         {briefingData.weatherInfo.safetyWarnings && briefingData.weatherInfo.safetyWarnings.length > 0 && (
                           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">

@@ -12,6 +12,16 @@ interface WeatherData {
   weatherDate: string;
   weatherTime?: string;
   weatherType: 'historical' | 'current' | 'forecast';
+  hourlyForecast?: HourlyForecast[];
+}
+
+interface HourlyForecast {
+  time: string; // HH:mm 형식
+  temperature: number;
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  rainfall: number;
 }
 
 export class WeatherService {
@@ -78,7 +88,7 @@ export class WeatherService {
     }
   }
 
-  // 현재 날씨 정보
+  // 현재 날씨 정보 (시간대별 예보 포함)
   async getCurrentWeather(location: string): Promise<WeatherData> {
     try {
       if (!this.API_KEY) {
@@ -86,33 +96,32 @@ export class WeatherService {
       }
 
       const coords = this.getCoordinatesForLocation(location);
-      let response;
+      if (!coords) {
+        throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
+      }
 
       console.log(`현재 날씨 조회: "${location}"`);
 
-      if (coords) {
-        response = await axios.get(this.CURRENT_WEATHER_URL, {
-          params: {
-            lat: coords.lat,
-            lon: coords.lon,
-            appid: this.API_KEY,
-            units: 'metric',
-            lang: 'ko'
-          }
-        });
-      } else {
-        response = await axios.get(this.CURRENT_WEATHER_URL, {
-          params: {
-            q: `${location},KR`,
-            appid: this.API_KEY,
-            units: 'metric',
-            lang: 'ko'
-          }
-        });
-      }
+      // One Call API로 현재 날씨와 시간대별 예보를 함께 가져오기
+      const response = await axios.get(this.ONE_CALL_URL, {
+        params: {
+          lat: coords.lat,
+          lon: coords.lon,
+          appid: this.API_KEY,
+          units: 'metric',
+          lang: 'ko',
+          exclude: 'minutely,alerts,daily'
+        }
+      });
 
       const weatherData = response.data;
-      const result = this.parseOpenWeatherResponse(weatherData);
+      const result = this.parseOneCallCurrentResponse(weatherData.current, location);
+      
+      // 시간대별 예보 데이터 추가
+      if (weatherData.hourly) {
+        result.hourlyForecast = this.parseHourlyForecast(weatherData.hourly);
+      }
+      
       result.weatherType = 'current';
       result.weatherDate = new Date().toISOString().split('T')[0];
       result.weatherTime = new Date().toTimeString().slice(0, 5);
@@ -122,7 +131,27 @@ export class WeatherService {
       
     } catch (error: any) {
       console.error('현재 날씨 조회 오류:', error.response?.data || error.message);
-      throw new Error(`현재 날씨 정보를 가져올 수 없습니다: ${error.response?.data?.message || error.message}`);
+      
+      // 폴백: 기존 current weather API 사용
+      try {
+        const fallbackResponse = await axios.get(this.CURRENT_WEATHER_URL, {
+          params: {
+            q: `${location},KR`,
+            appid: this.API_KEY,
+            units: 'metric',
+            lang: 'ko'
+          }
+        });
+        
+        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data);
+        fallbackResult.weatherType = 'current';
+        fallbackResult.weatherDate = new Date().toISOString().split('T')[0];
+        fallbackResult.weatherTime = new Date().toTimeString().slice(0, 5);
+        
+        return fallbackResult;
+      } catch (fallbackError: any) {
+        throw new Error(`현재 날씨 정보를 가져올 수 없습니다: ${fallbackError.response?.data?.message || fallbackError.message}`);
+      }
     }
   }
 
@@ -217,6 +246,12 @@ export class WeatherService {
       }
 
       const result = this.parseForecastResponse(weatherToUse, location);
+      
+      // 시간대별 예보 데이터 추가
+      if (forecastData.hourly) {
+        result.hourlyForecast = this.parseHourlyForecast(forecastData.hourly);
+      }
+      
       result.weatherType = 'forecast';
       result.weatherDate = targetDate.toISOString().split('T')[0];
       result.weatherTime = workTime || targetDate.toTimeString().slice(0, 5);
@@ -556,7 +591,47 @@ export class WeatherService {
 
 
 
+  // One Call API 현재 날씨 응답 파싱
+  private parseOneCallCurrentResponse(data: any, location: string): WeatherData {
+    const temperature = Math.round(data.temp || 15);
+    const humidity = data.humidity || 60;
+    const windSpeed = Math.round(data.wind_speed || 3);
+    const condition = this.translateWeatherCondition(data.weather?.[0]?.main || 'Clear');
+
+    const safetyWarnings = this.generateSafetyWarnings(condition, temperature, humidity, windSpeed);
+
+    return {
+      location,
+      temperature,
+      humidity,
+      windSpeed,
+      rainfall: data.rain?.['1h'] || 0,
+      condition,
+      description: this.getWeatherDescription(condition, temperature, 'current'),
+      safetyWarnings,
+      weatherDate: '',
+      weatherTime: '',
+      weatherType: 'current'
+    };
+  }
+
+  // 시간대별 예보 데이터 파싱 (향후 12시간)
+  private parseHourlyForecast(hourlyData: any[]): HourlyForecast[] {
+    return hourlyData.slice(0, 12).map((hour: any) => {
+      const date = new Date(hour.dt * 1000);
+      return {
+        time: date.getHours().toString().padStart(2, '0') + ':00',
+        temperature: Math.round(hour.temp),
+        condition: this.translateWeatherCondition(hour.weather?.[0]?.main || 'Clear'),
+        humidity: hour.humidity || 50,
+        windSpeed: Math.round(hour.wind_speed || 0),
+        rainfall: hour.rain?.['1h'] || 0
+      };
+    });
+  }
+
   // Remove fallback weather method - no mock data when API fails
 }
 
 export const weatherService = new WeatherService();
+export { WeatherData, HourlyForecast };
