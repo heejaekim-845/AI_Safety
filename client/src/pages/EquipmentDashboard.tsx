@@ -928,15 +928,15 @@ export default function EquipmentDashboard() {
                         {contact.name && contact.role && (
                           <div className="text-sm text-red-600">{contact.name}</div>
                         )}
-                        {contact.phone && (
-                          <div className="text-sm text-red-600">{contact.phone}</div>
+                        {(contact.phone || contact.contact) && (
+                          <div className="text-sm text-red-600">{contact.phone || contact.contact}</div>
                         )}
                       </div>
                       <Button 
                         size="sm" 
                         className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-all duration-200 hover:scale-105"
-                        onClick={() => window.open(`tel:${contact.phone || (typeof contact === 'string' ? contact : '')}`, '_self')}
-                        disabled={!contact.phone && typeof contact !== 'string'}
+                        onClick={() => window.open(`tel:${contact.phone || contact.contact || (typeof contact === 'string' ? contact : '')}`, '_self')}
+                        disabled={!contact.phone && !contact.contact && typeof contact !== 'string'}
                       >
                         <Phone className="h-4 w-4 mr-2" />
                         통화
