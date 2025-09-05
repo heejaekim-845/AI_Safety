@@ -625,23 +625,65 @@ export default function Briefing() {
                           <div className="mt-4">
                             <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
                               <Clock className="w-4 h-4" />
-                              시간대별 예보 (12시간)
+                              시간대별 예보 (작업시간 기준 ±2시간)
                             </h4>
-                            <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto">
-                              <div className="flex gap-3 min-w-max">
-                                {briefingData.weatherInfo.hourlyForecast.map((hour, index) => (
-                                  <div key={index} className="flex flex-col items-center p-2 bg-white rounded-md shadow-sm min-w-[70px]">
-                                    <div className="text-xs font-medium text-gray-600">{hour.time}</div>
-                                    <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
-                                    <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
-                                    {hour.rainfall > 0 && (
-                                      <div className="flex items-center gap-1 mt-1">
-                                        <Droplets className="w-3 h-3 text-blue-500" />
-                                        <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <div className="flex gap-3 justify-center">
+                                {(() => {
+                                  // 작업 시간 추출 (HH:mm 형식)
+                                  const workTime = selectedWorkSchedule?.briefingTime;
+                                  if (!workTime) {
+                                    // 작업 시간이 없으면 처음 5개만 표시
+                                    return briefingData.weatherInfo.hourlyForecast!.slice(0, 5).map((hour, index) => (
+                                      <div key={index} className="flex flex-col items-center p-2 bg-white rounded-md shadow-sm min-w-[70px]">
+                                        <div className="text-xs font-medium text-gray-600">{hour.time}</div>
+                                        <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
+                                        <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
+                                        {hour.rainfall > 0 && (
+                                          <div className="flex items-center gap-1 mt-1">
+                                            <Droplets className="w-3 h-3 text-blue-500" />
+                                            <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                          </div>
+                                        )}
                                       </div>
-                                    )}
-                                  </div>
-                                ))}
+                                    ));
+                                  }
+
+                                  // 작업시간을 시간 단위로 변환
+                                  const workHour = parseInt(workTime.split(':')[0]);
+                                  const startHour = Math.max(0, workHour - 2);
+                                  const endHour = workHour + 2;
+
+                                  // 해당 시간 범위의 예보만 필터링
+                                  const filteredForecast = briefingData.weatherInfo.hourlyForecast!.filter(hour => {
+                                    const hourNum = parseInt(hour.time.split(':')[0]);
+                                    return hourNum >= startHour && hourNum <= endHour;
+                                  });
+
+                                  return filteredForecast.map((hour, index) => {
+                                    const hourNum = parseInt(hour.time.split(':')[0]);
+                                    const isWorkTime = hourNum === workHour;
+                                    
+                                    return (
+                                      <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${
+                                        isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-white'
+                                      }`}>
+                                        <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-gray-600'}`}>
+                                          {hour.time}
+                                          {isWorkTime && <div className="text-xs text-blue-600">작업시간</div>}
+                                        </div>
+                                        <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
+                                        <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
+                                        {hour.rainfall > 0 && (
+                                          <div className="flex items-center gap-1 mt-1">
+                                            <Droplets className="w-3 h-3 text-blue-500" />
+                                            <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  });
+                                })()}
                               </div>
                             </div>
                           </div>
