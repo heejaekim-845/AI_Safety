@@ -970,17 +970,49 @@ export default function Briefing() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {briefingData.safetyRecommendations?.map((recommendation, index) => (
-                        <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
-                          <div className="flex items-start gap-2">
-                            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                              {index + 1}
+                    <div className="space-y-4">
+                      {(() => {
+                        // 안전권고사항을 카테고리별로 그룹핑
+                        const groupedRecommendations: { [key: string]: string[] } = {};
+                        let currentCategory = '일반 안전사항';
+                        
+                        briefingData.safetyRecommendations?.forEach((recommendation: string) => {
+                          // **로 시작하고 끝나는 패턴을 카테고리 제목으로 인식
+                          if (recommendation.startsWith('**') && recommendation.endsWith('**')) {
+                            currentCategory = recommendation.replace(/\*\*/g, '').trim();
+                            if (!groupedRecommendations[currentCategory]) {
+                              groupedRecommendations[currentCategory] = [];
+                            }
+                          } else if (recommendation.trim()) {
+                            // 빈 문자열이 아닌 경우만 추가
+                            if (!groupedRecommendations[currentCategory]) {
+                              groupedRecommendations[currentCategory] = [];
+                            }
+                            groupedRecommendations[currentCategory].push(recommendation);
+                          }
+                        });
+
+                        return Object.entries(groupedRecommendations).map(([category, items], categoryIndex) => (
+                          <div key={categoryIndex} className="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div className="font-bold text-green-800 text-base mb-3 flex items-center gap-2">
+                              <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                {categoryIndex + 1}
+                              </div>
+                              {category}
                             </div>
-                            <span className="text-green-800 text-sm leading-relaxed">{recommendation}</span>
+                            <div className="space-y-2">
+                              {items.map((item, itemIndex) => (
+                                <div key={itemIndex} className="flex items-start gap-2 bg-white p-3 rounded border border-green-100">
+                                  <div className="w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                                    •
+                                  </div>
+                                  <span className="text-green-800 text-sm leading-relaxed">{item}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )) || []}
+                        ));
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
