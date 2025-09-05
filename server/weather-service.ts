@@ -96,6 +96,74 @@ export class WeatherService {
     }
   }
 
+  // 현재 날씨 정보 (작업시간 기준 Historical API 보완 포함)
+  async getCurrentWeatherWithWorkTime(location: string, workTime?: string): Promise<WeatherData> {
+    try {
+      if (!this.API_KEY) {
+        throw new Error('OpenWeather API key not configured');
+      }
+
+      const coords = this.getCoordinatesForLocation(location);
+      if (!coords) {
+        throw new Error(`좌표를 찾을 수 없습니다: ${location}`);
+      }
+
+      console.log(`🌡️ [getCurrentWeatherWithWorkTime] 현재 날씨 조회 시작: "${location}", workTime: ${workTime}`);
+
+      // One Call API로 현재 날씨와 시간대별 예보를 함께 가져오기
+      const response = await axios.get(this.ONE_CALL_URL, {
+        params: {
+          lat: coords.lat,
+          lon: coords.lon,
+          appid: this.API_KEY,
+          units: 'metric',
+          lang: 'ko',
+          exclude: 'minutely,alerts,daily'
+        }
+      });
+
+      const weatherData = response.data;
+      const result = this.parseOneCallCurrentResponse(weatherData.current, location);
+      
+      // 시간대별 예보 데이터 추가 (작업시간 기준 Historical 보완 포함)
+      console.log(`🌡️ [getCurrentWeatherWithWorkTime] hourly 데이터 존재: ${!!weatherData.hourly}, 길이: ${weatherData.hourly?.length || 0}`);
+      if (weatherData.hourly) {
+        result.hourlyForecast = await this.parseHourlyForecast(weatherData.hourly, location, workTime);
+      }
+      
+      result.weatherType = 'current';
+      result.weatherDate = new Date().toISOString().split('T')[0];
+      result.weatherTime = new Date().toTimeString().slice(0, 5);
+      
+      console.log(`🌡️ [getCurrentWeatherWithWorkTime] 날씨 조회 완료: ${location}`, result);
+      return result;
+      
+    } catch (error: any) {
+      console.error('현재 날씨 조회 오류:', error.response?.data || error.message);
+      
+      // 폴백: 기존 current weather API 사용
+      try {
+        const fallbackResponse = await axios.get(this.CURRENT_WEATHER_URL, {
+          params: {
+            q: `${location},KR`,
+            appid: this.API_KEY,
+            units: 'metric',
+            lang: 'ko'
+          }
+        });
+        
+        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data);
+        fallbackResult.weatherType = 'current';
+        fallbackResult.weatherDate = new Date().toISOString().split('T')[0];
+        fallbackResult.weatherTime = new Date().toTimeString().slice(0, 5);
+        
+        return fallbackResult;
+      } catch (fallbackError: any) {
+        throw new Error(`현재 날씨 정보를 가져올 수 없습니다: ${fallbackError.response?.data?.message || fallbackError.message}`);
+      }
+    }
+  }
+
   // 현재 날씨 정보 (시간대별 예보 포함)
   async getCurrentWeather(location: string): Promise<WeatherData> {
     try {
