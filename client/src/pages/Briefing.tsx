@@ -633,8 +633,7 @@ export default function Briefing() {
                             <Clock className="w-4 h-4" />
                             시간대별 예보 (작업시간 기준 ±2시간)
                           </h4>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
+                          <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
                               {(() => {
                                 // 현재 시간과 날짜
                                 const now = new Date();
@@ -776,7 +775,6 @@ export default function Briefing() {
                                   );
                                 });
                               })()}
-                            </div>
                           </div>
                         </div>
                         
