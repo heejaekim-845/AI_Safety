@@ -383,10 +383,14 @@ export class ManualChatbotService {
           }
         }
 
-        // 패밀리 필터링 (정확한 매칭으로 복원)
+        // 패밀리 필터링 (공통 패밀리 포함)
         if (familyFilter && metadata.family) {
-          // 정확한 패밀리 매칭
-          if (metadata.family !== familyFilter) {
+          // 정확한 패밀리 매칭 또는 공통 패밀리 포함
+          const isExactMatch = metadata.family === familyFilter;
+          const isCommonFamily = metadata.family === "1수력 공통" && 
+                                (familyFilter === "1수력 1호기" || familyFilter === "1수력 2호기");
+          
+          if (!isExactMatch && !isCommonFamily) {
             continue;
           }
         }
