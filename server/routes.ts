@@ -893,6 +893,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let weatherInfo = null;
       
       try {
+        console.log(`🔥 [WEATHER DEBUG] 날씨 처리 시작! weatherLocation=${weatherLocation}`);
+        console.log(`🔥 [WEATHER DEBUG] workSchedule.briefingTime=${workSchedule.briefingTime}`);
+        console.log(`🔥 [WEATHER DEBUG] weatherService 존재 여부:`, !!weatherService);
+        console.log(`🔥 [WEATHER DEBUG] getCurrentWeatherWithWorkTime 존재 여부:`, typeof weatherService.getCurrentWeatherWithWorkTime);
+        
         // 1. 현재 실시간 날씨 (메인 온도 표시용, 작업시간 기준 Historical 보완 포함)
         console.log(`🚀 [ROUTE DEBUG] getCurrentWeatherWithWorkTime 호출 시작: location=${weatherLocation}, briefingTime=${workSchedule.briefingTime}`);
         const currentWeather = await weatherService.getCurrentWeatherWithWorkTime(weatherLocation, workSchedule.briefingTime || undefined);
