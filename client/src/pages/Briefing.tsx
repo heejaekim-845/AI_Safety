@@ -625,34 +625,44 @@ export default function Briefing() {
                           <div className="mt-4">
                             <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
                               <Clock className="w-4 h-4" />
-                              시간대별 예보 (향후 6시간)
+                              시간대별 예보 (작업시간 기준 ±2시간)
                             </h4>
                             <div className="bg-gray-50 rounded-lg p-3">
                               <div className="flex gap-3 justify-center">
                                 {(() => {
-                                  // 현재 시간 구하기
-                                  const now = new Date();
-                                  const currentHour = now.getHours();
-                                  
                                   // 작업 시간 추출 (HH:mm 형식)
                                   const workTime = selectedWorkSchedule?.briefingTime;
-                                  let workHour: number | null = null;
-                                  if (workTime) {
-                                    workHour = parseInt(workTime.split(':')[0]);
+                                  if (!workTime) {
+                                    // 작업 시간이 없으면 처음 5개만 표시
+                                    return briefingData.weatherInfo.hourlyForecast!.slice(0, 5).map((hour, index) => (
+                                      <div key={index} className="flex flex-col items-center p-2 bg-white rounded-md shadow-sm min-w-[70px]">
+                                        <div className="text-xs font-medium text-gray-600">{hour.time}</div>
+                                        <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
+                                        <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
+                                        {hour.rainfall > 0 && (
+                                          <div className="flex items-center gap-1 mt-1">
+                                            <Droplets className="w-3 h-3 text-blue-500" />
+                                            <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ));
                                   }
 
-                                  // 현재 시간 이후의 예보만 필터링 (미래시점만)
-                                  const futureForecast = briefingData.weatherInfo.hourlyForecast!.filter(hour => {
+                                  // 작업시간을 시간 단위로 변환
+                                  const workHour = parseInt(workTime.split(':')[0]);
+                                  const startHour = Math.max(0, workHour - 2);
+                                  const endHour = workHour + 2;
+
+                                  // 해당 시간 범위의 예보만 필터링
+                                  const filteredForecast = briefingData.weatherInfo.hourlyForecast!.filter(hour => {
                                     const hourNum = parseInt(hour.time.split(':')[0]);
-                                    return hourNum > currentHour; // 현재 시간 이후만
+                                    return hourNum >= startHour && hourNum <= endHour;
                                   });
 
-                                  // 처음 6개의 미래 예보만 표시
-                                  const displayForecast = futureForecast.slice(0, 6);
-
-                                  return displayForecast.map((hour, index) => {
+                                  return filteredForecast.map((hour, index) => {
                                     const hourNum = parseInt(hour.time.split(':')[0]);
-                                    const isWorkTime = workHour !== null && hourNum === workHour;
+                                    const isWorkTime = hourNum === workHour;
                                     
                                     return (
                                       <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${
