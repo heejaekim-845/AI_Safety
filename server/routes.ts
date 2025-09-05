@@ -179,7 +179,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/equipment/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log(`설비 삭제 요청: ID ${id}`);
+      
+      // 삭제 전 설비 존재 확인
+      const existing = await storage.getEquipmentById(id);
+      if (!existing) {
+        console.log(`설비 ID ${id} 없음`);
+        return res.status(404).json({ message: "설비를 찾을 수 없습니다." });
+      }
+      
+      console.log(`삭제할 설비: ${existing.name}`);
       await storage.deleteEquipment(id);
+      console.log(`설비 ID ${id} 삭제 완료`);
+      
       res.json({ message: "설비가 성공적으로 삭제되었습니다." });
     } catch (error) {
       console.error("설비 삭제 오류:", error);
