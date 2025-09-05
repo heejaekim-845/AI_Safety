@@ -917,6 +917,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       console.error(`🚨 [WRAPPER] generateEnhancedSafetyBriefing 호출 완료!`);
       
+      // 날씨 정보 디버깅
+      console.log('=== 날씨 정보 디버깅 (AI 처리 후) ===');
+      console.log('weatherInfo:', weatherInfo);
+      console.log('weatherInfo.safetyWarnings:', weatherInfo?.safetyWarnings);
+      console.log('weatherInfo.safetyWarnings length:', weatherInfo?.safetyWarnings?.length);
+      
       console.log(`🎯🎯🎯 [ROUTE DEBUG] generateEnhancedSafetyBriefing 완료 🎯🎯🎯`);
 
       // Create complete briefing data
