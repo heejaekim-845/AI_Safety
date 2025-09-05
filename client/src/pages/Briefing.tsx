@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiRequest } from "@/lib/queryClient";
 import { WorkScheduleForm } from "@/components/WorkScheduleForm";
+import RiskLevelBadge from "@/components/RiskLevelBadge";
 
 interface WorkSchedule {
   id: number;
@@ -838,12 +839,7 @@ export default function Briefing() {
                       <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">종합 위험도</span>
-                          <Badge 
-                            variant="outline" 
-                            className={`${getRiskLevelColor(briefingData.riskAssessment.overallRiskLevel)} font-medium`}
-                          >
-                            {briefingData.riskAssessment.overallRiskLevel}
-                          </Badge>
+                          <RiskLevelBadge level={briefingData.riskAssessment.overallRiskLevel} />
                         </div>
                         <div className="text-sm text-gray-600">
                           총점: {briefingData.riskAssessment.totalScore}점
