@@ -942,6 +942,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
       } catch (error) {
+        console.error(`🔥🔥🔥 [WEATHER ERROR] 날씨 처리 중 심각한 오류 발생! 🔥🔥🔥`);
+        console.error(`🔥 [WEATHER ERROR] 위치: ${weatherLocation}`);
+        console.error(`🔥 [WEATHER ERROR] 작업일: ${workSchedule.scheduledDate}`);
+        console.error(`🔥 [WEATHER ERROR] 작업시간: ${workSchedule.briefingTime}`);
+        console.error(`🔥 [WEATHER ERROR] 에러 상세:`, error);
+        console.error(`🔥 [WEATHER ERROR] 에러 스택:`, error?.stack);
         console.warn(`날씨 정보를 가져올 수 없습니다 (${weatherLocation}, ${workSchedule.scheduledDate}): ${String(error)}`);
         // weatherInfo remains null - no mock data will be used
       }
