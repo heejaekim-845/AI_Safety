@@ -617,10 +617,23 @@ export class WeatherService {
 
   // 시간대별 예보 데이터 파싱 (향후 12시간)
   private parseHourlyForecast(hourlyData: any[]): HourlyForecast[] {
+    console.log('=== 시간대별 예보 원본 데이터 디버깅 ===');
+    console.log('hourlyData 길이:', hourlyData.length);
+    
+    // 처음 5개 데이터 확인
+    hourlyData.slice(0, 5).forEach((hour, index) => {
+      const date = new Date(hour.dt * 1000);
+      const localTime = date.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+      console.log(`${index}: UTC시간=${new Date(hour.dt * 1000).toISOString()}, 한국시간=${localTime}, 온도=${hour.temp}°C`);
+    });
+    
     return hourlyData.slice(0, 12).map((hour: any) => {
       const date = new Date(hour.dt * 1000);
+      // 한국 시간으로 변환
+      const koreaDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+      
       return {
-        time: date.getHours().toString().padStart(2, '0') + ':00',
+        time: koreaDate.getHours().toString().padStart(2, '0') + ':00',
         temperature: Math.round(hour.temp),
         condition: this.translateWeatherCondition(hour.weather?.[0]?.main || 'Clear'),
         humidity: hour.humidity || 50,
