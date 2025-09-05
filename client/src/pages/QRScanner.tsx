@@ -522,7 +522,7 @@ export default function QRScanner() {
                           <span className="text-xl">{safetyRisk.icon}</span>
                           <div>
                             <p className="text-base font-bold" style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
-                              위험:{safetyRisk.level}
+                              위험수준:{safetyRisk.level}
                             </p>
                           </div>
                         </div>
@@ -655,7 +655,7 @@ export default function QRScanner() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-5 flex-1">
                     {/* Equipment Thumbnail */}
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
                       {eq.imageUrl ? (
                         <img 
                           src={eq.imageUrl} 
@@ -674,6 +674,16 @@ export default function QRScanner() {
                           {eq.name.substring(0, 2)}
                         </span>
                       </div>
+                      
+                      {/* Risk Level Circle */}
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm">
+                        <div className={`w-full h-full rounded-full ${
+                          eq.riskLevel === 'HIGH' || eq.riskLevel === 'RED' ? 'bg-red-500' :
+                          eq.riskLevel === 'MEDIUM' || eq.riskLevel === 'YELLOW' ? 'bg-yellow-500' :
+                          eq.riskLevel === 'LOW' || eq.riskLevel === 'GREEN' ? 'bg-green-500' :
+                          'bg-gray-500'
+                        }`}></div>
+                      </div>
                     </div>
                     
                     {/* Equipment Details */}
@@ -681,12 +691,12 @@ export default function QRScanner() {
                       <h4 className="font-semibold text-gray-900 mb-2 text-lg break-words leading-tight">
                         {eq.name}
                       </h4>
-                      <div className="flex items-center space-x-2 mb-2 text-sm text-gray-600">
+                      <div className="mb-2 text-sm text-gray-600">
                         <span className="break-words">{eq.code}</span>
-                        <span className="text-gray-400">/</span>
+                      </div>
+                      <div className="text-sm text-gray-500">
                         <span className="break-words">{eq.location}</span>
                       </div>
-                      <RiskLevelBadge level={eq.riskLevel || "MEDIUM"} />
                     </div>
                   </div>
                   <ChevronRight className="text-gray-400 h-6 w-6 mt-1 flex-shrink-0" />
