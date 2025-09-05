@@ -2357,6 +2357,9 @@ ${procedureSteps}
 
       const result = JSON.parse(response.text || "{}");
       
+      // 실제 작업유형명으로 강제 덮어쓰기 (AI가 임의로 해석하는 것을 방지)
+      result.workType = workTypeName;
+      
       console.log(`법령 검색 완료: ${result.recommendations?.industrialSafetyHealth?.length || 0}개 산안법, ${result.recommendations?.koshaGuide?.length || 0}개 KOSHA 가이드 등`);
       
       return result;
