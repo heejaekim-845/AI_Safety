@@ -910,17 +910,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`작업시간 기준 날씨 수집 완료 - 작업일: ${workSchedule.scheduledDate}, 시간: ${workSchedule.briefingTime}, 타입: ${workWeather.weatherType}`);
         console.log(`작업시간 기준 날씨 시간대별 예보 개수: ${workWeather.hourlyForecast?.length || 0}`);
         
-        // 3. 현재 실시간 온도로 메인 정보 업데이트, 시간대별 예보는 작업시간 기준 유지
+        // 3. 작업시간 기준 날씨로 메인 정보 업데이트
         weatherInfo = {
-          ...currentWeather,  // 현재 실시간 날씨 (메인 온도)
+          ...workWeather,  // 작업시간 기준 날씨 (메인 온도)
           hourlyForecast: workWeather.hourlyForecast || currentWeather.hourlyForecast,  // 작업시간 기준 예보 우선, 없으면 현재 예보
-          weatherDate: workWeather.weatherDate,        // 작업 날짜
-          weatherTime: workWeather.weatherTime,        // 작업 시간
-          weatherType: workWeather.weatherType         // 작업시간 기준 타입
         };
         
         console.log(`🌤️ 통합 날씨 정보 최종 완료:`);
-        console.log(`  - 메인온도: ${weatherInfo.temperature}°C (현재)`);
+        console.log(`  - 메인온도: ${weatherInfo.temperature}°C (작업시간 기준)`);
         console.log(`  - 예보개수: ${weatherInfo.hourlyForecast?.length}개 시간`);
         console.log(`  - 전체 시간대:`, weatherInfo.hourlyForecast?.map(h => h.time).join(', '));
         console.log(`  - 작업시간: ${workSchedule.briefingTime}`);

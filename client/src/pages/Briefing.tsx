@@ -620,6 +620,15 @@ export default function Briefing() {
                           </div>
                         </div>
 
+                        {/* 작업시간 기준 날씨 안내 */}
+                        {selectedWorkSchedule?.briefingTime && (
+                          <div className="mt-3 p-2 bg-blue-50 rounded-md border border-blue-200">
+                            <div className="text-center text-sm text-blue-700 font-medium">
+                              작업시간({selectedWorkSchedule.briefingTime}) 기준 날씨입니다
+                            </div>
+                          </div>
+                        )}
+
                         {/* 시간대별 예보 (작업시간 기준 고정 표시) */}
                         <div className="mt-4">
                           <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
