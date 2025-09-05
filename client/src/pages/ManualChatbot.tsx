@@ -442,12 +442,16 @@ export default function ManualChatbot() {
                   <Wrench className="w-4 h-4" />
                   <span>
                     {equipmentLoading ? '설비 정보 로딩 중...' : 
-                     `${equipmentData?.equipment?.length || 0}개 설비 패밀리 사용 가능`}
+                     `${equipmentData?.equipment?.length || 0}개 설비 패밀리`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
-                  <span>1,640개 매뉴얼 청크 검색 가능 (5개 매뉴얼)</span>
+                  <span>
+                    {equipmentData?.totalChunks ? 
+                      `${equipmentData.totalChunks.toLocaleString()}개 매뉴얼 청크 (5개 매뉴얼)` : 
+                      '매뉴얼 청크 로딩 중...'}
+                  </span>
                 </div>
               </div>
             </CardContent>

@@ -1682,18 +1682,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('설비 목록 조회 요청');
       
-      const equipment = await manualChatbotService.getAvailableEquipment();
+      const result = await manualChatbotService.getAvailableEquipment();
       
       res.json({
         success: true,
-        equipment,
-        message: `${equipment.length}개의 설비 패밀리를 찾았습니다.`
+        equipment: result.equipment,
+        totalChunks: result.totalChunks,
+        message: `${result.equipment.length}개의 설비 패밀리를 찾았습니다.`
       });
     } catch (error: any) {
       console.error('설비 목록 조회 실패:', error);
       res.status(500).json({
         success: false,
         equipment: [],
+        totalChunks: 0,
         message: `설비 목록 조회 실패: ${error.message}`
       });
     }

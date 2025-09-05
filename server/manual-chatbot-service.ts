@@ -526,7 +526,7 @@ ${relevantChunks.map((chunk, i) =>
     }
   }
 
-  async getAvailableEquipment(): Promise<{ family: string; equipment: string[] }[]> {
+  async getAvailableEquipment(): Promise<{ equipment: { family: string; equipment: string[] }[]; totalChunks: number }> {
     await this.initialize();
 
     try {
@@ -536,11 +536,13 @@ ${relevantChunks.map((chunk, i) =>
       const lines = fileContent.trim().split('\n');
       
       const equipmentMap = new Map<string, Set<string>>();
+      let totalChunks = 0;
       
       for (const line of lines) {
         try {
           const chunk = JSON.parse(line);
           const metadata = chunk.metadata || {};
+          totalChunks++; // 유효한 청크 개수 카운트
           
           if (typeof metadata.family === 'string' && Array.isArray(metadata.equipment)) {
             if (!equipmentMap.has(metadata.family)) {
@@ -553,13 +555,16 @@ ${relevantChunks.map((chunk, i) =>
         }
       }
 
-      return Array.from(equipmentMap.entries()).map(([family, equipment]) => ({
-        family,
-        equipment: Array.from(equipment)
-      }));
+      return {
+        equipment: Array.from(equipmentMap.entries()).map(([family, equipment]) => ({
+          family,
+          equipment: Array.from(equipment)
+        })),
+        totalChunks
+      };
     } catch (error) {
       console.error('설비 목록 조회 실패:', error);
-      return [];
+      return { equipment: [], totalChunks: 0 };
     }
   }
 
