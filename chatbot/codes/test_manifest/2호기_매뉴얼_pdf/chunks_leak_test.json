@@ -1,0 +1,943 @@
+[
+  {
+    "id": "51991e2b-f252-4ac0-9342-7af23b8849ab",
+    "chunk_id": "UNIT2-OM-KO-213-213-6bv3v",
+    "text": "공기폭발 Valve ꊊ ꊓ 의 오른쪽에 주입된다. 공기 Chamber Ⓔ 내의 압력증가속도는 조정 Screw ꊌ ꊕ 의 조정을 통해서 공기주입공 Ⅲ-4-7 Ⓓ 통로 조정에 의해 자유로 변화된다. 따라서 개방 Valve ꊌ ꊙ 시간 역시 변화된다. ※ 조정 Screw는 공장에서 시험을 하여 취급표시를 하였으므로 어떠한 상황에서도 조정을 하지 말아야 한다. 4. 설 치 가. 조 립 옥내용인 것으로서 AP형 차단기는 일반적으로 조립되어 수송된다. 그러나 운송 중 노출되어서는 안되며 도착후도 마찬가지이다. 사정에 따라 운송을 위해서 차단기 부분은 분해할 것이며 그 경우 사진 및 도면 에 따라 재조립해야 한다. 조립후 조임 Bolt, Nut등의 조임을 점검하고, 나쁘지 않다면 도면에 따라 설치해 야 한다. 나. 배 관 공기조의 공기 주입공은 공기압축설비로부터 뻗친 Pipe와 연결된 내부로 no-Return valve와 같이 설치되어 있다. 접합개소는 차광 Cover로 덮게를 해야 한다. 배관은 rim-joint방법에 의해 연결해야 하므로 동 pipe의 Rim가공전에 차광 Cover를 압착하여 연결 Nut를 제거해야 한다 배관정돈시에는 동파이프 내부에 찌꺼기나 먼지가 없음을 확인하고, 차단기 공기주입구를 Stop V/V로 폐쇄하고 연 결한다. 개방 및 폐쇄동작이 원활하면 Stroke는 충분한 것이다. 공기조 밑의 배기밸브 Ⓑ 의 Needle valve를 조인후 공기압축기의 저압측이 정확히 15㎏/㎠인가를 확인하고 Stop valve를 열어 차단기내의 공기조에 채운다. 공기조압력이 15㎏/㎠에 도달하면, Stop valve를 확실하게 닫고 연결부분이나 다른 주 부분은 비누거품을 적시어 누기 여부를 점검한다. 그러나 점검후 비누물도 부식의 원인이 되므로 세척해야 한다. 모든 부분이 양호하면 다음 식으로 개방, 투입시험을 실시한다. 처음에는 제어부 의 수동 Button을 눌러서 얼마간 개방, 투입시험을 행하고 모든 것이 양호하면 전 기적 회로에 의한 시험을 행한다.",
+    "char_len": 994,
+    "collection": "leak_test",
+    "doc_id": "UNIT2-OM-KO",
+    "page_start": 213,
+    "page_end": 213,
+    "section_path": "Ⅲ-4",
+    "title": "공기폭발 Valve ꊊ ꊓ 의 오른쪽에 주입된다",
+    "task_type": [
+      "설치",
+      "운전",
+      "점검",
+      "가스/배수/시험"
+    ],
+    "component": [
+      "차단기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "revB",
+    "doc_date": "2024-03-15",
+    "family": "1수력 2호기",
+    "equipment": [
+      "수차발전기"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "e1251b0d-4880-41a7-8f33-6ad6589875e1",
+    "chunk_id": "UNIT2-OM-KO-474-476-1ueng",
+    "text": ". 라. 도보순시 점검 단로기가 동작하는 동안 주위를 도보순시 하면서 이상여부를 시각과 청각으로 점 거하는 것으로 항목 및 절차는 표5와 같다. Ⅴ-4-39 Fig.13 Braking Mechanism Ⅴ-4-40 표 5 항목 No. 점 검 항 목 점 검 내 용 조 치 절 차 1 애 자 파손 및 흠집 가능한한 교체함 먼지 및 염분의 점착 상태가 심할 경우 부하중에 청소 또는 임시점검시 청소함 적 설 적설이 심하면 조작을 중지하고 제거함 2 Conducting부 (전류충전 및 접촉상태에서) 온도의 이상상승으로 인한 Blade와 접점부의 변색여부 및 과열로 인한 공기의 파동과 이음 조작을 중지하고 임시적 세부점검 실시함 전류차단으로 인한 접점의 이상 흔적 Blade 및 finger 접점부의 이상징후 발견시 임시 또는 정기점검시 결함부 교체함 finger 및 blade 접점의 동작 관계위치 확인 바람 전자력과 같은 임시적인 것이 아닌 외부적 힘에 의한 위치상의 불일치 발견시 재조정함 적은 동물류의 침입 참새 쥐등의 소동물의 침입 흔적을 점검하고 새의 둥지 발견시에는 정기점검시 청소함 3 누 기 전부분 누기점검을 하되 효과적인 방법은 누기음이 나는곳에 비누거품으로 점검함 점검개소 : pipe접합부 three-way발브, 전자변 기타 pipe류 임시 및 정기점검시 누기부분을 재조임과 재시험을 했음에도 계속 누기시에는 팩킹. Seal류를 교체함 4 조작기구함 빗물의침입 외부조임부분 및 Door팩킹 조임부분 재 조임 함 녹 조작기구함 및 단자함 내외부와 전기적 부분 철로된 부분을 이연 페인트로 보수하고 전류 통전부분은 천으로 가볍게 닦음 누유 완충장치 및 파이프 접속부 정기점검시 재조임 및 보수 기타 볼트류 및 Cottor pin의 절단 . 유실 5 기타 (Link 및 기계적 부분) 휘임 또는 변형과 절단 임시점검 실시 및 원인 파악을 하고 심한 변형 휘임 . 절단 발견시 교체함",
+    "char_len": 947,
+    "collection": "leak_test",
+    "doc_id": "UNIT2-OM-KO",
+    "page_start": 474,
+    "page_end": 476,
+    "section_path": "Ⅴ-4",
+    "title": "",
+    "task_type": [
+      "점검"
+    ],
+    "component": [
+      "단로기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.475 표 5",
+    "doc_version": "revB",
+    "doc_date": "2024-03-15",
+    "family": "1수력 2호기",
+    "equipment": [
+      "수차발전기"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "84a66784-e6bb-42c4-bca1-b53b96b323f1",
+    "chunk_id": "UNIT2-OM-KO-501-502-t9y3f",
+    "text": "-8-3 제5장 운전 및 설치 ························· Ⅴ-8-3 제6장 시험 및 유지관리 ················· Ⅴ-8-5 Ⅴ-8-1 C A P A C I T O R V O L T A G E T R A N S F O R M E R ( Ⅴ - 8 ) 1. 개 요 고압계통의 송전량 계량을 위한 자료획득의 수단으로서 종전에는 권선형 전위변압기 (이후 “PT”라함)가 사용되며 왔으나 계통전압의 상승과 함께 생산비용의 급격한 증가 를 피할 수 없게되어 고압계통에는 CAPACITOR 변압기(이후 “PD”라함)가 사용되게 되었다. 전력계량용 TOSHIBA PD는 구조가 간단하고 완전밀폐형으로서 공인을 획득한 것이 다. 이 PD가 여타 PD와 다른 점은 접지스위치, Spark gap, Potential Device Housing 을 없애고 내부를 두 Unit로 분리(Capacitor & 변압기)하였으며 또한 2차측 단락으로 인한 이상 현상으로부터의 보호를 위한 저압휴즈의 사용없이도 기타 설비에 의해 보호 되고 있다. 원리 및 구조 조작절차등은 다음과 같다. 2. PD의 원리 Condenser형 Potential Divider의 원리를 PD에 응용한 것이며 이른바 Resonance형 변환설비로서 결합용으로 누설변압기가 사용된다. 원리는 이미 알고있는 바와 같이 Fig.1을 보면 Potential Device는 정전 Capacitor C1과 C2에 직렬로 접속된 형태로서 Shunt Capacitor C2와 2차 부담회로사이에 고압누설 변압기가 삽입되어 있다. 여기에서 변압기의 누설저항은 C 1 +C 2 의 용량으로 공진토록 한다. C1 Vl Z1 Z2 C2 Z0 Zb Vt Fig.1 3. PD의 구조 Fig.",
+    "char_len": 865,
+    "collection": "leak_test",
+    "doc_id": "UNIT2-OM-KO",
+    "page_start": 501,
+    "page_end": 502,
+    "section_path": "Ⅴ-8",
+    "title": "-8-3 제5장 운전 및 설치 ························· Ⅴ-8-3 제6장 시험 및 유지관리 ·················",
+    "task_type": [
+      "설치",
+      "운전"
+    ],
+    "component": [
+      "접지개폐기"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "revB",
+    "doc_date": "2024-03-15",
+    "family": "1수력 2호기",
+    "equipment": [
+      "수차발전기"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "ce6e1079-694b-4b4a-a8fd-7e7383505c71",
+    "chunk_id": "UNIT2-OM-KO-502-503-3vcg4",
+    "text": "변압기의 누설저항은 C 1 +C 2 의 용량으로 공진토록 한다. C1 Vl Z1 Z2 C2 Z0 Zb Vt Fig.1 3. PD의 구조 Fig. 3.4는 본 설비중의 1상으로서 회로 및 주 Capacitor의 주요요소 및 Shunt Capacitor, 변압기 및 보호설비들을 나타낸 것이다. 주 Capacitor 및 Shunt Capacitor는 자기애자내에, 변압기의 내부요소는 하부에 봉입 된 탱크내에 있으며 기타 부분은 탱크측에 설치된 단자함내에 들어있다. 구조는 그림3 과 같으며 각 구성요소의 간단한 설명은 다음과 같다.",
+    "char_len": 296,
+    "collection": "leak_test",
+    "doc_id": "UNIT2-OM-KO",
+    "page_start": 502,
+    "page_end": 503,
+    "section_path": "제6장>3.4",
+    "title": "변압기의 누설저항은 C 1 +C 2 의 용량으로 공진토록 한다",
+    "task_type": [
+      "설치"
+    ],
+    "component": [],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "p.502 그림3",
+    "doc_version": "revB",
+    "doc_date": "2024-03-15",
+    "family": "1수력 2호기",
+    "equipment": [
+      "수차발전기"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  },
+  {
+    "id": "187d25e0-9565-4600-b4ad-0b9deb2e461b",
+    "chunk_id": "UNIT2-OM-KO-503-503-yfdhw",
+    "text": "봉입 된 탱크내에 있으며 기타 부분은 탱크측에 설치된 단자함내에 들어있다. 구조는 그림3 과 같으며 각 구성요소의 간단한 설명은 다음과 같다. Ⅴ-8-2 a) Main Capacitor 및 Shunt Capacitor PT에 비하여 PD가 높은 절연능력을 얻을 수 있는 이유로 결합 Capacitor에 크 게 이용되고 있으며 Toshiba의 고압 Capacitor는 Capacitor종이 및 절연오일의 질 개선, 진공기술 및 진공장비의 개발로 극도의 높은 기술수준을 유지하고 있 을뿐아니라 공장에서의 품질개선 노력을 꾸준히 하고 있다. PD에 사용된 Capacitor는 오일이 채워진 종이를 적층한 Capacitor Element에 회 로전압에 비례한 Capacitor Oil을 지지애자 내부에 채운 것이며 이를 완전히 밀 봉한 것이다. 온도상승에 의한 오일의 팽창 오일량과 부합되는 전지용량에 대한 대책으로 압 력조절기가 장치되어 있다. 주 Capacitor의 정격전압은 표준으로 66㎸, 77㎸를 적용하였으며 선로특성 및 부 담에 따라 정격용량을 선택토록 하였다. Voltage Dividing Capacitor는 주 Capacitor의 자기애자 하부에 내장되어 있으며 이를 직렬로 결선할수 있는 단자가 붓싱을 통하여 주 자기애자 하부에 노출되어 있다. b) 변압기 PD의 변압기는 누설변압기 구조이며 주 Capacitor 및 Shunt Capacitor의 정전용 량으로 공진하는 저항을 가지고 있다. 또한 변압기 및 Shunt Capacitor내에 직접 연결된 고압회로로부터의 이상충격전 류와 이에 의한 저압회로의 보호를 위해 사용되었던 Spark gap을 제거하였으며 따라서 이들 Capacitor 및 변압기는 높은 절연강도를 갖도록 설계되어있다. PD의 BIL에 대한 시험전압은 100%이며 Shunt Capacitor 및 변압기충격 내전압 은 약 150%가 됨으로서 외부로부터 침입하는 충격전압에 대해 기기를 보호할 수 있는 충분한 강도를 가지고 있다.",
+    "char_len": 987,
+    "collection": "leak_test",
+    "doc_id": "UNIT2-OM-KO",
+    "page_start": 503,
+    "page_end": 503,
+    "section_path": "Ⅴ-8",
+    "title": "봉입 된 탱크내에 있으며 기타 부분은 탱크측에 설치된 단자함내에 들어있다",
+    "task_type": [
+      "설치",
+      "가스/배수/시험"
+    ],
+    "component": [
+      "붓싱"
+    ],
+    "actuation": "스프링",
+    "standard_terms": [],
+    "spec": {
+      "gate_open_pct": 100
+    },
+    "alias_map": {
+      "차단기": [
+        "CB",
+        "Circuit Breaker",
+        "브레이커"
+      ],
+      "단로기": [
+        "DS",
+        "Disconnect Switch"
+      ],
+      "접지개폐기": [
+        "ES",
+        "Earthing Switch",
+        "접지스위치"
+      ],
+      "붓싱": [
+        "Bushing"
+      ],
+      "모선": [
+        "Bus",
+        "Main Bus"
+      ],
+      "가스": [
+        "SF6",
+        "S F 6",
+        "육불화황"
+      ],
+      "배수펌프": [
+        "Drainage Pump",
+        "배수 피트",
+        "DRAINAGE"
+      ],
+      "방수문": [
+        "Bulkhead Door",
+        "Flood Gate",
+        "벌크헤드"
+      ],
+      "드레인 밸브": [
+        "Drain Valve"
+      ],
+      "취수문": [
+        "Intake Gate"
+      ],
+      "크레인": [
+        "Gantry Crane",
+        "40TON",
+        "40 TON",
+        "40톤"
+      ],
+      "밀폐공간": [
+        "Confined Space"
+      ],
+      "잠수": [
+        "Diving"
+      ],
+      "SCADA": [
+        "원격",
+        "DESK",
+        "현장",
+        "LOCAL",
+        "REMOTE"
+      ],
+      "조속기": [
+        "Governor",
+        "Digital Governor",
+        "Speed Governor",
+        "GOV"
+      ],
+      "HMI": [
+        "Man-machine Interface",
+        "MMI",
+        "운전원 인터페이스",
+        "터치패널"
+      ],
+      "컨트롤러": [
+        "Controller",
+        "PLC",
+        "제어기"
+      ],
+      "Speed controller": [
+        "SPC",
+        "속도 제어기"
+      ],
+      "Opening controller": [
+        "OPC",
+        "개도 제어기"
+      ],
+      "Power controller": [
+        "POC",
+        "전력 제어기"
+      ],
+      "Wicket gate": [
+        "Guide Vane",
+        "GV",
+        "위켓게이트",
+        "가이드베인",
+        "Gate opening"
+      ],
+      "Servomotor": [
+        "Hydraulic Servomotor",
+        "서보모터",
+        "유압 서보모터"
+      ],
+      "Droop": [
+        "드룹",
+        "droop rate"
+      ],
+      "Isochronous": [
+        "등시"
+      ],
+      "Island operation": [
+        "Isolated network",
+        "Island mode",
+        "독립계통",
+        "단독계통"
+      ],
+      "Paralleling": [
+        "병렬운전",
+        "동기 투입",
+        "Synchronizing"
+      ],
+      "Overspeed test": [
+        "오버스피드 시험",
+        "과속 시험"
+      ],
+      "Alarm": [
+        "알람",
+        "경보"
+      ],
+      "Warning": [
+        "주의",
+        "경고"
+      ],
+      "Trip": [
+        "정지",
+        "트립"
+      ],
+      "Frequency": [
+        "Hz",
+        "주파수"
+      ],
+      "RPM": [
+        "r/min",
+        "회전속도"
+      ],
+      "Setpoint": [
+        "SP",
+        "설정치"
+      ],
+      "Gain": [
+        "Kp",
+        "Ki",
+        "Kd",
+        "PID",
+        "이득"
+      ]
+    },
+    "source_anchor": "",
+    "doc_version": "revB",
+    "doc_date": "2024-03-15",
+    "family": "1수력 2호기",
+    "equipment": [
+      "수차발전기"
+    ],
+    "diving": false,
+    "confined_space": false,
+    "uses_crane": false
+  }
+]
