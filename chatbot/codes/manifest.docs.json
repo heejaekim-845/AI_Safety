@@ -37,16 +37,16 @@
     },
     {
       "match": "보조여수로 수문설비.pdf",
-      "family": "1수력 공통",
-      "equipment": ["보조여수로", "수문설비"],
+      "family": "보조여수로",
+      "equipment": ["보조여수로 수문설비"],
       "doc_id": "SPILLWAY-GATE-KO",
       "doc_version": "v1.0",
       "doc_date": "2024-09-01"
     },
     {
       "match": "보조여수로 전기설비.pdf",
-      "family": "1수력 공통",
-      "equipment": ["보조여수로", "전기설비"],
+      "family": "보조여수로",
+      "equipment": ["보조여수로 전기설비"],
       "doc_id": "SPILLWAY-ELEC-KO",
       "doc_version": "v1.0",
       "doc_date": "2024-09-01"
