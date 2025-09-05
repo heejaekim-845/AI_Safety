@@ -31,6 +31,10 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 // @ts-ignore  
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
 
+// Alternative: pdf-parse for better Korean support
+// @ts-ignore
+import pdfParse from 'pdf-parse';
+
 import MiniSearch from 'minisearch';
 import { OpenAI } from 'openai';
 // @ts-ignore
@@ -237,6 +241,32 @@ function extractRelevantTerms(text: string, allTerms: string[]): string[] {
 
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
+  try {
+    // Try pdf-parse first for better Korean support
+    const data = fs.readFileSync(pdfPath);
+    const pdfData = await pdfParse(data);
+    console.log(`pdf-parse extracted: ${pdfData.text.length} chars, first 200: ${pdfData.text.substring(0, 200)}`);
+    
+    // Split text into pages (rough estimation)
+    const avgCharsPerPage = Math.max(1000, pdfData.text.length / pdfData.numpages);
+    const pages: string[] = [];
+    for (let i = 0; i < pdfData.numpages; i++) {
+      const start = i * avgCharsPerPage;
+      const end = Math.min((i + 1) * avgCharsPerPage, pdfData.text.length);
+      const pageText = pdfData.text.substring(start, end).trim();
+      if (pageText) pages.push(pageText);
+    }
+    
+    if (pages.length > 0 && !pages[0].includes('\u0000') && pages[0].length > 50) {
+      console.log('Using pdf-parse results - Korean text detected properly');
+      return pages;
+    }
+  } catch (error) {
+    console.log('pdf-parse failed, falling back to pdfjs-dist:', error);
+  }
+
+  // Fallback to original pdfjs-dist method
+  console.log('Using pdfjs-dist fallback');
   const data = new Uint8Array(fs.readFileSync(pdfPath));
   const doc = await pdfjsLib.getDocument({ 
     data,
@@ -245,12 +275,14 @@ async function extractPages(pdfPath: string): Promise<string[]> {
     standardFontDataUrl: '/home/runner/workspace/node_modules/pdfjs-dist/standard_fonts/',
     disableFontFace: false,
     useSystemFonts: true,
-    verbosity: 0
+    verbosity: 1
   }).promise;
   const pages: string[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
-    const content = await page.getTextContent();
+    const content = await page.getTextContent({
+      disableCombineTextItems: false
+    });
     const text = content.items.map((it: any) => it.str).join(' ').replace(/\s+/g,' ').replace(/\u0000/g,'').trim();
     pages.push(text);
   }
