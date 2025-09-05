@@ -26,7 +26,10 @@ import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
+// @ts-ignore
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+// @ts-ignore  
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs');
 
 import MiniSearch from 'minisearch';
 import { OpenAI } from 'openai';
@@ -234,33 +237,20 @@ function extractRelevantTerms(text: string, allTerms: string[]): string[] {
 
 // ----------------------------- PDF → page texts -----------------------------
 async function extractPages(pdfPath: string): Promise<string[]> {
-  const dataBuffer = fs.readFileSync(pdfPath);
-  const pdfData = await pdfParse(dataBuffer);
-  
-  // pdf-parse는 전체 텍스트를 반환하므로, 페이지별로 분할
-  // 페이지 구분자나 FormFeed 문자를 기준으로 분할 시도
-  const fullText = pdfData.text;
-  
-  // 먼저 \f (FormFeed) 또는 \n\n\n+ 패턴으로 페이지 구분 시도
-  let pages = fullText.split(/\f|\n{3,}/).filter(page => page.trim().length > 0);
-  
-  // 페이지가 너무 적으면 (1페이지만 나온 경우) 다른 방법 시도
-  if (pages.length === 1 && fullText.length > 2000) {
-    // 문자 길이 기준으로 대략적 페이지 분할 (약 2000자 per page)
-    const avgCharsPerPage = 2000;
-    const totalPages = Math.ceil(fullText.length / avgCharsPerPage);
-    pages = [];
-    for (let i = 0; i < totalPages; i++) {
-      const start = i * avgCharsPerPage;
-      const end = Math.min((i + 1) * avgCharsPerPage, fullText.length);
-      pages.push(fullText.slice(start, end));
-    }
+  const data = new Uint8Array(fs.readFileSync(pdfPath));
+  const doc = await pdfjsLib.getDocument({ 
+    data,
+    cMapUrl: '/home/runner/workspace/node_modules/pdfjs-dist/cmaps/',
+    cMapPacked: true 
+  }).promise;
+  const pages: string[] = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map((it: any) => it.str).join(' ').replace(/\s+/g,' ').replace(/\u0000/g,'').trim();
+    pages.push(text);
   }
-  
-  // 빈 페이지 제거 및 텍스트 정리
-  return pages
-    .map(page => page.replace(/\s+/g, ' ').replace(/\u0000/g, '').trim())
-    .filter(page => page.length > 50); // 너무 짧은 페이지는 제외
+  return pages;
 }
 
 // ----------------------------- Heading detection -----------------------------
