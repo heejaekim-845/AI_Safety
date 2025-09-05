@@ -638,11 +638,17 @@ export class WeatherService {
     
     return hourlyData.slice(0, 12).map((hour: any) => {
       const date = new Date(hour.dt * 1000);
-      // 한국 시간으로 변환
-      const koreaDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+      // 한국 시간으로 정확히 변환
+      const koreaHour = date.toLocaleString('en-US', { 
+        timeZone: 'Asia/Seoul',
+        hour12: false,
+        hour: '2-digit'
+      });
+      
+      console.log(`시간 변환: UTC ${date.toISOString()} → 한국 ${koreaHour}시, 온도=${Math.round(hour.temp)}°C`);
       
       return {
-        time: koreaDate.getHours().toString().padStart(2, '0') + ':00',
+        time: koreaHour + ':00',
         temperature: Math.round(hour.temp),
         condition: this.translateWeatherCondition(hour.weather?.[0]?.main || 'Clear'),
         humidity: hour.humidity || 50,
