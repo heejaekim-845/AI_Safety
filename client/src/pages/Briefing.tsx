@@ -634,7 +634,7 @@ export default function Briefing() {
                             시간대별 예보 (작업시간 기준 ±2시간)
                           </h4>
                           <div className="bg-gray-50 rounded-lg p-3">
-                            <div className="flex gap-3 justify-center">
+                            <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
                               {(() => {
                                 // 현재 시간과 날짜
                                 const now = new Date();
@@ -707,7 +707,7 @@ export default function Briefing() {
                                   };
                                   
                                   return (
-                                    <div key={time} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-200 border border-gray-300'}`}>
+                                    <div key={time} className={`flex flex-col items-center p-1.5 rounded-md shadow-sm min-w-[60px] flex-shrink-0 ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-200 border border-gray-300'}`}>
                                       <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-gray-500'}`}>
                                         {time}
                                         <div className="text-xs">{getTimeLabel()}</div>
@@ -757,7 +757,7 @@ export default function Briefing() {
                                   // const timeType = getTimeType(timeSlot);
                                   
                                   return (
-                                    <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-orange-50 border border-orange-300'}`}>
+                                    <div key={index} className={`flex flex-col items-center p-1.5 rounded-md shadow-sm min-w-[60px] flex-shrink-0 ${isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-orange-50 border border-orange-300'}`}>
                                       <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-orange-600'}`}>
                                         {timeSlot}
                                         <div className="text-xs">
