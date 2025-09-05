@@ -152,7 +152,7 @@ export class WeatherService {
           }
         });
         
-        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data);
+        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data, location);
         fallbackResult.weatherType = 'current';
         fallbackResult.weatherDate = new Date().toISOString().split('T')[0];
         fallbackResult.weatherTime = new Date().toTimeString().slice(0, 5);
@@ -220,7 +220,7 @@ export class WeatherService {
           }
         });
         
-        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data);
+        const fallbackResult = this.parseOpenWeatherResponse(fallbackResponse.data, location);
         fallbackResult.weatherType = 'current';
         fallbackResult.weatherDate = new Date().toISOString().split('T')[0];
         fallbackResult.weatherTime = new Date().toTimeString().slice(0, 5);
@@ -434,7 +434,7 @@ export class WeatherService {
       }
 
       const weatherData = response.data;
-      const realWeatherData = this.parseOpenWeatherResponse(weatherData);
+      const realWeatherData = this.parseOpenWeatherResponse(weatherData, location);
       realWeatherData.weatherType = 'current';
       realWeatherData.weatherDate = new Date().toISOString().split('T')[0];
       
@@ -472,12 +472,12 @@ export class WeatherService {
     return null;
   }
 
-  private parseOpenWeatherResponse(data: any): WeatherData {
+  private parseOpenWeatherResponse(data: any, originalLocation?: string): WeatherData {
     const temperature = Math.round(data.main.temp);
     const humidity = data.main.humidity;
     const windSpeed = Math.round(data.wind.speed);
     const condition = this.translateWeatherCondition(data.weather[0].main);
-    const location = data.name;
+    const location = originalLocation || data.name;
 
     const safetyWarnings = this.generateSafetyWarnings(condition, temperature, humidity, windSpeed);
 
