@@ -166,11 +166,23 @@ function detectLang(text: string) {
 function guessFamilyEquip(file: string, lang: 'ko'|'en') {
   const b = path.basename(file);
   const lower = b.toLowerCase();
-  if (lower.includes('gis')) return { family: 'GIS', equipment: ['170kV GIS'] };
-  if (lower.includes('조속기') || lower.includes('governor')) return { family: 'Hydro', equipment: ['Governor','HMI'] };
-  if (lower.includes('순서도') || lower.includes('배수')) return { family: 'Hydro', equipment: ['수차발전기','방수문','배수'] };
-  // 1호기/2호기 발전설비 운전유지보수 매뉴얼(발전기/여자/차단기 등)
-  if (lower.includes('매뉴얼') || lower.includes('manual')) return { family: 'Hydro', equipment: ['Generator','Aux','Switchgear'] };
+  if (lower.includes('gis')) return { family: '변전설비', equipment: ['170kV GIS'] };
+  // 구체적인 호기별 매뉴얼 먼저 확인
+  if (lower.includes('1호기') && (lower.includes('매뉴얼') || lower.includes('manual'))) {
+    return { family: '1수력 1호기', equipment: ['수차발전기'] };
+  }
+  if (lower.includes('2호기') && (lower.includes('매뉴얼') || lower.includes('manual'))) {
+    return { family: '1수력 2호기', equipment: ['수차발전기'] };
+  }
+  if (lower.includes('조속기') || lower.includes('governor')) {
+    // 조속기도 호기별로 분류
+    if (lower.includes('1호기')) return { family: '1수력 1호기', equipment: ['디지털조속기'] };
+    if (lower.includes('2호기')) return { family: '1수력 2호기', equipment: ['디지털조속기'] };
+    return { family: '1수력 공통', equipment: ['디지털조속기'] };
+  }
+  if (lower.includes('순서도') || lower.includes('배수')) return { family: '1수력 공통', equipment: ['수차발전기','방수문','배수'] };
+  // 일반적인 매뉴얼은 공통으로 분류
+  if (lower.includes('매뉴얼') || lower.includes('manual')) return { family: '1수력 공통', equipment: ['수차발전기'] };
   return { family: 'Plant', equipment: ['Equipment'] };
 }
 
