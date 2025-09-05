@@ -630,23 +630,91 @@ export default function Briefing() {
                             <div className="bg-gray-50 rounded-lg p-3">
                               <div className="flex gap-3 justify-center">
                                 {(() => {
+                                  // 현재 시간과 날짜
+                                  const now = new Date();
+                                  const currentHour = now.getHours();
+                                  const today = now.toISOString().split('T')[0];
+                                  const weatherDate = (briefingData.weatherInfo as any).weatherDate || today;
+
+                                  // 시간 타입 판단 함수
+                                  const getTimeType = (hourTime: string) => {
+                                    const hourNum = parseInt(hourTime.split(':')[0]);
+                                    
+                                    // 날짜가 다르면 미래/과거로 판단
+                                    if (weatherDate !== today) {
+                                      return weatherDate > today ? '미래' : '과거';
+                                    }
+                                    
+                                    // 같은 날이면 시간으로 판단
+                                    if (hourNum < currentHour) {
+                                      return '과거';
+                                    } else if (hourNum === currentHour) {
+                                      return '현재';
+                                    } else {
+                                      return '미래';
+                                    }
+                                  };
+
+                                  // 타입별 스타일 반환 함수
+                                  const getTypeStyle = (type: string, isWorkTime: boolean) => {
+                                    if (isWorkTime) {
+                                      return 'bg-blue-100 border-2 border-blue-300';
+                                    }
+                                    
+                                    switch (type) {
+                                      case '과거':
+                                        return 'bg-gray-100 border border-gray-300';
+                                      case '현재':
+                                        return 'bg-green-50 border border-green-300';
+                                      case '미래':
+                                        return 'bg-orange-50 border border-orange-300';
+                                      default:
+                                        return 'bg-white';
+                                    }
+                                  };
+
+                                  // 타입별 라벨 색상 반환 함수
+                                  const getTypeLabelStyle = (type: string, isWorkTime: boolean) => {
+                                    if (isWorkTime) {
+                                      return 'text-blue-700';
+                                    }
+                                    
+                                    switch (type) {
+                                      case '과거':
+                                        return 'text-gray-600';
+                                      case '현재':
+                                        return 'text-green-600';
+                                      case '미래':
+                                        return 'text-orange-600';
+                                      default:
+                                        return 'text-gray-600';
+                                    }
+                                  };
+
                                   // 작업 시간 추출 (HH:mm 형식)
                                   const workTime = selectedWorkSchedule?.briefingTime;
                                   if (!workTime) {
                                     // 작업 시간이 없으면 처음 5개만 표시
-                                    return briefingData.weatherInfo.hourlyForecast!.slice(0, 5).map((hour, index) => (
-                                      <div key={index} className="flex flex-col items-center p-2 bg-white rounded-md shadow-sm min-w-[70px]">
-                                        <div className="text-xs font-medium text-gray-600">{hour.time}</div>
-                                        <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
-                                        <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
-                                        {hour.rainfall > 0 && (
-                                          <div className="flex items-center gap-1 mt-1">
-                                            <Droplets className="w-3 h-3 text-blue-500" />
-                                            <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                    return briefingData.weatherInfo.hourlyForecast!.slice(0, 5).map((hour, index) => {
+                                      const timeType = getTimeType(hour.time);
+                                      
+                                      return (
+                                        <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${getTypeStyle(timeType, false)}`}>
+                                          <div className={`text-xs font-medium ${getTypeLabelStyle(timeType, false)}`}>
+                                            {hour.time}
+                                            <div className="text-xs">{timeType}</div>
                                           </div>
-                                        )}
-                                      </div>
-                                    ));
+                                          <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
+                                          <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
+                                          {hour.rainfall > 0 && (
+                                            <div className="flex items-center gap-1 mt-1">
+                                              <Droplets className="w-3 h-3 text-blue-500" />
+                                              <span className="text-xs text-blue-600">{hour.rainfall}mm</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    });
                                   }
 
                                   // 작업시간을 시간 단위로 변환
@@ -663,14 +731,15 @@ export default function Briefing() {
                                   return filteredForecast.map((hour, index) => {
                                     const hourNum = parseInt(hour.time.split(':')[0]);
                                     const isWorkTime = hourNum === workHour;
+                                    const timeType = getTimeType(hour.time);
                                     
                                     return (
-                                      <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${
-                                        isWorkTime ? 'bg-blue-100 border-2 border-blue-300' : 'bg-white'
-                                      }`}>
-                                        <div className={`text-xs font-medium ${isWorkTime ? 'text-blue-700' : 'text-gray-600'}`}>
+                                      <div key={index} className={`flex flex-col items-center p-2 rounded-md shadow-sm min-w-[70px] ${getTypeStyle(timeType, isWorkTime)}`}>
+                                        <div className={`text-xs font-medium ${getTypeLabelStyle(timeType, isWorkTime)}`}>
                                           {hour.time}
-                                          {isWorkTime && <div className="text-xs text-blue-600">작업시간</div>}
+                                          <div className="text-xs">
+                                            {isWorkTime ? '작업시간' : timeType}
+                                          </div>
                                         </div>
                                         <div className="text-sm font-bold mt-1">{hour.temperature}°C</div>
                                         <div className="text-xs text-gray-600 mt-1">{hour.condition}</div>
