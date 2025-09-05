@@ -622,10 +622,8 @@ export default function Briefing() {
 
                         {/* 작업시간 기준 날씨 안내 */}
                         {selectedWorkSchedule?.briefingTime && (
-                          <div className="mt-3 p-2 bg-blue-50 rounded-md border border-blue-200">
-                            <div className="text-center text-sm text-blue-700 font-medium">
-                              작업시간({selectedWorkSchedule.briefingTime}) 기준 날씨입니다
-                            </div>
+                          <div className="mt-2 text-center text-xs text-gray-500">
+                            작업시간({selectedWorkSchedule.briefingTime}) 기준 날씨입니다
                           </div>
                         )}
 
