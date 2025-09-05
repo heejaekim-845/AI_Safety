@@ -2,92 +2,92 @@
   "documentCount": 86,
   "nextId": 86,
   "documentIds": {
-    "0": "b21e1231-7dc1-45df-9c4a-26ad4f4b31de",
-    "1": "24c41d20-f9dc-4a53-adbe-1ff195c35724",
-    "2": "ec57acd5-7ec3-4699-96b2-6374393ac3e8",
-    "3": "3e4e410b-f04e-4cc3-bc5b-53a9e32c1c98",
-    "4": "16dfc6cd-8be8-4e19-ac12-c0ec4a25c995",
-    "5": "599e87a4-73fa-42fb-a083-056283098a3a",
-    "6": "fb64b64a-227e-418c-aba1-c37344998dda",
-    "7": "1935e02d-d1ce-40e8-b64c-af20d1b6f99a",
-    "8": "ed473839-8333-4b3e-a062-3f1d4df108ab",
-    "9": "060e29ed-3c82-4197-a9a0-a33722a72a1c",
-    "10": "cc460ffb-c214-4294-8850-1c700b283dd1",
-    "11": "ecacd6fa-610e-46d9-900e-bc4973fb8335",
-    "12": "0fd63629-0f9e-4970-ac8a-22bd186c8882",
-    "13": "6cd8c01d-9db3-47bf-b143-c7e21cfe277c",
-    "14": "7896d86e-dca2-4bbc-8b67-25a139236132",
-    "15": "5658aa8c-9b55-475b-b5a1-01e1a84b6092",
-    "16": "cc2bcadc-b9d1-4c58-b698-506d8cc593f6",
-    "17": "935f73a8-1968-4da4-a414-1d53739693fc",
-    "18": "a2070a7b-1af4-451c-9c66-609f2e7a43ca",
-    "19": "6334a627-d426-4af2-890e-4b0fc90b5145",
-    "20": "5d27aab3-0cf8-4e11-a1c8-806a15bc9463",
-    "21": "3f540afd-4aaf-4847-9713-9a2817508d42",
-    "22": "4ccba273-016e-4d2b-8dfa-40cde62b73bf",
-    "23": "80f1564e-0d71-4954-afcf-fc0d37a4a6bd",
-    "24": "25d3e8a8-25cc-480f-ab8e-aa01a7b29720",
-    "25": "e4288937-8bf8-45d1-9582-afc5620ac0d8",
-    "26": "81722ebf-6b57-4163-bc7a-600b7c9495d3",
-    "27": "c844e3b0-f1ab-461a-95b1-ca81b13c65be",
-    "28": "709ba4ac-1bb8-485f-ab75-52866388948d",
-    "29": "cc14761c-06a5-4043-a01e-fc9ebf374a0e",
-    "30": "30710051-64d8-45b2-994f-654fa9e889a3",
-    "31": "0bf7ef1d-365c-4820-a080-c11844390283",
-    "32": "6cda1833-164e-417d-9043-d26f9617977c",
-    "33": "02fe061b-199c-41d1-934c-97951d37b7ed",
-    "34": "db557670-f70f-496f-8a27-ba6fb83a3bb4",
-    "35": "a8e06ce0-dafc-4007-b86d-c7a8e77fb822",
-    "36": "c845f181-30e1-4c23-8dbc-b25360f15f0c",
-    "37": "09fbd1e6-1ac4-462d-8fd4-8fefa13bd82f",
-    "38": "2cdfeba3-3088-4882-a2d7-e148446ea59c",
-    "39": "b591fac8-a4f0-4ec1-9544-0a02c52d3a25",
-    "40": "7ad0fea6-ff18-4905-85ea-027a18232a24",
-    "41": "f43ef8a5-b0c6-4e4a-b31d-8372be185591",
-    "42": "bf4e2e0c-9b9c-4ddc-b7c3-b52b75c6d40b",
-    "43": "3645d797-9409-4b9c-9c44-3c899277d3de",
-    "44": "64524d19-aa8b-4853-be79-7bac7bcc1453",
-    "45": "55dc4f59-366c-4e1f-b3ca-8e1d7ffdb44b",
-    "46": "ad7bbdba-b44c-499b-82ef-c6a7125aa811",
-    "47": "02d91e39-7681-4780-88c4-ec97fc95a521",
-    "48": "46b492b2-fc8e-44da-8fec-d7bcda352b2c",
-    "49": "d1b4cbd7-7ef7-4d6c-9d46-a53e2b651868",
-    "50": "3a73ae55-3103-4e8b-b12c-4be984c046e8",
-    "51": "e9c85c0e-6bd3-442b-bc01-5d111370de29",
-    "52": "143e7235-7d6d-4b21-9898-78b3e057f7f1",
-    "53": "9b648032-ee47-49a7-a709-716b3c921a64",
-    "54": "bc999f18-d815-4831-a2b9-fbb3ea1a732b",
-    "55": "cdcae20c-0ada-4c09-958b-04d98ffc4e9c",
-    "56": "b8f965b8-5953-4aad-b1db-b0e98cf6f9c5",
-    "57": "47745ac7-3f04-48ed-9e98-e1c6bff5a22c",
-    "58": "d95a0273-75c0-474c-a900-f8d0774f011c",
-    "59": "14e0e0eb-78d6-45a6-a925-65b75260c4a7",
-    "60": "c36b29ac-666f-4fe9-b324-d9fabbb6b70a",
-    "61": "341a4130-86ea-41cd-959e-7e6ecf8bdd84",
-    "62": "6207cc23-0255-4d75-aaf1-77d86044ff31",
-    "63": "8d2826a3-cf8d-459e-aab7-acc0a751f6cb",
-    "64": "e2c76ee5-f9ec-4394-b8b7-ef902a52a42c",
-    "65": "7842c8c4-81a0-425f-9244-4713cdf06e4e",
-    "66": "c2d56375-b1cf-424f-b68a-1c61531332d9",
-    "67": "4254491d-95ed-4e60-87a2-d5e8f0f5e151",
-    "68": "905493ae-fcba-4680-912d-d7d9b81b63d6",
-    "69": "b8eaa189-a0cb-4d80-8650-5e212b1f6ffe",
-    "70": "94d4f7f0-795b-4483-8064-3d8e0dc0c274",
-    "71": "65e16ebe-9039-43c1-a2c2-6904bfb25145",
-    "72": "8a494211-355f-45dd-93a2-bc4f735a9e6d",
-    "73": "c5c208c5-2708-440d-b51c-bead8c94d48c",
-    "74": "07ac7bd8-bb39-4674-a027-91668f5a8f37",
-    "75": "2055d3c5-7aa9-4ffd-9501-73f07f471f0a",
-    "76": "9e7d48bd-bac5-456f-a3fa-570d0cb8d71d",
-    "77": "0459313b-6bd6-4c0c-9820-5e68a000bfa6",
-    "78": "44b08f1f-7d3b-41ac-b897-52098aa0d02c",
-    "79": "abf42a8b-efd8-4b8c-840c-ab6f1bfe9204",
-    "80": "0d865156-bf9a-4d01-b10d-9df57b1df509",
-    "81": "911a5501-60d1-4401-b870-27635800d7a5",
-    "82": "1c090732-0602-461d-b684-9e425553e413",
-    "83": "39ae2f1d-ff98-40be-a7dd-b173a2499aa5",
-    "84": "d9b1d36b-ad3b-443f-9ade-bc7d076b591b",
-    "85": "925bfd4e-910e-4dfb-a0d6-66f1dc401ad6"
+    "0": "e2eaf9b9-cc20-4d43-88a7-518dc0b1cc70",
+    "1": "7eb2eec2-e2b9-42bf-a77f-3b478e5a15d3",
+    "2": "6d3c108a-7b2b-4f82-af14-c7f4b224614e",
+    "3": "e6d6f6ac-7c90-4a71-879e-44ba4fab94fa",
+    "4": "6d202f58-9dbe-4d6d-b44d-2b993d88aa27",
+    "5": "76c8f0b2-f1d3-42f2-b689-c2ee0e7698b0",
+    "6": "714bdf62-4845-408a-a262-cd0f4f38cc69",
+    "7": "2dc5e0fd-6417-40f4-a5cf-0f83f2273775",
+    "8": "4e78f1bc-da4d-4bdb-a6f1-4ae2c2659dd5",
+    "9": "ce2f4da0-1d7f-42b4-b4a4-c42c8e1f74cf",
+    "10": "29c85979-c0d8-4f7d-b48d-897b646f63cd",
+    "11": "f837bbca-3a6b-49ec-b288-f34467f8c6b5",
+    "12": "c9f801e6-47a1-467a-b982-8ec796b27d74",
+    "13": "250e23f1-92c9-4ead-9261-22c31eac5c54",
+    "14": "29418128-e99f-4d89-b286-6861a4dc0ba6",
+    "15": "f20d9a7c-240c-42c5-a705-60efa19bd014",
+    "16": "6761d588-ca2a-4966-832c-12df36acfc28",
+    "17": "000bb4d9-e7c9-4778-bccd-8d823543bbb3",
+    "18": "01fc4a82-dea6-4d3a-b09f-7481b3513911",
+    "19": "c751a94b-2638-4566-9893-fb7bd757f9db",
+    "20": "c41dcc53-10e6-4694-bb8e-946465c4a4b7",
+    "21": "941172dd-ee5a-4625-99fd-e7970dadebba",
+    "22": "699950e1-6870-45a8-ade2-7be19b5dd4a0",
+    "23": "62bedbb7-c1f9-46fc-a2ca-1365296884e0",
+    "24": "e479c0e3-b501-46f1-abc5-a124c99efed2",
+    "25": "fa6b58be-6069-41e1-8867-b06c6ee9ea5c",
+    "26": "a52ce3f8-ce04-4a08-8ff6-0ab29a94b613",
+    "27": "0c04d373-08f4-4cf6-af2f-a6364c7faa7e",
+    "28": "526cfce0-5559-4bac-a991-aa51d4f5cc09",
+    "29": "36e5eed1-66ca-41a7-a02e-d834ad3a5ee6",
+    "30": "2173404b-e946-48e5-a67d-23ebb6f5b0f6",
+    "31": "63b30351-25c1-4591-bd31-bc487887d2fc",
+    "32": "590f29ce-ed78-4658-b375-72aaa97f72fb",
+    "33": "8e84c15c-2b9d-47a6-b97c-3d089f08f4ff",
+    "34": "10e1e186-816a-4d0a-9f6a-dbebbcd6d24c",
+    "35": "c8e58512-49bc-4261-a0f1-3cde820d089a",
+    "36": "a190a514-da7d-4611-a13a-e4c15e0a3cd1",
+    "37": "002076e7-03cf-4d08-baa5-4dbe3b588bad",
+    "38": "27f00d21-05f9-4925-beaa-c7bad5fd881e",
+    "39": "22f8fc07-06b0-4810-8785-771f0211b7d8",
+    "40": "12489374-9197-4227-ac57-5488f96d2c98",
+    "41": "7c0adfec-052d-4579-b254-beba24193c1d",
+    "42": "0b23a2fa-6d70-4d60-9f24-85320c85ffb1",
+    "43": "6dd827a9-1051-4587-b640-d099d5752f17",
+    "44": "a8146064-2876-462a-acb0-45ef180af370",
+    "45": "b2d45bf1-4d8d-495a-a480-31272e76193c",
+    "46": "8bd130c9-0dbf-4c9c-a942-5766db0e1724",
+    "47": "1191cbab-ea42-4876-83c0-f0965b4dcedc",
+    "48": "7875a558-3568-45a1-97d1-b416d48596c0",
+    "49": "8410243c-cd5a-4dd4-9e96-5e4ccdd90e6a",
+    "50": "6e956ec2-e079-4a9e-829f-c60f3998f029",
+    "51": "857d77e6-c4e6-41d0-b70e-40ddbd23896a",
+    "52": "d079b7ee-11a7-4e20-986b-9aa3c378154c",
+    "53": "07668182-20a8-441d-a074-7741a9a7c689",
+    "54": "264b3915-4002-4a25-ad13-4363f0f3d9b9",
+    "55": "db88eb03-56dd-4a4e-80d0-75c226cfced9",
+    "56": "691a235f-b0a0-409b-8ddd-ac4c0decece4",
+    "57": "fa193791-44f0-46ab-bec5-e04a0fd4ffed",
+    "58": "2e12a25a-2011-49ef-8dd7-1b6977a7e469",
+    "59": "103708cf-4432-4e3b-bf7b-2157024944b4",
+    "60": "cd6e5dab-094a-4d7a-a795-29250a921c4a",
+    "61": "94c8301e-e353-4dc0-ac57-106e7db7ac9c",
+    "62": "d782a4b7-1dd2-4090-8267-46406f355587",
+    "63": "807f59b8-9343-4ca4-acfd-e2005ab686fe",
+    "64": "5765faac-53c4-4acb-b01b-0415380e3335",
+    "65": "1b63013f-b966-47b4-a5c8-c983339dec74",
+    "66": "649e662b-4921-4fbd-992b-f672800160d5",
+    "67": "c455afcc-8193-44a4-9b8e-62147fad5e1f",
+    "68": "d6f9f728-ae05-4f70-8cd3-a06d27b8c3c9",
+    "69": "42b5d901-7612-4400-bd37-bcdfe0350f7d",
+    "70": "e8434230-f415-49cb-947a-7e053e9fa757",
+    "71": "4d09dea7-c90c-4b5b-b53f-4c70280fd9a1",
+    "72": "49e9b0c6-681b-4ecc-8a43-2407c68ceaa6",
+    "73": "2ac536a2-9f6b-4398-840a-caf4fd4c7bc7",
+    "74": "1f25dc62-1fdf-40c8-a112-951a457c355b",
+    "75": "bcaedcf1-68d2-47d9-93a8-d108759e460b",
+    "76": "01bd9898-71d0-4263-8cc1-70f9413f13b0",
+    "77": "b198ed43-2c6a-4623-961d-64498d2489af",
+    "78": "31b65669-92b4-43de-a36b-4626786fa056",
+    "79": "9e10a1a8-7465-48d4-8ca4-a51f6eaff3f5",
+    "80": "5abc7a2b-4610-411b-b7a2-ac37b2848a67",
+    "81": "fac302ca-c8f0-4cdc-aa0f-4d427f15eadf",
+    "82": "c81a994a-4689-4c66-a604-1a0c94c9841b",
+    "83": "3eb85a74-48be-4b47-af38-5e1fe0e2b012",
+    "84": "1c95926c-e550-4604-9afa-e4503f3768a0",
+    "85": "599e2910-6337-4ee3-b07a-e00c9757b3d1"
   },
   "fieldIds": {
     "title": 0,
@@ -621,7 +621,7 @@
   ],
   "storedFields": {
     "0": {
-      "id": "b21e1231-7dc1-45df-9c4a-26ad4f4b31de",
+      "id": "e2eaf9b9-cc20-4d43-88a7-518dc0b1cc70",
       "title": "중규모 수력플랜트 발전기 파트 운영 및 유지보수 매뉴얼 연구과제 성과물 추가 1",
       "section_path": "1.2",
       "collection": "procedures",
@@ -631,7 +631,7 @@
       "step_no": ""
     },
     "1": {
-      "id": "24c41d20-f9dc-4a53-adbe-1ff195c35724",
+      "id": "7eb2eec2-e2b9-42bf-a77f-3b478e5a15d3",
       "title": "매뉴얼 구성 1",
       "section_path": "1.6",
       "collection": "procedures",
@@ -641,7 +641,7 @@
       "step_no": ""
     },
     "2": {
-      "id": "ec57acd5-7ec3-4699-96b2-6374393ac3e8",
+      "id": "6d3c108a-7b2b-4f82-af14-c7f4b224614e",
       "title": "950-5J5947 1",
       "section_path": "2.4",
       "collection": "procedures",
@@ -651,7 +651,7 @@
       "step_no": ""
     },
     "3": {
-      "id": "3e4e410b-f04e-4cc3-bc5b-53a9e32c1c98",
+      "id": "e6d6f6ac-7c90-4a71-879e-44ba4fab94fa",
       "title": "",
       "section_path": "2.5",
       "collection": "specs",
@@ -661,7 +661,7 @@
       "step_no": ""
     },
     "4": {
-      "id": "16dfc6cd-8be8-4e19-ac12-c0ec4a25c995",
+      "id": "6d202f58-9dbe-4d6d-b44d-2b993d88aa27",
       "title": "스 히터 용량 계산서 M905-5J0374 32) 전달 매트릭스 방법 M905-5J2837 33) 계자 부스 바 절연 사양 M905-5J6063",
       "section_path": "1.1",
       "collection": "specs",
@@ -671,7 +671,7 @@
       "step_no": ""
     },
     "5": {
-      "id": "599e87a4-73fa-42fb-a083-056283098a3a",
+      "id": "76c8f0b2-f1d3-42f2-b689-c2ee0e7698b0",
       "title": "Type GDH7439S-24 Output 50,000 kVA Voltage 13,200 V Current 2,187 A Power Factor",
       "section_path": "0.9",
       "collection": "specs",
@@ -681,7 +681,7 @@
       "step_no": ""
     },
     "6": {
-      "id": "fb64b64a-227e-418c-aba1-c37344998dda",
+      "id": "714bdf62-4845-408a-a262-cd0f4f38cc69",
       "title": "85 ℃ 쓰러스트 베어링 Alarm : 75 ℃ , Trip : 85 ℃ 냉각수량 운전 수압 시험 수압 공기 냉각기 2,700 Liter/min",
       "section_path": "1.08",
       "collection": "specs",
@@ -691,7 +691,7 @@
       "step_no": ""
     },
     "7": {
-      "id": "1935e02d-d1ce-40e8-b64c-af20d1b6f99a",
+      "id": "2dc5e0fd-6417-40f4-a5cf-0f83f2273775",
       "title": "상승 : 35 m ｍ 하강 : 35 mm 하부 가이드 베어링 Type Segmental 수량 12 지름 1,920 mm 공차 ( 반지름 기준 )",
       "section_path": "2.6",
       "collection": "procedures",
@@ -701,7 +701,7 @@
       "step_no": ""
     },
     "8": {
-      "id": "ed473839-8333-4b3e-a062-3f1d4df108ab",
+      "id": "4e78f1bc-da4d-4bdb-a6f1-4ae2c2659dd5",
       "title": "회전자 잭업의 허용최대치 --------------- 6mm 재질 비석면 수지 ( 금형 ) 브레이크 슈 두께 40 mm 허용 마모량 25 mm ",
       "section_path": "1.2",
       "collection": "specs",
@@ -711,7 +711,7 @@
       "step_no": ""
     },
     "9": {
-      "id": "060e29ed-3c82-4197-a9a0-a33722a72a1c",
+      "id": "ce2f4da0-1d7f-42b4-b4a4-c42c8e1f74cf",
       "title": "향을 미친다 ",
       "section_path": "1.2",
       "collection": "hazards",
@@ -721,7 +721,7 @@
       "step_no": ""
     },
     "10": {
-      "id": "cc460ffb-c214-4294-8850-1c700b283dd1",
+      "id": "29c85979-c0d8-4f7d-b48d-897b646f63cd",
       "title": "O 유압 잭 O 오일 배관 O 베어링 오일 저장소 회전자 리드 및 계자 권선 O 연결부 모든 연결부에 변색 및 과열 징후가 있는지 확인한다 ",
       "section_path": "1.2",
       "collection": "hazards",
@@ -731,7 +731,7 @@
       "step_no": ""
     },
     "11": {
-      "id": "ecacd6fa-610e-46d9-900e-bc4973fb8335",
+      "id": "f837bbca-3a6b-49ec-b288-f34467f8c6b5",
       "title": "질의 양에 따라 다르다 ",
       "section_path": "0.5",
       "collection": "procedures",
@@ -741,7 +741,7 @@
       "step_no": ""
     },
     "12": {
-      "id": "0fd63629-0f9e-4970-ac8a-22bd186c8882",
+      "id": "c9f801e6-47a1-467a-b982-8ec796b27d74",
       "title": "야 한다 ",
       "section_path": "0.5",
       "collection": "specs",
@@ -751,7 +751,7 @@
       "step_no": ""
     },
     "13": {
-      "id": "6cd8c01d-9db3-47bf-b143-c7e21cfe277c",
+      "id": "250e23f1-92c9-4ead-9261-22c31eac5c54",
       "title": "출한다 ",
       "section_path": "1.3",
       "collection": "hazards",
@@ -761,7 +761,7 @@
       "step_no": ""
     },
     "14": {
-      "id": "7896d86e-dca2-4bbc-8b67-25a139236132",
+      "id": "29418128-e99f-4d89-b286-6861a4dc0ba6",
       "title": "정자 권선 및 코어의 손상 방지 조치를 하고 특별한 주의를 기울여 인양하도록 한다 ",
       "section_path": "1.3",
       "collection": "hazards",
@@ -771,7 +771,7 @@
       "step_no": ""
     },
     "15": {
-      "id": "5658aa8c-9b55-475b-b5a1-01e1a84b6092",
+      "id": "f20d9a7c-240c-42c5-a705-60efa19bd014",
       "title": "과또는 먼지 고정자 권선과 동일한 방법으로 권선을 청소한다 ",
       "section_path": "1.3",
       "collection": "hazards",
@@ -781,7 +781,7 @@
       "step_no": ""
     },
     "16": {
-      "id": "cc2bcadc-b9d1-4c58-b698-506d8cc593f6",
+      "id": "6761d588-ca2a-4966-832c-12df36acfc28",
       "title": "슬립 링 브 러시에 과도한 마모를 유발할 수 있기 때문이다 ",
       "section_path": "1.4",
       "collection": "hazards",
@@ -791,7 +791,7 @@
       "step_no": ""
     },
     "17": {
-      "id": "935f73a8-1968-4da4-a414-1d53739693fc",
+      "id": "000bb4d9-e7c9-4778-bccd-8d823543bbb3",
       "title": "되었는지 확인한다 ",
       "section_path": "0.03",
       "collection": "specs",
@@ -801,7 +801,7 @@
       "step_no": ""
     },
     "18": {
-      "id": "a2070a7b-1af4-451c-9c66-609f2e7a43ca",
+      "id": "01fc4a82-dea6-4d3a-b09f-7481b3513911",
       "title": "깊이 게이지로 측정하고 기록해야 한다 ",
       "section_path": "10.75",
       "collection": "procedures",
@@ -811,7 +811,7 @@
       "step_no": ""
     },
     "19": {
-      "id": "6334a627-d426-4af2-890e-4b0fc90b5145",
+      "id": "c751a94b-2638-4566-9893-fb7bd757f9db",
       "title": "- 베어링 갭 조정 값 , 반경 : g(mm) - 코터의 올리기 혹은 내리기 높이 : h’ = 50 × g ( m m ) (1) 갭 늘리기 ( ",
       "section_path": "1.3",
       "collection": "procedures",
@@ -821,7 +821,7 @@
       "step_no": ""
     },
     "20": {
-      "id": "5d27aab3-0cf8-4e11-a1c8-806a15bc9463",
+      "id": "c41dcc53-10e6-4694-bb8e-946465c4a4b7",
       "title": "코터 헤드의 높이가 (H1 + h’) 가 되도록 너트로 코터를 올리 고 기록한다 ",
       "section_path": "2.3",
       "collection": "procedures",
@@ -831,7 +831,7 @@
       "step_no": ""
     },
     "21": {
-      "id": "3f540afd-4aaf-4847-9713-9a2817508d42",
+      "id": "941172dd-ee5a-4625-99fd-e7970dadebba",
       "title": "망치로 코터 헤드를 부드 럽게 두드린다 ",
       "section_path": "2.4",
       "collection": "hazards",
@@ -841,7 +841,7 @@
       "step_no": ""
     },
     "22": {
-      "id": "4ccba273-016e-4d2b-8dfa-40cde62b73bf",
+      "id": "699950e1-6870-45a8-ade2-7be19b5dd4a0",
       "title": "100% ( 즉 , 정격 속도 ) (7) 잭업 작동 중에 밸브를 올바르게 작동했는지 확인한다 ",
       "section_path": "1.6",
       "collection": "hazards",
@@ -851,7 +851,7 @@
       "step_no": ""
     },
     "23": {
-      "id": "80f1564e-0d71-4954-afcf-fc0d37a4a6bd",
+      "id": "62bedbb7-c1f9-46fc-a2ca-1365296884e0",
       "title": "✓ ✓ ✓ 과도한 브러시 마모 ✓ ✓ 과도한 슬립 링 마모 ✓ 슬립 링의 탄 자국 : 브러시 내면과 접촉하고 브러시 간격의 순서대로 생긴 경우 ",
       "section_path": "1.6",
       "collection": "specs",
@@ -861,7 +861,7 @@
       "step_no": ""
     },
     "24": {
-      "id": "25d3e8a8-25cc-480f-ab8e-aa01a7b29720",
+      "id": "e479c0e3-b501-46f1-abc5-a124c99efed2",
       "title": "목 점검 사항 유지보수 / 점검 방법 슬립 링 청소 청결 상태 (1) 브러시 , 브러시 홀더 및 슬립 링의 먼지 또는 브러시 입자를 제거한다 ",
       "section_path": "1.6",
       "collection": "hazards",
@@ -871,7 +871,7 @@
       "step_no": ""
     },
     "25": {
-      "id": "e4288937-8bf8-45d1-9582-afc5620ac0d8",
+      "id": "fa6b58be-6069-41e1-8867-b06c6ee9ea5c",
       "title": "반경 방향 / 축 방향 모두 조정 및 이송이 가능해야 하며 가공 고정 부품이 슬립 링 축방향과 정확하게 평행하게 정렬되었는지 확인해야 한다 ",
       "section_path": "1.6",
       "collection": "procedures",
@@ -881,7 +881,7 @@
       "step_no": ""
     },
     "26": {
-      "id": "81722ebf-6b57-4163-bc7a-600b7c9495d3",
+      "id": "a52ce3f8-ce04-4a08-8ff6-0ab29a94b613",
       "title": "가장자리를 모따기한다 ",
       "section_path": "0.05",
       "collection": "procedures",
@@ -891,7 +891,7 @@
       "step_no": ""
     },
     "27": {
-      "id": "c844e3b0-f1ab-461a-95b1-ca81b13c65be",
+      "id": "0c04d373-08f4-4cf6-af2f-a6364c7faa7e",
       "title": "송 속도 (mm/rev) 깊이 (mm) 이송 속도 (mm/rev) 깊이 (mm) - 선반 사용시 steel 고속도강 (grade 4) 20~30",
       "section_path": "0.2",
       "collection": "procedures",
@@ -901,7 +901,7 @@
       "step_no": ""
     },
     "28": {
-      "id": "709ba4ac-1bb8-485f-ab75-52866388948d",
+      "id": "526cfce0-5559-4bac-a991-aa51d4f5cc09",
       "title": "~ 0",
       "section_path": "0.1",
       "collection": "hazards",
@@ -911,7 +911,7 @@
       "step_no": ""
     },
     "29": {
-      "id": "cc14761c-06a5-4043-a01e-fc9ebf374a0e",
+      "id": "36e5eed1-66ca-41a7-a02e-d834ad3a5ee6",
       "title": "전에 극성을 전환해야 한다 ",
       "section_path": "0.1",
       "collection": "hazards",
@@ -921,7 +921,7 @@
       "step_no": ""
     },
     "30": {
-      "id": "30710051-64d8-45b2-994f-654fa9e889a3",
+      "id": "2173404b-e946-48e5-a67d-23ebb6f5b0f6",
       "title": "절연체 표면을 청소하여 브러시 먼지와 사포 먼지를 모두 제거해야 한다 ",
       "section_path": "0.1",
       "collection": "hazards",
@@ -931,7 +931,7 @@
       "step_no": ""
     },
     "31": {
-      "id": "0bf7ef1d-365c-4820-a080-c11844390283",
+      "id": "63b30351-25c1-4591-bd31-bc487887d2fc",
       "title": "분포 및 층 형성 특성이 양호한 전기 - 흑연 카본 브러시를 사용하는 경우 1,000 시간당 약 3~12mm 정도를 마모량 기본으로 추측한다 ",
       "section_path": "0.1",
       "collection": "procedures",
@@ -941,7 +941,7 @@
       "step_no": ""
     },
     "32": {
-      "id": "6cda1833-164e-417d-9043-d26f9617977c",
+      "id": "590f29ce-ed78-4658-b375-72aaa97f72fb",
       "title": "발전기 명판 정보 ( 특히 모델 및 일련 번호 ) 2) 필요 수량 3) 브러시 등급과 치수 (thickness × width × length) ",
       "section_path": "2.1",
       "collection": "hazards",
@@ -951,7 +951,7 @@
       "step_no": ""
     },
     "33": {
-      "id": "02fe061b-199c-41d1-934c-97951d37b7ed",
+      "id": "8e84c15c-2b9d-47a6-b97c-3d089f08f4ff",
       "title": "싱에 제공된다 ",
       "section_path": "2.1",
       "collection": "hazards",
@@ -961,7 +961,7 @@
       "step_no": ""
     },
     "34": {
-      "id": "db557670-f70f-496f-8a27-ba6fb83a3bb4",
+      "id": "10e1e186-816a-4d0a-9f6a-dbebbcd6d24c",
       "title": "냉각기를 넣기 전에 폴리에틸렌 ( 또튼 이에 상응하는 ) 랩으로 완전히 덮는다 ",
       "section_path": "2.1",
       "collection": "hazards",
@@ -971,7 +971,7 @@
       "step_no": ""
     },
     "35": {
-      "id": "a8e06ce0-dafc-4007-b86d-c7a8e77fb822",
+      "id": "c8e58512-49bc-4261-a0f1-3cde820d089a",
       "title": "류를 제거하기 전에 모든 내부 압력을 제거해야 한다 ",
       "section_path": "2.1",
       "collection": "hazards",
@@ -981,7 +981,7 @@
       "step_no": ""
     },
     "36": {
-      "id": "c845f181-30e1-4c23-8dbc-b25360f15f0c",
+      "id": "a190a514-da7d-4611-a13a-e4c15e0a3cd1",
       "title": "후 처음 체결한 볼트부터 동일한 패턴으로 60% 까지 조인다 ",
       "section_path": "8.8",
       "collection": "procedures",
@@ -991,7 +991,7 @@
       "step_no": ""
     },
     "37": {
-      "id": "09fbd1e6-1ac4-462d-8fd4-8fefa13bd82f",
+      "id": "002076e7-03cf-4d08-baa5-4dbe3b588bad",
       "title": "mm 1`` 25mm Torque Range Ft-lb (±10%) 110 150 300 500 800 Nominal bolt size, Gr,",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1001,7 +1001,7 @@
       "step_no": ""
     },
     "38": {
-      "id": "2cdfeba3-3088-4882-a2d7-e148446ea59c",
+      "id": "27f00d21-05f9-4925-beaa-c7bad5fd881e",
       "title": "수 있다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1011,7 +1011,7 @@
       "step_no": ""
     },
     "39": {
-      "id": "b591fac8-a4f0-4ec1-9544-0a02c52d3a25",
+      "id": "22f8fc07-06b0-4810-8785-771f0211b7d8",
       "title": "작동 압력을 초과하지 않도록 주의해야 한다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1021,7 +1021,7 @@
       "step_no": ""
     },
     "40": {
-      "id": "7ad0fea6-ff18-4905-85ea-027a18232a24",
+      "id": "12489374-9197-4227-ac57-5488f96d2c98",
       "title": "우 온수와 함께 사용할 수 있다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1031,7 +1031,7 @@
       "step_no": ""
     },
     "41": {
-      "id": "f43ef8a5-b0c6-4e4a-b31d-8372be185591",
+      "id": "7c0adfec-052d-4579-b254-beba24193c1d",
       "title": "다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1041,7 +1041,7 @@
       "step_no": ""
     },
     "42": {
-      "id": "bf4e2e0c-9b9c-4ddc-b7c3-b52b75c6d40b",
+      "id": "0b23a2fa-6d70-4d60-9f24-85320c85ffb1",
       "title": "경 보다 3mm 작아야 하고 큰 끝은 튜브 시트 구멍 직경보다 3mm 커야 한다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1051,7 +1051,7 @@
       "step_no": ""
     },
     "43": {
-      "id": "3645d797-9409-4b9c-9c44-3c899277d3de",
+      "id": "6dd827a9-1051-4587-b640-d099d5752f17",
       "title": "중에 냉각기에 남은 물을 배출하거나 배관 시 스템의 밸브를 통해 누출될 수 있는 물을 배출하는데 도움이 되므로 배수 플러그 를 닫지 않는다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1061,7 +1061,7 @@
       "step_no": ""
     },
     "44": {
-      "id": "64524d19-aa8b-4853-be79-7bac7bcc1453",
+      "id": "a8146064-2876-462a-acb0-45ef180af370",
       "title": "지 구조의 본체를 풀기 전에 이 절차서의 “ 취급 (Handling)” 섹션에 있는 지침 에 따라 냉각기가 완전히 지지되었는지 확인해야 한다 ",
       "section_path": "8.8",
       "collection": "hazards",
@@ -1071,7 +1071,7 @@
       "step_no": ""
     },
     "45": {
-      "id": "55dc4f59-366c-4e1f-b3ca-8e1d7ffdb44b",
+      "id": "b2d45bf1-4d8d-495a-a480-31272e76193c",
       "title": "사용하여 핀을 바로잡 을 수 있다 ",
       "section_path": "8.8",
       "collection": "procedures",
@@ -1081,7 +1081,7 @@
       "step_no": ""
     },
     "46": {
-      "id": "ad7bbdba-b44c-499b-82ef-c6a7125aa811",
+      "id": "8bd130c9-0dbf-4c9c-a942-5766db0e1724",
       "title": "차를 반복한다 ",
       "section_path": "10.0",
       "collection": "procedures",
@@ -1091,7 +1091,7 @@
       "step_no": ""
     },
     "47": {
-      "id": "02d91e39-7681-4780-88c4-ec97fc95a521",
+      "id": "1191cbab-ea42-4876-83c0-f0965b4dcedc",
       "title": "5 mm 3",
       "section_path": "6.0",
       "collection": "procedures",
@@ -1101,7 +1101,7 @@
       "step_no": ""
     },
     "48": {
-      "id": "46b492b2-fc8e-44da-8fec-d7bcda352b2c",
+      "id": "7875a558-3568-45a1-97d1-b416d48596c0",
       "title": "공급 업체에서 상업적으로 구매할 수 있다 ",
       "section_path": "1.1",
       "collection": "specs",
@@ -1111,7 +1111,7 @@
       "step_no": ""
     },
     "49": {
-      "id": "d1b4cbd7-7ef7-4d6c-9d46-a53e2b651868",
+      "id": "8410243c-cd5a-4dd4-9e96-5e4ccdd90e6a",
       "title": "in 28 pressure control 14 backing ring 29 expansion tank 15 saddle 30 zinc anode",
       "section_path": "1.2",
       "collection": "specs",
@@ -1121,7 +1121,7 @@
       "step_no": ""
     },
     "50": {
-      "id": "3a73ae55-3103-4e8b-b12c-4be984c046e8",
+      "id": "6e956ec2-e079-4a9e-829f-c60f3998f029",
       "title": "y 열교환기는 어떤 경우에도 열교환기를 통해 흐르는 두 매체의 혼 합을 피해야 하는 경우에 사용된다 ",
       "section_path": "1.3",
       "collection": "specs",
@@ -1131,7 +1131,7 @@
       "step_no": ""
     },
     "51": {
-      "id": "e9c85c0e-6bd3-442b-bc01-5d111370de29",
+      "id": "857d77e6-c4e6-41d0-b70e-40ddbd23896a",
       "title": "셔에 나와있다 ",
       "section_path": "0.4",
       "collection": "hazards",
@@ -1141,7 +1141,7 @@
       "step_no": ""
     },
     "52": {
-      "id": "143e7235-7d6d-4b21-9898-78b3e057f7f1",
+      "id": "d079b7ee-11a7-4e20-986b-9aa3c378154c",
       "title": "까지 결로방지 기능을 제공하며 표시된 동작 압력을 정기적으로 점검해야 한다 ",
       "section_path": "3.1",
       "collection": "procedures",
@@ -1151,7 +1151,7 @@
       "step_no": ""
     },
     "53": {
-      "id": "9b648032-ee47-49a7-a709-716b3c921a64",
+      "id": "07668182-20a8-441d-a074-7741a9a7c689",
       "title": "해 클램핑 벨트는 손상을 방지하는 것이 좋다 ",
       "section_path": "3.2",
       "collection": "procedures",
@@ -1161,7 +1161,7 @@
       "step_no": ""
     },
     "54": {
-      "id": "bc999f18-d815-4831-a2b9-fbb3ea1a732b",
+      "id": "264b3915-4002-4a25-ad13-4363f0f3d9b9",
       "title": "결함 없는 상태인지 확인한다 ",
       "section_path": "3.3",
       "collection": "procedures",
@@ -1171,7 +1171,7 @@
       "step_no": ""
     },
     "55": {
-      "id": "cdcae20c-0ada-4c09-958b-04d98ffc4e9c",
+      "id": "db88eb03-56dd-4a4e-80d0-75c226cfced9",
       "title": "한 보관을 보장하기 위해 토양 안전성이 있는 평평한 지반을 지정해 관리한다 ",
       "section_path": "4.1",
       "collection": "hazards",
@@ -1181,7 +1181,7 @@
       "step_no": ""
     },
     "56": {
-      "id": "b8f965b8-5953-4aad-b1db-b0e98cf6f9c5",
+      "id": "691a235f-b0a0-409b-8ddd-ac4c0decece4",
       "title": "가하기 전에 연결 볼트를 조이거나 다시 조여야 한 다 ",
       "section_path": "4.2",
       "collection": "hazards",
@@ -1191,7 +1191,7 @@
       "step_no": ""
     },
     "57": {
-      "id": "47745ac7-3f04-48ed-9e98-e1c6bff5a22c",
+      "id": "fa193791-44f0-46ab-bec5-e04a0fd4ffed",
       "title": "시 조인다 ",
       "section_path": "5.1",
       "collection": "hazards",
@@ -1201,7 +1201,7 @@
       "step_no": ""
     },
     "58": {
-      "id": "d95a0273-75c0-474c-a900-f8d0774f011c",
+      "id": "2e12a25a-2011-49ef-8dd7-1b6977a7e469",
       "title": "",
       "section_path": "5.2",
       "collection": "hazards",
@@ -1211,7 +1211,7 @@
       "step_no": ""
     },
     "59": {
-      "id": "14e0e0eb-78d6-45a6-a925-65b75260c4a7",
+      "id": "103708cf-4432-4e3b-bf7b-2157024944b4",
       "title": "한 가스가 흡입되지 않도록 주의해야 한다 ",
       "section_path": "5.3",
       "collection": "hazards",
@@ -1221,7 +1221,7 @@
       "step_no": ""
     },
     "60": {
-      "id": "c36b29ac-666f-4fe9-b324-d9fabbb6b70a",
+      "id": "cd6e5dab-094a-4d7a-a795-29250a921c4a",
       "title": "합물의 경우 개봉 전에 항상 “ 퍼지 ” 해야 한 다 ",
       "section_path": "7.2",
       "collection": "procedures",
@@ -1231,7 +1231,7 @@
       "step_no": ""
     },
     "61": {
-      "id": "341a4130-86ea-41cd-959e-7e6ecf8bdd84",
+      "id": "94c8301e-e353-4dc0-ac57-106e7db7ac9c",
       "title": "기 : 결코 해당 시스템을 열여서는 안된다 ",
       "section_path": "2.3",
       "collection": "procedures",
@@ -1241,7 +1241,7 @@
       "step_no": ""
     },
     "62": {
-      "id": "6207cc23-0255-4d75-aaf1-77d86044ff31",
+      "id": "d782a4b7-1dd2-4090-8267-46406f355587",
       "title": "잭은 fig 1 과 같이 브레이크와 잭 모두에 대해 동일한 피스톤이 동착 하는 1 기통 유형인다 ",
       "section_path": "⑴1",
       "collection": "procedures",
@@ -1251,7 +1251,7 @@
       "step_no": 1
     },
     "63": {
-      "id": "8d2826a3-cf8d-459e-aab7-acc0a751f6cb",
+      "id": "807f59b8-9343-4ca4-acfd-e2005ab686fe",
       "title": "압축 공기 또는 압력 오일은 실린더 ① 을 바닥에서 밀어올려 피스톤을 밀어 올린 다 ",
       "section_path": "⑴3",
       "collection": "procedures",
@@ -1261,7 +1261,7 @@
       "step_no": 3
     },
     "64": {
-      "id": "e2c76ee5-f9ec-4394-b8b7-ef902a52a42c",
+      "id": "5765faac-53c4-4acb-b01b-0415380e3335",
       "title": "너트 ③ 을 시계 방향으로 돌리고 ( 피스톤에 는 안전 너트와 일치하는 나사산이 있음 ) 바닥면이 실린더 상단 표면에 닿을 때 까지 안전 너트 ",
       "section_path": "⑴3",
       "collection": "procedures",
@@ -1271,7 +1271,7 @@
       "step_no": 3
     },
     "65": {
-      "id": "7842c8c4-81a0-425f-9244-4713cdf06e4e",
+      "id": "1b63013f-b966-47b4-a5c8-c983339dec74",
       "title": "피스 톤 ② 는 오일 압력이 배출되어도 내려오지 않는다 ",
       "section_path": "⑴3",
       "collection": "specs",
@@ -1281,7 +1281,7 @@
       "step_no": 3
     },
     "66": {
-      "id": "c2d56375-b1cf-424f-b68a-1c61531332d9",
+      "id": "649e662b-4921-4fbd-992b-f672800160d5",
       "title": "한다 ",
       "section_path": "⑴3",
       "collection": "specs",
@@ -1291,7 +1291,7 @@
       "step_no": 3
     },
     "67": {
-      "id": "4254491d-95ed-4e60-87a2-d5e8f0f5e151",
+      "id": "c455afcc-8193-44a4-9b8e-62147fad5e1f",
       "title": ") 운전 a) 압축 공기를 실린더에 자동 또는 수동으로 공급하면 브레이크 활성화 된다 ",
       "section_path": "⑴2",
       "collection": "specs",
@@ -1301,7 +1301,7 @@
       "step_no": 2
     },
     "68": {
-      "id": "905493ae-fcba-4680-912d-d7d9b81b63d6",
+      "id": "d6f9f728-ae05-4f70-8cd3-a06d27b8c3c9",
       "title": "을 통해 공기가 실린더 밖으로 배출된다 ",
       "section_path": "⑴7",
       "collection": "specs",
@@ -1311,7 +1311,7 @@
       "step_no": 7
     },
     "69": {
-      "id": "b8eaa189-a0cb-4d80-8650-5e212b1f6ffe",
+      "id": "42b5d901-7612-4400-bd37-bcdfe0350f7d",
       "title": "로 잭 펌프 ⑦ 을 잭 파이프에 연결한다 ",
       "section_path": "⑴2",
       "collection": "procedures",
@@ -1321,7 +1321,7 @@
       "step_no": 2
     },
     "70": {
-      "id": "94d4f7f0-795b-4483-8064-3d8e0dc0c274",
+      "id": "e8434230-f415-49cb-947a-7e053e9fa757",
       "title": "이크 실린더와 배관에 납은 오일을 오일 저장 탱크로 보낸다 ",
       "section_path": "2.4",
       "collection": "specs",
@@ -1331,7 +1331,7 @@
       "step_no": ""
     },
     "71": {
-      "id": "65e16ebe-9039-43c1-a2c2-6904bfb25145",
+      "id": "4d09dea7-c90c-4b5b-b53f-4c70280fd9a1",
       "title": "는다 ",
       "section_path": "1.1",
       "collection": "procedures",
@@ -1341,7 +1341,7 @@
       "step_no": ""
     },
     "72": {
-      "id": "8a494211-355f-45dd-93a2-bc4f735a9e6d",
+      "id": "49e9b0c6-681b-4ecc-8a43-2407c68ceaa6",
       "title": "펌프는 발전기의 회전부를 잭업하는데 사용되며 모든 잭을 한번에 작동 시킬 수 있다 ",
       "section_path": "1.3",
       "collection": "procedures",
@@ -1351,7 +1351,7 @@
       "step_no": ""
     },
     "73": {
-      "id": "c5c208c5-2708-440d-b51c-bead8c94d48c",
+      "id": "2ac536a2-9f6b-4398-840a-caf4fd4c7bc7",
       "title": "을 풀어 오일 탱크 ② 내부에 공기가 들어가도록 한다 ",
       "section_path": "⑴7",
       "collection": "procedures",
@@ -1361,7 +1361,7 @@
       "step_no": 7
     },
     "74": {
-      "id": "07ac7bd8-bb39-4674-a027-91668f5a8f37",
+      "id": "1f25dc62-1fdf-40c8-a112-951a457c355b",
       "title": "",
       "section_path": "⑴13",
       "collection": "procedures",
@@ -1371,7 +1371,7 @@
       "step_no": 13
     },
     "75": {
-      "id": "2055d3c5-7aa9-4ffd-9501-73f07f471f0a",
+      "id": "bcaedcf1-68d2-47d9-93a8-d108759e460b",
       "title": "3",
       "section_path": "1.5",
       "collection": "procedures",
@@ -1381,7 +1381,7 @@
       "step_no": ""
     },
     "76": {
-      "id": "9e7d48bd-bac5-456f-a3fa-570d0cb8d71d",
+      "id": "01bd9898-71d0-4263-8cc1-70f9413f13b0",
       "title": "아래로 조작하면 잭업이 이루어 진다 ",
       "section_path": "2.1",
       "collection": "procedures",
@@ -1391,7 +1391,7 @@
       "step_no": ""
     },
     "77": {
-      "id": "0459313b-6bd6-4c0c-9820-5e68a000bfa6",
+      "id": "b198ed43-2c6a-4623-961d-64498d2489af",
       "title": "을 배출한다 ",
       "section_path": "⑴5",
       "collection": "procedures",
@@ -1401,7 +1401,7 @@
       "step_no": 5
     },
     "78": {
-      "id": "44b08f1f-7d3b-41ac-b897-52098aa0d02c",
+      "id": "31b65669-92b4-43de-a36b-4626786fa056",
       "title": "한 미 는 힘이 약해지면 핸들 바를 다시 민다 ",
       "section_path": "⑴2",
       "collection": "procedures",
@@ -1411,7 +1411,7 @@
       "step_no": 2
     },
     "79": {
-      "id": "abf42a8b-efd8-4b8c-840c-ab6f1bfe9204",
+      "id": "9e10a1a8-7465-48d4-8ca4-a51f6eaff3f5",
       "title": "주입과 공기를 보충 하는데 사용된다 ",
       "section_path": "1.5",
       "collection": "procedures",
@@ -1421,7 +1421,7 @@
       "step_no": ""
     },
     "80": {
-      "id": "0d865156-bf9a-4d01-b10d-9df57b1df509",
+      "id": "5abc7a2b-4610-411b-b7a2-ac37b2848a67",
       "title": "회전을 위한 감속 밸브 역 할을 하고 나머지 절반 회전을 위한 서든 다운 밸브 역할을 한다 ",
       "section_path": "⑴9",
       "collection": "procedures",
@@ -1431,7 +1431,7 @@
       "step_no": 9
     },
     "81": {
-      "id": "911a5501-60d1-4401-b870-27635800d7a5",
+      "id": "fac302ca-c8f0-4cdc-aa0f-4d427f15eadf",
       "title": "맞게 조정되었으므로 이 나사를 돌 리지 않는다 ",
       "section_path": "2.5",
       "collection": "procedures",
@@ -1441,7 +1441,7 @@
       "step_no": ""
     },
     "82": {
-      "id": "1c090732-0602-461d-b684-9e425553e413",
+      "id": "c81a994a-4689-4c66-a604-1a0c94c9841b",
       "title": "호스가 제거 된 후에도 오일이 누출되지 않는다 ",
       "section_path": "⑴12",
       "collection": "procedures",
@@ -1451,7 +1451,7 @@
       "step_no": 12
     },
     "83": {
-      "id": "39ae2f1d-ff98-40be-a7dd-b173a2499aa5",
+      "id": "3eb85a74-48be-4b47-af38-5e1fe0e2b012",
       "title": "서로 밀어 배관 경로를 열고 패킹 ⑭ 와 밀착하여 외부로의 추가 오일 누출을 방지할 수 있다 ",
       "section_path": "⑴11",
       "collection": "procedures",
@@ -1461,7 +1461,7 @@
       "step_no": 11
     },
     "84": {
-      "id": "d9b1d36b-ad3b-443f-9ade-bc7d076b591b",
+      "id": "1c95926c-e550-4604-9afa-e4503f3768a0",
       "title": "(T) 와 접촉하여 배관 경로가 닫힌다 ",
       "section_path": "⑴17",
       "collection": "procedures",
@@ -1471,7 +1471,7 @@
       "step_no": 17
     },
     "85": {
-      "id": "925bfd4e-910e-4dfb-a0d6-66f1dc401ad6",
+      "id": "599e2910-6337-4ee3-b07a-e00c9757b3d1",
       "title": "정되면 잠금나사 (25-1) 를 시계방향으로 회전시키고 잠금나사 (25-2) 가 잠긴다 ",
       "section_path": "68.747",
       "collection": "specs",

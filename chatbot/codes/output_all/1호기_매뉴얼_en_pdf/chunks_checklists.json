@@ -1,11 +1,11 @@
 [
   {
-    "id": "0f0f7b92-786b-4647-9960-698830c0b032",
-    "chunk_id": "1호기 매뉴얼(en).pdf-25-27-enflg",
+    "id": "0db9048b-abf9-49fb-814f-818fa5f72275",
+    "chunk_id": "UNIT1-OM-EN-25-27-dhbca",
     "text": "se the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer. ( 2.3) Adjust the cotter with the nut until head length of the cotter is (H1 + h’) mm and record. ( 2.4) Replace the stopper. VOITH FUJI M9 50 - 5 J594 6 5 / 7 Fig 3 shows method of head length measurement o f the cotter with a depth gauge. VOITH FUJI M9 50 - 5 J594 6 6 / 7 2. Fitting Run (1) When the guide bearing or thrust beari ng is replaced with new one, put it in a fitting run until it is fitted. (2) Raise the water wheel generator rotor with a hydraulic jack (used also as a pneumatic brake) to its maximum permissible jack - up height and hold it there for 15 to 20 minutes to al low an oil film to be formed on the sliding surface of the thrust bearing. (3) Confirm that the hydraulic jack has been lowered down and start the fitting run. (4) Provide RPM ra ting brackets under racing condition as shown in (6) below. When the bearing t emperature gets the saturation level in the first RPM rating bracket, increase the RPM to the next bracket and check the bearing temperature again.",
     "char_len": 1076,
     "collection": "checklists",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 25,
     "page_end": 27,
     "section_path": "2.4",
@@ -196,6 +196,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"

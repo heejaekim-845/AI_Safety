@@ -1,11 +1,11 @@
 [
   {
-    "id": "29613302-0aca-42ad-94c7-f3dca4ac04a7",
-    "chunk_id": "1호기 매뉴얼(en).pdf-6-6-2jqev",
+    "id": "29dea092-9b75-4258-a4a1-2b4f9a3b0ead",
+    "chunk_id": "UNIT1-OM-EN-6-6-1n570",
     "text": "st the specified level) Rise: 35 mm Drop: 35 mm VOITH FUJI M9 50 - 5 J5944 3 / 3 2.4 Guide bearing Lower Bearing type Segmental Pi eces 12 Diameter 1920 mm Clearance(by Radius) 0. 21 ～",
     "char_len": 184,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 6,
     "page_end": 6,
     "section_path": "2.4",
@@ -190,6 +190,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -199,12 +201,12 @@
     "uses_crane": false
   },
   {
-    "id": "74199291-6a2b-4c79-8dbd-ead0bd8eaf67",
-    "chunk_id": "1호기 매뉴얼(en).pdf-6-6-dfn4l",
+    "id": "5feb6507-e383-4da4-a761-5d318f0ec99f",
+    "chunk_id": "UNIT1-OM-EN-6-6-k4qgr",
     "text": "Bearing type Segmental Pi eces 12 Diameter 1920 mm Clearance(by Radius) 0. 21 ～ 0.2 4 mm 2.5 Brake shoe Material Non asbestos resin mold Thickness of brake shoe 40 mm Allowable wear margin 25 mm",
     "char_len": 194,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 6,
     "page_end": 6,
     "section_path": "2.5",
@@ -389,6 +391,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -398,12 +402,12 @@
     "uses_crane": false
   },
   {
-    "id": "25e3f112-1111-40d5-8b82-f071df077588",
-    "chunk_id": "1호기 매뉴얼(en).pdf-15-15-0bylh",
+    "id": "61ea866b-e5c1-423f-802d-048e7d814870",
+    "chunk_id": "UNIT1-OM-EN-15-15-xjr5b",
     "text": "r. Before measurement, be sure to remove oil, dirt, and dust from the slip ring. The insulation resistance of the stator winding, and the field winding should be more than 12 M O hm and more than",
     "char_len": 195,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 15,
     "page_end": 15,
     "section_path": "0.5",
@@ -588,6 +592,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"

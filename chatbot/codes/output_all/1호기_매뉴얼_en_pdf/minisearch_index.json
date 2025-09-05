@@ -2,63 +2,63 @@
   "documentCount": 57,
   "nextId": 57,
   "documentIds": {
-    "0": "b2f0bcbf-58a3-478f-b406-2992dd6a5769",
-    "1": "07827781-4460-4bae-9cdf-84796b3b6f1b",
-    "2": "2c65d755-d014-4c6f-8591-dbea26f05175",
-    "3": "f44bc846-b064-40b0-a7ba-26ae2801a920",
-    "4": "9864a2bc-50b6-4ba0-a31b-6c7fc911de4c",
-    "5": "33c6940a-d9f6-48ba-ab91-81cb5719711b",
-    "6": "57a5de7c-1b0a-44f0-b86e-eb52be85e483",
-    "7": "a89e077f-948c-4946-9785-019e931fd44a",
-    "8": "2833aaf4-00f8-46b7-b96c-40dff3aeb8f8",
-    "9": "c0e87fa9-abeb-44ec-8262-9fc571346fda",
-    "10": "2d0f25dd-382f-4159-8c8e-3c7bb39f93f4",
-    "11": "29613302-0aca-42ad-94c7-f3dca4ac04a7",
-    "12": "74199291-6a2b-4c79-8dbd-ead0bd8eaf67",
-    "13": "c34ef883-48ca-4731-9204-c81c0118b752",
-    "14": "5f9b68df-87aa-4341-bedc-55dd3e82cb8c",
-    "15": "0c69ca77-4338-4c70-9169-b533db20e495",
-    "16": "5c21e6bf-7902-4f2c-b303-9160c49cf24f",
-    "17": "d615e92a-48e1-4b73-aea0-f5dcdbb814f2",
-    "18": "576145b6-1c03-46f0-8383-d0c6757876af",
-    "19": "1765bb7b-ebd9-4268-8ac1-4a667d26004c",
-    "20": "dffe1c2e-0571-404a-9d05-4fce6f04ece8",
-    "21": "f2060c3f-12e3-4058-9245-a2040bfc10e3",
-    "22": "25e3f112-1111-40d5-8b82-f071df077588",
-    "23": "110155f6-aa27-4d3b-adc6-df5908e3c6f4",
-    "24": "dc0b8268-2269-461a-8199-7a2be87c7ada",
-    "25": "3f1e3213-e72a-4daf-82bc-edcd60be5b02",
-    "26": "dff7421b-7d09-4821-8004-e2416ea6c69f",
-    "27": "3f14066b-1c5a-4291-aeb6-37666d75f5ca",
-    "28": "c9d60d29-c5a3-4ab5-bf58-b07382100fb4",
-    "29": "4914543c-4abc-4b39-a56a-8ae8ce4b6b3f",
-    "30": "2560dcaf-ad96-45b1-872f-41611ee601d5",
-    "31": "a48bd285-0902-4e84-97f1-081e02d6613e",
-    "32": "7243b3e3-d5e0-4045-b8e4-8c7d8789a855",
-    "33": "45ba2d92-2111-4656-a8a9-91cb282f17e2",
-    "34": "a42e8ae1-c35c-4786-a53b-95ea37b0dbdf",
-    "35": "ffd64674-abe5-427c-889e-e9747c849c2f",
-    "36": "0f0f7b92-786b-4647-9960-698830c0b032",
-    "37": "580c7f63-a9e8-4384-b75a-0d3cb0c2d7e8",
-    "38": "f523aa10-778d-47b8-bff5-5d40e962ed6d",
-    "39": "26c0abaa-1b07-4d1a-8a50-4db38b3e79b6",
-    "40": "c53c7481-835d-470e-9065-9f17d80fe404",
-    "41": "70386bb8-971c-4be3-8453-8533fe34cd4c",
-    "42": "3523b316-2327-4979-bf17-4c9e3841a32f",
-    "43": "f1a6cd0e-471f-4826-999c-7c841cbeb14e",
-    "44": "5a377aec-8d54-461e-8efc-53e030c1b53e",
-    "45": "6c6f3cb9-6923-4f0b-8cec-00f58b15075a",
-    "46": "4969f31f-4c38-4172-9671-7d2847da80f6",
-    "47": "b1363aa5-4ec3-446c-bfb5-c0d76d8e5d24",
-    "48": "5587282f-b757-4d35-ae06-809862ffce82",
-    "49": "1de5fe85-cfd6-4cd1-860d-35365d9236e8",
-    "50": "45ba6081-7db8-4e8c-8b76-3071bcba9485",
-    "51": "c3a1898d-c130-4370-a65e-7be353fa47dc",
-    "52": "e6e54b46-6fe2-4020-bd4e-23c3e40a1b28",
-    "53": "69085aba-bd6e-4d7c-8411-429a74fd2446",
-    "54": "bf380194-2859-40f8-8aa1-7a0b14f511cd",
-    "55": "5f202950-e697-4b05-8c20-49adbc6759aa",
-    "56": "0b442400-7492-4fb6-b1fa-2d8f035b9e41"
+    "0": "1ae00e7f-5a4c-446c-926d-34705bb384f6",
+    "1": "c1d74886-65a6-454f-bda4-2fda92fac81a",
+    "2": "c0c5c71f-590d-4743-b682-b58d5c9c7981",
+    "3": "e410c499-fe14-45fa-b218-f794d963e6f3",
+    "4": "b08821c8-d2d8-40da-aad1-8c10b8200dfa",
+    "5": "62f0ae91-9af6-4a90-9748-bb3b2dbaada0",
+    "6": "ff7a8934-e406-47c0-a448-575323c6db9e",
+    "7": "ed3fecb4-916a-46cb-a475-72dd6a11f469",
+    "8": "25d34cef-aac5-4785-a235-3b4d96168aeb",
+    "9": "75ff899c-afce-400c-9225-fc29d2d0179d",
+    "10": "55577f38-abef-4cad-b561-77c2be0651ff",
+    "11": "29dea092-9b75-4258-a4a1-2b4f9a3b0ead",
+    "12": "5feb6507-e383-4da4-a761-5d318f0ec99f",
+    "13": "3c9f1113-2424-46a5-992c-ea17d872292a",
+    "14": "6d607de5-5397-4665-adec-4bd16dfcad9f",
+    "15": "ef7d7f9e-1214-400f-a6ea-1d062072901a",
+    "16": "0d0a416d-ad54-482f-8213-3b234c96476d",
+    "17": "07b5568b-231e-4736-967f-486b65f90fe3",
+    "18": "e00af774-09fc-4835-aa18-8ade0a235527",
+    "19": "15a53c14-a59a-4258-9ac9-cd4b51688161",
+    "20": "f53e8640-7872-47e8-bbec-9bdf81229c79",
+    "21": "bb8fed00-2fb0-4c10-8829-460c2f46e796",
+    "22": "61ea866b-e5c1-423f-802d-048e7d814870",
+    "23": "1c0379de-031f-4de4-ae6e-09087468626d",
+    "24": "5083918a-0cf9-42f9-804b-710d6066cba8",
+    "25": "f0cb708c-3714-4c19-a5c2-056a644beacb",
+    "26": "422f0dd8-78a2-4406-8352-fdcf989b7cc7",
+    "27": "054b4c81-fdee-4fce-bc89-b392911bdd28",
+    "28": "96f1d0bc-d018-4054-8d8d-a5614b3710f7",
+    "29": "391654fc-f625-456a-9338-45eda9f075d8",
+    "30": "96fdf15f-cd90-4d18-bfec-d36e6da591ff",
+    "31": "486485d9-0c57-4efd-a297-98820bad0d62",
+    "32": "5c41243e-e80d-4882-8c7e-ef303d15e1ba",
+    "33": "6744beae-bd60-48c0-9243-0e44b1db4c8a",
+    "34": "2d0cf77d-9e06-4728-9196-4dbe5a15e4d6",
+    "35": "be1d1479-d4c6-4c4b-bffd-3f56ae132b43",
+    "36": "0db9048b-abf9-49fb-814f-818fa5f72275",
+    "37": "f1690f73-69bf-41a7-9fe5-36bbf4ff527f",
+    "38": "d3ade1c9-0266-4570-b890-4eac35d9ab66",
+    "39": "4cdf5c8b-840c-432d-8b27-a8e48666dca3",
+    "40": "dce95fcc-300c-40ae-823a-7f292415370d",
+    "41": "1cad98f7-6c26-40d8-bbb7-f8ea16a279c4",
+    "42": "059f2adc-9db4-48c1-a181-b3719b86fb09",
+    "43": "719c4a42-1c2d-45e5-adb2-056ddb360204",
+    "44": "6a4d288f-e009-42d0-a902-25f6337c7e22",
+    "45": "08d738d9-1682-439d-86a9-7ee676a12ee7",
+    "46": "c82b8e56-27b9-4f2d-b7d6-8e4b119c657f",
+    "47": "25b8be3d-182a-44dd-a039-2fe4f3440146",
+    "48": "dcde3588-e04e-4180-8ed2-e04230b43c54",
+    "49": "d867432f-a9be-4919-ab41-d1d3cef53946",
+    "50": "a57f78d6-6583-4506-b855-dcde4434a395",
+    "51": "5506290d-5f3e-4015-b2b4-e4791727aa35",
+    "52": "a37b8ebf-27b9-46f3-a6fc-d220de0e35e3",
+    "53": "ab4f8e1e-253b-4da6-9d06-2917a360960f",
+    "54": "980557eb-cd15-4c22-9b6a-73c66b554193",
+    "55": "5bef5e57-7863-4fd4-89f6-70eed8a585f2",
+    "56": "a415ae9f-1204-4ae4-b5e0-e25b20d35117"
   },
   "fieldIds": {
     "title": 0,
@@ -418,7 +418,7 @@
   ],
   "storedFields": {
     "0": {
-      "id": "b2f0bcbf-58a3-478f-b406-2992dd6a5769",
+      "id": "1ae00e7f-5a4c-446c-926d-34705bb384f6",
       "title": "1 x 50 MW GENERATOR VOITH FUJI Instruc ti on Manual M9 50 - 5 J5943 1 / 3 D rawn",
       "section_path": "",
       "collection": "specs",
@@ -428,7 +428,7 @@
       "step_no": ""
     },
     "1": {
-      "id": "07827781-4460-4bae-9cdf-84796b3b6f1b",
+      "id": "c1d74886-65a6-454f-bda4-2fda92fac81a",
       "title": "enance Instruction Manual VOITH FUJI M9 50 - 5 J5943 2 / 3 CONTENTS 1",
       "section_path": "1.2",
       "collection": "specs",
@@ -438,7 +438,7 @@
       "step_no": ""
     },
     "2": {
-      "id": "2c65d755-d014-4c6f-8591-dbea26f05175",
+      "id": "c0c5c71f-590d-4743-b682-b58d5c9c7981",
       "title": "D ata M 9 50 - 5 J5944 1",
       "section_path": "1.4",
       "collection": "specs",
@@ -448,7 +448,7 @@
       "step_no": ""
     },
     "3": {
-      "id": "f44bc846-b064-40b0-a7ba-26ae2801a920",
+      "id": "e410c499-fe14-45fa-b218-f794d963e6f3",
       "title": "R eplacement M9 5 0 - 5 J5947 1",
       "section_path": "1.6",
       "collection": "specs",
@@ -458,7 +458,7 @@
       "step_no": ""
     },
     "4": {
-      "id": "9864a2bc-50b6-4ba0-a31b-6c7fc911de4c",
+      "id": "b08821c8-d2d8-40da-aad1-8c10b8200dfa",
       "title": "lip R ing M500 - 5J 6474 2",
       "section_path": "2.2",
       "collection": "specs",
@@ -468,7 +468,7 @@
       "step_no": ""
     },
     "5": {
-      "id": "33c6940a-d9f6-48ba-ab91-81cb5719711b",
+      "id": "62f0ae91-9af6-4a90-9748-bb3b2dbaada0",
       "title": "7 80 - 5J 5950 2",
       "section_path": "2.4",
       "collection": "specs",
@@ -478,7 +478,7 @@
       "step_no": ""
     },
     "6": {
-      "id": "57a5de7c-1b0a-44f0-b86e-eb52be85e483",
+      "id": "ff7a8934-e406-47c0-a448-575323c6db9e",
       "title": "x Method M905 - 5J2837 33 ) Field Bus Bar Insulation Specification M905 - 5J6063",
       "section_path": "2.4",
       "collection": "specs",
@@ -488,7 +488,7 @@
       "step_no": ""
     },
     "7": {
-      "id": "a89e077f-948c-4946-9785-019e931fd44a",
+      "id": "ed3fecb4-916a-46cb-a475-72dd6a11f469",
       "title": "e GDH7439S - 24 Output 5 000 0 kVA Voltage 1 32 00 V Current 2187 A Power factor",
       "section_path": "0.9",
       "collection": "specs",
@@ -498,7 +498,7 @@
       "step_no": ""
     },
     "8": {
-      "id": "2833aaf4-00f8-46b7-b96c-40dff3aeb8f8",
+      "id": "25d34cef-aac5-4785-a235-3b4d96168aeb",
       "title": "w from t op VOITH FUJI M9 50 - 5 J5944 2 / 3 2",
       "section_path": "2.1",
       "collection": "specs",
@@ -508,7 +508,7 @@
       "step_no": ""
     },
     "9": {
-      "id": "c0e87fa9-abeb-44ec-8262-9fc571346fda",
+      "id": "75ff899c-afce-400c-9225-fc29d2d0179d",
       "title": "guide bearing Alarm : 75 ℃ , Trip : 8 5 ℃ Thrust bearing Alarm: 75 ℃ ,Trip: 85 ℃",
       "section_path": "2.2",
       "collection": "specs",
@@ -518,7 +518,7 @@
       "step_no": ""
     },
     "10": {
-      "id": "2d0f25dd-382f-4159-8c8e-3c7bb39f93f4",
+      "id": "55577f38-abef-4cad-b561-77c2be0651ff",
       "title": "ing water pressure Testing water Pressure Air cooler 2 400 Liter /min 0",
       "section_path": "1.08",
       "collection": "specs",
@@ -528,7 +528,7 @@
       "step_no": ""
     },
     "11": {
-      "id": "29613302-0aca-42ad-94c7-f3dca4ac04a7",
+      "id": "29dea092-9b75-4258-a4a1-2b4f9a3b0ead",
       "title": "st the specified level) Rise: 35 mm Drop: 35 mm VOITH FUJI M9 50 - 5 J5944 3 / 3",
       "section_path": "2.4",
       "collection": "procedures",
@@ -538,7 +538,7 @@
       "step_no": ""
     },
     "12": {
-      "id": "74199291-6a2b-4c79-8dbd-ead0bd8eaf67",
+      "id": "5feb6507-e383-4da4-a761-5d318f0ec99f",
       "title": "Bearing type Segmental Pi eces 12 Diameter 1920 mm Clearance(by Radius) 0",
       "section_path": "2.5",
       "collection": "procedures",
@@ -548,7 +548,7 @@
       "step_no": ""
     },
     "13": {
-      "id": "c34ef883-48ca-4731-9204-c81c0118b752",
+      "id": "3c9f1113-2424-46a5-992c-ea17d872292a",
       "title": "on asbestos resin mold Thickness of brake shoe 40 mm Allowable wear margin 25 mm",
       "section_path": "2.6",
       "collection": "specs",
@@ -558,7 +558,7 @@
       "step_no": ""
     },
     "14": {
-      "id": "5f9b68df-87aa-4341-bedc-55dd3e82cb8c",
+      "id": "6d607de5-5397-4665-adec-4bd16dfcad9f",
       "title": "ion of generator, always check the operating conditions by observing the meters",
       "section_path": "2.6",
       "collection": "specs",
@@ -568,7 +568,7 @@
       "step_no": ""
     },
     "15": {
-      "id": "0c69ca77-4338-4c70-9169-b533db20e495",
+      "id": "ef7d7f9e-1214-400f-a6ea-1d062072901a",
       "title": "aks; and if it is too low, it will res ult in damage to the bearing due to heat",
       "section_path": "2.6",
       "collection": "specs",
@@ -578,7 +578,7 @@
       "step_no": ""
     },
     "16": {
-      "id": "5c21e6bf-7902-4f2c-b303-9160c49cf24f",
+      "id": "0d0a416d-ad54-482f-8213-3b234c96476d",
       "title": "s from burning, always check the thermometers for sudden changes in temperature",
       "section_path": "2.6",
       "collection": "specs",
@@ -588,7 +588,7 @@
       "step_no": ""
     },
     "17": {
-      "id": "d615e92a-48e1-4b73-aea0-f5dcdbb814f2",
+      "id": "07b5568b-231e-4736-967f-486b65f90fe3",
       "title": "rations",
       "section_path": "2.6",
       "collection": "specs",
@@ -598,7 +598,7 @@
       "step_no": ""
     },
     "18": {
-      "id": "576145b6-1c03-46f0-8383-d0c6757876af",
+      "id": "e00af774-09fc-4835-aa18-8ade0a235527",
       "title": "ack Oil pipe Bearing oil reservoir Joints Joints Frequency of inspection 12 mon",
       "section_path": "2.6",
       "collection": "specs",
@@ -608,7 +608,7 @@
       "step_no": ""
     },
     "19": {
-      "id": "1765bb7b-ebd9-4268-8ac1-4a667d26004c",
+      "id": "15a53c14-a59a-4258-9ac9-cd4b51688161",
       "title": "th hand",
       "section_path": "2.6",
       "collection": "specs",
@@ -618,7 +618,7 @@
       "step_no": ""
     },
     "20": {
-      "id": "dffe1c2e-0571-404a-9d05-4fce6f04ece8",
+      "id": "f53e8640-7872-47e8-bbec-9bdf81229c79",
       "title": "e lubricating oil is said to be deteriorated rap idly if acid value is exceeding",
       "section_path": "0.5",
       "collection": "specs",
@@ -628,7 +628,7 @@
       "step_no": ""
     },
     "21": {
-      "id": "f2060c3f-12e3-4058-9245-a2040bfc10e3",
+      "id": "bb8fed00-2fb0-4c10-8829-460c2f46e796",
       "title": "uction manual for the “ maintenance of the brush, brush holder and slip ring ” ",
       "section_path": "0.5",
       "collection": "specs",
@@ -638,7 +638,7 @@
       "step_no": ""
     },
     "22": {
-      "id": "25e3f112-1111-40d5-8b82-f071df077588",
+      "id": "61ea866b-e5c1-423f-802d-048e7d814870",
       "title": "r",
       "section_path": "0.5",
       "collection": "procedures",
@@ -648,7 +648,7 @@
       "step_no": ""
     },
     "23": {
-      "id": "110155f6-aa27-4d3b-adc6-df5908e3c6f4",
+      "id": "1c0379de-031f-4de4-ae6e-09087468626d",
       "title": "tator winding, and the field winding should be more than 12 M O hm and more than",
       "section_path": "0.5",
       "collection": "specs",
@@ -658,7 +658,7 @@
       "step_no": ""
     },
     "24": {
-      "id": "dc0b8268-2269-461a-8199-7a2be87c7ada",
+      "id": "5083918a-0cf9-42f9-804b-710d6066cba8",
       "title": "lm to the sliding surface of the thru s t bearing before starting the generator",
       "section_path": "0.5",
       "collection": "specs",
@@ -668,7 +668,7 @@
       "step_no": ""
     },
     "25": {
-      "id": "3f1e3213-e72a-4daf-82bc-edcd60be5b02",
+      "id": "f0cb708c-3714-4c19-a5c2-056a644beacb",
       "title": "part is encountered, it should be repaired to prevent the occurrence of failure",
       "section_path": "0.5",
       "collection": "specs",
@@ -678,7 +678,7 @@
       "step_no": ""
     },
     "26": {
-      "id": "dff7421b-7d09-4821-8004-e2416ea6c69f",
+      "id": "422f0dd8-78a2-4406-8352-fdcf989b7cc7",
       "title": "lead wires Check the marking on the end of each lead before it is disconnected",
       "section_path": "0.5",
       "collection": "specs",
@@ -688,7 +688,7 @@
       "step_no": ""
     },
     "27": {
-      "id": "3f14066b-1c5a-4291-aeb6-37666d75f5ca",
+      "id": "054b4c81-fdee-4fce-bc89-b392911bdd28",
       "title": "lent), and a coat of varnish be applied to the area from which rust was removed",
       "section_path": "0.5",
       "collection": "specs",
@@ -698,7 +698,7 @@
       "step_no": ""
     },
     "28": {
-      "id": "c9d60d29-c5a3-4ab5-bf58-b07382100fb4",
+      "id": "96f1d0bc-d018-4054-8d8d-a5614b3710f7",
       "title": "ection, refinish the dam a ged area with oil - resistant, self - drying varnish",
       "section_path": "0.5",
       "collection": "specs",
@@ -708,7 +708,7 @@
       "step_no": ""
     },
     "29": {
-      "id": "4914543c-4abc-4b39-a56a-8ae8ce4b6b3f",
+      "id": "391654fc-f625-456a-9338-45eda9f075d8",
       "title": "Looseness Check all the bolts and nuts of the roto r for any sings of looseness",
       "section_path": "0.5",
       "collection": "specs",
@@ -718,7 +718,7 @@
       "step_no": ""
     },
     "30": {
-      "id": "2560dcaf-ad96-45b1-872f-41611ee601d5",
+      "id": "96fdf15f-cd90-4d18-bfec-d36e6da591ff",
       "title": "the operating conditions by checking each data against that before the overhaul",
       "section_path": "0.5",
       "collection": "specs",
@@ -728,7 +728,7 @@
       "step_no": ""
     },
     "31": {
-      "id": "a48bd285-0902-4e84-97f1-081e02d6613e",
+      "id": "486485d9-0c57-4efd-a297-98820bad0d62",
       "title": "asured at the 4 positions divided equally around the circumference of the shaft",
       "section_path": "0.5",
       "collection": "specs",
@@ -738,7 +738,7 @@
       "step_no": ""
     },
     "32": {
-      "id": "7243b3e3-d5e0-4045-b8e4-8c7d8789a855",
+      "id": "5c41243e-e80d-4882-8c7e-ef303d15e1ba",
       "title": "atum surface before centering",
       "section_path": "0.03",
       "collection": "specs",
@@ -748,7 +748,7 @@
       "step_no": ""
     },
     "33": {
-      "id": "45ba2d92-2111-4656-a8a9-91cb282f17e2",
+      "id": "6744beae-bd60-48c0-9243-0e44b1db4c8a",
       "title": "rotating",
       "section_path": "0.03",
       "collection": "specs",
@@ -758,7 +758,7 @@
       "step_no": ""
     },
     "34": {
-      "id": "a42e8ae1-c35c-4786-a53b-95ea37b0dbdf",
+      "id": "2d0cf77d-9e06-4728-9196-4dbe5a15e4d6",
       "title": "g or lowering distance of the cotter: h’ = 50 x g (mm) (1) Increasing the ga p (",
       "section_path": "1.2",
       "collection": "specs",
@@ -768,7 +768,7 @@
       "step_no": ""
     },
     "35": {
-      "id": "ffd64674-abe5-427c-889e-e9747c849c2f",
+      "id": "be1d1479-d4c6-4c4b-bffd-3f56ae132b43",
       "title": "ter with the nut unt i l head length of the cotter is (H1 + h’) mm and record",
       "section_path": "2.2",
       "collection": "specs",
@@ -778,7 +778,7 @@
       "step_no": ""
     },
     "36": {
-      "id": "0f0f7b92-786b-4647-9960-698830c0b032",
+      "id": "0db9048b-abf9-49fb-814f-818fa5f72275",
       "title": "se the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer",
       "section_path": "2.4",
       "collection": "checklists",
@@ -788,7 +788,7 @@
       "step_no": ""
     },
     "37": {
-      "id": "580c7f63-a9e8-4384-b75a-0d3cb0c2d7e8",
+      "id": "f1690f73-69bf-41a7-9fe5-36bbf4ff527f",
       "title": "t, increase the RPM to the next bracket and check the bearing temperature again",
       "section_path": "2.4",
       "collection": "specs",
@@ -798,7 +798,7 @@
       "step_no": ""
     },
     "38": {
-      "id": "f523aa10-778d-47b8-bff5-5d40e962ed6d",
+      "id": "d3ade1c9-0266-4570-b890-4eac35d9ab66",
       "title": "- 5 J 6474 1 / 15 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 Contents 1",
       "section_path": "2.4",
       "collection": "specs",
@@ -808,7 +808,7 @@
       "step_no": ""
     },
     "39": {
-      "id": "26c0abaa-1b07-4d1a-8a50-4db38b3e79b6",
+      "id": "4cdf5c8b-840c-432d-8b27-a8e48666dca3",
       "title": "g current* ◎ Room temperature and humidity ○ Ambient conditions ○ Operating hour",
       "section_path": "2.4",
       "collection": "specs",
@@ -818,7 +818,7 @@
       "step_no": ""
     },
     "40": {
-      "id": "c53c7481-835d-470e-9065-9f17d80fe404",
+      "id": "dce95fcc-300c-40ae-823a-7f292415370d",
       "title": "grade",
       "section_path": "2.4",
       "collection": "specs",
@@ -828,7 +828,7 @@
       "step_no": ""
     },
     "41": {
-      "id": "70386bb8-971c-4be3-8453-8533fe34cd4c",
+      "id": "1cad98f7-6c26-40d8-bbb7-f8ea16a279c4",
       "title": "ent oil fumes ",
       "section_path": "2.4",
       "collection": "specs",
@@ -838,7 +838,7 @@
       "step_no": ""
     },
     "42": {
-      "id": "3523b316-2327-4979-bf17-4c9e3841a32f",
+      "id": "059f2adc-9db4-48c1-a181-b3719b86fb09",
       "title": "ted b e tween the bru shes and sliprings to prevent the slip rings from rusting",
       "section_path": "2.4",
       "collection": "specs",
@@ -848,7 +848,7 @@
       "step_no": ""
     },
     "43": {
-      "id": "f1a6cd0e-471f-4826-999c-7c841cbeb14e",
+      "id": "719c4a42-1c2d-45e5-adb2-056ddb360204",
       "title": "y oil or emery dust, polish the ring surface with a dry cloth to a bright gloss",
       "section_path": "2.4",
       "collection": "specs",
@@ -858,7 +858,7 @@
       "step_no": ""
     },
     "44": {
-      "id": "5a377aec-8d54-461e-8efc-53e030c1b53e",
+      "id": "6a4d288f-e009-42d0-a902-25f6337c7e22",
       "title": "( mm) Feed rate (mm/rev",
       "section_path": "0.2",
       "collection": "specs",
@@ -868,7 +868,7 @@
       "step_no": ""
     },
     "45": {
-      "id": "6c6f3cb9-6923-4f0b-8cec-00f58b15075a",
+      "id": "08d738d9-1682-439d-86a9-7ee676a12ee7",
       "title": "05 ~ 0",
       "section_path": "0.1",
       "collection": "specs",
@@ -878,7 +878,7 @@
       "step_no": ""
     },
     "46": {
-      "id": "4969f31f-4c38-4172-9671-7d2847da80f6",
+      "id": "c82b8e56-27b9-4f2d-b7d6-8e4b119c657f",
       "title": "larities to 6  m or le ss ( 6S)",
       "section_path": "0.05",
       "collection": "specs",
@@ -888,7 +888,7 @@
       "step_no": ""
     },
     "47": {
-      "id": "b1363aa5-4ec3-446c-bfb5-c0d76d8e5d24",
+      "id": "25b8be3d-182a-44dd-a039-2fe4f3440146",
       "title": "ly bad, they should be completely removed with an abrasive block or emery paper",
       "section_path": "0.05",
       "collection": "specs",
@@ -898,7 +898,7 @@
       "step_no": ""
     },
     "48": {
-      "id": "5587282f-b757-4d35-ae06-809862ffce82",
+      "id": "dcde3588-e04e-4180-8ed2-e04230b43c54",
       "title": "igh humidity or extreme temperature c hanges, or when there is oil on the rings",
       "section_path": "0.05",
       "collection": "specs",
@@ -908,7 +908,7 @@
       "step_no": ""
     },
     "49": {
-      "id": "1de5fe85-cfd6-4cd1-860d-35365d9236e8",
+      "id": "d867432f-a9be-4919-ab41-d1d3cef53946",
       "title": "of 25mm",
       "section_path": "0.05",
       "collection": "specs",
@@ -918,7 +918,7 @@
       "step_no": ""
     },
     "50": {
-      "id": "45ba6081-7db8-4e8c-8b76-3071bcba9485",
+      "id": "a57f78d6-6583-4506-b855-dcde4434a395",
       "title": "the curved slipring surface ",
       "section_path": "0.05",
       "collection": "specs",
@@ -928,7 +928,7 @@
       "step_no": ""
     },
     "51": {
-      "id": "c3a1898d-c130-4370-a65e-7be353fa47dc",
+      "id": "5506290d-5f3e-4015-b2b4-e4791727aa35",
       "title": "ubber gloves, and t r y to avoid exposing your arms or other parts of your body",
       "section_path": "0.05",
       "collection": "specs",
@@ -938,7 +938,7 @@
       "step_no": ""
     },
     "52": {
-      "id": "e6e54b46-6fe2-4020-bd4e-23c3e40a1b28",
+      "id": "a37b8ebf-27b9-46f3-a6fc-d220de0e35e3",
       "title": "ion to the brush sliding sound , sparks, an d vibration after replacing brushes",
       "section_path": "0.05",
       "collection": "specs",
@@ -948,7 +948,7 @@
       "step_no": ""
     },
     "53": {
-      "id": "69085aba-bd6e-4d7c-8411-429a74fd2446",
+      "id": "ab4f8e1e-253b-4da6-9d06-2917a360960f",
       "title": "grade, and be sure to remove all brushes and replace them all with the new type",
       "section_path": "0.05",
       "collection": "specs",
@@ -958,7 +958,7 @@
       "step_no": ""
     },
     "54": {
-      "id": "bf380194-2859-40f8-8aa1-7a0b14f511cd",
+      "id": "980557eb-cd15-4c22-9b6a-73c66b554193",
       "title": "y 2 mm between the bottom of the brush holder and the surface of the sl i pring",
       "section_path": "0.05",
       "collection": "specs",
@@ -968,7 +968,7 @@
       "step_no": ""
     },
     "55": {
-      "id": "5f202950-e697-4b05-8c20-49adbc6759aa",
+      "id": "5bef5e57-7863-4fd4-89f6-70eed8a585f2",
       "title": "948 5 / 17 VOITH FUJI M9 50 - 5 J 5948 6 / 17 VOITH FUJI M9 50 - 5 J 5948 7 / 17",
       "section_path": "0.05",
       "collection": "specs",
@@ -978,7 +978,7 @@
       "step_no": ""
     },
     "56": {
-      "id": "0b442400-7492-4fb6-b1fa-2d8f035b9e41",
+      "id": "a415ae9f-1204-4ae4-b5e0-e25b20d35117",
       "title": "10 / 13 VOITH FUJI M9 50 - 5 J 5949 11 / 13 VOITH FUJI M9 50 - 5 J 5949 12 / 13 ",
       "section_path": "0.05",
       "collection": "specs",

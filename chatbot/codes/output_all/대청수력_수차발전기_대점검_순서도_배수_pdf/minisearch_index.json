@@ -2,14 +2,14 @@
   "documentCount": 8,
   "nextId": 8,
   "documentIds": {
-    "0": "cf14e968-7b90-4299-9b65-37b40b99f46a",
-    "1": "83bf2718-cabe-4d15-a92f-0095ee0b8717",
-    "2": "87d498fa-44f0-49e7-ad2b-7921a74a273d",
-    "3": "b7f43dd3-2c1b-4a1a-861e-9f8df6a4e55d",
-    "4": "74e5bda4-283e-4cba-84eb-c03174325d9d",
-    "5": "ca36f386-ede4-44ab-ab16-b076af7b8a4f",
-    "6": "3b245d7b-f7fb-4ea4-880a-751ee544809d",
-    "7": "001fa393-dad3-48ad-8a38-b21a14633887"
+    "0": "f527a948-d888-4733-babb-25931edc6b0d",
+    "1": "a721628b-c959-4133-852b-2b23221d889f",
+    "2": "5b615d78-3c2a-436a-acd9-66d32dee1354",
+    "3": "fe642c0d-4665-4a1b-b061-36587e8cc13f",
+    "4": "c1e29b0f-8238-48bc-a6d6-60e19465cda6",
+    "5": "b504ee30-8b62-4ad6-ae20-f3ec7942fefb",
+    "6": "dbe1b358-60d5-4944-8cd6-490fa8e74332",
+    "7": "969761c6-a41e-47fc-97b7-d85e9714150f"
   },
   "fieldIds": {
     "title": 0,
@@ -75,82 +75,82 @@
   ],
   "storedFields": {
     "0": {
-      "id": "cf14e968-7b90-4299-9b65-37b40b99f46a",
+      "id": "f527a948-d888-4733-babb-25931edc6b0d",
       "title": "대청수력 제 2 호 수차발전기 대점검 작업 순서도 □ 작업 순서 요약도 □ 사전 검토사항 ◦ 작업자 안전장비 착용 확인 ( 상시 ) 및 작업 전",
       "section_path": "",
       "collection": "specs",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": ""
     },
     "1": {
-      "id": "83bf2718-cabe-4d15-a92f-0095ee0b8717",
+      "id": "a721628b-c959-4133-852b-2b23221d889f",
       "title": "본댐 발전소 제어실 2 층에서 43G2 스위치 를 SCADA ( 원격 ) → DESK ( 현장 ) 으로 절체 □ ( 1 일차 ) 작업 순서 ◦ ",
       "section_path": "⑴1",
       "collection": "hazards",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": 1
     },
     "2": {
-      "id": "87d498fa-44f0-49e7-ad2b-7921a74a273d",
+      "id": "5b615d78-3c2a-436a-acd9-66d32dee1354",
       "title": "튼 조작 ( 약 60 분 소요 ) ▶ “FULLY CLOSED“ 램프 ON 확인 후 모터전원 차단기 OFF ▶ 그레이팅 설치 ( 추락방지 ) ◦",
       "section_path": "⑴3",
       "collection": "hazards",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": 3
     },
     "3": {
-      "id": "b7f43dd3-2c1b-4a1a-861e-9f8df6a4e55d",
+      "id": "fe642c0d-4665-4a1b-b061-36587e8cc13f",
       "title": "→ CLOSE ( 본댐 발전소 입구 ) ▶ 방수문 CLOSE 전 수압철관 압력 * 확인 을 통해 수압철관 배수 여부 확인 * ( 평상시 ) 약 ",
       "section_path": "0.5",
       "collection": "checklists",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": ""
     },
     "4": {
-      "id": "74e5bda4-283e-4cba-84eb-c03174325d9d",
+      "id": "c1e29b0f-8238-48bc-a6d6-60e19465cda6",
       "title": "이어로프 상태 점검 ✓ 훅 해지장치의 작동상태 및 변형 · 손상여부 점검 ✓ 운전자 적정 자격 및 Gantry Crane 법정검사 여부 확인 ◦",
       "section_path": "⑴4",
       "collection": "specs",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": 4
     },
     "5": {
-      "id": "ca36f386-ede4-44ab-ab16-b076af7b8a4f",
+      "id": "b504ee30-8b62-4ad6-ae20-f3ec7942fefb",
       "title": "하 3 층 배수펌프실에서 배수피트 밸브 수동 “OPEN” ( 반시계방향 ) ▶ 본댐 발전소 지하 3 층 배수펌프실에서 배수펌프 “START” ◦",
       "section_path": "⑴5",
       "collection": "hazards",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": 5
     },
     "6": {
-      "id": "3b245d7b-f7fb-4ea4-880a-751ee544809d",
+      "id": "dbe1b358-60d5-4944-8cd6-490fa8e74332",
       "title": "Casing 입구 ( 지하 3 층 ) ▶ 입구 개방 후 2 개소 (Draft Tube, Sprial Casing) 모두 급배기설비 설치 및 가동",
       "section_path": "⑴5",
       "collection": "hazards",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": 5
     },
     "7": {
-      "id": "001fa393-dad3-48ad-8a38-b21a14633887",
+      "id": "969761c6-a41e-47fc-97b7-d85e9714150f",
       "title": "1 시간 전 부터 가동 ( 작업 중 계속 가동 ) ✓ 작업구역 설정 ( 출입경고 표지 비치 ) 【 허용기준 】 - (O 2 ) 18% 이상 ~ ",
       "section_path": "1.5",
       "collection": "hazards",
       "family": "1수력 공통",
-      "equipment": "수차발전기,방수문,배수",
+      "equipment": "수차발전기",
       "day": "",
       "step_no": ""
     }

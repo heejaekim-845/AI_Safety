@@ -1,11 +1,11 @@
 [
   {
-    "id": "b2f0bcbf-58a3-478f-b406-2992dd6a5769",
-    "chunk_id": "1호기 매뉴얼(en).pdf-1-2-4uxya",
+    "id": "1ae00e7f-5a4c-446c-926d-34705bb384f6",
+    "chunk_id": "UNIT1-OM-EN-1-2-ph0b1",
     "text": "1 x 50 MW GENERATOR VOITH FUJI Instruc ti on Manual M9 50 - 5 J5943 1 / 3 D rawn M urakami Approve S hiraki Date 2022 - 1 2 - 26 DAECH EONG POWER PLANT UNIT1 1 x 50 MW GENERATOR O peration and Maintenance Instruction Manual VOITH FUJI M9 50 - 5 J5943 2 / 3 CONTENTS 1. Generator",
     "char_len": 278,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 1,
     "page_end": 2,
     "section_path": "",
@@ -197,6 +197,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -206,12 +208,12 @@
     "uses_crane": false
   },
   {
-    "id": "07827781-4460-4bae-9cdf-84796b3b6f1b",
-    "chunk_id": "1호기 매뉴얼(en).pdf-2-2-y94jy",
+    "id": "c1d74886-65a6-454f-bda4-2fda92fac81a",
+    "chunk_id": "UNIT1-OM-EN-2-2-vo9eq",
     "text": "enance Instruction Manual VOITH FUJI M9 50 - 5 J5943 2 / 3 CONTENTS 1. Generator 1.1 Design and T echnical D ata M 9 50 - 5 J5944 1.2 Periodic M aintenance and I nspection M950 - 5 J5945",
     "char_len": 186,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 2,
     "page_end": 2,
     "section_path": "1.2",
@@ -398,6 +400,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -407,12 +411,12 @@
     "uses_crane": false
   },
   {
-    "id": "2c65d755-d014-4c6f-8591-dbea26f05175",
-    "chunk_id": "1호기 매뉴얼(en).pdf-2-2-ozoml",
+    "id": "c0c5c71f-590d-4743-b682-b58d5c9c7981",
+    "chunk_id": "UNIT1-OM-EN-2-2-uac8m",
     "text": "D ata M 9 50 - 5 J5944 1.2 Periodic M aintenance and I nspection M950 - 5 J5945 1.3 Overhaul I nspection M9 5 0 - 5 J5 946 1.4 Bearing R eplacement M9 5 0 - 5 J5947 1. 5 Disassembly of T hrust B earing M788 - 290935",
     "char_len": 215,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 2,
     "page_end": 2,
     "section_path": "1.4",
@@ -599,6 +603,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -608,12 +614,12 @@
     "uses_crane": false
   },
   {
-    "id": "f44bc846-b064-40b0-a7ba-26ae2801a920",
-    "chunk_id": "1호기 매뉴얼(en).pdf-2-2-jczoy",
+    "id": "e410c499-fe14-45fa-b218-f794d963e6f3",
+    "chunk_id": "UNIT1-OM-EN-2-2-drdvr",
     "text": "R eplacement M9 5 0 - 5 J5947 1. 5 Disassembly of T hrust B earing M788 - 290935 1.6 Maintenance of the B rush , B rush H older and S lip R ing M500 - 5J 6474 2. Auxiliary equipment 2. 1 A ir C ooler M9 50 - 5J5948",
     "char_len": 214,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 2,
     "page_end": 2,
     "section_path": "1.6",
@@ -800,6 +806,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -809,12 +817,12 @@
     "uses_crane": false
   },
   {
-    "id": "9864a2bc-50b6-4ba0-a31b-6c7fc911de4c",
-    "chunk_id": "1호기 매뉴얼(en).pdf-2-2-aj5kk",
+    "id": "b08821c8-d2d8-40da-aad1-8c10b8200dfa",
+    "chunk_id": "UNIT1-OM-EN-2-2-6szrs",
     "text": "lip R ing M500 - 5J 6474 2. Auxiliary equipment 2. 1 A ir C ooler M9 50 - 5J5948 2.2 Oil C ooler M 9 50 - 5J5949 2. 3 Brake and J ack M7 80 - 5J 5950 2. 3 Method of B rake and J ack V alve O perat ion M780 - 5J 5951",
     "char_len": 215,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 2,
     "page_end": 2,
     "section_path": "2.2",
@@ -999,6 +1007,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -1008,12 +1018,12 @@
     "uses_crane": false
   },
   {
-    "id": "33c6940a-d9f6-48ba-ab91-81cb5719711b",
-    "chunk_id": "1호기 매뉴얼(en).pdf-2-3-q4au1",
+    "id": "62f0ae91-9af6-4a90-9748-bb3b2dbaada0",
+    "chunk_id": "UNIT1-OM-EN-2-3-kpvwp",
     "text": "7 80 - 5J 5950 2. 3 Method of B rake and J ack V alve O perat ion M780 - 5J 5951 2.4 Hand O perated J ack U p P ump M 780 - 5 J 5952 VOITH FUJI M9 50 - 5 J5943 3 / 3 3 . List of D rawing and Calculation Sheet 1) G enerator Cross Section Drawing M905 - 287464 2) Generator Outline Drawing M905 - 288299 3) Generator Wiring Connection D iagram M 555 - 288301 4) Generator Piping Diag ram M 790 - 288300 5) Generator Pipe Assembly Drawin g M 905 - 2907 17 6) Generator Painting Specification M905 - 5 H9382 7) Stator Coil Section Drawing M 905 - 3C8759 8) Stator Coil Insulation Specification MI23 - 39 04 9) Stator W inding Diagram MI23 - 3898 10) Rotor Pole As sembl y Drawing M905 - 3D0376 11) Stator and Rotor Liftin g Drawing M905 - 3D0377 12) Outline D rawing of Lifting Ji g for Stator and Rotor M905 - 4J6889 13) Bear ing Struc tural Drawing M905 - 288302 14) Na me P lat e Drawing M 091 - 289364 15) List of S pare Parts an d Acces sories M 096 - 5J 2400 16) Generator fou ndation Load Calculation M905 - 5J4018 17) Criti cal Speed Calculation M905 - 5 H9724 1 8 ) Flywheel Ef fect Calculation M905 - 5H9680 19 ) Generator efficiency Calculat ion MI2 3 - 3899 20) Generator Electrical Parameter Calcu lation MI 23 - 3900 21) Generator Capability Curve MI23 - 3901 22) Generator Cooling Air Volume Calcul ation M905 - 5H9632 23) Generator Shaft Strength Calculation M905 - 5H9722 24) Generator R otating Part St rength C alcu lation M905 - 5H0335 25) Stato r Frame Strength Calcul ation M905 - 5J0 291 26) Bracket Strength Calculation M905 - 5J 0215 27) Generator Thrust Bearing Su rf ace Pressure Calculation M905 - 5J0153 28 ) Generator Bearing Loss Calculation M905 - 5J0138 29 ) Brake and Ja c k Capacity Calculation M905 - 5J0376 3 0) Brake Ring Tempe rature Calculation M905 - 5J0378 3 1) Space Heater Capacity Calcu lation M 905 - 5J0374 3 2) Transfer Matrix Method M905 - 5J2837 33 ) Field Bus Bar Insulation Specification M905 - 5J6063",
     "char_len": 1949,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 2,
     "page_end": 3,
     "section_path": "2.4",
@@ -1204,6 +1214,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -1213,12 +1225,12 @@
     "uses_crane": false
   },
   {
-    "id": "57a5de7c-1b0a-44f0-b86e-eb52be85e483",
-    "chunk_id": "1호기 매뉴얼(en).pdf-3-4-nv79b",
+    "id": "ff7a8934-e406-47c0-a448-575323c6db9e",
+    "chunk_id": "UNIT1-OM-EN-3-4-3cji2",
     "text": "x Method M905 - 5J2837 33 ) Field Bus Bar Insulation Specification M905 - 5J6063 DE S IGN AND TECHNICAL DATA VOITH FUJI Instruction Manual M9 50 - 5 J5944 1 / 3 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 1. General Data Generator Type GDH7439S - 24 Output 5 000 0 kVA Voltage 1 32 00 V Current 2187 A Power factor",
     "char_len": 321,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 3,
     "page_end": 4,
     "section_path": "2.4",
@@ -1409,6 +1421,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -1418,12 +1432,12 @@
     "uses_crane": false
   },
   {
-    "id": "a89e077f-948c-4946-9785-019e931fd44a",
-    "chunk_id": "1호기 매뉴얼(en).pdf-4-5-f14t9",
+    "id": "ed3fecb4-916a-46cb-a475-72dd6a11f469",
+    "chunk_id": "UNIT1-OM-EN-4-5-zt5ic",
     "text": "e GDH7439S - 24 Output 5 000 0 kVA Voltage 1 32 00 V Current 2187 A Power factor 0.9 Frequency 6 0Hz Speed 150 m in - 1 Flywheel effect GD 2 = more than 2 5 00 t - m 2 Rating Contin uous Direction of rotation Clockwise a s view from t op VOITH FUJI M9 50 - 5 J5944 2 / 3 2. Data in reference to Maintenance",
     "char_len": 306,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 4,
     "page_end": 5,
     "section_path": "0.9",
@@ -1615,6 +1629,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -1624,12 +1640,12 @@
     "uses_crane": false
   },
   {
-    "id": "2833aaf4-00f8-46b7-b96c-40dff3aeb8f8",
-    "chunk_id": "1호기 매뉴얼(en).pdf-5-5-t3q9u",
+    "id": "25d34cef-aac5-4785-a235-3b4d96168aeb",
+    "chunk_id": "UNIT1-OM-EN-5-5-vneqn",
     "text": "w from t op VOITH FUJI M9 50 - 5 J5944 2 / 3 2. Data in reference to Maintenance 2.1 Allowable temperature Generator Lower guide bearing Alarm : 75 ℃ , Trip : 8 5 ℃ Thrust bearing Alarm: 75 ℃ ,Trip: 85 ℃",
     "char_len": 203,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 5,
     "page_end": 5,
     "section_path": "2.1",
@@ -1817,6 +1833,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -1826,12 +1844,12 @@
     "uses_crane": false
   },
   {
-    "id": "c0e87fa9-abeb-44ec-8262-9fc571346fda",
-    "chunk_id": "1호기 매뉴얼(en).pdf-5-5-bm7wu",
+    "id": "75ff899c-afce-400c-9225-fc29d2d0179d",
+    "chunk_id": "UNIT1-OM-EN-5-5-u4690",
     "text": "guide bearing Alarm : 75 ℃ , Trip : 8 5 ℃ Thrust bearing Alarm: 75 ℃ ,Trip: 85 ℃ 2.2 Cooling water (max. water temp. 2 5 ℃ ) Amount of cooling water Working water pressure Testing water Pressure Air cooler 2 400 Liter /min 0. 7 2 MPa",
     "char_len": 233,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 5,
     "page_end": 5,
     "section_path": "2.2",
@@ -2021,6 +2039,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -2030,12 +2050,12 @@
     "uses_crane": false
   },
   {
-    "id": "2d0f25dd-382f-4159-8c8e-3c7bb39f93f4",
-    "chunk_id": "1호기 매뉴얼(en).pdf-5-6-nj94v",
+    "id": "55577f38-abef-4cad-b561-77c2be0651ff",
+    "chunk_id": "UNIT1-OM-EN-5-6-iet9d",
     "text": "ing water pressure Testing water Pressure Air cooler 2 400 Liter /min 0. 7 2 MPa 1.08 MPa Oil cooler 3 00 Liter /min 0. 7 2 MPa 1.08 MPa 2 .3 Lubricating oil Amount of oi l Lower bearing sump tank 25 0 0 Liters (Including oil cooler) Kind of lubricating oil for bearing ISO VG 46 Limit values of oil level ( Against the specified level) Rise: 35 mm Drop: 35 mm VOITH FUJI M9 50 - 5 J5944 3 / 3",
     "char_len": 393,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 5,
     "page_end": 6,
     "section_path": "1.08",
@@ -2224,6 +2244,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -2233,12 +2255,12 @@
     "uses_crane": false
   },
   {
-    "id": "29613302-0aca-42ad-94c7-f3dca4ac04a7",
-    "chunk_id": "1호기 매뉴얼(en).pdf-6-6-2jqev",
+    "id": "29dea092-9b75-4258-a4a1-2b4f9a3b0ead",
+    "chunk_id": "UNIT1-OM-EN-6-6-1n570",
     "text": "st the specified level) Rise: 35 mm Drop: 35 mm VOITH FUJI M9 50 - 5 J5944 3 / 3 2.4 Guide bearing Lower Bearing type Segmental Pi eces 12 Diameter 1920 mm Clearance(by Radius) 0. 21 ～",
     "char_len": 184,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 6,
     "page_end": 6,
     "section_path": "2.4",
@@ -2423,6 +2445,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -2432,12 +2456,12 @@
     "uses_crane": false
   },
   {
-    "id": "74199291-6a2b-4c79-8dbd-ead0bd8eaf67",
-    "chunk_id": "1호기 매뉴얼(en).pdf-6-6-dfn4l",
+    "id": "5feb6507-e383-4da4-a761-5d318f0ec99f",
+    "chunk_id": "UNIT1-OM-EN-6-6-k4qgr",
     "text": "Bearing type Segmental Pi eces 12 Diameter 1920 mm Clearance(by Radius) 0. 21 ～ 0.2 4 mm 2.5 Brake shoe Material Non asbestos resin mold Thickness of brake shoe 40 mm Allowable wear margin 25 mm",
     "char_len": 194,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 6,
     "page_end": 6,
     "section_path": "2.5",
@@ -2622,6 +2646,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -2631,12 +2657,12 @@
     "uses_crane": false
   },
   {
-    "id": "c34ef883-48ca-4731-9204-c81c0118b752",
-    "chunk_id": "1호기 매뉴얼(en).pdf-6-9-ockre",
+    "id": "3c9f1113-2424-46a5-992c-ea17d872292a",
+    "chunk_id": "UNIT1-OM-EN-6-9-6xoq9",
     "text": "on asbestos resin mold Thickness of brake shoe 40 mm Allowable wear margin 25 mm 2.6 Allowable value of rotor jacking up --------------- 6 mm FOR PERIODIC MAINTENA NCE AND INS PECTION VOITH FUJI Instruction Manual M9 50 - 5 J594 5 1 / 10 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 VOITH FUJI M9 50 - 5 J594 5 2 / 10 1 . Periodic Maintenance and Inspection To ensure proper functions and performance of the generator, it is important to always maintain records of operating conditions of the generator so that they can be compared with the past records. This is also ver y helpful in finding troubles in their early stages. It is advisable to determine inspection intervals according to the conditions of the generator for necessary maintenance. Use the following table to set up the inspection intervals: VOITH FUJI M9 50 - 5 J594 5 3 / 10 Met hod of inspection & maintenance 1. Periodic maintenance and inspection During operation of generator, always check the operating conditions by observing the meters.",
     "char_len": 1016,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 6,
     "page_end": 9,
     "section_path": "2.6",
@@ -2824,6 +2850,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -2833,12 +2861,12 @@
     "uses_crane": false
   },
   {
-    "id": "5f9b68df-87aa-4341-bedc-55dd3e82cb8c",
-    "chunk_id": "1호기 매뉴얼(en).pdf-9-10-imdp9",
+    "id": "6d607de5-5397-4665-adec-4bd16dfcad9f",
+    "chunk_id": "UNIT1-OM-EN-9-10-nqddt",
     "text": "ion of generator, always check the operating conditions by observing the meters. Perform routine inspections to fin d troubles in their early stages. It is important to kee p records of normal operating condition s (vibration, noise, smell, etc . ) of the generator as it helps you find even a minor trouble. Should any fault be noted, it must be repaired immediately. Po i nt s to observe Output Voltage Current Power factor Fre quen cy Exciting current Stator winding temperature Bearing temperature Cooling water temperature Cooling air temperature Vibration Other s Frequency of inspection 12 mon. ○ 1 mon. Weekly Daily ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ Item Item to be recorded VOITH FUJI M9 50 - 5 J594 5 4 / 10 Method of inspection & maintenance Check the oil gauge to see that the oil tank is fill ed with lubricating oil to the specified level. If the oil level is too high, it will cause oil leaks; and if it is too low, it will res ult in damage to the bearing due to heat.",
     "char_len": 970,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 9,
     "page_end": 10,
     "section_path": "2.6",
@@ -3029,6 +3057,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -3038,12 +3068,12 @@
     "uses_crane": false
   },
   {
-    "id": "0c69ca77-4338-4c70-9169-b533db20e495",
-    "chunk_id": "1호기 매뉴얼(en).pdf-10-11-ii7tc",
+    "id": "ef7d7f9e-1214-400f-a6ea-1d062072901a",
+    "chunk_id": "UNIT1-OM-EN-10-11-e8pld",
     "text": "aks; and if it is too low, it will res ult in damage to the bearing due to heat. Note that the oil level will slightly move when the generator is started. Check that the cooling water is flowing at the rated quantity. Decrease of water flow will cause an increase of bearing temperature, affecti ng t he bearing metal. The water flow is decreased if the cooling pipe is stopped up with foreign objects contained in the cooling water, or if scales are accumulated on the inner wall of the cooling pipe during a long period of operation. Po i nt s to observ e Oi l gauge Oil leaks Water flow relay Frequency of inspection 12 mon. 1 mon. ○ ○ Weekly ○ Daily Item Oil level Flow of cooling water VOITH FUJI M9 50 - 5 J594 5 5 / 10 Method of inspection & maintenance Check for unusual smell while the generator is in operation. To gain access to the winding, be sure the stop the generator to prevent unexpected hazards . To protect the windings and bearings from burning, always check the thermometers for sudden changes in temperature.",
     "char_len": 1031,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 10,
     "page_end": 11,
     "section_path": "2.6",
@@ -3235,6 +3265,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -3244,12 +3276,12 @@
     "uses_crane": false
   },
   {
-    "id": "5c21e6bf-7902-4f2c-b303-9160c49cf24f",
-    "chunk_id": "1호기 매뉴얼(en).pdf-11-12-of2qs",
+    "id": "0d0a416d-ad54-482f-8213-3b234c96476d",
+    "chunk_id": "UNIT1-OM-EN-11-12-rav6d",
     "text": "s from burning, always check the thermometers for sudden changes in temperature. The stator winding is subject to accumulation of dirt and dust during a long period of operation; this affects t h e cooling effect and slig htly increases the temperature of the winding. Similarly, the cooling effect is decreased due to the accumulation of scales inside the cooling pipe w h ich increases the bear ing temperature. Clean the stator win d ing and the cooling pipe, and the temperatures will be lowered to the original levels. Po i nt s to observe Unusual smell Discoloration of insulation Loose wedges Looseness or break ing of binding strings Checking of lead - wires Thermometer Frequency of inspection 12 mon. ○ ○ ○ ○ ○ 1 mon. ○ Wee kly ○ ○ Daily ○ ○ Item Winding Temperature VOITH FUJI M9 50 - 5 J594 5 6 / 10 Method of inspection & maintenance Periodically check the upper and lower brackets for unusual vibrations. Vibrations should be measured always at the same point of each bracket.",
     "char_len": 990,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 11,
     "page_end": 12,
     "section_path": "2.6",
@@ -3441,6 +3473,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -3450,12 +3484,12 @@
     "uses_crane": false
   },
   {
-    "id": "d615e92a-48e1-4b73-aea0-f5dcdbb814f2",
-    "chunk_id": "1호기 매뉴얼(en).pdf-12-12-r6t4r",
+    "id": "07b5568b-231e-4736-967f-486b65f90fe3",
+    "chunk_id": "UNIT1-OM-EN-12-12-sg20k",
     "text": "rations. Vibrations should be measured always at the same point of each bracket. Excessive vibrations not only shorten the service life of the machine but also cause serious troubles. Water leaks will affect the proper function of the generator . Note that water leaking inside the machine will cause s h ort - circuit trouble of th e generator. Check the cover of the bearing oil re s ervoir to see that the fan and the stator winding are free from oil vapor. Also, c heck for loose bolts to prevent the oil from leaking through the fitting parts and joints. Check all the joints for any sig ns of discoloration and overhea ting. Also, check that all the bolts are firmly tightened and that the flexible leads are normal. Check all the joints for any signs of discoloration and overheating. Also, check for loose bolts. Po i nt s to observe Upper and lower brackets Cooler Cooling w ater pipe Oil cooler Hydraulic jack Oil pipe Bearing oil reservoir Joints Joints Frequency of inspection 12 mon.",
     "char_len": 996,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 12,
     "page_end": 12,
     "section_path": "2.6",
@@ -3646,6 +3680,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -3655,12 +3691,12 @@
     "uses_crane": false
   },
   {
-    "id": "576145b6-1c03-46f0-8383-d0c6757876af",
-    "chunk_id": "1호기 매뉴얼(en).pdf-12-13-muaqk",
+    "id": "e00af774-09fc-4835-aa18-8ade0a235527",
+    "chunk_id": "UNIT1-OM-EN-12-13-xvpal",
     "text": "ack Oil pipe Bearing oil reservoir Joints Joints Frequency of inspection 12 mon. ○ ○ ○ 1 mon. ○ ○ ○ ○ ○ ○ Weekly Daily Item Vibration Water leaks Oil leaks Rotor leads and field winding Bus bar VOITH FUJI M9 50 - 5 J594 5 7 / 10 Method of inspection & maintenance Periodically check the brake shoe fo r wear and inspect the relationship b etween the wear and the operating frequen c y. This is helpful in estimating the time of replacement of the brake shoe. Check the brake ring for any signs of wear and damage. Excessive damage to the brake ring should be corrected. In case when the braking sc ratch is seen even on the head of the fixing bolt, the brake ring must be replaced or repaired. Wi t h no pressure , the brake pistons move down in order starting with the one closest to the exhaust side. Check to see that all the pistons come down smoothly. If required, move the piston in trouble w i th hand. If it still fails to move smoothly, disassemble, and check the brak e .",
     "char_len": 981,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 12,
     "page_end": 13,
     "section_path": "2.6",
@@ -3853,6 +3889,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -3862,12 +3900,12 @@
     "uses_crane": false
   },
   {
-    "id": "1765bb7b-ebd9-4268-8ac1-4a667d26004c",
-    "chunk_id": "1호기 매뉴얼(en).pdf-13-14-ggqlh",
+    "id": "15a53c14-a59a-4258-9ac9-cd4b51688161",
+    "chunk_id": "UNIT1-OM-EN-13-14-i0yoe",
     "text": "th hand. If it still fails to move smoothly, disassemble, and check the brak e . Po i nt s to observe Wear of brake shoe Wear of and damage to brake ring Movement of brake piston Frequency of inspection 12 mon. 1 mon. ○ ○ ○ Weekly Daily Item Brake shoe Brake ring Brake VOITH FUJI M9 50 - 5 J594 5 8 / 10 Method of inspection & maintenance The time of replacement of lubricating oil depends on the temperature of the oil during operation and the number of foreign objects which may enter the oil. It is advisable to periodically check the oil for signs of water content, number of foreign objects and acid value as it is used as a guide in determining the time of filtering or replacement of the oil. Since lubricating oil is said to be deteriorated rap idly if acid value is exceeding",
     "char_len": 785,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 13,
     "page_end": 14,
     "section_path": "2.6",
@@ -4059,6 +4097,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -4068,12 +4108,12 @@
     "uses_crane": false
   },
   {
-    "id": "dffe1c2e-0571-404a-9d05-4fce6f04ece8",
-    "chunk_id": "1호기 매뉴얼(en).pdf-14-15-xb230",
+    "id": "f53e8640-7872-47e8-bbec-9bdf81229c79",
+    "chunk_id": "UNIT1-OM-EN-14-15-1tx54",
     "text": "e lubricating oil is said to be deteriorated rap idly if acid value is exceeding 0.4 - 0.5 KOH - mg/g. This value may a lso be used as a guide for replacement of the oil. Refer to the instruction manual for the “ maintenance of the brush, brush holder and slip ring ” . Po i nt s to observe C o ntamination or deter ioration of oil Frequency of inspection 12 mon. ○ 1 mon. ○ Weekly ○ Daily ○ Item Lubricating oil Brush, brush holder and slip ring VOITH FUJI M9 50 - 5 J594 5 9 / 10 2. Maintenance and Inspection during Stoppage (1) When the generator is stopped for several weeks, an appropriate p atrolling inspection, should be maintained, even while at rest, according to the above - mentioned requirements for Chapter 1 “ Daily Maintenance and Inspection ” and the following items should receive consideration. Items Items to be checked Method s of mainte nance and inspection Slip ring and brush holder Refer to the instruction manual for the “ maintenance of the brush, brush holder and slip ring ” .",
     "char_len": 1006,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 14,
     "page_end": 15,
     "section_path": "0.5",
@@ -4265,6 +4305,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -4274,12 +4316,12 @@
     "uses_crane": false
   },
   {
-    "id": "f2060c3f-12e3-4058-9245-a2040bfc10e3",
-    "chunk_id": "1호기 매뉴얼(en).pdf-15-15-ioj87",
+    "id": "bb8fed00-2fb0-4c10-8829-460c2f46e796",
+    "chunk_id": "UNIT1-OM-EN-15-15-hzjga",
     "text": "uction manual for the “ maintenance of the brush, brush holder and slip ring ” . When the generator is not to be operated for a long period, lift the brush, or insert a rust - proof paper bet we en the slip ring and the brush. If the generator is to be stopped extending over several months, lift the brush. Space heater Check to make sure that the space heater i s working while the generator is stopped. (2) (3) Maintenance and inspections prior to ope ra tion When the generator is to be operated after it has been stopped for a long period, check the following points, and carry out repairs as necessary: Items Items to be checked Method s of maintenance and inspection Windings Insulation resistance The insulation resistance of windin g may be deteriorated while the generator is stopped for a long period. Measure the insulation resistance of the stator and field windings with a megger to ensure the proper operation of the generator. Before measurement, be sure to remove oil, dirt, and dust from the slip ring.",
     "char_len": 1020,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 15,
     "page_end": 15,
     "section_path": "0.5",
@@ -4467,6 +4509,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -4476,12 +4520,12 @@
     "uses_crane": false
   },
   {
-    "id": "25e3f112-1111-40d5-8b82-f071df077588",
-    "chunk_id": "1호기 매뉴얼(en).pdf-15-15-0bylh",
+    "id": "61ea866b-e5c1-423f-802d-048e7d814870",
+    "chunk_id": "UNIT1-OM-EN-15-15-xjr5b",
     "text": "r. Before measurement, be sure to remove oil, dirt, and dust from the slip ring. The insulation resistance of the stator winding, and the field winding should be more than 12 M O hm and more than",
     "char_len": 195,
     "collection": "procedures",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 15,
     "page_end": 15,
     "section_path": "0.5",
@@ -4666,6 +4710,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -4675,12 +4721,12 @@
     "uses_crane": false
   },
   {
-    "id": "110155f6-aa27-4d3b-adc6-df5908e3c6f4",
-    "chunk_id": "1호기 매뉴얼(en).pdf-15-16-pzr2n",
+    "id": "1c0379de-031f-4de4-ae6e-09087468626d",
+    "chunk_id": "UNIT1-OM-EN-15-16-c8qsl",
     "text": "tator winding, and the field winding should be more than 12 M O hm and more than 0.5 M O hm respectively. When the resistance is lower than the specified limit, the gene ra tor shoul d be put in dry - run and then measure it once again before puttin g the generator in normal operation Slip rings, brush, and brush holder Refer to the instruction manual for the “ maintenance of the brush, brush holder and slip ring ” . VOITH FUJI M9 50 - 5 J594 5 10 / 10 Items Item s t o be checked Method s of maintenance and inspection Cooling water Cooling water flow Check to m a ke sure that the cooling water is flowing at the rated quantity and that no water is le a king. Water leaks Lubricating oil O il level Check to m a ke sure th at the lubricating oil is supplied to the specified level and that no oil is leaking. O il leaks C h ecking the inside of generator Check that there are no tools, etc. left inside the generator. Lift the rotor When t he generator is stopped for more tha n two week s , lift the rotor of th e turbine generator using an oil lifter or oil jack and from an oil film to the sliding surface of the thru s t bearing before starting the generator.",
     "char_len": 1169,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 15,
     "page_end": 16,
     "section_path": "0.5",
@@ -4868,6 +4914,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -4877,12 +4925,12 @@
     "uses_crane": false
   },
   {
-    "id": "dc0b8268-2269-461a-8199-7a2be87c7ada",
-    "chunk_id": "1호기 매뉴얼(en).pdf-16-18-zwpeo",
+    "id": "5083918a-0cf9-42f9-804b-710d6066cba8",
+    "chunk_id": "UNIT1-OM-EN-16-18-jr416",
     "text": "lm to the sliding surface of the thru s t bearing before starting the generator. Shaft current preventive insulation Contamination Check and c l ean the sha ft current preventive insulation. Note: 1. No inspection is required on umbrella type shaft current preventive insulation. 2. Dra in ing method of cooling water when machine is stopped for longer period. (To prevent freezing) Drain water by opening the drain v a lve on water supply side in the turbine room after the water supply system is stopped. Please refer to instruction manuals for draining water from the air cooler and from the oil cooler. FOR OVERHAUL INS PECTION VOITH FUJI Instruction Manual M9 50 - 5 J594 6 1 / 5 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 VOITH FUJI M9 50 - 5 J594 6 2 / 5 1. G eneral It is recommended that the generator be periodically disassembled for checking each part in detail. If any bad part is encountered, it should be repaired to prevent the occurrence of failure.",
     "char_len": 973,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 16,
     "page_end": 18,
     "section_path": "0.5",
@@ -5070,6 +5118,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -5079,12 +5129,12 @@
     "uses_crane": false
   },
   {
-    "id": "3f1e3213-e72a-4daf-82bc-edcd60be5b02",
-    "chunk_id": "1호기 매뉴얼(en).pdf-18-18-b1qs2",
+    "id": "f0cb708c-3714-4c19-a5c2-056a644beacb",
+    "chunk_id": "UNIT1-OM-EN-18-18-ztivu",
     "text": "part is encountered, it should be repaired to prevent the occurrence of failure. It is general practice to carry out the periodical ins pection about one year after the initial run and after that once in 3 ~ 5 years. The generator should be disassembled to such an extent that the rotor and the bearing can be inspected in detail. Prior to the periodical inspection, data on each part sho uld be recorded, and at the time of trial run the function of each part should be checked, comparing the results with the previous data. If data before and that after the overhauling are considerably different, this should receive consideration and an appr opri ate means should be provided. 2. Precautions for Disassembly and Reassembly Item Precautions Guide bearing gap Measure the gap at the guide bearing before it is disassembled so that the measured gap may be used as a reference after it is reassembled . Treat ment of lead wires Check the marking on the end of each lead before it is disconnected.",
     "char_len": 996,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 18,
     "page_end": 18,
     "section_path": "0.5",
@@ -5272,6 +5322,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -5281,12 +5333,12 @@
     "uses_crane": false
   },
   {
-    "id": "dff7421b-7d09-4821-8004-e2416ea6c69f",
-    "chunk_id": "1호기 매뉴얼(en).pdf-18-19-c7xy4",
+    "id": "422f0dd8-78a2-4406-8352-fdcf989b7cc7",
+    "chunk_id": "UNIT1-OM-EN-18-19-9h68i",
     "text": "lead wires Check the marking on the end of each lead before it is disconnected. Any lead without marking should be treated properly for each identification. Checking of fixing bolts When loosening bolts for disassembly, check to make sure t hat the y have been fully tightened. If loose bolts are noted, they should be properly marked and fully tightened at the time of reassembly; also, they should be carefully checked at the time of the next per iodical ins p ection and overhaul (check particularl y the f oundation bolts for an y signs of looseness). Lifting of lower bracket Normally, lifting of the lower bracket is not required even when the generator is to be overhauled. However, if it is required, special care should be used not to damage the stat or wind ing. Match marks Reassemble the generator according to the match marks provided. VOITH FUJI M9 50 - 5 J594 6 3 / 5 3. M aintenance after Disassembly (1) Checking and cleaning of stator Items Items to be checked Methods Stator core Rust Any signs of rust should be removed using a fine sandpape r (#320 or equivalent), and a coat of varnish be applied to the area from which rust was removed.",
     "char_len": 1159,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 18,
     "page_end": 19,
     "section_path": "0.5",
@@ -5473,6 +5525,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -5482,12 +5536,12 @@
     "uses_crane": false
   },
   {
-    "id": "3f14066b-1c5a-4291-aeb6-37666d75f5ca",
-    "chunk_id": "1호기 매뉴얼(en).pdf-19-19-fqjvc",
+    "id": "054b4c81-fdee-4fce-bc89-b392911bdd28",
+    "chunk_id": "UNIT1-OM-EN-19-19-5wx7s",
     "text": "lent), and a coat of varnish be applied to the area from which rust was removed. Be sure to scrape off the rust just enough until it is removed while paying attention not to damage the stator winding. Stator winding Damage to insulation I f insulation is damaged or deteriorated (including wedges), repair it immediately or contact the manufacturer. If loose binding strings are noted, correct them or c o ntact the manufacturer. Poor insulation of lead joints Loose wedges Lo oseness or br eaking of binding strings Presence of oil and dust Dust on the stator winding should be removed with compressed air. Dirty oil on the winding should be wiped off with a cloth moistened with gasoline or benzine. In either case, care should b e used not to damage the insulation. As the cleaning oil such as gasoline and benzine tends to dissolve the compound of the winding insulation, the work must be done as quick as possible. Varnishing If the varnished surface of the windings is dam a ged dur ing cleaning or inspection, refinish the dam a ged area with oil - resistant, self - drying varnish.",
     "char_len": 1089,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 19,
     "page_end": 19,
     "section_path": "0.5",
@@ -5674,6 +5728,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -5683,12 +5739,12 @@
     "uses_crane": false
   },
   {
-    "id": "c9d60d29-c5a3-4ab5-bf58-b07382100fb4",
-    "chunk_id": "1호기 매뉴얼(en).pdf-19-20-sk216",
+    "id": "96f1d0bc-d018-4054-8d8d-a5614b3710f7",
+    "chunk_id": "UNIT1-OM-EN-19-20-kdkp3",
     "text": "ection, refinish the dam a ged area with oil - resistant, self - drying varnish. The varnish should be sprayed or hand coated evenly and dried completely. Stator winding leads Looseness or breaking of support ring binding strings Perform the same procedu res as for the stator winding. VOITH FUJI M9 50 - 5 J594 6 4 / 5 (2) Inspection and cleaning of rotor Items Items to be checked Methods Field winding Abnormal deformation of insulation Check against other normal poles. If any defect is noted, correct it or consult the manufactur er. Presen ce of oil and dust Clean the winding in the same manner as for the stator winding. Varnishing Apply a coat of varnish in the same manner as for the stator winding. (3 ) Other s Items Items to be checked Methods Oil reservoir Contamination Re move all deposit s on the bottom of the oil reservoir. Cooler Cooling pipe Remove scales on the inner wall of cooling pipe using a nylon brush. Bolts and nuts Looseness Check all the bolts and nuts of the roto r for any sings of looseness.",
     "char_len": 1027,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 19,
     "page_end": 20,
     "section_path": "0.5",
@@ -5875,6 +5931,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -5884,12 +5942,12 @@
     "uses_crane": false
   },
   {
-    "id": "4914543c-4abc-4b39-a56a-8ae8ce4b6b3f",
-    "chunk_id": "1호기 매뉴얼(en).pdf-20-21-089ep",
+    "id": "391654fc-f625-456a-9338-45eda9f075d8",
+    "chunk_id": "UNIT1-OM-EN-20-21-ui74n",
     "text": "Looseness Check all the bolts and nuts of the roto r for any sings of looseness. Also, check the main bolts and n uts of other parts. All the bolts and nuts of the rotor are locked. Check that they are secured with locking washer, etc. Shaft current preventive insulation Contamination Check the shaft curre n t preventive in s ulation for cleanliness. No te: No inspecti on is required on umbrella type shaft current preventive insulati on . VOITH FUJI M9 50 - 5 J594 6 5 / 5 4. Precautions before Test Run Items Precautions Perform overall inspection by referring to the instruction manual for the “ daily maintenance ” . Operating conditions Check to see that t here are no obstacles that prevent the proper operation of the generator, in the vicinity of the machine. Confirm that the persons near the machine are notified of the generator being put into operation. Check that the associated equ ipment are ready f or operation. 5. Precautions during Test Run Observe the operating conditions by checking each data against that before the overhaul.",
     "char_len": 1051,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 20,
     "page_end": 21,
     "section_path": "0.5",
@@ -6077,6 +6135,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -6086,12 +6146,12 @@
     "uses_crane": false
   },
   {
-    "id": "2560dcaf-ad96-45b1-872f-41611ee601d5",
-    "chunk_id": "1호기 매뉴얼(en).pdf-21-23-rufnc",
+    "id": "96fdf15f-cd90-4d18-bfec-d36e6da591ff",
+    "chunk_id": "UNIT1-OM-EN-21-23-6ulsx",
     "text": "the operating conditions by checking each data against that before the overhaul. If the results are c o nsiderably different from the data, this should be g iven consideration and a suit able means should be provided. 6. Other Precautions When overhauling the generator, do not use silicone joint material and sealing material in its circulation blowing routes; these materials m a y cause exc e ssive wear in the slip ring brush. FOR BEARING REPLACEMENT VOITH FUJI Instruction Manual M9 50 - 5 J594 7 1 / 7 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 CONTENTS 1. Replacement of G uide B earing and A djustment of C learance 2. Fitting Run VOITH FUJI M9 50 - 5 J594 6 2 / 7 1. Replacement of Guide Bearing and Adjustment of Clearance A. Setting Method for Guide Bearing Gap After lowering the rotor, the bearing gap shall be adjusted by the cotter . (Refer Fig. 1) (1) The distance “ X ” between the shaft and the datum surface for centering of the bearing oil tank should be measured at the 4 positions divided equally around the circumference of the shaft.",
     "char_len": 1065,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 21,
     "page_end": 23,
     "section_path": "0.5",
@@ -6278,6 +6338,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -6287,12 +6349,12 @@
     "uses_crane": false
   },
   {
-    "id": "a48bd285-0902-4e84-97f1-081e02d6613e",
-    "chunk_id": "1호기 매뉴얼(en).pdf-23-23-1rmty",
+    "id": "486485d9-0c57-4efd-a297-98820bad0d62",
+    "chunk_id": "UNIT1-OM-EN-23-23-shily",
     "text": "asured at the 4 positions divided equally around the circumference of the shaft. It should be confirmed that the center of th e shaft is at the center of the datum surface before centering. The allowable value of deviation shall not exceed",
     "char_len": 239,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 23,
     "page_end": 23,
     "section_path": "0.5",
@@ -6477,6 +6539,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -6486,12 +6550,12 @@
     "uses_crane": false
   },
   {
-    "id": "7243b3e3-d5e0-4045-b8e4-8c7d8789a855",
-    "chunk_id": "1호기 매뉴얼(en).pdf-23-25-qs8ze",
+    "id": "5c41243e-e80d-4882-8c7e-ef303d15e1ba",
+    "chunk_id": "UNIT1-OM-EN-23-25-gta0m",
     "text": "atum surface before centering. The allowable value of deviation shall not exceed 0.03 mm. Should the alignment be beyond the allowable value, the respective parts shall be removed, and t h e location of the shaft a djusted by pushing the shaft with the jack. (2) With the cotter shall be inserted, the head of the cotter sh o uld be hit gently until the clearance between the bearing gap and Point - “ A ” is 0 mm. When doing this, it should be ensured that the location of the shaft has not be en m oved. (3) Head length of the cotter “ H ” shall be measured with depth gauge and recorded. (4) Nuts are provided for the screw part of the cotter. The cotter is raised by revol v ing the nut until the bearing gap is at the specified value (G mm) shown in instruc tion m anual. Raising d i stance (ho) is equal to 50 x G (mm). (5) Stopper shall be fixed to prevent the nut from rotating. VOITH FUJI M9 50 - 5 J594 6 3 / 7 VOITH FUJI M9 50 - 5 J594 6 4 / 7 B.",
     "char_len": 957,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 23,
     "page_end": 25,
     "section_path": "0.03",
@@ -6676,6 +6740,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -6685,12 +6751,12 @@
     "uses_crane": false
   },
   {
-    "id": "45ba2d92-2111-4656-a8a9-91cb282f17e2",
-    "chunk_id": "1호기 매뉴얼(en).pdf-25-25-d4hhd",
+    "id": "6744beae-bd60-48c0-9243-0e44b1db4c8a",
+    "chunk_id": "UNIT1-OM-EN-25-25-otjos",
     "text": "rotating. VOITH FUJI M9 50 - 5 J594 6 3 / 7 VOITH FUJI M9 50 - 5 J594 6 4 / 7 B. Re - adjusting Method of the Gap If re - adjustment of the bearing gap is necessary, the method is as follows . - Gap adju sting Value at radiu s: g (mm) - Raising or lowering distance of the cotter: h’ = 50 x g (mm) (1) Increasing the ga p (",
     "char_len": 323,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 25,
     "page_end": 25,
     "section_path": "0.03",
@@ -6875,6 +6941,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -6884,12 +6952,12 @@
     "uses_crane": false
   },
   {
-    "id": "a42e8ae1-c35c-4786-a53b-95ea37b0dbdf",
-    "chunk_id": "1호기 매뉴얼(en).pdf-25-25-kcjwc",
+    "id": "2d0cf77d-9e06-4728-9196-4dbe5a15e4d6",
+    "chunk_id": "UNIT1-OM-EN-25-25-hlm7j",
     "text": "g or lowering distance of the cotter: h’ = 50 x g (mm) (1) Increasing the ga p ( 1.1) R emove the stopper . ( 1.2) Raise the cotter with the nut unt i l head length of the cotter is (H1 + h’) mm and record. (",
     "char_len": 208,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 25,
     "page_end": 25,
     "section_path": "1.2",
@@ -7074,6 +7142,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -7083,12 +7153,12 @@
     "uses_crane": false
   },
   {
-    "id": "ffd64674-abe5-427c-889e-e9747c849c2f",
-    "chunk_id": "1호기 매뉴얼(en).pdf-25-25-i0ar6",
+    "id": "be1d1479-d4c6-4c4b-bffd-3f56ae132b43",
+    "chunk_id": "UNIT1-OM-EN-25-25-8dpuc",
     "text": "ter with the nut unt i l head length of the cotter is (H1 + h’) mm and record. ( 1.3) Replace the stopper . (2) Decreasing the ga p ( 2.1) Remove th e stopper. ( 2.2) Raise the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer. (",
     "char_len": 250,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 25,
     "page_end": 25,
     "section_path": "2.2",
@@ -7273,6 +7343,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -7282,12 +7354,12 @@
     "uses_crane": false
   },
   {
-    "id": "0f0f7b92-786b-4647-9960-698830c0b032",
-    "chunk_id": "1호기 매뉴얼(en).pdf-25-27-enflg",
+    "id": "0db9048b-abf9-49fb-814f-818fa5f72275",
+    "chunk_id": "UNIT1-OM-EN-25-27-dhbca",
     "text": "se the nut as shown Fig 2 and rap the cotter head gently with a rubber hummer. ( 2.3) Adjust the cotter with the nut until head length of the cotter is (H1 + h’) mm and record. ( 2.4) Replace the stopper. VOITH FUJI M9 50 - 5 J594 6 5 / 7 Fig 3 shows method of head length measurement o f the cotter with a depth gauge. VOITH FUJI M9 50 - 5 J594 6 6 / 7 2. Fitting Run (1) When the guide bearing or thrust beari ng is replaced with new one, put it in a fitting run until it is fitted. (2) Raise the water wheel generator rotor with a hydraulic jack (used also as a pneumatic brake) to its maximum permissible jack - up height and hold it there for 15 to 20 minutes to al low an oil film to be formed on the sliding surface of the thrust bearing. (3) Confirm that the hydraulic jack has been lowered down and start the fitting run. (4) Provide RPM ra ting brackets under racing condition as shown in (6) below. When the bearing t emperature gets the saturation level in the first RPM rating bracket, increase the RPM to the next bracket and check the bearing temperature again.",
     "char_len": 1076,
     "collection": "checklists",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 25,
     "page_end": 27,
     "section_path": "2.4",
@@ -7478,6 +7550,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -7487,12 +7561,12 @@
     "uses_crane": false
   },
   {
-    "id": "580c7f63-a9e8-4384-b75a-0d3cb0c2d7e8",
-    "chunk_id": "1호기 매뉴얼(en).pdf-27-30-fbrk9",
+    "id": "f1690f73-69bf-41a7-9fe5-36bbf4ff527f",
+    "chunk_id": "UNIT1-OM-EN-27-30-bqgbl",
     "text": "t, increase the RPM to the next bracket and check the bearing temperature again. Repeat the operation for the r emaining RPM rating brackets until the RPM reaches the rated value. (5) During the fitting run, carefully observe the bearing temperature. The normal temperature rise of bearing is shown in Fig. (A). If the temperature rises as shown in Fig. (B), stop the gene rator immediately and disassemble it to check it for the cause of such par abolic temperature rise. (6) RPM brackets for the fitting run. Approx. 50% of rated speed Approx. 70% of rated speed Approx. 85% of rated speed Approx. 100% (rated speed ) VOITH FUJI M9 50 - 5 J594 6 7 / 7 (7) Make sure to operate the valve correctly, during jack - up operation. (Refer to th e brake and jack instruction manual.) FOR MAINTENANCE OF THE BRUSH, BRUSH HOLDER AND SLIP RIN G VOITH FUJI Instruction Manual M 50 0 - 5 J 6474 1 / 15 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 Contents 1.",
     "char_len": 954,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 27,
     "page_end": 30,
     "section_path": "2.4",
@@ -7686,6 +7760,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -7695,12 +7771,12 @@
     "uses_crane": false
   },
   {
-    "id": "f523aa10-778d-47b8-bff5-5d40e962ed6d",
-    "chunk_id": "1호기 매뉴얼(en).pdf-30-31-9ziui",
+    "id": "d3ade1c9-0266-4570-b890-4eac35d9ab66",
+    "chunk_id": "UNIT1-OM-EN-30-31-ab79u",
     "text": "- 5 J 6474 1 / 15 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 Contents 1. General Inspection 2. Slipring Maintenance 3. Brush Maintenance 4. Brush Holder Maintenance 1. General Inspe c tion S liprings and brush parts should be kept clean and be given careful daily maintenance care. Inattention to maintenance may lead to abnormal brus h wear, slipring roughness, pig tail burnout, and other problems. Item Inspection period Points to be inspected Daily Weekly or monthly Yearly Brush ○ Degree of wear ◎ Sparks, sliding sound or vibration (time of occurrence and brush posit i on)* ◎ Amount of wear (replacement time and product mark)* ○ Smooth sliding in the holder (amount of graphite dust) VOITH FUJI M 50 0 - 5 J 6474 2 / 15 Item Inspection period Point s to be inspected Daily Weekly or monthly Yearly Brush ○ Dirt on the surface that contacts the slipring. Sliding contact condition. ○ Brush dam a ge ○ Looseness in electrical conducting parts ○ Abnormal pig tail condition (discoloration, ca ulking, degradation) Brush holder ○ C o ntamination on the brush holder and surrounding parts ○ Deterioration of the spring, irregularity in movement ◎ Brush pre ss ure* ○ Looseness of fixtures Sliprings ○ Surface condition (scratches, brush marks, rust) ○ Contamination on the inter - phase insulators ◎ Temperature rise* ○ Dust accumulation ◎ Slipring wear* ◎ Eccentricity* Load Condition ◎ Exciting current* ◎ Room temperature and humidity ○ Ambient conditions ○ Operating hour",
     "char_len": 1486,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 30,
     "page_end": 31,
     "section_path": "2.4",
@@ -7887,6 +7963,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -7896,12 +7974,12 @@
     "uses_crane": false
   },
   {
-    "id": "26c0abaa-1b07-4d1a-8a50-4db38b3e79b6",
-    "chunk_id": "1호기 매뉴얼(en).pdf-31-32-28j3j",
+    "id": "4cdf5c8b-840c-432d-8b27-a8e48666dca3",
+    "chunk_id": "UNIT1-OM-EN-31-32-iapme",
     "text": "g current* ◎ Room temperature and humidity ○ Ambient conditions ○ Operating hour VOITH FUJI M 50 0 - 5 J 6474 3 / 15 Maintenance Fault diagnosis for sliprings, brush holders and brushes ✓ ✓ ✓ ✓ ✓ ✓ Brush sparking. Fault ✓ ✓ ✓ Brushes make excessive noise , ch a tter o r broken leads. ✓ ✓ ✓ ✓ Brush leads discoloured. ✓ Individual brush leads discoloured. ✓ ✓ ✓ ✓ ✓ Excessive brush wear. *1) ✓ ✓ Excessive slipring wear. ✓ Burning spots on sliprings ; A true image of brush surface - in the s equence of brush spacing. ✓ ✓ ✓ ✓ Ditto, but ; In the leading edge of brush - irregularly distributed. ✓ ✓ ✓ Slipring with grooved and threaded surface. ✓ Flashover in slipring compartment. Insufficient ventilation. Cooling air heavily polluted with abra sive dust or sand . Deposits of carbon d ust. Low brush current density. (Below 3 to 5A/cm 2 ) Sustained overload. Excessive brush friction. Unsuitable brush grade. Holders excessively inclined ; clearance between holders and slip r ings.",
     "char_len": 986,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 31,
     "page_end": 32,
     "section_path": "2.4",
@@ -8086,6 +8164,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -8095,12 +8175,12 @@
     "uses_crane": false
   },
   {
-    "id": "c53c7481-835d-470e-9065-9f17d80fe404",
-    "chunk_id": "1호기 매뉴얼(en).pdf-32-32-sbb5n",
+    "id": "dce95fcc-300c-40ae-823a-7f292415370d",
+    "chunk_id": "UNIT1-OM-EN-32-32-uoq6t",
     "text": "grade. Holders excessively inclined ; clearance between holders and slip r ings. Brushes can not move fr eely in holders. Irregular brush pressure ; Heavy overload on individual brushes. Low brush pressure.(Below 130g/cm 2 ) Sliprings eccentric running, out of true, or loose. Rust, oil film on slipring Marking origination f rom moist during standstill by electro lytic action. P o ssible cause Improve ventilation ; check filter, clean or replace it. Clean sliprings and brushes. Fit a filter if possible. Clean creepage paths. Reduce brush quantities. Reduce to suitable load. Ch a n ge brush grade. Ch a nge brush grade aft er inquiry with supplier. Correct holders position. Clean brush holders. Check brush pressure ; replace (we a k) springs and/or holders, as necessary. Re - grinding sliprings. Check sliprings for tight fit. Clean sliprings and re - surface, if necessary. Prevent oil fumes . Lifting brushes off during longer lasting periods of standstill.",
     "char_len": 967,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 32,
     "page_end": 32,
     "section_path": "2.4",
@@ -8285,6 +8365,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -8294,12 +8376,12 @@
     "uses_crane": false
   },
   {
-    "id": "70386bb8-971c-4be3-8453-8533fe34cd4c",
-    "chunk_id": "1호기 매뉴얼(en).pdf-32-33-slpg0",
+    "id": "1cad98f7-6c26-40d8-bbb7-f8ea16a279c4",
+    "chunk_id": "UNIT1-OM-EN-32-33-1wig2",
     "text": "ent oil fumes . Lifting brushes off during longer lasting periods of standstill. Re - grinding sliprings. Remedy Note: *1) Silicon - based adhesives and sealants gene r ate a silicon gas that causes excessive brush wear. VOITH FUJI M 50 0 - 5 J 6474 4 / 15 2. Slipr ing M a intenance Item Points to be ins pected Maintenance / inspection method Cleaning of slipring s State of Cleanliness (1) Remove any oil, dust, or brush particles from the sliprings, brush, and brush holder. (2) Wipe the sliding surface of the sliprings with a clean cloth. Do not use an oily cloth. (3) If there is oil on the sliding surface, wipe it off with a cloth moistened in a volatile solvent (unleaded gasoline, benzine, alcohol, etc.), then wipe it with a dry cloth. (4) Clean the sliprings e s pecially carefully aft er bedding in a brush or resurfacing a slipring. Maintenance during long - term shutdown Surface of sliprings When the generator will be shut down for a long time, the brushes should be lifted, or a good thickness cardboard shall be inserted b e tween the bru shes and sliprings to prevent the slip rings from rusting.",
     "char_len": 1117,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 32,
     "page_end": 33,
     "section_path": "2.4",
@@ -8486,6 +8568,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -8495,12 +8579,12 @@
     "uses_crane": false
   },
   {
-    "id": "3523b316-2327-4979-bf17-4c9e3841a32f",
-    "chunk_id": "1호기 매뉴얼(en).pdf-33-34-26uhf",
+    "id": "059f2adc-9db4-48c1-a181-b3719b86fb09",
+    "chunk_id": "UNIT1-OM-EN-33-34-gz307",
     "text": "ted b e tween the bru shes and sliprings to prevent the slip rings from rusting. During sound operation, graphite - impregnated film will be formed on the slip r ings. If it has a uniform, unstreaked coloration, it must not be removed, because this film is essential for good sliding . Grinding of sliprings Eccentricity or other departure from circularity (1) If there are scratches, rough or uneven places, or spark burns on a slipring, lift the brush and grind the slipring with an abrasive block or emery paper (about No. 320) . (2) If you use emery paper, maintain a constant press ure while grinding the ring, and check that the emery paper is not scratching the ring. Also be c areful not to make “ waves ” (high and low places ) on the ring. VOITH FUJI M 50 0 - 5 J 6474 5 / 15 Item Points to be inspected Maintenance / inspection me thod Grinding of sliprings Eccentricit y or other departure from circularity (3) After grinding the ring, remove any oil or emery dust, polish the ring surface with a dry cloth to a bright gloss.",
     "char_len": 1037,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 33,
     "page_end": 34,
     "section_path": "2.4",
@@ -8688,6 +8772,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -8697,12 +8783,12 @@
     "uses_crane": false
   },
   {
-    "id": "f1a6cd0e-471f-4826-999c-7c841cbeb14e",
-    "chunk_id": "1호기 매뉴얼(en).pdf-34-35-gf7fb",
+    "id": "719c4a42-1c2d-45e5-adb2-056ddb360204",
+    "chunk_id": "UNIT1-OM-EN-34-35-64lya",
     "text": "y oil or emery dust, polish the ring surface with a dry cloth to a bright gloss. Skimming of sliprings Eccentricity or other departure from circ ularity (1) If a slipring departs badly fro m a circular shape due to eccentricity, waves, or surface roughness, it should be resurfaced with a cutting tool (skimmed). (a) The s k imming is best done by mounting the rotor on a lathe. If this is not possible, the skim ming should be done with the rotor moun ted firmly on a plan e support. (b) The cutting machine should permit both radial adjustment and axial feed of the cutting tool. M a ke sure that the part that holds the cutting tool is accuratel y aligned in parallel with th e rotor axis. VOITH FUJI M 50 0 - 5 J 6474 6 / 15 ( c ) An example of the c utting con d itions for skimming the slipring is shown below. When using a lathe Slipring material Cutting tool material Cutting speed (m/min.) Rough cutting F i nish cutting Feed rate (mm/rev.) Depth ( mm) Feed rate (mm/rev.) Depth (mm) Steel High - speed steel (grade 4) 20 ~ 30",
     "char_len": 1035,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 34,
     "page_end": 35,
     "section_path": "2.4",
@@ -8887,6 +8973,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -8896,12 +8984,12 @@
     "uses_crane": false
   },
   {
-    "id": "5a377aec-8d54-461e-8efc-53e030c1b53e",
-    "chunk_id": "1호기 매뉴얼(en).pdf-35-35-2sx9o",
+    "id": "6a4d288f-e009-42d0-a902-25f6337c7e22",
+    "chunk_id": "UNIT1-OM-EN-35-35-4f511",
     "text": "( mm) Feed rate (mm/rev.) Depth (mm) Steel High - speed steel (grade 4) 20 ~ 30 0.1 ~ 0.3 0.1 ~ 0.3 0.05 ~ 0.08 0.05 ~ 0.1 Ultrahard steel 80 ~ 150 0.05 ~ 0.2 When using a plan e support Steel High - speed steel (grade 4) Up to 30",
     "char_len": 230,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 35,
     "page_end": 35,
     "section_path": "0.2",
@@ -9086,6 +9174,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -9095,12 +9185,12 @@
     "uses_crane": false
   },
   {
-    "id": "6c6f3cb9-6923-4f0b-8cec-00f58b15075a",
-    "chunk_id": "1호기 매뉴얼(en).pdf-35-36-6ewx0",
+    "id": "08d738d9-1682-439d-86a9-7ee676a12ee7",
+    "chunk_id": "UNIT1-OM-EN-35-36-zi930",
     "text": "05 ~ 0.2 When using a plan e support Steel High - speed steel (grade 4) Up to 30 0.1 ~ 0.2 0.1 ~ 0.15 0 .05 ~ 0.08 0.05 Ultrahard steel Above 30 0.05 ~ 0.1 VOITH FUJI M 50 0 - 5 J 6474 7 / 15 Item Points to be inspected Maintenance / inspection method Skimming slipring (d) Chamfer the edges of the spiral grooves after skimming. (e) Smooth the final machined surface with emery paper to r educe any irregularities to 6  m or le ss ( 6S). (2) The eccentricity of the slipring should be",
     "char_len": 486,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 35,
     "page_end": 36,
     "section_path": "0.1",
@@ -9287,6 +9377,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -9296,12 +9388,12 @@
     "uses_crane": false
   },
   {
-    "id": "4969f31f-4c38-4172-9671-7d2847da80f6",
-    "chunk_id": "1호기 매뉴얼(en).pdf-36-37-wo8x9",
+    "id": "c82b8e56-27b9-4f2d-b7d6-8e4b119c657f",
+    "chunk_id": "UNIT1-OM-EN-36-37-dnpei",
     "text": "larities to 6  m or le ss ( 6S). (2) The eccentricity of the slipring should be 0.05mm or less. This tolerance refers to the deviation of the center, that is, half of the instrument reading of the deviation. Slipring roughness Slipring surfaces Brush mark s on the sli pring surface are a common occurrence. They m a y equally spaced at the same interval as the brushes, or they may be irregularly spaced and extending in the sliding direction. These m a rks prevent good electrical contact between the brushes and sl iprings and can cause sparks. (1) Brush marks spaced at the same interval as the brushe s occur mainly when the generator is stopped, and are probably the result of high humidity or severe changes in the ambient tem p erature. For this rea s on, it is advisable to lift the bru shes when the generator is stopped for a long time. VOITH FUJI M 50 0 - 5 J 6474 8 / 15 Item Points to be inspected Maintenance / inspection method If the marks are particularly bad, they should be completely removed with an abrasive block or emery paper.",
     "char_len": 1052,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 36,
     "page_end": 37,
     "section_path": "0.05",
@@ -9488,6 +9580,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -9497,12 +9591,12 @@
     "uses_crane": false
   },
   {
-    "id": "b1363aa5-4ec3-446c-bfb5-c0d76d8e5d24",
-    "chunk_id": "1호기 매뉴얼(en).pdf-37-38-vkqz4",
+    "id": "25b8be3d-182a-44dd-a039-2fe4f3440146",
+    "chunk_id": "UNIT1-OM-EN-37-38-pvz6o",
     "text": "ly bad, they should be completely removed with an abrasive block or emery paper. (2) When the marks ap pear in rows that extend in the sliding direction, the cause may be contamination of the sliding surface by dust or gas, worn - out brushes, inadequate brush pressure, uneven brush pressure, sticking due to abrasion particles in the brush holders, eccentrici ty or roughn ess of the sliprings, a bad contact due to a brush defect, etc. I nvestigate these possible causes and study the problem. Since th e se marks can cause sparks or unbalanced current flow, they should be removed with emery paper or an abras i ve block . Ch a nge of slipring polarity VOITH FUJI M 50 0 - 5 J 6474 9 / 15 Item Points to be inspected Maintenance / inspection method Slipring surface damage in a synchronous generator tends to occur on one of the two rings. This is especially true when the machine is u sed in an en vironment with high humidity or extreme temperature c hanges, or when there is oil on the rings.",
     "char_len": 999,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 37,
     "page_end": 38,
     "section_path": "0.05",
@@ -9689,6 +9783,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -9698,12 +9794,12 @@
     "uses_crane": false
   },
   {
-    "id": "5587282f-b757-4d35-ae06-809862ffce82",
-    "chunk_id": "1호기 매뉴얼(en).pdf-38-38-u4ju7",
+    "id": "dcde3588-e04e-4180-8ed2-e04230b43c54",
+    "chunk_id": "UNIT1-OM-EN-38-38-fw99d",
     "text": "igh humidity or extreme temperature c hanges, or when there is oil on the rings. To reduce surface damage, the polarity should be switched about once a year to equalize wear on the rings. When the problem is particularly bad, the polarity sh ould be switched before heavy damage occurs. To switch the polarity of the sliprings, switch the connection tabs that connect the brush holder supports to the leads as shown in the drawing above. 3. Brush M a intenance Item Points to be inspected Maintenance / inspection method Replacement of brushes Degree of wear The brushes tend not to wear evenly, and the wear depends on the polarit y , so be careful not to let the brushe s wear out. Worn - out brushes can lead to sparks due to inadequate brush pr essure, inad equate pig tail length, or excessive play of the brushes in the brush holders. (1) The brushes have a wear allowance of 25mm. They are painted in two colors, with the arm end colored red and white.",
     "char_len": 959,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 38,
     "page_end": 38,
     "section_path": "0.05",
@@ -9890,6 +9986,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -9899,12 +9997,12 @@
     "uses_crane": false
   },
   {
-    "id": "1de5fe85-cfd6-4cd1-860d-35365d9236e8",
-    "chunk_id": "1호기 매뉴얼(en).pdf-38-39-03nma",
+    "id": "d867432f-a9be-4919-ab41-d1d3cef53946",
+    "chunk_id": "UNIT1-OM-EN-38-39-j4ywg",
     "text": "of 25mm. They are painted in two colors, with the arm end colored red and white. When the white part is completely inside the brush holder box, it is time to replace the brush. VOITH FUJI M 50 0 - 5 J 6474 10 / 15 Item Points to be inspected Maintenance / inspection method (2) Replace the worn - out brush with a brush that has already been bedded in. (3) If a brush has been used so long that it has become impregnated with oil, or the pig tail mounting fixture is loose, replace the brush. Brush f i tting Contact condition (1) A new brush has a flat sliding surface, which must be bedded in to fit the curved surface of the slipring. (See Fig. 1) (a) To bed in the brush, fi r st insert a shee t of rough e mery paper (approximately No. 120) between the brush and the slipring, hold it against the slipring surface, and draw it back and forth (to the left and right) across the brush until the brush co n forms to the curved slipring surface . Do not let the edges o f the brush become rounded.",
     "char_len": 998,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 38,
     "page_end": 39,
     "section_path": "0.05",
@@ -10091,6 +10189,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -10100,12 +10200,12 @@
     "uses_crane": false
   },
   {
-    "id": "45ba6081-7db8-4e8c-8b76-3071bcba9485",
-    "chunk_id": "1호기 매뉴얼(en).pdf-39-40-9zsyg",
+    "id": "a57f78d6-6583-4506-b855-dcde4434a395",
+    "chunk_id": "UNIT1-OM-EN-39-40-ze9g9",
     "text": "the curved slipring surface . Do not let the edges o f the brush become rounded. (b) Next switch to a finer grade of emery paper (No. 220 or No. 320) and repeat the process to make the brush conform accurately to the slipring su r face. (2) After bedding in a brush, clean the brush, brush holder, slipring, and insulat or surfaces to remove all brush dust and emery dust. (3) Check that the brush moves smoothly inside the brush holder. (4) Take advantage of times when the generator is stopped to bed in a supply of spare brushes to use for emergency replacements while the generato r is r u nning. VOITH FUJI M 50 0 - 5 J 6474 11 / 15 Item Points to be inspected Maintenance / inspection method (5) When replacing brushe s while the generator is running, replace the brushes one at a time, taking ample time and care to prevent short - ci r cuit accidents. (6) The sliprin gs are space d wide apart to allow room to work, but you should still wear sho es with rubber soles and rubber gloves, and t r y to avoid exposing your arms or other parts of your body.",
     "char_len": 1061,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 39,
     "page_end": 40,
     "section_path": "0.05",
@@ -10294,6 +10394,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -10303,12 +10405,12 @@
     "uses_crane": false
   },
   {
-    "id": "c3a1898d-c130-4370-a65e-7be353fa47dc",
-    "chunk_id": "1호기 매뉴얼(en).pdf-40-41-jjj8y",
+    "id": "5506290d-5f3e-4015-b2b4-e4791727aa35",
+    "chunk_id": "UNIT1-OM-EN-40-41-zp8dq",
     "text": "ubber gloves, and t r y to avoid exposing your arms or other parts of your body. (7) The following diagrams outline the procedure for bedding in a brush. VOITH FUJI M 50 0 - 5 J 6474 12 / 15 Item Points to be inspected Maintenance / inspection method Bedding - in run Brush sliding sound and sparks (1) When 1/3 or more of the brushes are replaced, after a through cleaning, a bedding - in run should be made. First run the gene rator for one or two hours with no load, then run it with a light load. Switch to a full load when at least 80% of the sliding surface of the brushes is making contact. (2) If a bedding - in run cannot be carried ou t , take extra care when bedding in the brushes with eme r y paper. (3) After resurfacing a slipring, either by grinding or with a cutting tool, carry out a bedding - in run for as long as p o ssible to let a carbon film form on the slipring surface. (4) Pay particular attention to the brush sliding sound , sparks, an d vibration after replacing brushes.",
     "char_len": 1001,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 40,
     "page_end": 41,
     "section_path": "0.05",
@@ -10498,6 +10600,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -10507,12 +10611,12 @@
     "uses_crane": false
   },
   {
-    "id": "e6e54b46-6fe2-4020-bd4e-23c3e40a1b28",
-    "chunk_id": "1호기 매뉴얼(en).pdf-41-42-6zefl",
+    "id": "a37b8ebf-27b9-46f3-a6fc-d220de0e35e3",
+    "chunk_id": "UNIT1-OM-EN-41-42-hiv4o",
     "text": "ion to the brush sliding sound , sparks, an d vibration after replacing brushes. Improper bedding in can cause various unfavorable co nditions during operation after brush replacement. Degree of brush wear When electrographite carbon brushes are used that have a good current distributio n and film f ormation characteristics, they should wear an average of 3 - 12 mm per 1000 hours. VOITH FUJI M 50 0 - 5 J 6474 13 / 15 Item Points to be inspected Maintenance / inspection method Grades of brushes and intermixing (1) Never use different grades of brushes together. (2) D i ffe rences in the phys ical characteristics and sliding characteristics of brushes can lead to accidents. For this reason, even when the brushes are of the same grade, try to avo i d using new brushes together with brushes that have been in se r vice for a long tim e. Consult the manufacturer before replacing brushes with spare brushes of a different grade, and be sure to remove all brushes and replace them all with the new type.",
     "char_len": 1008,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 41,
     "page_end": 42,
     "section_path": "0.05",
@@ -10700,6 +10804,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -10709,12 +10815,12 @@
     "uses_crane": false
   },
   {
-    "id": "69085aba-bd6e-4d7c-8411-429a74fd2446",
-    "chunk_id": "1호기 매뉴얼(en).pdf-42-43-xasvf",
+    "id": "ab4f8e1e-253b-4da6-9d06-2917a360960f",
+    "chunk_id": "UNIT1-OM-EN-42-43-nqt17",
     "text": "grade, and be sure to remove all brushes and replace them all with the new type. Pressure a djustment The mechanism is constructed so that brush pressure adjustment is not required. Initial brush dimensions The carbon film on the surface of the sliprings stabilizes wear on the brushes. To see how brush wear depends on running time, the initial height of the brush after the completion of the bedding - in run should be mea sured and recorded. 4. Brush Holder Maintenance Item Points to be inspected Maintenance / inspection method Cleaning State of cleanliness Use a dry compressed air jet or vacuum cleaner to remove dust and dirt from around the brush holders. For stubbor n dir t, use a clean cloth or a nonmetallic brush. Remove any oil, etc. with a cloth soaked in benzine. Take out the brush before cleaning the brush holder. VOITH FUJI M 50 0 - 5 J 6474 14 / 15 Item Points to be inspected Maintenance / inspection method Replacement of brush holders Position of br ush holders (1) When installing a new brush holder, check th a t there is a gap of approximately 2 mm between the bottom of the brush holder and the surface of the sl i pring.",
     "char_len": 1150,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 42,
     "page_end": 43,
     "section_path": "0.05",
@@ -10901,6 +11007,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -10910,12 +11018,12 @@
     "uses_crane": false
   },
   {
-    "id": "bf380194-2859-40f8-8aa1-7a0b14f511cd",
-    "chunk_id": "1호기 매뉴얼(en).pdf-43-51-0mv3n",
+    "id": "980557eb-cd15-4c22-9b6a-73c66b554193",
+    "chunk_id": "UNIT1-OM-EN-43-51-3dmfq",
     "text": "y 2 mm between the bottom of the brush holder and the surface of the sl i pring. (2) Install the brush holder at the correct angle to the slipring surface, and make sure th a t the brush holders a n d slipring s are centered on the same point in the axi a l direction. 5. Ordering Spare Part s When ordering spare brush holders and brushes, specify the following details, and attach used specimens if possible. 1) Information on the nameplat e of the generator (especially the model and serial number) 2) Quantit y required 3) Brush grade and d imensions (thickness x width x length) VOITH FUJI M 50 0 - 5 J 6474 15 / 15 FOR AIR COOLER VOITH FUJI Instruction Manual M9 50 - 5 J 5948 1 / 17 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 AIR COOLER VOITH FUJI M9 50 - 5 J 5948 2 / 17 VOITH FUJI M9 50 - 5 J 5948 3 / 17 VOITH FUJI M9 50 - 5 J 5948 4 / 17 VOITH FUJI M9 50 - 5 J 5948 5 / 17 VOITH FUJI M9 50 - 5 J 5948 6 / 17 VOITH FUJI M9 50 - 5 J 5948 7 / 17",
     "char_len": 961,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 43,
     "page_end": 51,
     "section_path": "0.05",
@@ -11102,6 +11210,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -11111,12 +11221,12 @@
     "uses_crane": false
   },
   {
-    "id": "5f202950-e697-4b05-8c20-49adbc6759aa",
-    "chunk_id": "1호기 매뉴얼(en).pdf-51-73-ve723",
+    "id": "5bef5e57-7863-4fd4-89f6-70eed8a585f2",
+    "chunk_id": "UNIT1-OM-EN-51-73-92gfa",
     "text": "948 5 / 17 VOITH FUJI M9 50 - 5 J 5948 6 / 17 VOITH FUJI M9 50 - 5 J 5948 7 / 17 VOITH FUJI M9 50 - 5 J 5948 8 / 17 VOITH FUJI M9 50 - 5 J 5948 9 / 17 VOITH FUJI M9 50 - 5 J 5948 10 / 17 VOITH FUJI M9 50 - 5 J 5948 11 / 17 VOITH FUJI M9 50 - 5 J 5948 12 / 17 VOITH FUJI M9 50 - 5 J 5948 13 / 17 VOITH FUJI M9 50 - 5 J 5948 14 / 17 VOITH FUJI M9 50 - 5 J 5948 15 / 17 VOITH FUJI M9 50 - 5 J 5948 16 / 17 VOITH FUJI M9 50 - 5 J 5948 17 / 17 FOR OIL COOLER VOITH FUJI Instruction Manual M9 50 - 5 J 5949 1 / 13 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 OIL COOLER VOITH FUJI M9 50 - 5 J 5949 2 / 13 VOITH FUJI M9 50 - 5 J 5949 3 / 13 VOITH FUJI M9 50 - 5 J 5949 4 / 13 VOITH FUJI M9 50 - 5 J 5949 5 / 13 VOITH FUJI M9 50 - 5 J 5949 6 / 13 VOITH FUJI M9 50 - 5 J 5949 7 / 13 VOITH FUJI M9 50 - 5 J 5949 8 / 13 VOITH FUJI M9 50 - 5 J 5949 9 / 13 VOITH FUJI M9 50 - 5 J 5949 10 / 13 VOITH FUJI M9 50 - 5 J 5949 11 / 13 VOITH FUJI M9 50 - 5 J 5949 12 / 13",
     "char_len": 957,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 51,
     "page_end": 73,
     "section_path": "0.05",
@@ -11303,6 +11413,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
@@ -11312,12 +11424,12 @@
     "uses_crane": false
   },
   {
-    "id": "0b442400-7492-4fb6-b1fa-2d8f035b9e41",
-    "chunk_id": "1호기 매뉴얼(en).pdf-73-86-n2qt4",
+    "id": "a415ae9f-1204-4ae4-b5e0-e25b20d35117",
+    "chunk_id": "UNIT1-OM-EN-73-86-1uk2d",
     "text": "10 / 13 VOITH FUJI M9 50 - 5 J 5949 11 / 13 VOITH FUJI M9 50 - 5 J 5949 12 / 13 VOITH FUJI M9 50 - 5 J 5949 13 / 13 FOR BRAKE AND JACK VOITH FUJI Instruction Manual M 78 0 - 5 J 59 50 1 / 4 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 VOITH FUJI M 780 - 5 J 59 50 2 / 4 VOITH FUJI M 780 - 5 J 59 50 3 / 4 VOITH FUJI M 780 - 5 J 59 50 4 / 4 FOR M ETHOD OF BRAKE AND JACK V ALVE OPERATION VOITH FUJI Inst ruction Manual M 78 0 - 5 J 59 5 1 1 / 3 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 C ontents 1 . GENERAL 2 . JACK O PERATION 3 . BRAKING OPERATION 4 . PIPING OPERATION VOITH FUJI M 780 - 5 J 59 5 1 2 / 3 VOITH FUJI M 780 - 5 J 59 5 1 3 / 3 FOR H AND OPERAT ING JACK U P PUMP VOITH FUJI I nst ruction Manual M 78 0 - 5 J 59 5 2 1 / 5 Drawn Murakami Approve Shiraki Date 2022 - 12 - 26 VOITH FUJI M 780 - 5 J 59 5 2 2 / 5 VOITH FUJI M 780 - 5 J 59 5 2 3 / 5 VOITH FUJI M 780 - 5 J 59 5 2 4 / 5 VOITH FUJI M 780 - 5 J 59 5 2 5 / 5",
     "char_len": 945,
     "collection": "specs",
-    "doc_id": "1호기 매뉴얼(en).pdf",
+    "doc_id": "UNIT1-OM-EN",
     "page_start": 73,
     "page_end": 86,
     "section_path": "0.05",
@@ -11504,6 +11616,8 @@
       ]
     },
     "source_anchor": "",
+    "doc_version": "revA",
+    "doc_date": "2023-11-01",
     "family": "1수력 1호기",
     "equipment": [
       "수차발전기"
