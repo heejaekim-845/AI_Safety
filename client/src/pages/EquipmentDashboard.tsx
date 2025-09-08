@@ -725,13 +725,32 @@ export default function EquipmentDashboard() {
                               target.style.display = 'none';
                               const parent = target.parentElement;
                               if (parent) {
-                                parent.innerHTML = `
-                                  <div class="text-center py-8 text-gray-500">
-                                    <MapPin class="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                                    <p>이미지를 불러올 수 없습니다</p>
-                                    <p class="text-xs mt-1">${facility.imageUrl}</p>
-                                  </div>
-                                `;
+                                // Clear existing content safely
+                                parent.innerHTML = '';
+                                
+                                // Create error message container
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'text-center py-8 text-gray-500';
+                                
+                                // Create and add icon placeholder (note: actual icon needs React component)
+                                const iconDiv = document.createElement('div');
+                                iconDiv.className = 'mx-auto h-12 w-12 text-gray-300 mb-2';
+                                iconDiv.textContent = '📍'; // Simple emoji fallback for MapPin icon
+                                
+                                // Create error message
+                                const errorMsg = document.createElement('p');
+                                errorMsg.textContent = '이미지를 불러올 수 없습니다';
+                                
+                                // Create URL display (safely using textContent)
+                                const urlMsg = document.createElement('p');
+                                urlMsg.className = 'text-xs mt-1';
+                                urlMsg.textContent = facility.imageUrl || '';
+                                
+                                // Append all elements
+                                errorDiv.appendChild(iconDiv);
+                                errorDiv.appendChild(errorMsg);
+                                errorDiv.appendChild(urlMsg);
+                                parent.appendChild(errorDiv);
                               }
                             }}
                           />
