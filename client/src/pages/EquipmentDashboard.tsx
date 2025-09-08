@@ -726,7 +726,7 @@ export default function EquipmentDashboard() {
                               const parent = target.parentElement;
                               if (parent) {
                                 // Clear existing content safely
-                                parent.innerHTML = '';
+                                parent.replaceChildren();
                                 
                                 // Create error message container
                                 const errorDiv = document.createElement('div');
