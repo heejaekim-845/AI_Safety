@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { sql } from "drizzle-orm";
 import { 
   equipment, 
   workTypes, 
@@ -13,7 +14,7 @@ export async function initializeDatabase() {
     console.log("Testing database connection...");
     
     // Test basic connection
-    const result = await db.execute(`SELECT 1 as test`);
+    const result = await db.execute(sql`SELECT 1 as test`);
     console.log("Database connection successful:", result);
 
     // Create sample equipment data
